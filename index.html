@@ -83,7 +83,7 @@ function docConv(){
  <span class="art">Article 2 : Effectif formé</span>
  <div class="row"><b>${tr.length} stagiaire${tr.length>1?"s":""}</b><span>${tr.map(esc).join("<br>")||"—"}</span></div>
  <span class="art">Article 3 : Dispositions financières</span>
- <table><tr><th>Coût pédagogique HT par jour</th><td class="r">${eur(D.pj)} €</td></tr><tr><th>Nombre de jours</th><td class="r">${eur(nbj)}</td></tr><tr><th>Total HT</th><td class="r">${eur(tot)} €</td></tr><tr><th>TVA 20 %</th><td class="r">${eur(tva)} €</td></tr><tr><th>Total TTC</th><td class="r"><b>${eur(tot+tva)} €</b></td></tr></table>
+ <table><tr><th>Coût pédagogique HT par jour</th><td class="r">${eur(D.pj)} €</td></tr><tr><th>Nombre de jours</th><td class="r">${String(nbj).replace(".",",")}</td></tr><tr><th>Total HT</th><td class="r">${eur(tot)} €</td></tr><tr><th>TVA 20 %</th><td class="r">${eur(tva)} €</td></tr><tr><th>Total TTC</th><td class="r"><b>${eur(tot+tva)} €</b></td></tr></table>
  <p class="mu">Fait en double exemplaire à Moirans, le ${esc(fd(D.dc))}.</p>`;
 }
 function docPlan(){
@@ -95,7 +95,7 @@ function docPlan(){
  <div class="row"><b>Intervenant</b><span>${esc(D.iv||"—")}</span></div>
  <div class="row"><b>Stagiaires</b><span>${tr.map(esc).join("<br>")||"—"}</span></div>
  <span class="art">Dates d’intervention</span>
- ${ds.map(d=>`<div class="dt"><b>${esc(fdl(d))}</b><br><span class="mu">9h00 – 12h30 · 14h00 – 17h30</span></div>`).join("")||"<p>Dates à préciser.</p>"}
+ ${ds.map(d=>`<div class="dt"><b>${esc(fdl(d))}</b><br><span class="mu">${({m:"½ journée : 9h00 – 12h30",a:"½ journée : 14h00 – 17h30"})[(D.hf||{})[d]]||"9h00 – 12h30 · 14h00 – 17h30"}</span></div>`).join("")||"<p>Dates à préciser.</p>"}
  <p class="mu">Ce document vaut convocation aux participants concernés.</p>`;
 }
 function head(){return `<h1>${plan?"Validation de la planification":"Signature de la convention"}</h1><div class="mu">${esc(org)}${tel?" · "+esc(tel):""}${mail?" · "+esc(mail):""}</div>`}
