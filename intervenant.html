@@ -31,6 +31,18 @@ ul{margin:4px 0 0 18px;padding:0}
 .ft{margin-top:22px;text-align:center;font-size:13px;color:var(--mu)}
 .hd{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .hd img{height:54px}
+.pbz{margin-top:14px;border-top:1px dashed var(--br);padding-top:12px}
+.pbb{width:100%;min-height:56px;justify-content:center;background:#dc2626!important;border-color:#dc2626!important;color:#fff!important;font-size:18px!important;font-weight:800!important;border-radius:12px!important}
+.pbb:hover{background:#b91c1c!important}
+.pbf{margin-top:10px;background:#fef2f2;border:2px solid #dc2626;border-radius:12px;padding:12px}
+@media (prefers-color-scheme:dark){.pbf{background:#3a1416}}
+.pbf label{display:block;font-weight:700;margin-bottom:6px;color:#991b1b}
+@media (prefers-color-scheme:dark){.pbf label{color:#fca5a5}}
+.pbf textarea{width:100%;font:inherit;font-size:16px;padding:10px;border:1px solid #fca5a5;border-radius:8px;background:var(--card);color:var(--tx);resize:vertical}
+.btn.dg{background:#dc2626;border-color:#dc2626;color:#fff}
+.hide{display:none!important}
+.pbok{margin-top:8px;padding:8px 12px;border-radius:8px;background:#e7f6ec;color:var(--ok);font-weight:600;font-size:14px}
+.pberr{color:#b42318;font-weight:600;font-size:14px;margin-top:6px}
 @media print{body{background:#fff;color:#000}.btns{display:none}.card{break-inside:avoid}}
 </style>
 </head>
@@ -43,6 +55,8 @@ const $=s=>document.querySelector(s),app=$("#app");
 const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const fdl=d=>{const x=new Date(d+"T12:00:00");return isNaN(x)?d:x.toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long",year:"numeric"})};
 const fds=d=>{const x=new Date(d+"T12:00:00");return isNaN(x)?d:x.toLocaleDateString("fr-FR",{day:"2-digit",month:"2-digit",year:"numeric"})};
+const b64u=o=>btoa(unescape(encodeURIComponent(JSON.stringify(o)))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
+const PBK=n=>"fppb:"+n;const pbHist=n=>{try{return JSON.parse(localStorage.getItem(PBK(n))||"[]")}catch(e){return[]}};
 function unb64u(t){t=String(t).replace(/-/g,"+").replace(/_/g,"/");while(t.length%4)t+="=";return t}
 async function load(h){
  if(h.startsWith("z.")){const bin=atob(unb64u(h.slice(2))),u=Uint8Array.from(bin,c=>c.charCodeAt(0)),ds=new DecompressionStream("deflate-raw"),w=ds.writable.getWriter();w.write(u);w.close();return JSON.parse(await new Response(ds.readable).text())}
@@ -57,7 +71,7 @@ function ics(f,D){
  (f.ds||[]).forEach(d=>{const dd=d.replace(/-/g,""),t=slot(f,d);o.push("BEGIN:VEVENT","UID:"+f.n+"-"+dd+"@topas-iv","DTSTAMP:"+now,"DTSTART;TZID=Europe/Paris:"+dd+"T"+t[0].replace(":","")+"00","DTEND;TZID=Europe/Paris:"+dd+"T"+t[1].replace(":","")+"00","SUMMARY:"+z(f.t+" – "+f.c),"LOCATION:"+z(f.a||f.c),"DESCRIPTION:"+z("N° "+f.n+"\nClient : "+f.c+"\nStagiaires : "+(f.tr||[]).map(x=>x[0]).join(", ")),"END:VEVENT")});
  o.push("END:VCALENDAR");return o.join("\r\n");
 }
-function card(f,past){
+function card(f,past,ix){
  const ds=(f.ds||[]).slice().sort(),T=today(),ct=f.ct||[];
  const tr=(f.tr||[]);
  return `<div class="card"><div>${past?`<span class="tag">Terminée</span>`:`<span class="tag go">Planifiée</span>`}<span class="tag">N° ${esc(f.n)}</span></div>
@@ -69,7 +83,11 @@ function card(f,past){
  <div class="row"><b>Stagiaires (${tr.length})</b><div>${tr.map(x=>esc(x[0])+(x[1]?` <span class="mu">– ${esc(x[1])}</span>`:"")).join("<br>")||"—"}</div></div>
  ${f.ob?`<div class="row"><b>Objectif</b><div>${esc(f.ob)}</div></div>`:""}
  ${(f.pg||[]).length?`<details><summary>Programme (${f.pg.length} module${f.pg.length>1?"s":""})</summary><ul>${f.pg.map(m=>`<li>${esc(m)}</li>`).join("")}</ul></details>`:""}
- <div class="btns"><button type="button" class="btn p" data-ics="${esc(f.n)}">📅 Ajouter à mon agenda</button></div></div>`;
+ <div class="btns"><button type="button" class="btn p" data-ics="${esc(f.n)}">📅 Ajouter à mon agenda</button></div>
+ <div class="pbz"><button type="button" class="btn pbb" data-pbo="${ix}" aria-expanded="false" aria-controls="pbf${ix}">⚠ Signalez un problème</button>
+ <div class="pbf hide" id="pbf${ix}"><label for="pbt${ix}">Décrivez le problème (retard, stagiaire absent, matériel, accès aux locaux…)</label><textarea id="pbt${ix}" rows="4"></textarea>
+ <div class="btns"><button type="button" class="btn dg" data-pbs="${ix}">Envoyer à TOPAS informatique</button><button type="button" class="btn" data-pbc="${ix}">Annuler</button></div><div class="pberr" id="pbe${ix}" role="alert"></div></div>
+ <div id="pbh${ix}">${pbHist(f.n).map(x=>`<div class="pbok">✔ Problème envoyé le ${esc(x.tsl)} : « ${esc(x.msg.length>90?x.msg.slice(0,87)+"…":x.msg)} »</div>`).join("")}</div></div></div>`;
 }
 async function main(){
  let D=null;try{D=await load(location.hash.replace(/^#/,""))}catch(e){D=null}
@@ -80,9 +98,19 @@ async function main(){
  document.title="Espace intervenant – "+(D.i||"");
  app.innerHTML=`<div class="hd"><img src="logo.jpg" alt="TOPAS informatique"><div><h1>Espace intervenant</h1><div class="mu">${esc(D.i||"")}</div></div></div>
  <p class="mu">Vos formations à venir, avec les dates, le lieu, les stagiaires et le programme. Ce lien est personnel : ne le partagez pas. Mis à jour le ${esc(fds(D.u||T))} — un nouveau lien vous est envoyé à chaque changement de planning.</p>
- <h2 style="margin-top:18px">À venir (${up.length})</h2>${up.map(f=>card(f,false)).join("")||'<div class="card mu">Aucune formation planifiée pour le moment.</div>'}
- ${pa.length?`<details><summary>Formations terminées (${pa.length})</summary>${pa.map(f=>card(f,true)).join("")}</details>`:""}
+ <h2 style="margin-top:18px">À venir (${up.length})</h2>${up.map(f=>card(f,false,D.f.indexOf(f))).join("")||'<div class="card mu">Aucune formation planifiée pour le moment.</div>'}
+ ${pa.length?`<details><summary>Formations terminées (${pa.length})</summary>${pa.map(f=>card(f,true,D.f.indexOf(f))).join("")}</details>`:""}
  <div class="ft">${esc(G[0]||"")}${G[1]?" · ☎ "+esc(G[1]):""}${G[2]?" · ✉ <a href=\"mailto:"+esc(G[2])+"\">"+esc(G[2])+"</a>":""}${G[3]?" · "+esc(G[3]):""}</div>`;
+ document.querySelectorAll("[data-pbo]").forEach(b=>b.onclick=()=>{const i=b.dataset.pbo,fm=document.getElementById("pbf"+i);fm.classList.toggle("hide");b.setAttribute("aria-expanded",fm.classList.contains("hide")?"false":"true");if(!fm.classList.contains("hide"))document.getElementById("pbt"+i).focus()});
+ document.querySelectorAll("[data-pbc]").forEach(b=>b.onclick=()=>{const i=b.dataset.pbc;document.getElementById("pbf"+i).classList.add("hide");document.querySelector('[data-pbo="'+i+'"]').setAttribute("aria-expanded","false")});
+ document.querySelectorAll("[data-pbs]").forEach(b=>b.onclick=async()=>{const i=+b.dataset.pbs,f=D.f[i],ta=document.getElementById("pbt"+i),er=document.getElementById("pbe"+i),msg=ta.value.trim();er.textContent="";if(msg.length<3){er.textContent="Merci de décrire le problème en quelques mots.";ta.focus();return}
+  b.disabled=true;b.textContent="Envoi en cours…";const now=new Date(),p2=n=>String(n).padStart(2,"0"),dl=now.getFullYear()+"-"+p2(now.getMonth()+1)+"-"+p2(now.getDate()),hl=p2(now.getHours())+":"+p2(now.getMinutes()),tsl=fds(dl)+" à "+hl;
+  const pl={t:"fp-pb",id:now.getTime().toString(36)+Math.random().toString(36).slice(2,6),n:f.n,iv:D.i||"",em:D.e||"",msg:msg.slice(0,2000),dl,hl},code="FPPB:"+b64u(pl),S2=[];
+  if(D.t)S2.push(fetch("https://ntfy.sh/"+encodeURIComponent(D.t),{method:"POST",body:JSON.stringify(pl)}).then(r=>{if(!r.ok)throw 0;return 1}));
+  if(D.m)S2.push(fetch("https://formsubmit.co/ajax/"+encodeURIComponent(D.m),{method:"POST",headers:{Accept:"application/json"},body:new URLSearchParams({_subject:"⚠ Problème signalé – "+f.n+" – "+(D.i||""),_captcha:"false",_template:"table",Formation:f.t+" ("+f.n+")",Formateur:D.i||"",Date:tsl,Probleme:msg,Code:code})}).then(r=>{if(!r.ok)throw 0;return 1}));
+  const R2=await Promise.allSettled(S2),ok=R2.some(r=>r.status==="fulfilled");b.disabled=false;b.textContent="Envoyer à TOPAS informatique";
+  if(ok){const H=pbHist(f.n);H.push({msg,tsl});try{localStorage.setItem(PBK(f.n),JSON.stringify(H))}catch(e){}document.getElementById("pbh"+i).insertAdjacentHTML("beforeend",`<div class="pbok">✔ Problème envoyé le ${esc(tsl)} : TOPAS informatique est prévenu.</div>`);ta.value="";document.getElementById("pbf"+i).classList.add("hide")}
+  else{er.innerHTML='L’envoi automatique n’a pas fonctionné. <a href="mailto:'+esc(D.m||"")+"?subject="+encodeURIComponent("⚠ Problème signalé – "+f.n)+"&body="+encodeURIComponent(msg+"\n\n"+code)+'">Envoyer par e-mail</a>'}});
  document.querySelectorAll("[data-ics]").forEach(b=>b.onclick=()=>{const f=D.f.find(x=>x.n===b.dataset.ics);if(!f)return;const bl=new Blob([ics(f,D)],{type:"text/calendar"}),a=document.createElement("a");a.href=URL.createObjectURL(bl);a.download=f.n+"-planning.ics";document.body.appendChild(a);a.click();setTimeout(()=>a.remove(),500)});
 }
 main();
