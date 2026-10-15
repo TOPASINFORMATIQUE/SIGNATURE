@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Questionnaire</title>
+<style>
+:root{--bg:#f4f5f8;--card:#fff;--tx:#14171f;--mu:#5a6275;--br:#d9dce5;--pr:#12308f;--ok:#157347;--ko:#b42318;--ac:#7a1010}
+@media (prefers-color-scheme:dark){:root{--bg:#10131a;--card:#1a1e29;--tx:#e8eaf0;--mu:#a0a7b8;--br:#2c3242;--pr:#8fa8ff;--ok:#5fd08a;--ko:#ff8a7a;--ac:#ff9b9b}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+.w{max-width:720px;margin:0 auto;padding:16px}
+h1{font-size:22px;margin:6px 0 2px;color:var(--pr)}
+h2{font-size:17px;margin:0 0 6px}
+.card{background:var(--card);border:1px solid var(--br);border-radius:12px;padding:16px;margin:12px 0}
+.mu{color:var(--mu);font-size:14px}
+.q{margin:18px 0}
+.q>b{display:block;margin-bottom:6px}
+.opts{display:flex;flex-direction:column;gap:6px}
+.opt{display:flex;align-items:center;gap:10px;border:1px solid var(--br);border-radius:10px;padding:10px 12px;cursor:pointer}
+.opt:has(input:checked){border-color:var(--pr);background:rgba(18,48,143,.09)}
+.opt input{width:22px;height:22px;flex:none;margin:0}
+.scale{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.scale .opt{flex-direction:column;text-align:center;font-size:13px;padding:8px 4px;gap:4px}
+.scale .opt .e{font-size:26px;line-height:1}
+.scale .opt input{position:absolute;opacity:0;width:1px;height:1px}
+.star{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.star .opt{justify-content:center;font-size:20px;font-weight:700}
+.star .opt input{position:absolute;opacity:0;width:1px;height:1px}
+input[type=text],textarea{width:100%;font:inherit;padding:12px;border:1px solid var(--br);border-radius:8px;background:var(--card);color:var(--tx)}
+input:focus-visible,textarea:focus-visible,button:focus-visible{outline:3px solid var(--pr);outline-offset:2px}
+button,a.btn{display:inline-block;font:inherit;font-weight:700;border:0;border-radius:10px;padding:14px 20px;cursor:pointer;text-decoration:none;text-align:center}
+.go{background:var(--pr);color:#fff;width:100%;font-size:18px}
+@media (prefers-color-scheme:dark){.go{color:#0b1020}}
+.go[disabled]{opacity:.5}
+.sec{background:transparent;border:1px solid var(--br);color:var(--tx);padding:8px 14px;font-weight:600;font-size:14px}
+.err{color:var(--ko);font-weight:600;min-height:1.4em}
+.bad{border-color:var(--ko)!important}
+.okb{border-color:var(--ok)}
+.okt{color:var(--ok);font-weight:700;font-size:18px}
+.hide{display:none}
+</style>
+</head>
+<body>
+<div class="w"><div id="app"></div></div>
+<script>
+(function(){
+"use strict";
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const fd=d=>{if(!d)return"";const x=new Date(d+"T12:00:00");return isNaN(x)?d:x.toLocaleDateString("fr-FR",{day:"2-digit",month:"2-digit",year:"numeric"})};
+const b64u=o=>btoa(unescape(encodeURIComponent(JSON.stringify(o)))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
+function unb64u(t){t=String(t).replace(/-/g,"+").replace(/_/g,"/");while(t.length%4)t+="=";return JSON.parse(decodeURIComponent(escape(atob(t))))}
+let D=null;try{D=unb64u(location.hash.replace(/^#/,""))}catch(e){D=null}
+const app=$("#app");
+if(!D||!D.n||!/^(auto|post|bilan)$/.test(D.q||"")){app.innerHTML='<div class="card"><h1>Lien incomplet</h1><p>Ce lien est incomplet ou a été modifié. Merci de rouvrir le lien reçu par e-mail, tel quel.</p></div>';return}
+const K=D.q,org=D.g||"",KEY="fpq:"+K+":"+D.n+":"+(D.nm||"");
+let done=null;try{done=localStorage.getItem(KEY)}catch(e){}
+const SAT=[["😀","Très satisfaisant"],["🙂","Satisfaisant"],["😕","Peu satisfaisant"],["😞","Insatisfaisant"]];
+const QUAL=[["😀","Très bien"],["🙂","Bien"],["😕","Moyen"],["😞","Insuffisant"]];
+const DEF={
+ auto:{title:"Auto-évaluation avant la formation",intro:"Ce court questionnaire (2 minutes) nous permet d’adapter la formation à votre niveau et à vos attentes.",
+  items:[
+   {id:"soc",t:"Société",k:"text",pre:D.c||"",req:1},
+   {id:"nom",t:"Nom Prénom / Fonction",k:"text",pre:((D.nm||"")+(D.fn?" / "+D.fn:"")),req:1},
+   {id:"hand",t:"Êtes-vous en situation de handicap ? Si oui nous reviendrons vers vous pour adapter la formation à vos besoins",k:"radio",o:["OUI","NON"],req:1},
+   {id:"niv",t:"Quel est votre niveau avant la formation ?",k:"radio",o:["Expert","Avancé","Intermédiaire","Débutant"],req:1},
+   {id:"obj",t:"Quels sont vos objectifs principaux pour cette formation ?",k:"radio",o:["Approfondir mes connaissances existantes","Acquérir de nouvelles compétences","Améliorer mes performances professionnelles","Autre"],req:1},
+   {id:"obj2",t:"Si « Autre », précisez",k:"text"},
+   {id:"att",t:"Avez-vous des attentes particulières par rapport à cette formation ?",k:"area"},
+   {id:"inf",t:"Y a-t-il d’autres informations que vous souhaitez partager avec l’équipe de formation ?",k:"area"}]},
+ post:{title:"Enquête de satisfaction",intro:"Merci de donner votre avis sur la formation que vous venez de suivre. Vos réponses nous aident à nous améliorer.",
+  items:[
+   {id:"g",t:"Note globale de la formation",k:"star",req:1},
+   {id:"acc",t:"Accueil et organisation de la formation",k:"scale",o:SAT,req:1},
+   {id:"con",t:"Contenu de la formation (adapté à vos besoins)",k:"scale",o:SAT,req:1},
+   {id:"ani",t:"Qualité de l’animation (pédagogie du formateur)",k:"scale",o:SAT,req:1},
+   {id:"ryt",t:"Rythme et durée de la formation",k:"scale",o:SAT,req:1},
+   {id:"sup",t:"Supports de cours et exercices",k:"scale",o:SAT,req:1},
+   {id:"mat",t:"Matériel et conditions de la salle ou du poste de travail",k:"scale",o:SAT,req:1},
+   {id:"obj",t:"Les objectifs de la formation ont-ils été atteints ?",k:"radio",o:["Oui, totalement","Oui, en grande partie","En partie","Non"],req:1},
+   {id:"rec",t:"Recommanderiez-vous cette formation ?",k:"radio",o:["Oui","Non"],req:1},
+   {id:"han",t:"Si vous avez signalé une situation de handicap, la formation a-t-elle été adaptée à vos besoins ?",k:"radio",o:["Sans objet","Oui","Non"]},
+   {id:"pf",t:"Points forts de la formation",k:"area"},
+   {id:"ame",t:"Axes d’amélioration / suggestions",k:"area"},
+   {id:"bes",t:"Besoins de formation complémentaires",k:"area"}]},
+ bilan:{title:"Bilan post-formation du formateur",intro:"Merci de faire le bilan de votre intervention. Ces informations alimentent notre démarche d’amélioration continue.",
+  items:[
+   {id:"niv",t:"Niveau général du groupe",k:"radio",o:["Débutant","Intermédiaire","Avancé","Hétérogène"],req:1},
+   {id:"obj",t:"Objectifs pédagogiques atteints par le groupe",k:"radio",o:["Totalement","En grande partie","En partie","Non atteints"],req:1},
+   {id:"mot",t:"Participation et motivation des stagiaires",k:"scale",o:QUAL,req:1},
+   {id:"ass",t:"Assiduité et respect des horaires",k:"scale",o:QUAL,req:1},
+   {id:"acc",t:"Conditions d’accueil et matérielles chez le client (salle, postes, connexion)",k:"scale",o:QUAL,req:1},
+   {id:"pro",t:"Le programme était-il adapté au besoin du groupe ?",k:"radio",o:["Oui","À adapter"],req:1},
+   {id:"han",t:"Situation de handicap : une adaptation a-t-elle été nécessaire et satisfaisante ?",k:"radio",o:["Sans objet","Oui, satisfaisante","Oui, à améliorer"]},
+   {id:"dif",t:"Difficultés rencontrées",k:"area"},
+   {id:"cpl",t:"Stagiaires ayant besoin d’un accompagnement ou d’une formation complémentaire",k:"area"},
+   {id:"sug",t:"Suggestions d’amélioration",k:"area"}]}
+}[K];
+document.title=DEF.title;
+function field(q){
+ const req=q.req?" *":"";
+ if(q.k==="text")return `<div class="q" data-id="${q.id}"><b>${esc(q.t)}${req}</b><input type="text" id="f_${q.id}" value="${esc(q.pre||"")}"></div>`;
+ if(q.k==="area")return `<div class="q" data-id="${q.id}"><b>${esc(q.t)}</b><textarea id="f_${q.id}" rows="3" maxlength="500"></textarea></div>`;
+ if(q.k==="radio")return `<div class="q" data-id="${q.id}"><b>${esc(q.t)}${req}</b><div class="opts">${q.o.map(o=>`<label class="opt"><input type="radio" name="${q.id}" value="${esc(o)}"><span>${esc(o)}</span></label>`).join("")}</div></div>`;
+ if(q.k==="scale")return `<div class="q" data-id="${q.id}"><b>${esc(q.t)}${req}</b><div class="scale">${q.o.map(o=>`<label class="opt"><input type="radio" name="${q.id}" value="${esc(o[1])}"><span class="e">${o[0]}</span><span>${esc(o[1])}</span></label>`).join("")}</div></div>`;
+ if(q.k==="star")return `<div class="q" data-id="${q.id}"><b>${esc(q.t)}${req}</b><div class="star">${[1,2,3,4,5].map(n=>`<label class="opt"><input type="radio" name="${q.id}" value="${n}/5"><span>${"★".repeat(n)}</span></label>`).join("")}</div><div class="mu">1 = très insuffisant · 5 = excellent</div></div>`}
+function val(q){if(q.k==="text"||q.k==="area")return($("#f_"+q.id).value||"").trim();const e=document.querySelector("input[name="+q.id+"]:checked");return e?e.value:""}
+function render(){
+ const who=K==="bilan"?"Formateur : "+esc(D.nm||""):esc(D.nm||"");
+ app.innerHTML=`<h1>${esc(DEF.title)}</h1><div class="mu">${esc(org)}</div>
+ <div class="card"><h2>${esc(D.f||"")}</h2><div class="mu">${D.a?"Du "+esc(fd(D.a))+" au "+esc(fd(D.b)):""}${D.c?" · "+esc(D.c):""}${who?" · "+who:""}</div><p>${esc(DEF.intro)}</p></div>`+
+ (done?`<div class="card okb"><div class="okt">✔ Déjà envoyé</div><p>Votre réponse a déjà été transmise depuis cet appareil. Merci !</p></div>`:
+ `<div class="card" id="form">${DEF.items.map(field).join("")}<div class="err" id="err" role="alert"></div><button class="go" id="go" type="button">Envoyer mes réponses</button><p class="mu">Vos réponses sont transmises uniquement à ${esc(org)}.</p></div>`)+`<div id="res"></div>`;
+ if(!done)$("#go").onclick=submit;
+}
+async function submit(){
+ const err=$("#err");err.textContent="";$$(".bad").forEach(e=>e.classList.remove("bad"));
+ const ans=[];let bad=null;
+ DEF.items.forEach(q=>{const v=val(q);if(q.req&&!v&&!bad){bad=q}ans.push([q,v])});
+ if(bad){const e=document.querySelector('[data-id="'+bad.id+'"]');if(e){e.classList.add("bad");e.scrollIntoView({block:"center",behavior:"smooth"})}return err.textContent="Merci de répondre à la question « "+bad.t.slice(0,60)+(bad.t.length>60?"…":"")+" »."}
+ const go=$("#go");go.disabled=true;go.textContent="Envoi en cours…";
+ const now=new Date(),p2=n=>String(n).padStart(2,"0"),dl=now.getFullYear()+"-"+p2(now.getMonth()+1)+"-"+p2(now.getDate()),hl=p2(now.getHours())+":"+p2(now.getMinutes());
+ const cut=(s,n)=>String(s).slice(0,n);
+ let lim=300,payload,body;
+ for(;;){
+  payload={t:"fp-q",q:K,n:D.n,ti:D.ti,nm:D.nm||"",dl,hl,tsl:fd(dl)+" à "+hl};
+  if(K==="auto"){payload.v={};ans.forEach(a=>{payload.v[a[0].id]=cut(a[1],lim)})}
+  else payload.a=ans.filter(a=>a[1]!=="").map(a=>[cut(a[0].t,90),cut(a[1],lim)]);
+  body=JSON.stringify(payload);
+  if(new TextEncoder().encode(body).length<=3800||lim<=40)break;lim=Math.floor(lim*.7);
+ }
+ const code="FPQ:"+b64u(payload);
+ const subj=DEF.title+" – "+D.n+" – "+(D.nm||"");
+ const sends=[];
+ if(D.t)sends.push(fetch("https://ntfy.sh/"+encodeURIComponent(D.t),{method:"POST",body}).then(r=>{if(!r.ok)throw 0;return 1}));
+ if(D.m){const f=new URLSearchParams({_subject:subj,_captcha:"false",_template:"table",Questionnaire:DEF.title,Dossier:D.n+" – "+(D.f||""),Nom:D.nm||"",Date:payload.tsl,Code:code});ans.forEach(a=>{if(a[1])f.append(a[0].t.slice(0,80),a[1])});sends.push(fetch("https://formsubmit.co/ajax/"+encodeURIComponent(D.m),{method:"POST",headers:{Accept:"application/json"},body:f}).then(r=>{if(!r.ok)throw 0;return 1}))}
+ const R=await Promise.allSettled(sends),ok=R.some(r=>r.status==="fulfilled");
+ if(ok){try{localStorage.setItem(KEY,"1")}catch(e){}}
+ $("#form").classList.add("hide");
+ const mailto="mailto:"+encodeURIComponent(D.m||"")+"?subject="+encodeURIComponent(subj)+"&body="+encodeURIComponent("Bonjour,\n\nVoici mes réponses au questionnaire.\n\n"+code+"\n");
+ $("#res").innerHTML=ok?`<div class="card okb"><div class="okt">✔ Merci, vos réponses sont envoyées !</div><p>${esc(org)} les a bien reçues. Vous pouvez fermer cette page.</p></div>`:
+ `<div class="card" style="border-color:var(--ko)"><div class="err">La transmission automatique n’a pas fonctionné.</div><p>Appuyez sur le bouton ci-dessous : un e-mail est déjà prêt, il suffit de l’envoyer.</p><a class="btn go" href="${mailto}">✉ Envoyer par e-mail</a></div>`;
+ window.scrollTo(0,0);
+}
+render();
+})();
+</script>
+</body>
+</html>
