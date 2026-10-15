@@ -98,7 +98,7 @@ function docPlan(){
  ${ds.map(d=>`<div class="dt"><b>${esc(fdl(d))}</b><br><span class="mu">${({m:"½ journée : 9h00 – 12h30",a:"½ journée : 14h00 – 17h30"})[(D.hf||{})[d]]||"9h00 – 12h30 · 14h00 – 17h30"}</span></div>`).join("")||"<p>Dates à préciser.</p>"}
  <p class="mu">Ce document vaut convocation aux participants concernés.</p>`;
 }
-function head(){return `<h1>${plan?"Validation de la planification":"Signature de la convention"}</h1><div class="mu">${esc(org)}${tel?" · "+esc(tel):""}${mail?" · "+esc(mail):""}</div>`}
+function head(){return `<img src="logo.jpg" alt="TOPAS informatique" style="height:56px;margin-bottom:8px"><h1>${plan?"Validation de la planification":"Signature de la convention"}</h1><div class="mu">${esc(org)}${tel?" · "+esc(tel):""}${mail?" · "+esc(mail):""}</div>`}
 
 function render(){
  app.innerHTML=head()+

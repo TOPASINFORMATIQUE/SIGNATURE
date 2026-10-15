@@ -111,7 +111,7 @@ function field(q){
 function val(q){if(q.k==="text"||q.k==="area")return($("#f_"+q.id).value||"").trim();const e=document.querySelector("input[name="+q.id+"]:checked");return e?e.value:""}
 function render(){
  const who=K==="bilan"?"Formateur : "+esc(D.nm||""):esc(D.nm||"");
- app.innerHTML=`<h1>${esc(DEF.title)}</h1><div class="mu">${esc(org)}</div>
+ app.innerHTML=`<img src="logo.jpg" alt="TOPAS informatique" style="height:56px;margin-bottom:8px"><h1>${esc(DEF.title)}</h1><div class="mu">${esc(org)}</div>
  <div class="card"><h2>${esc(D.f||"")}</h2><div class="mu">${D.a?"Du "+esc(fd(D.a))+" au "+esc(fd(D.b)):""}${D.c?" · "+esc(D.c):""}${who?" · "+who:""}</div><p>${esc(DEF.intro)}</p></div>`+
  (done?`<div class="card okb"><div class="okt">✔ Déjà envoyé</div><p>Votre réponse a déjà été transmise depuis cet appareil. Merci !</p></div>`:
  `<div class="card" id="form">${DEF.items.map(field).join("")}<div class="err" id="err" role="alert"></div><button class="go" id="go" type="button">Envoyer mes réponses</button><p class="mu">Vos réponses sont transmises uniquement à ${esc(org)}.</p></div>`)+`<div id="res"></div>`;
