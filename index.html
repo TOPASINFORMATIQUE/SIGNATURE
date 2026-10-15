@@ -42,6 +42,25 @@ button,a.btn{display:inline-block;font:inherit;font-weight:700;border:0;border-r
 .okt{color:var(--ok);font-weight:700;font-size:18px}
 .hide{display:none}
 @media print{body{background:#fff;color:#000}.noprint{display:none!important}.card{border:0;padding:0}}
+
+.paper{background:#fff;color:#111;border:1px solid var(--br);border-radius:6px;padding:22px 22px;margin:12px 0;box-shadow:0 1px 6px rgba(0,0,0,.08)}
+.cv{font:12.5px/1.4 Arial,Helvetica,sans-serif;color:#111}.cv *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.cv .hg{display:grid;grid-template-columns:44% 56%;gap:10px;align-items:stretch}.cv .hg .gb{display:flex;flex-direction:column;justify-content:center}.cv .cf{text-align:center;align-items:center}.cv .cl{text-align:left;align-items:flex-start}
+.cv .lg{border-left:12px solid #12308f;padding-left:8px}.cv .lg img{height:62px;display:block}.cv .ad{font-size:11.5px;line-height:1.55;margin-top:4px}.cv .web{color:#12308f}
+.cv .gb{background:#ececec;border-radius:10px;padding:8px 12px}.cv .ttl{background:#e4e4ea;border-radius:8px;color:#12308f;font-weight:700;font-size:20px;text-align:center;padding:10px 6px}
+.cv .mr{color:#7a1010;font-weight:700}.cv .mr2{color:#7a1010}.cv .pill{background:#ececec;border-radius:10px;padding:3px 10px;color:#7a1010;font-weight:700;display:inline-block;min-width:150px}
+.cv .art{display:flex;gap:10px;align-items:center;margin:14px 0 6px;flex-wrap:wrap}.cv .r{display:grid;grid-template-columns:170px 1fr;gap:8px;margin:3px 0}.cv .r b{text-align:right;color:#111;font-weight:700}
+.cv .trg{display:grid;grid-template-columns:1fr 1fr;gap:2px 14px}
+.cv .ft{margin-top:12px;font-size:10.5px;color:#12308f;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.cv table{border-collapse:collapse}.cv td,.cv th{padding:2px 12px;text-align:center;border:0}
+.cv .sg{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px}.cv .sg>div{background:#ececec;border-radius:8px;min-height:105px;text-align:center;padding:6px}.cv .sg img{max-width:100%;max-height:80px}
+.cv .px{width:100%;margin:8px 0 4px}.cv .px td{padding:6px 10px;text-align:center;font-size:13px;border-bottom:1px solid #d8d8d8}.cv .px .hd td{font-size:11px;color:#7a1010;font-weight:700;text-transform:uppercase;letter-spacing:.4px;border-bottom:2px solid #7a1010}.cv .px .lb{text-align:right;font-weight:700}
+.cv .tt{width:100%;border-collapse:separate;background:#ececec;border-radius:10px;margin-top:10px}.cv .tt .sl{width:42%;padding:14px 22px;color:#7a1010;font-weight:700;font-size:15px;text-align:left}.cv .tt .am{text-align:right}.cv .tt .am table{margin:8px 20px 8px auto;width:auto}.cv .tt .am td{padding:3px 10px;font-weight:700;text-align:left;font-size:14px}.cv .tt .am .v{text-align:right;min-width:120px}.cv .tt .tc td{border-top:1px solid #888;padding-top:5px}
+.pln{font-size:13px;line-height:1.5}.pln .hg2{display:grid;grid-template-columns:40% 60%;gap:12px;align-items:start}.pln .ttp{background:#e4e4ea;display:flex;justify-content:space-between;align-items:center;padding:8px 14px;border-radius:6px;gap:8px;flex-wrap:wrap}.pln .ttp b{font-size:24px;color:#12308f}
+.pln .bar{background:#e4e4ea;color:#7a1010;font-weight:700;font-size:15px;padding:8px 14px;border-radius:6px;margin-bottom:6px}.pln .bx{border:1px solid #666;border-radius:4px;padding:8px 10px;min-height:92px}.pln .g2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:14px}.pln .msg{margin:18px 0 14px}.pln .rd{color:#7a1010;font-weight:700}
+.pln .rw{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}.pln .box{background:#f6f6f8;border-radius:6px;padding:10px 14px;min-height:150px}.pln .dtp{margin:5px 0;padding:5px 8px;background:#fff;border-left:4px solid #12308f;border-radius:4px}.pln .ftp{margin-top:24px;text-align:center;font-size:15px;border-bottom:6px solid #12308f;padding-bottom:10px}
+@media(max-width:640px){.paper{padding:12px}.cv .hg,.pln .hg2,.pln .g2,.pln .rw,.cv .sg,.cv .trg{grid-template-columns:1fr}.cv .r{grid-template-columns:1fr;gap:0}.cv .r b{text-align:left;margin-top:6px}.cv .ttl{font-size:17px}.cv .tt .sl{display:block;width:auto;padding:10px 14px}.cv .tt,.cv .tt>tbody,.cv .tt>tbody>tr,.cv .tt>tbody>tr>td{display:block;width:100%}.cv .tt .am table{margin:4px 10px 8px auto}.cv .px td{padding:6px 3px;font-size:12px}}
+@media print{.paper{border:0;box-shadow:none;padding:0}}
 </style>
 </head>
 <body>
@@ -68,41 +87,51 @@ document.title=(plan?"Validation de la planification":"Signature de la conventio
 const KEY="fpsig:"+D.k+":"+D.n;
 let done=null;try{done=JSON.parse(localStorage.getItem(KEY)||"null")}catch(e){}
 
+const frd=d=>{if(!d)return"—";const x=d.split("-");return (+x[2])+"/"+(+x[1])+"/"+x[0].slice(2)};
+const fjn=n=>String(n).replace(".",",");
+const nmT=i=>esc(tr[i]||"")+((D.tf||[])[i]?" "+esc(D.tf[i]):"");
+function sigBlock(){return done&&done.sg?`<br>${sigSvg(done.sg)}<div style="font-size:10px;color:#333">Signé électroniquement par ${esc(done.nm)}<br>le ${esc(done.tsl)}</div>`:""}
 function docConv(){
- const nbj=D.j||1,tot=(D.pj||0)*nbj,tva=tot*.2;
- return `<h2>Convention simplifiée de formation professionnelle</h2>
- <p class="mu">N° <b>${esc(D.n)}</b> · du ${esc(fd(D.dc))}</p>
- <div class="row"><b>Organisme</b><span>${esc(org)}<br>${esc(addr)}<br>N° d’agrément ${esc(nda)} · SIRET ${esc(siret)}</span></div>
- <div class="row"><b>Entreprise</b><span>${esc(C[0])}<br>${esc(C[1])}</span></div>
- <span class="art">Article 1er : Objet</span>
- <div class="row"><b>Intitulé</b><span><b style="color:inherit">${esc(D.f)}</b></span></div>
- ${D.o?`<div class="row"><b>Objectif</b><span>${esc(D.o)}</span></div>`:""}
- <div class="row"><b>Période</b><span>du ${esc(fd(D.a))} au ${esc(fd(D.b))}</span></div>
- <div class="row"><b>Durée</b><span>${eur(D.h)} heures</span></div>
- <div class="row"><b>Lieu</b><span>${esc(C[0])} – ${esc(C[1])}</span></div>
- <span class="art">Article 2 : Effectif formé</span>
- <div class="row"><b>${tr.length} stagiaire${tr.length>1?"s":""}</b><span>${tr.map(esc).join("<br>")||"—"}</span></div>
- <span class="art">Article 3 : Dispositions financières</span>
- <table><tr><th>Coût pédagogique HT par jour</th><td class="r">${eur(D.pj)} €</td></tr><tr><th>Nombre de jours</th><td class="r">${String(nbj).replace(".",",")}</td></tr><tr><th>Total HT</th><td class="r">${eur(tot)} €</td></tr><tr><th>TVA 20 %</th><td class="r">${eur(tva)} €</td></tr><tr><th>Total TTC</th><td class="r"><b>${eur(tot+tva)} €</b></td></tr></table>
- <p class="mu">Fait en double exemplaire à Moirans, le ${esc(fd(D.dc))}.</p>`;
+ const nbj=D.j||1,h=+D.h||nbj*7,pj=+D.pj||0,tot=pj*nbj,tva=tot*.2,hj=h/nbj||7,dcf=fd(D.dc);
+ const row=(l,v)=>`<div class="r"><b>${l}</b><span>${v}</span></div>`;
+ return `<div class="cv"><div class="hg">
+<div class="lg"><img src="logo.jpg" alt="TOPAS informatique"><div class="ad"><span class="mr">Entre</span><br>${esc(addr)}<br>Tél ${esc(tel)}<br>Mail ${esc(mail)}<br><b class="web">${esc(web)}</b></div></div>
+<div><div class="ttl">Convention simplifiée de Formation professionnelle</div><div style="margin:12px 0 0"><b>N°</b> &nbsp; <span style="font-size:15px">${esc(D.n)}</span> &nbsp;&nbsp;&nbsp; <b>Date</b> &nbsp; ${esc(dcf)}</div></div>
+<div class="gb cf"><b>Centre de Formation</b><div style="margin-top:8px"><b>N° Agrément : ${esc(nda)}</b><br><small>inscrit auprès de la Préfecture<br>de la Région Rhône Alpes</small></div><div style="margin-top:8px;font-size:11px;line-height:1.6"><b>URSSAF : ${esc(G[8]||"")}<br>N° de SIRET : ${esc(siret)}<br>APE : ${esc(G[9]||"")}</b></div></div>
+<div class="gb cl"><div class="mr">Et</div><div style="margin-top:6px"><b>${esc(C[0])}</b><br>${esc(C[1])}</div><div style="margin-top:10px"><b>Envoyée à</b> &nbsp; 1. Facture / MAIL<br><span style="margin-left:74px">${esc(C[2])}</span></div></div></div>
+<div class="art"><span class="pill">Article 1er : Objet de la Convention</span><span class="mr2">L’organisme ${esc(org)} organisera l’action de formation suivante :</span></div>
+${row("Intitulé du stage :",`<b>${esc(D.f)}</b>`)}${row("Objectif :",esc(D.o||"Utilisation et maîtrise d’applications informatiques de gestion"))}${row("Type d’action de formation :","Acquisition des connaissances")}${row("Période du stage :",`<b>DU ${frd(D.a)} AU ${frd(D.b)}</b>`)}${row("Durée en heures :",`<b class="mr">${eur(h)} heures</b>`)}${row("Lieu :",`<span class="gb" style="display:block;padding:3px 10px"><b>${esc(C[0])} &nbsp;&nbsp; ${esc(C[1])}</b></span>`)}
+<div class="art"><span class="pill">Article 2 : Effectif formé</span><b>Nombre de stagiaires : ${tr.length}</b></div>
+<div class="r"><b>Nom et prénom des stagiaires :</b><span class="trg">${tr.map((t,i)=>`<span>${nmT(i)}</span>`).join("")}</span></div>
+<div class="art"><span class="pill">Article 3 : Dispositions Financières</span><span class="mr2">En contrepartie de cette action de formation, l’employeur s’acquittera des coûts suivants :</span></div>
+<table class="px"><colgroup><col style="width:34%"><col style="width:22%"><col style="width:22%"><col style="width:22%"></colgroup>
+<tr class="hd"><td></td><td>Par jour</td><td>Nbre de jours</td><td>Coût total</td></tr>
+<tr><td class="lb">Coûts pédagogiques HT :</td><td>${eur(pj)} €</td><td>${fjn(nbj)}</td><td><b>${eur(tot)} €</b></td></tr>
+<tr><td class="lb">Taux horaire HT :</td><td>${eur(pj/hj)} €</td><td></td><td></td></tr></table>
+<table class="tt"><tr><td class="sl">Soit Coût Total</td><td class="am"><table><tr><td>Total H.T.</td><td class="v">${eur(tot)} €</td></tr><tr><td>TVA 20 %</td><td class="v">${eur(tva)} €</td></tr><tr class="tc"><td>Total TTC</td><td class="v">${eur(tot+tva)} €</td></tr></table></td></tr></table>
+<div style="text-align:center;margin:14px 0 10px">Fait en double exemplaire à MOIRANS &nbsp;le ${esc(dcf)}</div>
+<div class="sg"><div><b class="mr">Cachet &amp; Signature de l’Organisme</b><br><img src="stamp.jpg" alt="Cachet TOPAS"></div><div id="sigent"><b class="mr">Cachet &amp; Signature de l’Entreprise</b>${sigBlock()}</div></div>
+<div class="ft"><span>S.A.S au capital de ${esc(G[11]||"")}</span><span>APE ${esc(G[9]||"")}</span><span>TVA INTRA : ${esc(G[10]||"")}</span><span>N° Siret : ${esc((siret||"").replace(/\s/g,""))}</span></div></div>`;
 }
+function hrsT(d){const p=(D.hf||{})[d];return p==="m"?"½ journée : 9h00 – 12h30":p==="a"?"½ journée : 14h00 – 17h30":"9h00 – 12h30 / 14h00 – 17h30"}
 function docPlan(){
- const ds=D.ds||[];
- return `<h2>Planification de la formation</h2>
- <p class="mu">Dossier N° <b>${esc(D.n)}</b></p>
- <div class="row"><b>Formation</b><span><b style="color:inherit">${esc(D.f)}</b></span></div>
- <div class="row"><b>Lieu d’intervention</b><span>${esc(C[0])} – ${esc(C[1])}</span></div>
- <div class="row"><b>Intervenant</b><span>${esc(D.iv||"—")}</span></div>
- <div class="row"><b>Stagiaires</b><span>${tr.map(esc).join("<br>")||"—"}</span></div>
- <span class="art">Dates d’intervention</span>
- ${ds.map(d=>`<div class="dt"><b>${esc(fdl(d))}</b><br><span class="mu">${({m:"½ journée : 9h00 – 12h30",a:"½ journée : 14h00 – 17h30"})[(D.hf||{})[d]]||"9h00 – 12h30 · 14h00 – 17h30"}</span></div>`).join("")||"<p>Dates à préciser.</p>"}
- <p class="mu">Ce document vaut convocation aux participants concernés.</p>`;
+ const ds=D.ds||[],pe=D.pe||"",ad=D.ad||mail;
+ return `<div class="cv pln"><div class="hg2">
+<div class="lg"><img src="logo.jpg" alt="TOPAS informatique"><div class="ad">${esc(addr)}<br>Tél ${esc(tel)}<br>Mail ${esc(mail)}<br><b class="web">${esc(web)}</b></div></div>
+<div><div class="ttp"><b>Planification</b><span>Envoyée le &nbsp; <b style="font-size:13px;color:#111">${esc(pe?fdl(pe):"")}</b></span></div><div style="margin-top:8px">N° dossier : <b>${esc(D.n)}</b></div></div></div>
+<div class="g2"><div><div class="bar">Lieu Intervention</div><div class="bx"><b>${esc(C[0])}</b><br>${esc(C[1])}</div></div>
+<div><div style="font-size:15px;margin-bottom:6px">Adresse de Facturation</div><div class="bx"><b>${esc(C[0])}</b><br>${esc(C[1])}<div style="font-size:11px;margin-top:8px"><b>A l’attention de :</b> ${esc(D.at||"1. Facture / MAIL")}<br>${esc(D.em||C[2]||"")}</div></div></div></div>
+<div class="msg"><b>Bonjour,</b><br><br><b>Vous trouverez ci-dessous les dates d’intervention en vos locaux.</b><br><br><b>Selon Devis accepté</b>${D.fu?` / <span class="rd">${esc(D.fu)}</span>`:""}<br><b>En vous remerciant par avance de votre acceptation par mail à : <span class="web">${esc(ad)}</span></b></div>
+<div class="rw"><div><div class="bar" style="color:#111;font-weight:600">Prestation à Réaliser</div><div class="box"><i>${esc(D.f)}</i><br><br><b>Durée :</b> ${esc(D.h||"")} h · ${fjn(D.j||ds.length||1)} jour(s)<br><b>Période :</b> ${esc(fd(D.a))} → ${esc(fd(D.b))}<br><br><b>Stagiaires (${tr.length}) :</b><br>${tr.map((t,i)=>nmT(i)).join("<br>")||"—"}</div></div>
+<div><div class="bar">Dates Intervention</div><div class="box"><div style="font-size:11px;margin-bottom:6px"><b>Intervenant :</b> &nbsp; ${esc(D.iv||"")}</div>${ds.map(d=>`<div class="dtp"><b>${esc(fdl(d))}</b><br><span style="font-size:12px">${hrsT(d)}</span></div>`).join("")||"<i>Dates à définir</i>"}</div></div></div>
+<div id="sigent" style="margin-top:14px">${done&&done.sg?`<b class="mr">Validé en ligne</b>${sigBlock()}`:""}</div>
+<div class="ftp">*** Ce document vaut pour convocation aux Participants/Stagiaires concernés ***</div></div>`;
 }
-function head(){return `<img src="logo.jpg" alt="TOPAS informatique" style="height:56px;margin-bottom:8px"><h1>${plan?"Validation de la planification":"Signature de la convention"}</h1><div class="mu">${esc(org)}${tel?" · "+esc(tel):""}${mail?" · "+esc(mail):""}</div>`}
+function head(){return `<img src="logo.jpg" alt="TOPAS informatique" style="height:56px;margin-bottom:8px"><h1>${plan?"Validation de la planification":"Signature de la convention"}</h1><div class="mu">Vérifiez le document ci-dessous, puis signez en bas de page.</div>`}
 
 function render(){
  app.innerHTML=head()+
- `<div class="card" id="doc">${plan?docPlan():docConv()}<div id="sigdone"></div></div>`+
+ `<div class="paper" id="doc">${plan?docPlan():docConv()}</div>`+
  (done?`<div class="card okb noprint"><div class="okt">✔ Déjà ${plan?"validée":"signée"}</div><p>Ce document a déjà été ${plan?"validé":"signé"} depuis cet appareil par <b>${esc(done.nm)}</b> le ${esc(done.tsl)}.</p><button class="sec" id="prt">🖨 Imprimer / enregistrer ma copie</button></div>`:
  `<div class="card noprint" id="form">
   <h2>${plan?"Valider les dates":"Signer la convention"}</h2>
@@ -117,7 +146,7 @@ function render(){
   <button class="go" id="go" type="button">${plan?"Valider la planification":"Signer la convention"}</button>
   <p class="mu">Les informations saisies sont transmises uniquement à ${esc(org)}. Cette signature électronique simple a valeur d’accord.</p>
  </div>`)+`<div id="res"></div>`;
- if(done){const p=$("#prt");if(p)p.onclick=()=>window.print();if(done.sg)$("#sigdone").innerHTML=sigDoc(done);return}
+ if(done){const p=$("#prt");if(p)p.onclick=()=>window.print();return}
  pad();
 }
 function sigSvg(sg){let d="";String(sg||"").split(";").forEach(st=>{const P=st.split(",").map(q=>q.split(".").map(v=>parseInt(v,36))).filter(q=>q.length===2&&!isNaN(q[0])&&!isNaN(q[1]));if(!P.length)return;if(P.length===1)P.push([P[0][0]+1,P[0][1]]);d+="M"+P.map(q=>q[0]+" "+q[1]).join("L")});return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 140" width="200" height="87"><path d="${d}" fill="none" stroke="#12308f" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`}
@@ -160,7 +189,7 @@ async function submit(){
  const R=await Promise.allSettled(sends),ok=R.some(r=>r.status==="fulfilled");
  done={nm,fn,tsl:payload.tsl,sg:payload.sg};
  if(ok){try{localStorage.setItem(KEY,JSON.stringify(done))}catch(e){}}
- $("#form").classList.add("hide");$("#sigdone").innerHTML=sigDoc(done);
+ $("#form").classList.add("hide");$("#doc").innerHTML=plan?docPlan():docConv();
  const mailto="mailto:"+encodeURIComponent(D.m||"")+"?subject="+encodeURIComponent((plan?"Planification validée":"Convention signée")+" – "+D.n+" – "+nm)+"&body="+encodeURIComponent("Bonjour,\n\n"+nm+(fn?" ("+fn+")":"")+" a "+(plan?"validé la planification":"signé la convention")+" "+D.n+" en ligne.\n\n"+code+"\n");
  $("#res").innerHTML=ok?
   `<div class="card okb noprint"><div class="okt">✔ Merci, c’est ${plan?"validé":"signé"} !</div><p>${esc(org)} a bien reçu votre ${plan?"validation":"signature"}. Vous pouvez fermer cette page.</p><button class="sec" id="prt">🖨 Imprimer / enregistrer ma copie</button> <a class="sec btn" href="${mailto}" style="margin-top:6px">✉ Envoyer aussi une confirmation par e-mail</a></div>`:
