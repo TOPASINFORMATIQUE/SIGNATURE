@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Espace intervenant</title>
+<style>
+:root{--bg:#f4f5f8;--card:#fff;--tx:#14171f;--mu:#5a6275;--br:#d9dce5;--pr:#12308f;--ok:#157347;--ac:#7a1010;--soft:#eef1fb}
+@media (prefers-color-scheme:dark){:root{--bg:#10131a;--card:#1a1e29;--tx:#e8eaf0;--mu:#a0a7b8;--br:#2c3242;--pr:#8fa8ff;--ok:#5fd08a;--ac:#ff9b9b;--soft:#222a40}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+.w{max-width:760px;margin:0 auto;padding:16px 14px 40px}
+h1{font-size:22px;margin:6px 0 2px;color:var(--pr)}
+h2{font-size:18px;margin:0 0 4px}
+.mu{color:var(--mu);font-size:14px}
+.card{background:var(--card);border:1px solid var(--br);border-radius:14px;padding:16px;margin:12px 0}
+.tag{display:inline-block;font-size:12px;font-weight:700;background:var(--soft);color:var(--pr);border-radius:99px;padding:2px 10px;margin-right:6px}
+.tag.go{background:#e7f6ec;color:var(--ok)}
+.row{display:grid;grid-template-columns:110px 1fr;gap:4px 12px;margin:6px 0}
+.row>b{color:var(--mu);font-weight:600;font-size:14px}
+@media(max-width:520px){.row{grid-template-columns:1fr;gap:0}.row>b{margin-top:6px}}
+.dt{margin:6px 0;padding:8px 12px;border-left:4px solid var(--pr);background:var(--soft);border-radius:6px}
+.dt.past{opacity:.6;border-left-color:var(--mu)}
+.btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+a.btn,button{font:inherit;font-weight:600;border:1px solid var(--br);background:var(--card);color:var(--tx);border-radius:10px;padding:11px 14px;min-height:44px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+.btn.p{background:var(--pr);color:#fff;border-color:var(--pr)}
+@media (prefers-color-scheme:dark){.btn.p{color:#0b1020}}
+details{margin-top:10px}summary{cursor:pointer;font-weight:600;padding:6px 0}
+ul{margin:4px 0 0 18px;padding:0}
+.ft{margin-top:22px;text-align:center;font-size:13px;color:var(--mu)}
+.hd{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.hd img{height:54px}
+@media print{body{background:#fff;color:#000}.btns{display:none}.card{break-inside:avoid}}
+</style>
+</head>
+<body>
+<div class="w"><div id="app"></div></div>
+<script>
+(function(){
+"use strict";
+const $=s=>document.querySelector(s),app=$("#app");
+const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const fdl=d=>{const x=new Date(d+"T12:00:00");return isNaN(x)?d:x.toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long",year:"numeric"})};
+const fds=d=>{const x=new Date(d+"T12:00:00");return isNaN(x)?d:x.toLocaleDateString("fr-FR",{day:"2-digit",month:"2-digit",year:"numeric"})};
+function unb64u(t){t=String(t).replace(/-/g,"+").replace(/_/g,"/");while(t.length%4)t+="=";return t}
+async function load(h){
+ if(h.startsWith("z.")){const bin=atob(unb64u(h.slice(2))),u=Uint8Array.from(bin,c=>c.charCodeAt(0)),ds=new DecompressionStream("deflate-raw"),w=ds.writable.getWriter();w.write(u);w.close();return JSON.parse(await new Response(ds.readable).text())}
+ return JSON.parse(decodeURIComponent(escape(atob(unb64u(h)))));
+}
+const HRS={m:["09:00","12:30","½ journée : 9h00 – 12h30"],a:["14:00","17:30","½ journée : 14h00 – 17h30"]},FULL=["09:00","17:30","9h00 – 12h30 / 14h00 – 17h30"];
+const slot=(f,d)=>HRS[(f.hf||{})[d]]||FULL;
+const today=()=>{const n=new Date(),p=x=>String(x).padStart(2,"0");return n.getFullYear()+"-"+p(n.getMonth()+1)+"-"+p(n.getDate())};
+function ics(f,D){
+ const z=s=>String(s).replace(/([,;\\])/g,"\\$1").replace(/\n/g,"\\n"),now=new Date().toISOString().replace(/[-:]/g,"").slice(0,15)+"Z";
+ const o=["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//TOPAS Formation//FR","CALSCALE:GREGORIAN","METHOD:PUBLISH"];
+ (f.ds||[]).forEach(d=>{const dd=d.replace(/-/g,""),t=slot(f,d);o.push("BEGIN:VEVENT","UID:"+f.n+"-"+dd+"@topas-iv","DTSTAMP:"+now,"DTSTART;TZID=Europe/Paris:"+dd+"T"+t[0].replace(":","")+"00","DTEND;TZID=Europe/Paris:"+dd+"T"+t[1].replace(":","")+"00","SUMMARY:"+z(f.t+" – "+f.c),"LOCATION:"+z(f.a||f.c),"DESCRIPTION:"+z("N° "+f.n+"\nClient : "+f.c+"\nStagiaires : "+(f.tr||[]).map(x=>x[0]).join(", ")),"END:VEVENT")});
+ o.push("END:VCALENDAR");return o.join("\r\n");
+}
+function card(f,past){
+ const ds=(f.ds||[]).slice().sort(),T=today(),ct=f.ct||[];
+ const tr=(f.tr||[]);
+ return `<div class="card"><div>${past?`<span class="tag">Terminée</span>`:`<span class="tag go">Planifiée</span>`}<span class="tag">N° ${esc(f.n)}</span></div>
+ <h2 style="margin-top:8px">${esc(f.t)}</h2><div class="mu">${esc(f.c)}</div>
+ <div class="row"><b>Dates</b><div>${ds.map(d=>{const t=slot(f,d);return `<div class="dt${d<T?" past":""}"><b>${esc(fdl(d))}</b><br><span class="mu">${esc(t[2])}</span></div>`}).join("")||"À définir"}</div></div>
+ <div class="row"><b>Lieu</b><div>${esc(f.c)}<br>${esc(f.a||"")}${f.a?`<br><a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(f.c+" "+f.a)}" target="_blank" rel="noopener">📍 Itinéraire</a>`:""}</div></div>
+ <div class="row"><b>Durée</b><div>${esc(f.h)} h · ${esc(String(f.j).replace(".",","))} jour(s)</div></div>
+ ${ct.length&&ct[0]?`<div class="row"><b>Contact client</b><div>${esc(ct[0])}${ct[1]?`<br>${esc(ct[1])}`:""}${ct[2]?`<br><a href="tel:${esc(ct[2].replace(/\s/g,""))}">☎ ${esc(ct[2])}</a>`:""}${ct[3]?`<br><a href="mailto:${esc(ct[3])}">✉ ${esc(ct[3])}</a>`:""}</div></div>`:""}
+ <div class="row"><b>Stagiaires (${tr.length})</b><div>${tr.map(x=>esc(x[0])+(x[1]?` <span class="mu">– ${esc(x[1])}</span>`:"")).join("<br>")||"—"}</div></div>
+ ${f.ob?`<div class="row"><b>Objectif</b><div>${esc(f.ob)}</div></div>`:""}
+ ${(f.pg||[]).length?`<details><summary>Programme (${f.pg.length} module${f.pg.length>1?"s":""})</summary><ul>${f.pg.map(m=>`<li>${esc(m)}</li>`).join("")}</ul></details>`:""}
+ <div class="btns"><button type="button" class="btn p" data-ics="${esc(f.n)}">📅 Ajouter à mon agenda</button></div></div>`;
+}
+async function main(){
+ let D=null;try{D=await load(location.hash.replace(/^#/,""))}catch(e){D=null}
+ if(!D||D.k!=="iv"||!D.f){app.innerHTML='<div class="card"><h1>Lien incomplet</h1><p>Ce lien est incomplet ou a été modifié. Merci de rouvrir le lien reçu par e-mail, tel quel, ou de contacter l’organisme de formation.</p></div>';return}
+ const G=D.g||[],T=today(),F=D.f.slice().sort((a,b)=>String((a.ds||[]).slice().sort()[0]||"").localeCompare(String((b.ds||[]).slice().sort()[0]||"")));
+ const isPast=f=>{const l=(f.ds||[]).slice().sort().pop();return l&&l<T};
+ const up=F.filter(f=>!isPast(f)),pa=F.filter(isPast);
+ document.title="Espace intervenant – "+(D.i||"");
+ app.innerHTML=`<div class="hd"><img src="logo.jpg" alt="TOPAS informatique"><div><h1>Espace intervenant</h1><div class="mu">${esc(D.i||"")}</div></div></div>
+ <p class="mu">Vos formations à venir, avec les dates, le lieu, les stagiaires et le programme. Ce lien est personnel : ne le partagez pas. Mis à jour le ${esc(fds(D.u||T))} — un nouveau lien vous est envoyé à chaque changement de planning.</p>
+ <h2 style="margin-top:18px">À venir (${up.length})</h2>${up.map(f=>card(f,false)).join("")||'<div class="card mu">Aucune formation planifiée pour le moment.</div>'}
+ ${pa.length?`<details><summary>Formations terminées (${pa.length})</summary>${pa.map(f=>card(f,true)).join("")}</details>`:""}
+ <div class="ft">${esc(G[0]||"")}${G[1]?" · ☎ "+esc(G[1]):""}${G[2]?" · ✉ <a href=\"mailto:"+esc(G[2])+"\">"+esc(G[2])+"</a>":""}${G[3]?" · "+esc(G[3]):""}</div>`;
+ document.querySelectorAll("[data-ics]").forEach(b=>b.onclick=()=>{const f=D.f.find(x=>x.n===b.dataset.ics);if(!f)return;const bl=new Blob([ics(f,D)],{type:"text/calendar"}),a=document.createElement("a");a.href=URL.createObjectURL(bl);a.download=f.n+"-planning.ics";document.body.appendChild(a);a.click();setTimeout(()=>a.remove(),500)});
+}
+main();
+})();
+</script>
+</body>
+</html>
