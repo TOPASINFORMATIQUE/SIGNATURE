@@ -59,7 +59,7 @@ const K=D.q,org=D.g||"",KEY="fpq:"+K+":"+D.n+":"+(D.nm||"");
 let done=null;try{done=localStorage.getItem(KEY)}catch(e){}
 const SAT=[["😀","Très satisfaisant"],["🙂","Satisfaisant"],["😕","Peu satisfaisant"],["😞","Insatisfaisant"]];
 const QUAL=[["😀","Très bien"],["🙂","Bien"],["😕","Moyen"],["😞","Insuffisant"]];
-const DEF={
+let DEF={
  auto:{title:"Auto-évaluation avant la formation",intro:"Ce court questionnaire (2 minutes) nous permet d’adapter la formation à votre niveau et à vos attentes.",
   items:[
    {id:"soc",t:"Société",k:"text",pre:D.c||"",req:1},
@@ -98,6 +98,8 @@ const DEF={
    {id:"cpl",t:"Stagiaires ayant besoin d’un accompagnement ou d’une formation complémentaire",k:"area"},
    {id:"sug",t:"Suggestions d’amélioration",k:"area"}]}
 }[K];
+if(D.x&&Array.isArray(D.x.i)&&D.x.i.length){const KM={t:"text",a:"area",r:"radio",s:"scale",g:"star"};DEF={title:D.x.ti||DEF.title,intro:D.x.in||"",items:D.x.i.map(a=>({id:String(a[0]),k:KM[a[1]]||"text",t:String(a[2]||""),req:a[3]?1:0,o:a[1]==="s"?(a[4]==="qual"?QUAL:SAT):(Array.isArray(a[4])?a[4]:[]),pre:a[0]==="soc"?(D.c||""):a[0]==="nom"?((D.nm||"")+(D.fn?" / "+D.fn:"")):""}))}}
+const PREV=D.n==="APERCU";
 document.title=DEF.title;
 function field(q){
  const req=q.req?" *":"";
@@ -126,15 +128,15 @@ async function submit(){
  let lim=300,payload,body;
  for(;;){
   payload={t:"fp-q",q:K,n:D.n,ti:D.ti,nm:D.nm||"",dl,hl,tsl:fd(dl)+" à "+hl};
-  if(K==="auto"){payload.v={};ans.forEach(a=>{payload.v[a[0].id]=cut(a[1],lim)})}
-  else payload.a=ans.filter(a=>a[1]!=="").map(a=>[cut(a[0].t,90),cut(a[1],lim)]);
+  if(K==="auto"){payload.v={};ans.forEach(a=>{if(/^(soc|nom|hand|niv|obj|obj2|att|inf)$/.test(a[0].id))payload.v[a[0].id]=cut(a[1],lim)})}
+  payload.a=ans.filter(a=>a[1]!=="").map(a=>[cut(a[0].t,90),cut(a[1],lim)]);
   body=JSON.stringify(payload);
   if(new TextEncoder().encode(body).length<=3800||lim<=40)break;lim=Math.floor(lim*.7);
  }
  const code="FPQ:"+b64u(payload);
  const subj=DEF.title+" – "+D.n+" – "+(D.nm||"");
- const sends=[];
- if(D.t)sends.push(fetch("https://ntfy.sh/"+encodeURIComponent(D.t),{method:"POST",body}).then(r=>{if(!r.ok)throw 0;return 1}));
+ const sends=[];if(PREV){$("#form").classList.add("hide");$("#res").innerHTML='<div class="card okb"><div class="okt">Aperçu</div><p>Voici ce que verra le destinataire. Rien n’a été envoyé.</p><button class="sec" onclick="location.reload()">Recommencer</button></div>';window.scrollTo(0,0);return}
+ if(D.t&&!PREV)sends.push(fetch("https://ntfy.sh/"+encodeURIComponent(D.t),{method:"POST",body}).then(r=>{if(!r.ok)throw 0;return 1}));
  if(D.m){const f=new URLSearchParams({_subject:subj,_captcha:"false",_template:"table",Questionnaire:DEF.title,Dossier:D.n+" – "+(D.f||""),Nom:D.nm||"",Date:payload.tsl,Code:code});ans.forEach(a=>{if(a[1])f.append(a[0].t.slice(0,80),a[1])});sends.push(fetch("https://formsubmit.co/ajax/"+encodeURIComponent(D.m),{method:"POST",headers:{Accept:"application/json"},body:f}).then(r=>{if(!r.ok)throw 0;return 1}))}
  const R=await Promise.allSettled(sends),ok=R.some(r=>r.status==="fulfilled");
  if(ok){try{localStorage.setItem(KEY,"1")}catch(e){}}
