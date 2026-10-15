@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Signature en ligne</title>
+<style>
+:root{--bg:#f4f5f8;--card:#fff;--tx:#14171f;--mu:#5a6275;--br:#d9dce5;--pr:#12308f;--ok:#157347;--ko:#b42318;--ac:#7a1010}
+@media (prefers-color-scheme:dark){:root{--bg:#10131a;--card:#1a1e29;--tx:#e8eaf0;--mu:#a0a7b8;--br:#2c3242;--pr:#8fa8ff;--ok:#5fd08a;--ko:#ff8a7a;--ac:#ff9b9b}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+.w{max-width:760px;margin:0 auto;padding:16px}
+h1{font-size:22px;margin:6px 0 2px;color:var(--pr)}
+h2{font-size:17px;margin:0 0 8px}
+.card{background:var(--card);border:1px solid var(--br);border-radius:12px;padding:16px;margin:12px 0}
+.mu{color:var(--mu);font-size:14px}
+.row{display:grid;grid-template-columns:150px 1fr;gap:6px 12px;margin:4px 0}
+.row b{color:var(--mu);font-weight:600}
+@media(max-width:560px){.row{grid-template-columns:1fr;gap:0}.row b{margin-top:6px}}
+.art{display:inline-block;background:#ececf2;color:var(--ac);font-weight:700;border-radius:999px;padding:2px 12px;margin:14px 0 6px;font-size:14px}
+@media (prefers-color-scheme:dark){.art{background:#262c3c}}
+table{width:100%;border-collapse:collapse;margin:6px 0}
+td,th{padding:6px 8px;border-bottom:1px solid var(--br);text-align:left;font-size:15px}
+td.r{text-align:right;white-space:nowrap}
+.dt{margin:6px 0;padding:8px 12px;border-left:4px solid var(--pr);background:rgba(18,48,143,.07);border-radius:6px}
+label{display:block;font-weight:600;margin:12px 0 4px}
+input[type=text]{width:100%;font:inherit;padding:12px;border:1px solid var(--br);border-radius:8px;background:var(--card);color:var(--tx)}
+input[type=text]:focus,button:focus-visible,canvas:focus-visible{outline:3px solid var(--pr);outline-offset:2px}
+.pad{position:relative;border:2px dashed var(--br);border-radius:10px;background:#fff;aspect-ratio:320/140;width:100%;touch-action:none}
+.pad canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:crosshair}
+.pad .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#9aa0b0;pointer-events:none;font-size:15px}
+.chk{display:flex;gap:10px;align-items:flex-start;margin:14px 0;font-weight:600}
+.chk input{width:24px;height:24px;margin-top:2px;flex:none}
+button,a.btn{display:inline-block;font:inherit;font-weight:700;border:0;border-radius:10px;padding:14px 20px;cursor:pointer;text-decoration:none;text-align:center}
+.go{background:var(--pr);color:#fff;width:100%;font-size:18px}
+@media (prefers-color-scheme:dark){.go{color:#0b1020}}
+.go[disabled]{opacity:.5;cursor:not-allowed}
+.sec{background:transparent;border:1px solid var(--br);color:var(--tx);padding:8px 14px;font-weight:600;font-size:14px}
+.err{color:var(--ko);font-weight:600;min-height:1.4em}
+.okb{border-color:var(--ok)}
+.okt{color:var(--ok);font-weight:700;font-size:18px}
+.hide{display:none}
+@media print{body{background:#fff;color:#000}.noprint{display:none!important}.card{border:0;padding:0}}
+</style>
+</head>
+<body>
+<div class="w">
+<div id="app"></div>
+</div>
+<script>
+(function(){
+"use strict";
+const $=s=>document.querySelector(s);
+const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const eur=n=>Number(n||0).toLocaleString("fr-FR",{minimumFractionDigits:2,maximumFractionDigits:2});
+const fd=d=>{if(!d)return"—";const x=new Date(d+"T12:00:00");return isNaN(x)?d:x.toLocaleDateString("fr-FR",{day:"2-digit",month:"2-digit",year:"numeric"})};
+const fdl=d=>{const x=new Date(d+"T12:00:00");return isNaN(x)?d:x.toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long",year:"numeric"})};
+const b64u=o=>btoa(unescape(encodeURIComponent(JSON.stringify(o)))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
+function unb64u(t){t=String(t).replace(/-/g,"+").replace(/_/g,"/");while(t.length%4)t+="=";return JSON.parse(decodeURIComponent(escape(atob(t))))}
+let D=null;
+try{D=unb64u(location.hash.replace(/^#/,""))}catch(e){D=null}
+const app=$("#app");
+if(!D||!D.n||!D.g){app.innerHTML='<div class="card"><h1>Lien incomplet</h1><p>Ce lien de signature est incomplet ou a été modifié. Merci de rouvrir le lien reçu par e-mail, tel quel, ou de contacter l’organisme de formation.</p></div>';return}
+const plan=D.k==="plan",G=D.g,C=D.c||["","",""],tr=D.tr||[];
+const org=G[0]||"",addr=G[1]||"",tel=G[2]||"",mail=G[3]||"",web=G[4]||"",nda=G[5]||"",siret=G[6]||"";
+document.title=(plan?"Validation de la planification":"Signature de la convention")+" "+D.n;
+const KEY="fpsig:"+D.k+":"+D.n;
+let done=null;try{done=JSON.parse(localStorage.getItem(KEY)||"null")}catch(e){}
+
+function docConv(){
+ const nbj=D.j||1,tot=(D.pj||0)*nbj,tva=tot*.2;
+ return `<h2>Convention simplifiée de formation professionnelle</h2>
+ <p class="mu">N° <b>${esc(D.n)}</b> · du ${esc(fd(D.dc))}</p>
+ <div class="row"><b>Organisme</b><span>${esc(org)}<br>${esc(addr)}<br>N° d’agrément ${esc(nda)} · SIRET ${esc(siret)}</span></div>
+ <div class="row"><b>Entreprise</b><span>${esc(C[0])}<br>${esc(C[1])}</span></div>
+ <span class="art">Article 1er : Objet</span>
+ <div class="row"><b>Intitulé</b><span><b style="color:inherit">${esc(D.f)}</b></span></div>
+ ${D.o?`<div class="row"><b>Objectif</b><span>${esc(D.o)}</span></div>`:""}
+ <div class="row"><b>Période</b><span>du ${esc(fd(D.a))} au ${esc(fd(D.b))}</span></div>
+ <div class="row"><b>Durée</b><span>${eur(D.h)} heures</span></div>
+ <div class="row"><b>Lieu</b><span>${esc(C[0])} – ${esc(C[1])}</span></div>
+ <span class="art">Article 2 : Effectif formé</span>
+ <div class="row"><b>${tr.length} stagiaire${tr.length>1?"s":""}</b><span>${tr.map(esc).join("<br>")||"—"}</span></div>
+ <span class="art">Article 3 : Dispositions financières</span>
+ <table><tr><th>Coût pédagogique HT par jour</th><td class="r">${eur(D.pj)} €</td></tr><tr><th>Nombre de jours</th><td class="r">${eur(nbj)}</td></tr><tr><th>Total HT</th><td class="r">${eur(tot)} €</td></tr><tr><th>TVA 20 %</th><td class="r">${eur(tva)} €</td></tr><tr><th>Total TTC</th><td class="r"><b>${eur(tot+tva)} €</b></td></tr></table>
+ <p class="mu">Fait en double exemplaire à Moirans, le ${esc(fd(D.dc))}.</p>`;
+}
+function docPlan(){
+ const ds=D.ds||[];
+ return `<h2>Planification de la formation</h2>
+ <p class="mu">Dossier N° <b>${esc(D.n)}</b></p>
+ <div class="row"><b>Formation</b><span><b style="color:inherit">${esc(D.f)}</b></span></div>
+ <div class="row"><b>Lieu d’intervention</b><span>${esc(C[0])} – ${esc(C[1])}</span></div>
+ <div class="row"><b>Intervenant</b><span>${esc(D.iv||"—")}</span></div>
+ <div class="row"><b>Stagiaires</b><span>${tr.map(esc).join("<br>")||"—"}</span></div>
+ <span class="art">Dates d’intervention</span>
+ ${ds.map(d=>`<div class="dt"><b>${esc(fdl(d))}</b><br><span class="mu">9h00 – 12h30 · 14h00 – 17h30</span></div>`).join("")||"<p>Dates à préciser.</p>"}
+ <p class="mu">Ce document vaut convocation aux participants concernés.</p>`;
+}
+function head(){return `<h1>${plan?"Validation de la planification":"Signature de la convention"}</h1><div class="mu">${esc(org)}${tel?" · "+esc(tel):""}${mail?" · "+esc(mail):""}</div>`}
+
+function render(){
+ app.innerHTML=head()+
+ `<div class="card" id="doc">${plan?docPlan():docConv()}<div id="sigdone"></div></div>`+
+ (done?`<div class="card okb noprint"><div class="okt">✔ Déjà ${plan?"validée":"signée"}</div><p>Ce document a déjà été ${plan?"validé":"signé"} depuis cet appareil par <b>${esc(done.nm)}</b> le ${esc(done.tsl)}.</p><button class="sec" id="prt">🖨 Imprimer / enregistrer ma copie</button></div>`:
+ `<div class="card noprint" id="form">
+  <h2>${plan?"Valider les dates":"Signer la convention"}</h2>
+  <p class="mu">Vérifiez le document ci-dessus, puis renseignez les champs. Cela ne prend qu’une minute.</p>
+  <label for="nm">Nom et prénom du signataire</label><input type="text" id="nm" autocomplete="name">
+  <label for="fn">Fonction</label><input type="text" id="fn" autocomplete="organization-title">
+  <label id="sl">Votre signature (au doigt ou à la souris)</label>
+  <div class="pad"><canvas id="cv" tabindex="0" aria-labelledby="sl"></canvas><div class="ph" id="ph">Signez ici</div></div>
+  <div style="margin-top:6px"><button class="sec" id="clr" type="button">Effacer la signature</button></div>
+  <label class="chk"><input type="checkbox" id="ok"><span>${plan?"J’ai pris connaissance des dates d’intervention et je les valide.":"Lu et approuvé, bon pour accord."}</span></label>
+  <div class="err" id="err" role="alert"></div>
+  <button class="go" id="go" type="button">${plan?"Valider la planification":"Signer la convention"}</button>
+  <p class="mu">Les informations saisies sont transmises uniquement à ${esc(org)}. Cette signature électronique simple a valeur d’accord.</p>
+ </div>`)+`<div id="res"></div>`;
+ if(done){const p=$("#prt");if(p)p.onclick=()=>window.print();if(done.sg)$("#sigdone").innerHTML=sigDoc(done);return}
+ pad();
+}
+function sigSvg(sg){let d="";String(sg||"").split(";").forEach(st=>{const P=st.split(",").map(q=>q.split(".").map(v=>parseInt(v,36))).filter(q=>q.length===2&&!isNaN(q[0])&&!isNaN(q[1]));if(!P.length)return;if(P.length===1)P.push([P[0][0]+1,P[0][1]]);d+="M"+P.map(q=>q[0]+" "+q[1]).join("L")});return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 140" width="200" height="87"><path d="${d}" fill="none" stroke="#12308f" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`}
+function sigDoc(p){return `<div style="margin-top:16px;border:1px solid var(--br);border-radius:8px;padding:10px 14px"><b>${plan?"Validée":"Signée"} en ligne</b> par ${esc(p.nm)}${p.fn?" ("+esc(p.fn)+")":""}, ${esc(C[0])}, le ${esc(p.tsl)}<br><span style="background:#fff;display:inline-block;border-radius:6px">${sigSvg(p.sg)}</span></div>`}
+
+let strokes=[],cur=null;
+function pad(){
+ const cv=$("#cv"),ctx=cv.getContext("2d");
+ function size(){const r=cv.getBoundingClientRect(),dp=window.devicePixelRatio||1;cv.width=Math.max(1,Math.round(r.width*dp));cv.height=Math.max(1,Math.round(r.height*dp));redraw()}
+ function pt(e){const r=cv.getBoundingClientRect();return[Math.round((e.clientX-r.left)/r.width*320),Math.round((e.clientY-r.top)/r.height*140)]}
+ function redraw(){ctx.clearRect(0,0,cv.width,cv.height);ctx.strokeStyle="#12308f";ctx.lineWidth=2.4*cv.width/320;ctx.lineCap="round";ctx.lineJoin="round";const k=cv.width/320;strokes.concat(cur?[cur]:[]).forEach(s=>{if(!s.length)return;ctx.beginPath();ctx.moveTo(s[0][0]*k,s[0][1]*k);if(s.length===1)ctx.lineTo(s[0][0]*k+.1,s[0][1]*k);s.forEach(q=>ctx.lineTo(q[0]*k,q[1]*k));ctx.stroke()});$("#ph").style.display=(strokes.length||cur)?"none":"flex"}
+ cv.addEventListener("pointerdown",e=>{e.preventDefault();try{cv.setPointerCapture(e.pointerId)}catch(x){}cur=[pt(e)];redraw()});
+ cv.addEventListener("pointermove",e=>{if(!cur)return;e.preventDefault();cur.push(pt(e));redraw()});
+ const end=e=>{if(!cur)return;strokes.push(cur);cur=null;redraw()};
+ cv.addEventListener("pointerup",end);cv.addEventListener("pointercancel",end);cv.addEventListener("pointerleave",end);
+ $("#clr").onclick=()=>{strokes=[];cur=null;redraw()};
+ window.addEventListener("resize",size);size();
+ $("#go").onclick=submit;
+}
+function compact(){
+ let th=2,out;
+ for(;;){
+  out=strokes.map(s=>{const r=[];let l=null;s.forEach((q,i)=>{if(!l||Math.hypot(q[0]-l[0],q[1]-l[1])>=th||i===s.length-1){if(!l||q[0]!==l[0]||q[1]!==l[1])r.push(q);l=q}});return r});
+  const n=out.reduce((a,s)=>a+s.length,0),str=out.map(s=>s.map(q=>Math.max(0,q[0]).toString(36)+"."+Math.max(0,q[1]).toString(36)).join(",")).join(";");
+  if(str.length<=2200||th>40)return str;th+=1.5;
+ }
+}
+async function submit(){
+ const err=$("#err"),nm=$("#nm").value.trim(),fn=$("#fn").value.trim();err.textContent="";
+ if(nm.length<3)return(err.textContent="Merci d’indiquer votre nom et prénom.",$("#nm").focus());
+ if(!strokes.length)return err.textContent="Merci de signer dans le cadre.";
+ if(!$("#ok").checked)return err.textContent="Merci de cocher la case pour confirmer.";
+ const go=$("#go");go.disabled=true;go.textContent="Envoi en cours…";
+ const now=new Date(),p2=n=>String(n).padStart(2,"0"),dl=now.getFullYear()+"-"+p2(now.getMonth()+1)+"-"+p2(now.getDate()),hl=p2(now.getHours())+":"+p2(now.getMinutes());
+ const payload={t:"fp-sign",k:plan?"plan":"conv",n:D.n,nm,fn,dl,hl,tsl:fd(dl)+" à "+hl,sg:compact()};
+ const code="FPSIG:"+b64u(payload),body=JSON.stringify(payload);
+ const sends=[];
+ if(D.t)sends.push(fetch("https://ntfy.sh/"+encodeURIComponent(D.t),{method:"POST",body}).then(r=>{if(!r.ok)throw 0;return 1}));
+ if(D.m){const f=new URLSearchParams({_subject:(plan?"Planification validée":"Convention signée")+" – "+D.n+" – "+nm,_captcha:"false",_template:"table",Document:(plan?"Planification ":"Convention ")+D.n,Signataire:nm,Fonction:fn,"Société":C[0],Date:payload.tsl,Code:code});sends.push(fetch("https://formsubmit.co/ajax/"+encodeURIComponent(D.m),{method:"POST",headers:{Accept:"application/json"},body:f}).then(r=>{if(!r.ok)throw 0;return 1}))}
+ const R=await Promise.allSettled(sends),ok=R.some(r=>r.status==="fulfilled");
+ done={nm,fn,tsl:payload.tsl,sg:payload.sg};
+ if(ok){try{localStorage.setItem(KEY,JSON.stringify(done))}catch(e){}}
+ $("#form").classList.add("hide");$("#sigdone").innerHTML=sigDoc(done);
+ const mailto="mailto:"+encodeURIComponent(D.m||"")+"?subject="+encodeURIComponent((plan?"Planification validée":"Convention signée")+" – "+D.n+" – "+nm)+"&body="+encodeURIComponent("Bonjour,\n\n"+nm+(fn?" ("+fn+")":"")+" a "+(plan?"validé la planification":"signé la convention")+" "+D.n+" en ligne.\n\n"+code+"\n");
+ $("#res").innerHTML=ok?
+  `<div class="card okb noprint"><div class="okt">✔ Merci, c’est ${plan?"validé":"signé"} !</div><p>${esc(org)} a bien reçu votre ${plan?"validation":"signature"}. Vous pouvez fermer cette page.</p><button class="sec" id="prt">🖨 Imprimer / enregistrer ma copie</button> <a class="sec btn" href="${mailto}" style="margin-top:6px">✉ Envoyer aussi une confirmation par e-mail</a></div>`:
+  `<div class="card noprint" style="border-color:var(--ko)"><div class="err">La transmission automatique n’a pas fonctionné.</div><p>Appuyez sur le bouton ci-dessous pour envoyer votre ${plan?"validation":"signature"} par e-mail (un message est déjà prêt, il suffit de l’envoyer).</p><a class="btn go" href="${mailto}">✉ Envoyer par e-mail</a></div>`;
+ const pr=$("#prt");if(pr)pr.onclick=()=>window.print();
+ window.scrollTo(0,0);
+}
+render();
+})();
+</script>
+</body>
+</html>
