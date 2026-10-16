@@ -6,40 +6,55 @@
 <meta name="robots" content="noindex,nofollow">
 <title>Questionnaire</title>
 <style>
-:root{--bg:#f4f5f8;--card:#fff;--tx:#14171f;--mu:#5a6275;--br:#d9dce5;--pr:#12308f;--ok:#157347;--ko:#b42318;--ac:#7a1010}
-@media (prefers-color-scheme:dark){:root{--bg:#10131a;--card:#1a1e29;--tx:#e8eaf0;--mu:#a0a7b8;--br:#2c3242;--pr:#8fa8ff;--ok:#5fd08a;--ko:#ff8a7a;--ac:#ff9b9b}}
+:root{--bg:#eef3fa;--card:#fff;--tx:#1f2937;--mu:#5a6275;--br:#d9dce5;--pr:#1e3a8a;--bl:#1565c0;--gr:#16a34a;--sf:#eef4fb;--ok:#157347;--ko:#b42318}
+@media (prefers-color-scheme:dark){:root{--bg:#10131a;--card:#1a1e29;--tx:#e8eaf0;--mu:#a0a7b8;--br:#2c3242;--pr:#9db4ff;--bl:#1e4f9a;--gr:#22c55e;--sf:#1f2636;--ok:#5fd08a;--ko:#ff8a7a}}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 'Segoe UI',system-ui,-apple-system,Roboto,Arial,sans-serif}
 .w{max-width:720px;margin:0 auto;padding:16px}
-h1{font-size:22px;margin:6px 0 2px;color:var(--pr)}
-h2{font-size:17px;margin:0 0 6px}
-.card{background:var(--card);border:1px solid var(--br);border-radius:12px;padding:16px;margin:12px 0}
+.sh{background:var(--card);border-radius:16px;overflow:hidden;box-shadow:0 2px 10px rgba(15,23,42,.06)}
+.hd{display:flex;align-items:center;gap:14px;padding:14px 18px;flex-wrap:wrap}
+.hd img{height:52px;background:#fff;border-radius:6px;padding:2px}
+.qb{border-left:1px solid var(--br);padding-left:14px;color:var(--pr);font-size:11px;line-height:1.3}
+.qb b{font-size:20px;font-weight:800}.qb i{color:#e11d48;font-style:normal}
+.band{background:var(--bl);color:#fff;text-align:center;font-size:14px;font-weight:600;padding:8px}
+.bd{padding:20px 20px 8px}
+.kk{font-size:13px;font-weight:700;color:var(--gr);text-transform:uppercase;letter-spacing:.5px}
+.hi{font-size:26px;font-weight:800;color:var(--pr);margin:2px 0 4px}.hi span{color:var(--gr)}
+h1{font-size:20px;margin:0 0 6px;color:var(--pr);text-transform:uppercase;font-weight:800}
+.box{display:flex;gap:14px;align-items:center;background:var(--sf);border-radius:14px;padding:14px 16px;margin:12px 0}
+.ic{flex:none;width:48px;height:48px;border-radius:50%;background:#d6e6f7;display:flex;align-items:center;justify-content:center;font-size:22px}
+.box h2{font-size:16px;margin:0 0 2px;color:var(--pr)}
 .mu{color:var(--mu);font-size:14px}
-.q{margin:18px 0}
-.q>b{display:block;margin-bottom:6px}
+.q{margin:14px 0;display:flex;gap:12px;align-items:flex-start}
+.qn{flex:none;width:32px;height:32px;border-radius:50%;background:var(--gr);color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center;font-size:15px;margin-top:6px}
+.qc{flex:1;min-width:0;background:var(--sf);border-radius:12px;padding:12px 14px;border:2px solid transparent}
+.qc>b{display:block;margin-bottom:8px}
 .opts{display:flex;flex-direction:column;gap:6px}
-.opt{display:flex;align-items:center;gap:10px;border:1px solid var(--br);border-radius:10px;padding:10px 12px;cursor:pointer}
-.opt:has(input:checked){border-color:var(--pr);background:rgba(18,48,143,.09)}
-.opt input{width:22px;height:22px;flex:none;margin:0}
-.scale{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.opt{display:flex;align-items:center;gap:10px;border:1px solid var(--br);border-radius:10px;padding:10px 12px;cursor:pointer;background:var(--card)}
+.opt:has(input:checked){border-color:var(--gr);background:rgba(22,163,74,.12);font-weight:600}
+.opt input{width:22px;height:22px;flex:none;margin:0;accent-color:var(--gr)}
+.scale{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
 .scale .opt{flex-direction:column;text-align:center;font-size:13px;padding:8px 4px;gap:4px}
 .scale .opt .e{font-size:26px;line-height:1}
-.scale .opt input{position:absolute;opacity:0;width:1px;height:1px}
+.scale .opt input,.star .opt input{position:absolute;opacity:0;width:1px;height:1px}
 .star{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
-.star .opt{justify-content:center;font-size:20px;font-weight:700}
-.star .opt input{position:absolute;opacity:0;width:1px;height:1px}
+.star .opt{justify-content:center;font-size:18px;white-space:nowrap;font-weight:700;color:#f59e0b;padding:10px 2px}
 input[type=text],textarea{width:100%;font:inherit;padding:12px;border:1px solid var(--br);border-radius:8px;background:var(--card);color:var(--tx)}
-input:focus-visible,textarea:focus-visible,button:focus-visible{outline:3px solid var(--pr);outline-offset:2px}
-button,a.btn{display:inline-block;font:inherit;font-weight:700;border:0;border-radius:10px;padding:14px 20px;cursor:pointer;text-decoration:none;text-align:center}
-.go{background:var(--pr);color:#fff;width:100%;font-size:18px}
-@media (prefers-color-scheme:dark){.go{color:#0b1020}}
+input:focus-visible,textarea:focus-visible,button:focus-visible,.opt:focus-within{outline:3px solid var(--bl);outline-offset:2px}
+button,a.btn{display:inline-block;font:inherit;font-weight:800;border:0;border-radius:10px;padding:15px 22px;cursor:pointer;text-decoration:none;text-align:center}
+.go{background:var(--gr);color:#fff;width:100%;font-size:18px;margin-top:6px}
 .go[disabled]{opacity:.5}
 .sec{background:transparent;border:1px solid var(--br);color:var(--tx);padding:8px 14px;font-weight:600;font-size:14px}
 .err{color:var(--ko);font-weight:600;min-height:1.4em}
-.bad{border-color:var(--ko)!important}
-.okb{border-color:var(--ok)}
-.okt{color:var(--ok);font-weight:700;font-size:18px}
+.bad,.q.bad .qc{border-color:var(--ko)!important}
+.okb{border:2px solid var(--gr)}
+.okt{color:var(--ok);font-weight:800;font-size:18px}
+.card{background:var(--card);border-radius:14px;padding:16px;margin:12px 0}
+.ft{padding:6px 20px 20px}
+.bye{font-family:'Segoe Script','Brush Script MT','Comic Sans MS',cursive;font-size:28px;color:var(--pr);font-style:italic}
+.bl{height:3px;width:150px;background:var(--gr);border-radius:3px;margin:2px 0 12px}
 .hide{display:none}
+@media (max-width:480px){.hi{font-size:22px}.qb{border:0;padding:0}.q{gap:8px}.qn{width:28px;height:28px;font-size:13px}.scale{grid-template-columns:repeat(2,minmax(0,1fr))}.scale .opt{flex-direction:row;justify-content:flex-start;text-align:left;font-size:14px;padding:8px 10px}.scale .opt .e{font-size:22px}.qc{padding:10px 12px}}
 </style>
 </head>
 <body>
@@ -104,20 +119,25 @@ let DEF={
 if(D.x&&Array.isArray(D.x.i)&&D.x.i.length){const KM={t:"text",a:"area",r:"radio",s:"scale",g:"star"};DEF={title:D.x.ti||DEF.title,intro:D.x.in||"",items:D.x.i.map(a=>({id:String(a[0]),k:KM[a[1]]||"text",t:String(a[2]||""),req:a[3]?1:0,o:a[1]==="s"?(a[4]==="qual"?QUAL:SAT):(Array.isArray(a[4])?a[4]:[]),pre:a[0]==="soc"?(D.c||""):a[0]==="nom"?((D.nm||"")+(D.fn?" / "+D.fn:"")):""}))}}
 const PREV=D.n==="APERCU";
 document.title=DEF.title;
+let QN=0;
+function wrap(q,inner){QN++;return `<div class="q" data-id="${q.id}"><span class="qn" aria-hidden="true">${QN}</span><div class="qc">${inner}</div></div>`}
 function field(q){
  const req=q.req?" *":"";
- if(q.k==="text")return `<div class="q" data-id="${q.id}"><b>${esc(q.t)}${req}</b><input type="text" id="f_${q.id}" value="${esc(q.pre||"")}"></div>`;
- if(q.k==="area")return `<div class="q" data-id="${q.id}"><b>${esc(q.t)}</b><textarea id="f_${q.id}" rows="3" maxlength="500"></textarea></div>`;
- if(q.k==="radio")return `<div class="q" data-id="${q.id}"><b>${esc(q.t)}${req}</b><div class="opts">${q.o.map(o=>`<label class="opt"><input type="radio" name="${q.id}" value="${esc(o)}"><span>${esc(o)}</span></label>`).join("")}</div></div>`;
- if(q.k==="scale")return `<div class="q" data-id="${q.id}"><b>${esc(q.t)}${req}</b><div class="scale">${q.o.map(o=>`<label class="opt"><input type="radio" name="${q.id}" value="${esc(o[1])}"><span class="e">${o[0]}</span><span>${esc(o[1])}</span></label>`).join("")}</div></div>`;
- if(q.k==="star")return `<div class="q" data-id="${q.id}"><b>${esc(q.t)}${req}</b><div class="star">${[1,2,3,4,5].map(n=>`<label class="opt"><input type="radio" name="${q.id}" value="${n}/5"><span>${"★".repeat(n)}</span></label>`).join("")}</div><div class="mu">1 = très insuffisant · 5 = excellent</div></div>`}
+ if(q.k==="text")return wrap(q,`<b>${esc(q.t)}${req}</b><input type="text" id="f_${q.id}" value="${esc(q.pre||"")}">`);
+ if(q.k==="area")return wrap(q,`<b>${esc(q.t)}</b><textarea id="f_${q.id}" rows="3" maxlength="500"></textarea>`);
+ if(q.k==="radio")return wrap(q,`<b>${esc(q.t)}${req}</b><div class="opts">${q.o.map(o=>`<label class="opt"><input type="radio" name="${q.id}" value="${esc(o)}"><span>${esc(o)}</span></label>`).join("")}</div>`);
+ if(q.k==="scale")return wrap(q,`<b>${esc(q.t)}${req}</b><div class="scale">${q.o.map(o=>`<label class="opt"><input type="radio" name="${q.id}" value="${esc(o[1])}"><span class="e">${o[0]}</span><span>${esc(o[1])}</span></label>`).join("")}</div>`);
+ if(q.k==="star")return wrap(q,`<b>${esc(q.t)}${req}</b><div class="star">${[1,2,3,4,5].map(n=>`<label class="opt"><input type="radio" name="${q.id}" value="${n}/5"><span>${n} ★</span></label>`).join("")}</div><div class="mu">1 = très insuffisant · 5 = excellent</div>`)}
 function val(q){if(q.k==="text"||q.k==="area")return($("#f_"+q.id).value||"").trim();const e=document.querySelector("input[name="+q.id+"]:checked");return e?e.value:""}
 function render(){
  const who=K==="bilan"?"Formateur : "+esc(D.nm||""):esc(D.nm||"");
- app.innerHTML=`<img src="logo.jpg" alt="TOPAS informatique" style="height:56px;margin-bottom:8px"><h1>${esc(DEF.title)}</h1><div class="mu">${esc(org)}</div>
- <div class="card"><h2>${esc(D.f||"")}</h2><div class="mu">${D.a?"Du "+esc(fd(D.a))+" au "+esc(fd(D.b)):""}${D.c?" · "+esc(D.c):""}${who?" · "+who:""}</div><p>${esc(DEF.intro)}</p></div>`+
+ QN=0;const KI={auto:["🎯","Auto-évaluation"],post:["⭐","Votre avis compte"],bilan:["🧑‍🏫","Bilan formateur"]}[K]||["📋","Questionnaire"];
+ app.innerHTML=`<div class="sh"><div class="hd"><img src="logo.jpg" alt="${esc(org||"TOPAS informatique")}"><div class="qb"><b>Qualiopi <i>▶</i>▶</b><br>processus certifié<br>🇫🇷 RÉPUBLIQUE FRANÇAISE</div></div><div class="band">🌐 www.topas.fr</div>
+ <div class="bd"><div class="kk">${KI[0]} ${esc(KI[1])}</div>${D.nm?`<div class="hi"><span>✦</span> Bonjour ${esc(String(D.nm).split(" ")[0])},</div>`:""}<h1>${esc(DEF.title)}</h1><p style="margin:4px 0 0">${esc(DEF.intro)}</p>
+ <div class="box"><span class="ic">📋</span><div><h2>${esc(D.f||"")}</h2><div class="mu">${D.a?"Du "+esc(fd(D.a))+" au "+esc(fd(D.b)):""}${D.c?" · "+esc(D.c):""}${who?" · "+who:""}</div></div></div>`+
  (done?`<div class="card okb"><div class="okt">✔ Déjà envoyé</div><p>Votre réponse a déjà été transmise depuis cet appareil. Merci !</p></div>`:
- `<div class="card" id="form">${DEF.items.map(field).join("")}<div class="err" id="err" role="alert"></div><button class="go" id="go" type="button">Envoyer mes réponses</button><p class="mu">Vos réponses sont transmises uniquement à ${esc(org)}.</p></div>`)+`<div id="res"></div>`;
+ `<div id="form">${DEF.items.map(field).join("")}<div class="err" id="err" role="alert"></div><button class="go" id="go" type="button">✔ Envoyer mes réponses</button><p class="mu" style="text-align:center">Vos réponses sont transmises uniquement à ${esc(org)}.</p></div>`)+`<div id="res"></div></div>
+ <div class="ft"><div class="bye">${K==="bilan"?"Merci pour votre intervention !":"À très bientôt !"}</div><div class="bl"></div><div class="mu" style="font-size:12px">${esc(org)} · Organisme de formation certifié Qualiopi</div></div></div>`;
  if(!done)$("#go").onclick=submit;
 }
 async function submit(){
