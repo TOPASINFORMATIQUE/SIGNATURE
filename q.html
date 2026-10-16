@@ -45,6 +45,9 @@ button,a.btn{display:inline-block;font:inherit;font-weight:700;border:0;border-r
 <body>
 <div class="w"><div id="app"></div></div>
 <script>
+const SBU="https://kbfnxqyxqualmqhiufnq.supabase.co",SBK="sb_publishable_5vjNCP7zREh5upGu_pTAIA_mgUPG8Cx";
+const sbDep=(c,p)=>fetch(SBU+"/rest/v1/rpc/deposer",{method:"POST",headers:{apikey:SBK,"Content-Type":"application/json"},body:JSON.stringify({p_canal:c,p_data:p})}).then(r=>{if(!r.ok)throw 0;return 1});
+
 (function(){
 "use strict";
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
@@ -136,7 +139,7 @@ async function submit(){
  const code="FPQ:"+b64u(payload);
  const subj=DEF.title+" – "+D.n+" – "+(D.nm||"");
  const sends=[];if(PREV){$("#form").classList.add("hide");$("#res").innerHTML='<div class="card okb"><div class="okt">Aperçu</div><p>Voici ce que verra le destinataire. Rien n’a été envoyé.</p><button class="sec" onclick="location.reload()">Recommencer</button></div>';window.scrollTo(0,0);return}
- if(D.t&&!PREV)sends.push(fetch("https://ntfy.sh/"+encodeURIComponent(D.t),{method:"POST",body}).then(r=>{if(!r.ok)throw 0;return 1}));
+ if(D.t&&!PREV)sends.push(sbDep(D.t,payload));
  if(D.m){const f=new URLSearchParams({_subject:subj,_captcha:"false",_template:"table",Questionnaire:DEF.title,Dossier:D.n+" – "+(D.f||""),Nom:D.nm||"",Date:payload.tsl,Code:code});ans.forEach(a=>{if(a[1])f.append(a[0].t.slice(0,80),a[1])});sends.push(fetch("https://formsubmit.co/ajax/"+encodeURIComponent(D.m),{method:"POST",headers:{Accept:"application/json"},body:f}).then(r=>{if(!r.ok)throw 0;return 1}))}
  const R=await Promise.allSettled(sends),ok=R.some(r=>r.status==="fulfilled");
  if(ok){try{localStorage.setItem(KEY,"1")}catch(e){}}

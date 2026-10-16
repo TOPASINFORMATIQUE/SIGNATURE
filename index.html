@@ -68,6 +68,9 @@ button,a.btn{display:inline-block;font:inherit;font-weight:700;border:0;border-r
 <div id="app"></div>
 </div>
 <script>
+const SBU="https://kbfnxqyxqualmqhiufnq.supabase.co",SBK="sb_publishable_5vjNCP7zREh5upGu_pTAIA_mgUPG8Cx";
+const sbDep=(c,p)=>fetch(SBU+"/rest/v1/rpc/deposer",{method:"POST",headers:{apikey:SBK,"Content-Type":"application/json"},body:JSON.stringify({p_canal:c,p_data:p})}).then(r=>{if(!r.ok)throw 0;return 1});
+
 (function(){
 "use strict";
 const $=s=>document.querySelector(s);
@@ -184,7 +187,7 @@ async function submit(){
  const payload={t:"fp-sign",k:plan?"plan":"conv",n:D.n,nm,fn,dl,hl,tsl:fd(dl)+" à "+hl,sg:compact()};
  const code="FPSIG:"+b64u(payload),body=JSON.stringify(payload);
  const sends=[];
- if(D.t)sends.push(fetch("https://ntfy.sh/"+encodeURIComponent(D.t),{method:"POST",body}).then(r=>{if(!r.ok)throw 0;return 1}));
+ if(D.t)sends.push(sbDep(D.t,payload));
  if(D.m){const f=new URLSearchParams({_subject:(plan?"Planification validée":"Convention signée")+" – "+D.n+" – "+nm,_captcha:"false",_template:"table",Document:(plan?"Planification ":"Convention ")+D.n,Signataire:nm,Fonction:fn,"Société":C[0],Date:payload.tsl,Code:code});sends.push(fetch("https://formsubmit.co/ajax/"+encodeURIComponent(D.m),{method:"POST",headers:{Accept:"application/json"},body:f}).then(r=>{if(!r.ok)throw 0;return 1}))}
  const R=await Promise.allSettled(sends),ok=R.some(r=>r.status==="fulfilled");
  done={nm,fn,tsl:payload.tsl,sg:payload.sg};
