@@ -61,6 +61,7 @@ button,a.btn{display:inline-block;font:inherit;font-weight:700;border:0;border-r
 .pln .rw{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}.pln .box{background:#f6f6f8;border-radius:6px;padding:10px 14px;min-height:150px}.pln .dtp{margin:5px 0;padding:5px 8px;background:#fff;border-left:4px solid #12308f;border-radius:4px}.pln .ftp{margin-top:24px;text-align:center;font-size:15px;border-bottom:6px solid #12308f;padding-bottom:10px}
 @media(max-width:640px){.paper{padding:12px}.cv .hg,.pln .hg2,.pln .g2,.pln .rw,.cv .sg,.cv .trg{grid-template-columns:1fr}.cv .r{grid-template-columns:1fr;gap:0}.cv .r b{text-align:left;margin-top:6px}.cv .ttl{font-size:17px}.cv .tt .sl{display:block;width:auto;padding:10px 14px}.cv .tt,.cv .tt>tbody,.cv .tt>tbody>tr,.cv .tt>tbody>tr>td{display:block;width:100%}.cv .tt .am table{margin:4px 10px 8px auto}.cv .px td{padding:6px 3px;font-size:12px}}
 @media print{.paper{border:0;box-shadow:none;padding:0}}
+.pdx{margin-top:22px;break-before:page;page-break-before:always}.pdj{border:1px solid #c9cde0;border-radius:6px;margin:8px 0;overflow:hidden}.pdh{background:#12308f;color:#fff;font-weight:700;padding:6px 10px}.pdb{padding:4px 10px 2px;break-inside:avoid}.pdt{font-weight:700;color:#12308f;margin-top:4px}.pdm{font-weight:600;margin-top:3px}.pdb ul{margin:2px 0 4px 18px;padding:0}
 </style>
 </head>
 <body>
@@ -128,8 +129,9 @@ function docPlan(){
 <div class="rw"><div><div class="bar" style="color:#111;font-weight:600">Prestation à Réaliser</div><div class="box"><i>${esc(D.f)}</i><br><br><b>Durée :</b> ${esc(D.h||"")} h · ${fjn(D.j||ds.length||1)} jour(s)<br><b>Période :</b> ${esc(fd(D.a))} → ${esc(fd(D.b))}<br><br><b>Stagiaires (${tr.length}) :</b><br>${tr.map((t,i)=>nmT(i)).join("<br>")||"—"}</div></div>
 <div><div class="bar">Dates Intervention</div><div class="box"><div style="font-size:11px;margin-bottom:6px"><b>Intervenant :</b> &nbsp; ${esc(D.iv||"")}</div>${ds.map(d=>`<div class="dtp"><b>${esc(fdl(d))}</b><br><span style="font-size:12px">${hrsT(d)}</span></div>`).join("")||"<i>Dates à définir</i>"}</div></div></div>
 <div id="sigent" style="margin-top:14px">${done&&done.sg?`<b class="mr">Validé en ligne</b>${sigBlock()}`:""}</div>
-<div class="ftp">*** Ce document vaut pour convocation aux Participants/Stagiaires concernés ***</div></div>`;
+<div class="ftp">*** Ce document vaut pour convocation aux Participants/Stagiaires concernés ***</div>${dero()}</div>`;
 }
+function dero(){const R=Array.isArray(D.dr)?D.dr:[];if(!R.length)return"";return `<div class="pdx"><div class="bar">Déroulé de l’intervention</div><div style="font-size:12px;margin:0 0 8px">Horaires indicatifs, adaptés sur place au rythme des stagiaires.</div>${R.map(d=>`<div class="pdj"><div class="pdh">${esc(d[0])}</div>${(d[1]||[]).map(b=>`<div class="pdb"><div class="pdt">${esc(b[0])}</div>${(b[1]||[]).map(g=>(g[0]?`<div class="pdm">${esc(g[0])}</div>`:"")+((g[1]||[]).length?`<ul>${g[1].map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`:"")).join("")}</div>`).join("")}</div>`).join("")}</div>`}
 function head(){return `<img src="logo.jpg" alt="TOPAS informatique" style="height:56px;margin-bottom:8px"><h1>${plan?"Validation de la planification":"Signature de la convention"}</h1><div class="mu">Vérifiez le document ci-dessous, puis signez en bas de page.</div>`}
 
 function render(){
