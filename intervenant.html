@@ -49,6 +49,9 @@ ul{margin:4px 0 0 18px;padding:0}
 <body>
 <div class="w"><div id="app"></div></div>
 <script>
+const SBU="https://kbfnxqyxqualmqhiufnq.supabase.co",SBK="sb_publishable_5vjNCP7zREh5upGu_pTAIA_mgUPG8Cx";
+const sbDep=(c,p)=>fetch(SBU+"/rest/v1/rpc/deposer",{method:"POST",headers:{apikey:SBK,"Content-Type":"application/json"},body:JSON.stringify({p_canal:c,p_data:p})}).then(r=>{if(!r.ok)throw 0;return 1});
+
 (function(){
 "use strict";
 const $=s=>document.querySelector(s),app=$("#app");
@@ -106,7 +109,7 @@ async function main(){
  document.querySelectorAll("[data-pbs]").forEach(b=>b.onclick=async()=>{const i=+b.dataset.pbs,f=D.f[i],ta=document.getElementById("pbt"+i),er=document.getElementById("pbe"+i),msg=ta.value.trim();er.textContent="";if(msg.length<3){er.textContent="Merci de décrire le problème en quelques mots.";ta.focus();return}
   b.disabled=true;b.textContent="Envoi en cours…";const now=new Date(),p2=n=>String(n).padStart(2,"0"),dl=now.getFullYear()+"-"+p2(now.getMonth()+1)+"-"+p2(now.getDate()),hl=p2(now.getHours())+":"+p2(now.getMinutes()),tsl=fds(dl)+" à "+hl;
   const pl={t:"fp-pb",id:now.getTime().toString(36)+Math.random().toString(36).slice(2,6),n:f.n,iv:D.i||"",em:D.e||"",msg:msg.slice(0,2000),dl,hl},code="FPPB:"+b64u(pl),S2=[];
-  if(D.t)S2.push(fetch("https://ntfy.sh/"+encodeURIComponent(D.t),{method:"POST",body:JSON.stringify(pl)}).then(r=>{if(!r.ok)throw 0;return 1}));
+  if(D.t)S2.push(sbDep(D.t,pl));
   if(D.m)S2.push(fetch("https://formsubmit.co/ajax/"+encodeURIComponent(D.m),{method:"POST",headers:{Accept:"application/json"},body:new URLSearchParams({_subject:"⚠ Problème signalé – "+f.n+" – "+(D.i||""),_captcha:"false",_template:"table",Formation:f.t+" ("+f.n+")",Formateur:D.i||"",Date:tsl,Probleme:msg,Code:code})}).then(r=>{if(!r.ok)throw 0;return 1}));
   const R2=await Promise.allSettled(S2),ok=R2.some(r=>r.status==="fulfilled");b.disabled=false;b.textContent="Envoyer à TOPAS informatique";
   if(ok){const H=pbHist(f.n);H.push({msg,tsl});try{localStorage.setItem(PBK(f.n),JSON.stringify(H))}catch(e){}document.getElementById("pbh"+i).insertAdjacentHTML("beforeend",`<div class="pbok">✔ Problème envoyé le ${esc(tsl)} : TOPAS informatique est prévenu.</div>`);ta.value="";document.getElementById("pbf"+i).classList.add("hide")}
