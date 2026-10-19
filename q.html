@@ -14,13 +14,14 @@ body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 'Segoe UI',syst
 .sh{background:var(--card);border-radius:16px;overflow:hidden;box-shadow:0 2px 10px rgba(15,23,42,.06)}
 .hd{display:flex;align-items:center;gap:14px;padding:14px 18px;flex-wrap:wrap}
 .hd img{height:52px;background:#fff;border-radius:6px;padding:2px}
+.adv{border-left:1px solid var(--br);padding-left:14px;font-size:14px;line-height:1.45}.adv b{color:var(--pr)}.adv a{color:var(--bl);overflow-wrap:anywhere}
 .qb{border-left:1px solid var(--br);padding-left:14px;color:var(--pr);font-size:11px;line-height:1.3}
 .qb b{font-size:20px;font-weight:800}.qb i{color:#e11d48;font-style:normal}
 .band{background:var(--bl);color:#fff;text-align:center;font-size:14px;font-weight:600;padding:8px}
 .bd{padding:20px 20px 8px}
 .kk{font-size:13px;font-weight:700;color:var(--gr);text-transform:uppercase;letter-spacing:.5px}
 .hi{font-size:26px;font-weight:800;color:var(--pr);margin:2px 0 4px}.hi span{color:var(--gr)}
-h1{font-size:20px;margin:0 0 6px;color:var(--pr);text-transform:uppercase;font-weight:800}
+h1{font-size:19px;margin:8px 0 6px;color:#fff;background:#1e3a8a;border-radius:12px;padding:12px 16px;text-transform:uppercase;font-weight:800;line-height:1.3}
 .box{display:flex;gap:14px;align-items:center;background:var(--sf);border-radius:14px;padding:14px 16px;margin:12px 0}
 .ic{flex:none;width:48px;height:48px;border-radius:50%;background:#d6e6f7;display:flex;align-items:center;justify-content:center;font-size:22px}
 .box h2{font-size:16px;margin:0 0 2px;color:var(--pr)}
@@ -29,16 +30,17 @@ h1{font-size:20px;margin:0 0 6px;color:var(--pr);text-transform:uppercase;font-w
 .qn{flex:none;width:32px;height:32px;border-radius:50%;background:var(--gr);color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center;font-size:15px;margin-top:6px}
 .qc{flex:1;min-width:0;background:var(--sf);border-radius:12px;padding:12px 14px;border:2px solid transparent}
 .qc>b{display:block;margin-bottom:8px}
-.opts{display:flex;flex-direction:column;gap:6px}
-.opt{display:flex;align-items:center;gap:10px;border:1px solid var(--br);border-radius:10px;padding:10px 12px;cursor:pointer;background:var(--card)}
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opt{position:relative;display:flex;align-items:center;gap:8px;border:1.5px solid #c9d8ea;border-radius:999px;padding:10px 16px;min-height:44px;cursor:pointer;background:var(--card)}
 .opt:has(input:checked){border-color:var(--gr);background:rgba(22,163,74,.12);font-weight:600}
-.opt input{width:22px;height:22px;flex:none;margin:0;accent-color:var(--gr)}
-.scale{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
-.scale .opt{flex-direction:column;text-align:center;font-size:13px;padding:8px 4px;gap:4px}
-.scale .opt .e{font-size:26px;line-height:1}
+.opt input{position:absolute;opacity:0;width:1px;height:1px;margin:0}
+.opt:has(input:checked)::before{content:"✔";color:var(--gr);font-weight:800}
+.scale{display:flex;flex-wrap:wrap;gap:8px}
+.scale .opt{font-size:14px}
+.scale .opt .e{font-size:20px;line-height:1}
 .scale .opt input,.star .opt input{position:absolute;opacity:0;width:1px;height:1px}
-.star{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
-.star .opt{justify-content:center;font-size:18px;white-space:nowrap;font-weight:700;color:#f59e0b;padding:10px 2px}
+.star{display:flex;flex-wrap:wrap;gap:8px}
+.star .opt{justify-content:center;font-size:17px;white-space:nowrap;font-weight:700;color:#f59e0b;min-width:58px}
 input[type=text],textarea{width:100%;font:inherit;padding:12px;border:1px solid var(--br);border-radius:8px;background:var(--card);color:var(--tx)}
 input:focus-visible,textarea:focus-visible,button:focus-visible,.opt:focus-within{outline:3px solid var(--bl);outline-offset:2px}
 button,a.btn{display:inline-block;font:inherit;font-weight:800;border:0;border-radius:10px;padding:15px 22px;cursor:pointer;text-decoration:none;text-align:center}
@@ -49,12 +51,13 @@ button,a.btn{display:inline-block;font:inherit;font-weight:800;border:0;border-r
 .bad,.q.bad .qc{border-color:var(--ko)!important}
 .okb{border:2px solid var(--gr)}
 .okt{color:var(--ok);font-weight:800;font-size:18px}
+.thx{text-align:center;padding:26px 18px}.thx .ck{width:76px;height:76px;border-radius:50%;background:var(--gr);color:#fff;font-size:42px;font-weight:800;display:flex;align-items:center;justify-content:center;margin:0 auto 12px}.thx .okt{font-size:22px;color:var(--pr)}.thx p{margin:8px 0 0}
 .card{background:var(--card);border-radius:14px;padding:16px;margin:12px 0}
 .ft{padding:6px 20px 20px}
 .bye{font-family:'Segoe Script','Brush Script MT','Comic Sans MS',cursive;font-size:28px;color:var(--pr);font-style:italic}
 .bl{height:3px;width:150px;background:var(--gr);border-radius:3px;margin:2px 0 12px}
 .hide{display:none}
-@media (max-width:480px){.hi{font-size:22px}.qb{border:0;padding:0}.q{gap:8px}.qn{width:28px;height:28px;font-size:13px}.scale{grid-template-columns:repeat(2,minmax(0,1fr))}.scale .opt{flex-direction:row;justify-content:flex-start;text-align:left;font-size:14px;padding:8px 10px}.scale .opt .e{font-size:22px}.qc{padding:10px 12px}}
+@media (max-width:480px){.hi{font-size:22px}.hd{gap:10px}.hd img{height:44px}.adv,.qb{border:0;padding:0}.qb{flex-basis:100%}.q{gap:8px}.qn{width:28px;height:28px;font-size:13px}.qc{padding:10px 12px}.bd{padding:16px 14px 6px}.opt{padding:9px 13px}.star .opt{min-width:0;flex:1}}
 </style>
 </head>
 <body>
@@ -132,12 +135,12 @@ function val(q){if(q.k==="text"||q.k==="area")return($("#f_"+q.id).value||"").tr
 function render(){
  const who=K==="bilan"?"Formateur : "+esc(D.nm||""):esc(D.nm||"");
  QN=0;const KI={auto:["🎯","Auto-évaluation"],post:["⭐","Votre avis compte"],bilan:["🧑‍🏫","Bilan formateur"]}[K]||["📋","Questionnaire"];
- app.innerHTML=`<div class="sh"><div class="hd"><img src="logo.jpg" alt="${esc(org||"TOPAS informatique")}"><div class="qb"><b>Qualiopi <i>▶</i>▶</b><br>processus certifié<br>🇫🇷 RÉPUBLIQUE FRANÇAISE</div></div><div class="band">🌐 www.topas.fr</div>
- <div class="bd"><div class="kk">${KI[0]} ${esc(KI[1])}</div>${D.nm?`<div class="hi"><span>✦</span> Bonjour ${esc(String(D.nm).split(" ")[0])},</div>`:""}<h1>${esc(DEF.title)}</h1><p style="margin:4px 0 0">${esc(DEF.intro)}</p>
- <div class="box"><span class="ic">📋</span><div><h2>${esc(D.f||"")}</h2><div class="mu">${D.a?"Du "+esc(fd(D.a))+" au "+esc(fd(D.b)):""}${D.c?" · "+esc(D.c):""}${who?" · "+who:""}</div></div></div>`+
- (done?`<div class="card okb"><div class="okt">✔ Déjà envoyé</div><p>Votre réponse a déjà été transmise depuis cet appareil. Merci !</p></div>`:
+ app.innerHTML=`<div class="sh"><div class="hd"><img src="logo.jpg" alt="${esc(org||"TOPAS informatique")}"><div class="adv"><b>Administration des Ventes</b>${D.m?`<br>✉️ <a href="mailto:${esc(D.m)}">${esc(D.m)}</a>`:""}</div><div class="qb"><b>Qualiopi <i>▶</i>▶</b><br>processus certifié<br>🇫🇷 RÉPUBLIQUE FRANÇAISE</div></div><div class="band">🌐 www.topas.fr</div>
+ <div class="bd"><div class="kk">${KI[0]} ${esc(KI[1])}</div>${D.nm?`<div class="hi"><span>✦</span> Bonjour ${esc(String(D.nm).split(" ")[0])},</div>`:""}<h1>${esc(DEF.title)}</h1>${DEF.intro?`<div class="box"><span class="ic">📋</span><div>${esc(DEF.intro)}</div></div>`:""}
+ <div class="box"><span class="ic">🎓</span><div><h2>${esc(D.f||"")}</h2><div class="mu">${D.a?"Du "+esc(fd(D.a))+" au "+esc(fd(D.b)):""}${D.c?" · "+esc(D.c):""}${who?" · "+who:""}</div></div></div>`+
+ (done?`<div class="card okb thx"><div class="ck">✔</div><div class="okt">Déjà envoyé</div><p>Votre réponse a déjà été transmise depuis cet appareil. Merci !</p></div>`:
  `<div id="form">${DEF.items.map(field).join("")}<div class="err" id="err" role="alert"></div><button class="go" id="go" type="button">✔ Envoyer mes réponses</button><p class="mu" style="text-align:center">Vos réponses sont transmises uniquement à ${esc(org)}.</p></div>`)+`<div id="res"></div></div>
- <div class="ft"><div class="bye">${K==="bilan"?"Merci pour votre intervention !":"À très bientôt !"}</div><div class="bl"></div><div class="mu" style="font-size:12px">${esc(org)} · Organisme de formation certifié Qualiopi</div></div></div>`;
+ <div class="ft"><div class="bye">Merci !</div><div class="bl"></div><div class="mu" style="font-size:12px">${esc(org)} · Organisme de formation certifié Qualiopi</div></div></div>`;
  if(!done)$("#go").onclick=submit;
 }
 async function submit(){
@@ -165,7 +168,7 @@ async function submit(){
  if(ok){try{localStorage.setItem(KEY,"1")}catch(e){}}
  $("#form").classList.add("hide");
  const mailto="mailto:"+encodeURIComponent(D.m||"")+"?subject="+encodeURIComponent(subj)+"&body="+encodeURIComponent("Bonjour,\n\nVoici mes réponses au questionnaire.\n\n"+code+"\n");
- $("#res").innerHTML=ok?`<div class="card okb"><div class="okt">✔ Merci, vos réponses sont envoyées !</div><p>${esc(org)} les a bien reçues. Vous pouvez fermer cette page.</p></div>`:
+ $("#res").innerHTML=ok?`<div class="card okb thx"><div class="ck">✔</div><div class="okt">Merci, vos réponses sont envoyées !</div><p>${esc(org)} les a bien reçues${K==="bilan"?" : merci pour votre intervention":""}.</p><p class="mu">Vous pouvez fermer cette page.</p></div>`:
  `<div class="card" style="border-color:var(--ko)"><div class="err">La transmission automatique n’a pas fonctionné.</div><p>Appuyez sur le bouton ci-dessous : un e-mail est déjà prêt, il suffit de l’envoyer.</p><a class="btn go" href="${mailto}">✉ Envoyer par e-mail</a></div>`;
  window.scrollTo(0,0);
 }
