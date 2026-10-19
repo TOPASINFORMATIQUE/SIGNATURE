@@ -4,33 +4,75 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
-<title>Espace intervenant</title>
+<title>Espace formateur</title>
 <style>
-:root{--bg:#f4f5f8;--card:#fff;--tx:#14171f;--mu:#5a6275;--br:#d9dce5;--pr:#12308f;--ok:#157347;--ac:#7a1010;--soft:#eef1fb}
-@media (prefers-color-scheme:dark){:root{--bg:#10131a;--card:#1a1e29;--tx:#e8eaf0;--mu:#a0a7b8;--br:#2c3242;--pr:#8fa8ff;--ok:#5fd08a;--ac:#ff9b9b;--soft:#222a40}}
+:root{--bg:#eef3fa;--card:#fff;--tx:#1f2937;--mu:#5a6275;--br:#d9dce5;--pr:#1e3a8a;--bl:#1565c0;--gr:#16a34a;--sf:#eef4fb;--ok:#157347;--ko:#b42318;--or:#ea580c;--gy:#94a3b8}
+@media (prefers-color-scheme:dark){:root{--bg:#10131a;--card:#1a1e29;--tx:#e8eaf0;--mu:#a0a7b8;--br:#2c3242;--pr:#9db4ff;--bl:#1e4f9a;--gr:#22c55e;--sf:#1f2636;--ok:#5fd08a;--ko:#ff8a7a;--or:#fb923c;--gy:#64748b}}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 'Segoe UI',system-ui,-apple-system,Roboto,Arial,sans-serif}
 .w{max-width:760px;margin:0 auto;padding:16px 14px 40px}
-h1{font-size:22px;margin:6px 0 2px;color:var(--pr)}
-h2{font-size:18px;margin:0 0 4px}
-.mu{color:var(--mu);font-size:14px}
-.card{background:var(--card);border:1px solid var(--br);border-radius:14px;padding:16px;margin:12px 0}
-.tag{display:inline-block;font-size:12px;font-weight:700;background:var(--soft);color:var(--pr);border-radius:99px;padding:2px 10px;margin-right:6px}
-.tag.go{background:#e7f6ec;color:var(--ok)}
-.row{display:grid;grid-template-columns:110px 1fr;gap:4px 12px;margin:6px 0}
-.row>b{color:var(--mu);font-weight:600;font-size:14px}
-@media(max-width:520px){.row{grid-template-columns:1fr;gap:0}.row>b{margin-top:6px}}
-.dt{margin:6px 0;padding:8px 12px;border-left:4px solid var(--pr);background:var(--soft);border-radius:6px}
-.dt.past{opacity:.6;border-left-color:var(--mu)}
+.sh{background:var(--card);border-radius:16px;overflow:hidden;box-shadow:0 2px 10px rgba(15,23,42,.06)}
+.hd{display:flex;align-items:center;gap:14px;padding:14px 18px;flex-wrap:wrap}
+.hd img{height:52px;background:#fff;border-radius:6px;padding:2px}
+.adv{border-left:1px solid var(--br);padding-left:14px;font-size:14px;line-height:1.45}.adv b{color:var(--pr)}.adv a{color:var(--bl);overflow-wrap:anywhere}
+.band{background:var(--bl);color:#fff;text-align:center;font-size:15px;font-weight:600;padding:8px}
+.bd{padding:16px 18px 18px}
+.hi{font-size:26px;font-weight:800;color:var(--pr);margin:0 0 2px}
+.mu{color:var(--mu);font-size:15px}
+.upd{font-size:15px;color:var(--mu);margin:0}.upd b{color:var(--tx)}
+.kpi{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:14px 0 0}
+.kpi>div{background:var(--sf);border-radius:14px;padding:10px 12px;line-height:1.2}
+.kpi b{display:block;font-size:26px;color:var(--pr)}.kpi span{font-size:15px;color:var(--mu)}
+.hero{margin:14px 0;border-radius:18px;padding:18px;background:linear-gradient(135deg,#1e3a8a,#1565c0);color:#fff;box-shadow:0 6px 18px rgba(30,58,138,.25)}
+.hero .kk{font-size:14px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;opacity:.85}
+.hero h2{font-size:21px;margin:4px 0 2px;line-height:1.3;color:#fff}
+.hero .cd{display:inline-block;margin:8px 0;background:rgba(255,255,255,.18);border-radius:999px;padding:4px 14px;font-weight:800;font-size:17px}
+.hero .li{font-size:15px;margin:3px 0;opacity:.95}
+.hero a.btn{background:#fff;color:#1e3a8a;border-color:#fff}
+.pills{position:sticky;top:0;z-index:5;display:flex;gap:8px;overflow-x:auto;padding:10px 0;margin:4px 0;background:var(--bg);scrollbar-width:none}
+.pills::-webkit-scrollbar{display:none}
+.pills a{flex:none;display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 16px;border-radius:999px;background:var(--card);color:var(--tx);text-decoration:none;font-weight:700;font-size:15px;box-shadow:0 1px 4px rgba(15,23,42,.08)}
+.pills a b{min-width:24px;height:24px;border-radius:12px;display:inline-flex;align-items:center;justify-content:center;padding:0 7px;font-size:13px;color:#fff;background:var(--c,var(--bl))}
+.sec{scroll-margin-top:70px}
+.sec>h2{font-size:19px;margin:20px 0 8px;display:flex;align-items:center;gap:8px}
+.sec>h2 .n{font-size:14px;color:#fff;background:var(--c,var(--bl));border-radius:999px;padding:1px 10px}
+.fc{background:var(--card);border-radius:16px;padding:16px;margin:12px 0;border-left:6px solid var(--c,var(--bl));box-shadow:0 2px 10px rgba(15,23,42,.06)}
+.s-auj{--c:var(--gr)}.s-cours{--c:var(--gr)}.s-venir{--c:var(--bl)}.s-clo{--c:var(--or)}.s-fini{--c:var(--gy)}
+.st{display:inline-block;font-size:14px;font-weight:800;color:#fff;background:var(--c,var(--bl));border-radius:999px;padding:2px 12px;margin-right:6px}
+.num{font-size:14px;color:var(--mu)}
+.fc h3{font-size:19px;margin:8px 0 0;line-height:1.3;color:var(--pr)}
+.cli{font-weight:700;font-size:16px}
+.cdn{font-weight:800;color:var(--c,var(--bl));font-size:16px;margin-top:2px}
+.ln{display:flex;gap:10px;align-items:flex-start;margin:10px 0 0;font-size:15px}
+.ln>i{flex:none;font-style:normal;width:26px;text-align:center;font-size:18px;line-height:1.3}
+.ln>div{flex:1;min-width:0;overflow-wrap:anywhere}
+.dt{margin:4px 0;padding:8px 12px;border-left:4px solid var(--c,var(--bl));background:var(--sf);border-radius:8px}
+.dt.past{opacity:.6}.dt.now{outline:2px solid var(--gr)}
+.dt b{display:block;font-size:15px}.dt span{font-size:15px;color:var(--mu)}
+.big{font-size:22px;font-weight:800;color:var(--tx);line-height:1.25}
 .btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
-a.btn,button{font:inherit;font-weight:600;border:1px solid var(--br);background:var(--card);color:var(--tx);border-radius:10px;padding:11px 14px;min-height:44px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
-.btn.p{background:var(--pr);color:#fff;border-color:var(--pr)}
+a.btn,button{font:inherit;font-size:15px;font-weight:700;border:1px solid var(--br);background:var(--card);color:var(--tx);border-radius:12px;padding:10px 14px;min-height:44px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.btn.gn{background:var(--gr);border-color:var(--gr);color:#fff}
+.btn.p{background:var(--pr);border-color:var(--pr);color:#fff}
 @media (prefers-color-scheme:dark){.btn.p{color:#0b1020}}
-details{margin-top:10px}summary{cursor:pointer;font-weight:600;padding:6px 0}
-ul{margin:4px 0 0 18px;padding:0}
-.ft{margin-top:22px;text-align:center;font-size:13px;color:var(--mu)}
-.hd{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-.hd img{height:54px}
+.btn.on{background:var(--sf);border-color:var(--bl)}
+.pan{margin-top:10px;background:var(--sf);border-radius:12px;padding:12px 14px;font-size:15px}
+.pan h4{margin:0 0 6px;font-size:16px;color:var(--pr)}
+.pan ul{margin:4px 0 8px 18px;padding:0}.pan li{margin:2px 0}
+.dj{margin:0 0 10px}.dj>b{display:block;color:var(--pr)}
+.sl{margin:4px 0 0 0}.sl>b{font-size:14px;color:var(--mu);text-transform:uppercase;letter-spacing:.3px}
+details{margin-top:12px}summary{cursor:pointer;font-weight:700;min-height:44px;display:flex;align-items:center;font-size:15px}
+.task{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 0;border-top:1px solid var(--br)}
+.task:first-of-type{border-top:0}
+.task>span{flex:1;min-width:180px;font-weight:600}
+.task .ok{color:var(--ok);font-weight:800}
+.tl{display:flex;gap:10px;padding:10px 0;border-top:1px solid var(--br);font-size:15px}.tl:first-child{border-top:0}
+.tl b{flex:none;min-width:96px}
+.vei{background:var(--card);border-radius:16px;padding:16px;margin:16px 0;border:2px solid #f59e0b;box-shadow:0 2px 10px rgba(15,23,42,.06)}
+.vei .kk{font-size:14px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:#b45309}
+.vei h3{margin:4px 0;font-size:18px}
+.empty{background:var(--card);border-radius:16px;padding:18px;text-align:center;color:var(--mu);font-size:16px}
+.ft{margin-top:22px;text-align:center;font-size:14px;color:var(--mu)}
 .pbz{margin-top:14px;border-top:1px dashed var(--br);padding-top:12px}
 .pbb{width:100%;min-height:56px;justify-content:center;background:#dc2626!important;border-color:#dc2626!important;color:#fff!important;font-size:18px!important;font-weight:800!important;border-radius:12px!important}
 .pbb:hover{background:#b91c1c!important}
@@ -41,9 +83,12 @@ ul{margin:4px 0 0 18px;padding:0}
 .pbf textarea{width:100%;font:inherit;font-size:16px;padding:10px;border:1px solid #fca5a5;border-radius:8px;background:var(--card);color:var(--tx);resize:vertical}
 .btn.dg{background:#dc2626;border-color:#dc2626;color:#fff}
 .hide{display:none!important}
-.pbok{margin-top:8px;padding:8px 12px;border-radius:8px;background:#e7f6ec;color:var(--ok);font-weight:600;font-size:14px}
-.pberr{color:#b42318;font-weight:600;font-size:14px;margin-top:6px}
-@media print{body{background:#fff;color:#000}.btns{display:none}.card{break-inside:avoid}}
+.pbok{margin-top:8px;padding:8px 12px;border-radius:8px;background:#e7f6ec;color:var(--ok);font-weight:600;font-size:15px}
+.pberr{color:#b42318;font-weight:600;font-size:15px;margin-top:6px}
+a{color:var(--bl)}
+button:focus-visible,a:focus-visible,summary:focus-visible,textarea:focus-visible{outline:3px solid var(--bl);outline-offset:2px}
+@media (max-width:480px){.hi{font-size:23px}.hd{gap:10px;padding:12px 14px}.hd img{height:44px}.adv{border:0;padding:0;flex-basis:100%}.bd{padding:14px}.kpi{gap:6px}.kpi>div{padding:8px}.kpi b{font-size:22px}.kpi span{font-size:14px}.fc{padding:14px}.btns>.btn,.btns>button{flex:1 1 calc(50% - 8px)}}
+@media print{body{background:#fff;color:#000}.btns,.pills,.pbz{display:none}.fc{break-inside:avoid}}
 </style>
 </head>
 <body>
@@ -57,6 +102,7 @@ const sbDep=(c,p)=>fetch(SBU+"/rest/v1/rpc/deposer",{method:"POST",headers:{apik
 const $=s=>document.querySelector(s),app=$("#app");
 const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const fdl=d=>{const x=new Date(d+"T12:00:00");return isNaN(x)?d:x.toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long",year:"numeric"})};
+const fdm=d=>{const x=new Date(d+"T12:00:00");return isNaN(x)?d:x.toLocaleDateString("fr-FR",{weekday:"short",day:"numeric",month:"short"})};
 const fds=d=>{const x=new Date(d+"T12:00:00");return isNaN(x)?d:x.toLocaleDateString("fr-FR",{day:"2-digit",month:"2-digit",year:"numeric"})};
 const b64u=o=>btoa(unescape(encodeURIComponent(JSON.stringify(o)))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
 const PBK=n=>"fppb:"+n;const pbHist=n=>{try{return JSON.parse(localStorage.getItem(PBK(n))||"[]")}catch(e){return[]}};
@@ -65,45 +111,88 @@ async function load(h){
  if(h.startsWith("z.")){const bin=atob(unb64u(h.slice(2))),u=Uint8Array.from(bin,c=>c.charCodeAt(0)),ds=new DecompressionStream("deflate-raw"),w=ds.writable.getWriter();w.write(u);w.close();return JSON.parse(await new Response(ds.readable).text())}
  return JSON.parse(decodeURIComponent(escape(atob(unb64u(h)))));
 }
-const HRS={m:["09:00","12:30","½ journée : 9h00 – 12h30"],a:["14:00","17:30","½ journée : 14h00 – 17h30"]},FULL=["09:00","17:30","9h00 – 12h30 / 14h00 – 17h30"];
+const HRS={m:["09:00","12:30","Matin · 9h00 – 12h30"],a:["14:00","17:30","Après-midi · 14h00 – 17h30"]},FULL=["09:00","17:30","Journée · 9h00 – 12h30 / 14h00 – 17h30"];
 const slot=(f,d)=>HRS[(f.hf||{})[d]]||FULL;
+const hOf=(f,d)=>(f.hf||{})[d]?3.5:7;
 const today=()=>{const n=new Date(),p=x=>String(x).padStart(2,"0");return n.getFullYear()+"-"+p(n.getMonth()+1)+"-"+p(n.getDate())};
-function ics(f,D){
+const T=today(),dd=(a,b)=>Math.round((Date.parse(b+"T12:00:00")-Date.parse(a+"T12:00:00"))/864e5);
+const rel=d=>{const n=dd(T,d);return n===0?"aujourd’hui":n===1?"demain":n===-1?"hier":n>0?"dans "+n+" jours":"il y a "+(-n)+" jours"};
+const DS=f=>[...new Set((f.ds||[]).filter(Boolean))].sort();
+// statut calculé le jour de la lecture (le lien peut être ouvert plusieurs jours après l'envoi)
+function stat(f){const d=DS(f),a=d[0],z=d[d.length-1];if(!a)return"venir";if(d.includes(T))return"auj";if(a>T)return"venir";if(z>=T)return"cours";return (f.cl||[]).some(x=>!x[1])?"clo":"fini"}
+const SL={auj:"Aujourd’hui",cours:"En cours",venir:"À venir",clo:"À clôturer",fini:"Terminée"};
+const maps=f=>"https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(f.c+" "+(f.a||""));
+function ics(f){
  const z=s=>String(s).replace(/([,;\\])/g,"\\$1").replace(/\n/g,"\\n"),now=new Date().toISOString().replace(/[-:]/g,"").slice(0,15)+"Z";
  const o=["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//TOPAS Formation//FR","CALSCALE:GREGORIAN","METHOD:PUBLISH"];
- (f.ds||[]).forEach(d=>{const dd=d.replace(/-/g,""),t=slot(f,d);o.push("BEGIN:VEVENT","UID:"+f.n+"-"+dd+"@topas-iv","DTSTAMP:"+now,"DTSTART;TZID=Europe/Paris:"+dd+"T"+t[0].replace(":","")+"00","DTEND;TZID=Europe/Paris:"+dd+"T"+t[1].replace(":","")+"00","SUMMARY:"+z(f.t+" – "+f.c),"LOCATION:"+z(f.a||f.c),"DESCRIPTION:"+z("N° "+f.n+"\nClient : "+f.c+"\nStagiaires : "+(f.tr||[]).map(x=>x[0]).join(", ")),"END:VEVENT")});
+ DS(f).forEach(d=>{const dd2=d.replace(/-/g,""),t=slot(f,d);o.push("BEGIN:VEVENT","UID:"+f.n+"-"+dd2+"@topas-iv","DTSTAMP:"+now,"DTSTART;TZID=Europe/Paris:"+dd2+"T"+t[0].replace(":","")+"00","DTEND;TZID=Europe/Paris:"+dd2+"T"+t[1].replace(":","")+"00","SUMMARY:"+z(f.t+" – "+f.c),"LOCATION:"+z(f.a||f.c),"DESCRIPTION:"+z("N° "+f.n+"\nClient : "+f.c+"\nStagiaires : "+(f.tr||[]).map(x=>x[0]).join(", ")),"END:VEVENT")});
  o.push("END:VCALENDAR");return o.join("\r\n");
 }
-function card(f,past,ix){
- const ds=(f.ds||[]).slice().sort(),T=today(),ct=f.ct||[];
- const tr=(f.tr||[]);
- return `<div class="card"><div>${past?`<span class="tag">Terminée</span>`:`<span class="tag go">Planifiée</span>`}<span class="tag">N° ${esc(f.n)}</span></div>
- <h2 style="margin-top:8px">${esc(f.t)}</h2><div class="mu">${esc(f.c)}</div>
- <div class="row"><b>Dates</b><div>${ds.map(d=>{const t=slot(f,d);return `<div class="dt${d<T?" past":""}"><b>${esc(fdl(d))}</b><br><span class="mu">${esc(t[2])}</span></div>`}).join("")||"À définir"}</div></div>
- <div class="row"><b>Lieu</b><div>${esc(f.c)}<br>${esc(f.a||"")}${f.a?`<br><a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(f.c+" "+f.a)}" target="_blank" rel="noopener">📍 Itinéraire</a>`:""}</div></div>
- <div class="row"><b>Durée</b><div>${esc(f.h)} h · ${esc(String(f.j).replace(".",","))} jour(s)</div></div>
- ${ct.length&&ct[0]?`<div class="row"><b>Contact client</b><div>${esc(ct[0])}${ct[1]?`<br>${esc(ct[1])}`:""}${ct[2]?`<br><a href="tel:${esc(ct[2].replace(/\s/g,""))}">☎ ${esc(ct[2])}</a>`:""}${ct[3]?`<br><a href="mailto:${esc(ct[3])}">✉ ${esc(ct[3])}</a>`:""}</div></div>`:""}
- <div class="row"><b>Stagiaires (${tr.length})</b><div>${tr.map(x=>esc(x[0])+(x[1]?` <span class="mu">– ${esc(x[1])}</span>`:"")).join("<br>")||"—"}</div></div>
- ${f.ob?`<div class="row"><b>Objectif</b><div>${esc(f.ob)}</div></div>`:""}
- ${(f.pg||[]).length?`<details><summary>Programme (${f.pg.length} module${f.pg.length>1?"s":""})</summary><ul>${f.pg.map(m=>`<li>${esc(m)}</li>`).join("")}</ul></details>`:""}
- <div class="btns"><button type="button" class="btn p" data-ics="${esc(f.n)}">📅 Ajouter à mon agenda</button></div>
- <div class="pbz"><button type="button" class="btn pbb" data-pbo="${ix}" aria-expanded="false" aria-controls="pbf${ix}">⚠ Signalez un problème</button>
+const HRD={m:{acc:"9h00 → 9h15",m:"9h15 → 12h15",clo:"12h15 → 12h30"},a:{acc:"14h00 → 14h15",a:"14h15 → 17h15",clo:"17h15 → 17h30"},"":{acc:"9h00 → 9h15",m:"9h15 → 12h30",a:"14h00 → 17h15",clo:"17h15 → 17h30"}};
+function scDay(day,i,n){const [d,part,sls]=day,h=HRD[part||""]||HRD[""];
+ return `<div class="dj"><b>Jour ${i+1}${n>1?"/"+n:""} – ${d?esc(fdl(d)):"date à définir"}${part==="m"?" (matin)":part==="a"?" (après-midi)":""}</b>${(sls||[]).map(([k,G])=>`<div class="sl"><b>${k==="m"?"Matin":"Après-midi"} · ${esc(h[k]||"")}</b>${(G||[]).map(([m,it])=>`${m?`<div><b>${esc(m)}</b></div>`:""}${(it||[]).length?`<ul>${it.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`:""}`).join("")}</div>`).join("")}</div>`}
+function scToday(f){const sc=f.sc||[];if(!sc.length)return"";const d=DS(f);let i=sc.findIndex(x=>x[0]===T);if(i<0)i=d.indexOf(T);if(i<0||!sc[i])return"";return scDay(sc[i],i,sc.length)}
+function scAll(f){const sc=f.sc||[];return sc.map((x,i)=>scDay(x,i,sc.length)).join("")}
+function pbZone(f,ix){return `<div class="pbz"><button type="button" class="btn pbb" data-pbo="${ix}" aria-expanded="false" aria-controls="pbf${ix}">⚠ Signalez un problème</button>
  <div class="pbf hide" id="pbf${ix}"><label for="pbt${ix}">Décrivez le problème (retard, stagiaire absent, matériel, accès aux locaux…)</label><textarea id="pbt${ix}" rows="4"></textarea>
  <div class="btns"><button type="button" class="btn dg" data-pbs="${ix}">Envoyer à TOPAS informatique</button><button type="button" class="btn" data-pbc="${ix}">Annuler</button></div><div class="pberr" id="pbe${ix}" role="alert"></div></div>
- <div id="pbh${ix}">${pbHist(f.n).map(x=>`<div class="pbok">✔ Problème envoyé le ${esc(x.tsl)} : « ${esc(x.msg.length>90?x.msg.slice(0,87)+"…":x.msg)} »</div>`).join("")}</div></div></div>`;
-}
+ <div id="pbh${ix}">${pbHist(f.n).map(x=>`<div class="pbok">✔ Problème envoyé le ${esc(x.tsl)} : « ${esc(x.msg.length>90?x.msg.slice(0,87)+"…":x.msg)} »</div>`).join("")}</div></div>`}
+const ctLine=(f,btn)=>{const ct=f.ct||[];if(!ct[0]&&!ct[2]&&!ct[3])return"";return `<div class="ln"><i>👤</i><div><b>${esc(ct[0]||"Contact client")}</b>${ct[1]?` <span class="mu">– ${esc(ct[1])}</span>`:""}${btn?"":`${ct[2]?`<br><a href="tel:${esc(ct[2].replace(/\s/g,""))}">☎ ${esc(ct[2])}</a>`:""}${ct[3]?`<br><a href="mailto:${esc(ct[3])}">✉ ${esc(ct[3])}</a>`:""}`}${btn&&(ct[2]||ct[3])?`<div class="btns" style="margin-top:6px">${ct[2]?`<a class="btn gn" href="tel:${esc(ct[2].replace(/\s/g,""))}">📞 Appeler</a>`:""}${ct[3]?`<a class="btn" href="mailto:${esc(ct[3])}">✉ Mail</a>`:""}</div>`:""}</div></div>`};
+const lieu=(f,btn)=>`<div class="ln"><i>📍</i><div><b>${esc(f.c)}</b>${f.a?`<br>${esc(f.a)}`:""}${btn?`<div class="btns" style="margin-top:6px"><a class="btn" href="${maps(f)}" target="_blank" rel="noopener">🧭 Itinéraire</a></div>`:""}</div></div>`;
+const trList=f=>{const tr=f.tr||[];return tr.map(x=>esc(x[0])+(x[1]?` <span class="mu">– ${esc(x[1])}</span>`:"")).join("<br>")||"—"};
+const head=(f,s,extra)=>`<div><span class="st">${esc(extra||SL[s])}</span><span class="num">N° ${esc(f.n)}</span></div><h3>${esc(f.t)}</h3><div class="cli">${esc(f.c)}</div>`;
+const tg=(ix,k,lab)=>`<button type="button" class="btn" data-tg="${k}${ix}" aria-expanded="false">${lab}</button>`;
+const pan=(ix,k,h)=>`<div class="pan hide" id="${k}${ix}">${h}</div>`;
+// grande carte : Aujourd'hui / En cours
+function bigCard(f,s,ix){const d=DS(f),i=d.indexOf(T),nx=d.find(x=>x>T),t=i>=0?slot(f,T):null,sd=scToday(f);
+ const lab=s==="auj"?"Aujourd’hui · jour "+(i+1)+"/"+d.length:"En cours · prochain jour "+(nx?rel(nx):"—");
+ return `<div class="fc s-${s}">${head(f,s,lab)}
+ ${t?`<div class="ln"><i>🕘</i><div class="big">${esc(t[2].replace(/^.* · /,""))}</div></div>`:nx?`<div class="ln"><i>📅</i><div><b>${esc(fdl(nx))}</b><br><span class="mu">${esc(slot(f,nx)[2])}</span></div></div>`:""}
+ ${lieu(f,1)}${ctLine(f,1)}
+ <details><summary>👥 Stagiaires (${(f.tr||[]).length})</summary><div class="pan">${trList(f)}</div></details>
+ <div class="btns">${sd?tg(ix,"sd","📋 Voir le scénario du jour"):""}${(f.sc||[]).length?tg(ix,"sa","🗂 Scénario complet"):""}${(f.pg||[]).length?tg(ix,"pg","📘 Programme"):""}${f.sp?`<a class="btn" href="${esc(f.sp)}" target="_blank" rel="noopener">📚 Support de cours</a>`:""}</div>
+ ${sd?pan(ix,"sd",sd):""}${(f.sc||[]).length?pan(ix,"sa",scAll(f)):""}${(f.pg||[]).length?pan(ix,"pg",progH(f)):""}
+ ${pbZone(f,ix)}</div>`}
+const progH=f=>`${f.ob?`<h4>Objectif</h4><div>${esc(f.ob)}</div>`:""}<h4 style="margin-top:8px">Programme</h4><ul>${(f.pg||[]).map(m=>`<li>${esc(m)}</li>`).join("")}</ul>`;
+// carte À venir
+function upCard(f,s,ix){const d=DS(f);
+ return `<div class="fc s-${s}">${head(f,s)}<div class="cdn">${d[0]?esc(rel(d[0]).replace(/^./,c=>c.toUpperCase())):"Dates à définir"}</div>
+ <div class="ln"><i>📅</i><div>${d.map(x=>{const t=slot(f,x);return `<div class="dt"><b>${esc(fdl(x))}</b><span>${esc(t[2])}</span></div>`}).join("")||"À définir"}</div></div>
+ ${lieu(f,0)}${ctLine(f,0)}<div class="ln"><i>👥</i><div>${(f.tr||[]).length} stagiaire${(f.tr||[]).length>1?"s":""} · ${esc(f.h)} h</div></div>
+ <div class="btns"><a class="btn" href="${maps(f)}" target="_blank" rel="noopener">🧭 Itinéraire</a><button type="button" class="btn p" data-ics="${esc(f.n)}">📅 Ajouter à mon agenda</button>${(f.pg||[]).length?tg(ix,"pg","📘 Programme"):""}${(f.sc||[]).length?tg(ix,"sa","🗂 Scénario"):""}${f.sp?`<a class="btn" href="${esc(f.sp)}" target="_blank" rel="noopener">📚 Support de cours</a>`:""}</div>
+ ${(f.pg||[]).length?pan(ix,"pg",progH(f)):""}${(f.sc||[]).length?pan(ix,"sa",scAll(f)):""}
+ <details><summary>➕ Détails (stagiaires, contact)</summary><div class="pan"><h4>Stagiaires (${(f.tr||[]).length})</h4>${trList(f)}${(f.ct||[])[0]||(f.ct||[])[2]?`<h4 style="margin-top:8px">Contact client</h4>${esc((f.ct||[])[0]||"")}${(f.ct||[])[1]?" – "+esc(f.ct[1]):""}${(f.ct||[])[2]?`<br><a href="tel:${esc(f.ct[2].replace(/\s/g,""))}">☎ ${esc(f.ct[2])}</a>`:""}${(f.ct||[])[3]?`<br><a href="mailto:${esc(f.ct[3])}">✉ ${esc(f.ct[3])}</a>`:""}`:""}</div></details>
+ ${pbZone(f,ix)}</div>`}
+// carte À clôturer
+function cloCard(f,ix,D){const d=DS(f),m=D.m||"",sub=x=>encodeURIComponent(x+" – N° "+f.n+" – "+f.c+" – "+(D.i||""));
+ const L={bilan:["📝 Mon bilan de la formation",x=>x?'<span class="ok">✔ Reçu, merci</span>':f.bl?`<a class="btn gn" href="${esc(f.bl)}" target="_blank" rel="noopener">📝 Remplir mon bilan</a>`:'<span class="mu">Le lien vous sera envoyé par mail.</span>'],
+  emarg:["📄 Feuilles de présence signées",x=>x?'<span class="ok">✔ Reçues, merci</span>':m?`<a class="btn" href="mailto:${esc(m)}?subject=${sub("Feuilles de présence")}&body=${encodeURIComponent("Bonjour,\n\nVous trouverez ci-joint les feuilles de présence signées.\n\n")}">📄 Feuilles de présence à retourner</a>`:""],
+  supp:["📚 Supports de cours remis aux stagiaires",x=>x?'<span class="ok">✔ Noté</span>':m?`<a class="btn" href="mailto:${esc(m)}?subject=${sub("Supports de cours remis")}&body=${encodeURIComponent("Bonjour,\n\nLes supports de cours ont bien été remis aux stagiaires.\n\n")}">📚 Supports remis ? Le confirmer</a>`:""]};
+ const open=(f.cl||[]).filter(x=>!x[1]).length;
+ return `<div class="fc s-clo">${head(f,"clo")}<div class="cdn">Terminée ${esc(rel(d[d.length-1]))} · ${open} tâche${open>1?"s":""} à faire</div>
+ <div style="margin-top:8px">${(f.cl||[]).filter(x=>L[x[0]]).map(([k,v])=>`<div class="task"><span>${L[k][0]}</span>${L[k][1](v)}</div>`).join("")}</div>
+ ${pbZone(f,ix)}</div>`}
 async function main(){
  let D=null;try{D=await load(location.hash.replace(/^#/,""))}catch(e){D=null}
- if(!D||D.k!=="iv"||!D.f){app.innerHTML='<div class="card"><h1>Lien incomplet</h1><p>Ce lien est incomplet ou a été modifié. Merci de rouvrir le lien reçu par e-mail, tel quel, ou de contacter l’organisme de formation.</p></div>';return}
- const G=D.g||[],T=today(),F=D.f.slice().sort((a,b)=>String((a.ds||[]).slice().sort()[0]||"").localeCompare(String((b.ds||[]).slice().sort()[0]||"")));
- const isPast=f=>{const l=(f.ds||[]).slice().sort().pop();return l&&l<T};
- const up=F.filter(f=>!isPast(f)),pa=F.filter(isPast);
- document.title="Espace intervenant – "+(D.i||"");
- app.innerHTML=`<div class="hd"><img src="logo.jpg" alt="TOPAS informatique"><div><h1>Espace intervenant</h1><div class="mu">${esc(D.i||"")}</div></div></div>
- <p class="mu">Vos formations à venir, avec les dates, le lieu, les stagiaires et le programme. Ce lien est personnel : ne le partagez pas. Mis à jour le ${esc(fds(D.u||T))} — un nouveau lien vous est envoyé à chaque changement de planning.</p>
- <h2 style="margin-top:18px">À venir (${up.length})</h2>${up.map(f=>card(f,false,D.f.indexOf(f))).join("")||'<div class="card mu">Aucune formation planifiée pour le moment.</div>'}
- ${pa.length?`<details><summary>Formations terminées (${pa.length})</summary>${pa.map(f=>card(f,true,D.f.indexOf(f))).join("")}</details>`:""}
+ if(!D||D.k!=="iv"||!D.f){app.innerHTML='<div class="fc"><h3>Lien incomplet</h3><p>Ce lien est incomplet ou a été modifié. Merci de rouvrir le lien reçu par e-mail, tel quel, ou de contacter l’organisme de formation.</p></div>';return}
+ const G=D.g||[],F=D.f.map((f,ix)=>({f,ix,s:stat(f),a:DS(f)[0]||"9999"})).sort((x,y)=>x.a.localeCompare(y.a)),by=k=>F.filter(x=>x.s===k);
+ const pr=(D.p||String(D.i||"").split(" ")[0]||"").trim(),mo=T.slice(0,7);
+ const allD=F.flatMap(x=>DS(x.f).map(d=>({x,d}))),nUp=F.filter(x=>x.s==="venir").length,nMo=allD.filter(o=>o.d.slice(0,7)===mo).length,hUp=allD.filter(o=>o.d>=T).reduce((a,o)=>a+hOf(o.x.f,o.d),0);
+ const nx=allD.filter(o=>o.d>T).sort((a,b)=>a.d.localeCompare(b.d))[0];
+ document.title="Espace formateur – "+(D.i||"");
+ const SEC=[["auj","☀️ Aujourd’hui","var(--gr)"],["cours","▶ En cours","var(--gr)"],["venir","📅 À venir","var(--bl)"],["clo","✅ À clôturer","var(--or)"]],C=k=>by(k).length,fini=by("fini");
+ const sec=(k,t,c)=>{const L=by(k);if(!L.length&&k!=="venir")return"";return `<section class="sec" id="s-${k}" style="--c:${c}"><h2>${t} <span class="n">${L.length}</span></h2>${L.map(x=>k==="auj"||k==="cours"?bigCard(x.f,k,x.ix):k==="clo"?cloCard(x.f,x.ix,D):upCard(x.f,k,x.ix)).join("")||'<div class="empty">Aucune formation à venir pour le moment.</div>'}</section>`};
+ const V=D.v;
+ app.innerHTML=`<div class="sh"><div class="hd"><img src="logo.jpg" alt="TOPAS informatique"><div class="adv"><b>Espace formateur</b>${D.m?`<br>✉️ <a href="mailto:${esc(D.m)}">${esc(D.m)}</a>`:""}${G[1]?`<br>☎ ${esc(G[1])}`:""}</div></div><div class="band">🔒 Votre lien personnel – ne le partagez pas</div>
+ <div class="bd"><div class="hi">Bonjour${pr?" "+esc(pr):""} 👋</div><p class="upd">Mis à jour le <b>${esc(fds(D.u||T))}</b>. Si le planning change, un nouveau lien vous est envoyé : utilisez toujours le plus récent.</p>
+ <div class="kpi"><div><b>${nUp}</b><span>À venir</span></div><div><b>${nMo}</b><span>Ce mois-ci <small>(jour${nMo>1?"s":""})</small></span></div><div><b>${String(hUp).replace(".",",")} h</b><span>Heures planifiées</span></div></div></div></div>
+ ${nx?`<div class="hero"><div class="kk">Prochaine intervention</div><h2>${esc(nx.x.f.t)}</h2><div class="li"><b>${esc(nx.x.f.c)}</b></div><div class="cd">${esc(rel(nx.d).replace(/^./,c=>c.toUpperCase()))}</div><div class="li">📅 ${esc(fdl(nx.d))}${DS(nx.x.f).length>1?` <span style="opacity:.8">(${DS(nx.x.f).map(fdm).join(", ")})</span>`:""}</div><div class="li">🕘 ${esc(slot(nx.x.f,nx.d)[2])}</div><div class="li">📍 ${esc(nx.x.f.c)}${nx.x.f.a?" – "+esc(nx.x.f.a):""}</div><div class="btns"><a class="btn" href="${maps(nx.x.f)}" target="_blank" rel="noopener">🧭 Itinéraire</a></div></div>`:""}
+ <nav class="pills" aria-label="Mes formations par statut">${SEC.filter(([k])=>C(k)||k==="venir").map(([k,t,c])=>`<a href="#s-${k}" style="--c:${c}">${t} <b>${C(k)}</b></a>`).join("")}${fini.length?`<a href="#s-fini" style="--c:var(--gy)">🗂 Terminées <b>${fini.length}</b></a>`:""}</nav>
+ ${SEC.map(x=>sec(...x)).join("")}
+ ${V&&V.t?`<div class="vei"><div class="kk">📢 Info réglementaire</div><h3>${esc(V.t)}</h3>${V.r?`<div class="mu" style="color:var(--tx)">${esc(V.r)}</div>`:""}<div class="mu" style="margin-top:4px">Transmise le ${esc(fds(V.dd||V.d||T))}${V.u?` · <a href="${esc(V.u)}" target="_blank" rel="noopener">Voir la source</a>`:""}</div><div class="btns">${V.lu?'<span class="pbok" style="margin:0">✔ Vous l’avez lue, merci</span>':V.a?`<a class="btn gn" href="${esc(V.a)}" target="_blank" rel="noopener">✅ J’ai lu – donner mon avis</a>`:""}</div></div>`:""}
+ ${fini.length?`<section class="sec" id="s-fini"><details><summary>🗂 Formations terminées (${fini.length})</summary><div class="fc s-fini" style="padding:6px 16px">${fini.slice().reverse().map(x=>{const d=DS(x.f);return `<div class="tl"><b>${esc(fds(d[d.length-1]||""))}</b><div><b>${esc(x.f.c)}</b><br><span class="mu">${esc(x.f.t)} · N° ${esc(x.f.n)}</span></div></div>`}).join("")}</div></details></section>`:""}
  <div class="ft">${esc(G[0]||"")}${G[1]?" · ☎ "+esc(G[1]):""}${G[2]?" · ✉ <a href=\"mailto:"+esc(G[2])+"\">"+esc(G[2])+"</a>":""}${G[3]?" · "+esc(G[3]):""}</div>`;
+ document.querySelectorAll("[data-tg]").forEach(b=>b.onclick=()=>{const p=document.getElementById(b.dataset.tg);if(!p)return;const on=p.classList.toggle("hide");b.setAttribute("aria-expanded",on?"false":"true");b.classList.toggle("on",!on)});
  document.querySelectorAll("[data-pbo]").forEach(b=>b.onclick=()=>{const i=b.dataset.pbo,fm=document.getElementById("pbf"+i);fm.classList.toggle("hide");b.setAttribute("aria-expanded",fm.classList.contains("hide")?"false":"true");if(!fm.classList.contains("hide"))document.getElementById("pbt"+i).focus()});
  document.querySelectorAll("[data-pbc]").forEach(b=>b.onclick=()=>{const i=b.dataset.pbc;document.getElementById("pbf"+i).classList.add("hide");document.querySelector('[data-pbo="'+i+'"]').setAttribute("aria-expanded","false")});
  document.querySelectorAll("[data-pbs]").forEach(b=>b.onclick=async()=>{const i=+b.dataset.pbs,f=D.f[i],ta=document.getElementById("pbt"+i),er=document.getElementById("pbe"+i),msg=ta.value.trim();er.textContent="";if(msg.length<3){er.textContent="Merci de décrire le problème en quelques mots.";ta.focus();return}
@@ -114,7 +203,7 @@ async function main(){
   const R2=await Promise.allSettled(S2),ok=R2.some(r=>r.status==="fulfilled");b.disabled=false;b.textContent="Envoyer à TOPAS informatique";
   if(ok){const H=pbHist(f.n);H.push({msg,tsl});try{localStorage.setItem(PBK(f.n),JSON.stringify(H))}catch(e){}document.getElementById("pbh"+i).insertAdjacentHTML("beforeend",`<div class="pbok">✔ Problème envoyé le ${esc(tsl)} : TOPAS informatique est prévenu.</div>`);ta.value="";document.getElementById("pbf"+i).classList.add("hide")}
   else{er.innerHTML='L’envoi automatique n’a pas fonctionné. <a href="mailto:'+esc(D.m||"")+"?subject="+encodeURIComponent("⚠ Problème signalé – "+f.n)+"&body="+encodeURIComponent(msg+"\n\n"+code)+'">Envoyer par e-mail</a>'}});
- document.querySelectorAll("[data-ics]").forEach(b=>b.onclick=()=>{const f=D.f.find(x=>x.n===b.dataset.ics);if(!f)return;const bl=new Blob([ics(f,D)],{type:"text/calendar"}),a=document.createElement("a");a.href=URL.createObjectURL(bl);a.download=f.n+"-planning.ics";document.body.appendChild(a);a.click();setTimeout(()=>a.remove(),500)});
+ document.querySelectorAll("[data-ics]").forEach(b=>b.onclick=()=>{const f=D.f.find(x=>x.n===b.dataset.ics);if(!f)return;const bl=new Blob([ics(f)],{type:"text/calendar"}),a=document.createElement("a");a.href=URL.createObjectURL(bl);a.download=f.n+"-planning.ics";document.body.appendChild(a);a.click();setTimeout(()=>a.remove(),500)});
 }
 main();
 })();
