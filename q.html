@@ -75,8 +75,8 @@ const b64u=o=>btoa(unescape(encodeURIComponent(JSON.stringify(o)))).replace(/\+/
 function unb64u(t){t=String(t).replace(/-/g,"+").replace(/_/g,"/");while(t.length%4)t+="=";return JSON.parse(decodeURIComponent(escape(atob(t))))}
 let D=null;try{D=unb64u(location.hash.replace(/^#/,""))}catch(e){D=null}
 const app=$("#app");
-if(!D||!D.n||!/^(auto|post|bilan)$/.test(D.q||"")){app.innerHTML='<div class="card"><h1>Lien incomplet</h1><p>Ce lien est incomplet ou a été modifié. Merci de rouvrir le lien reçu par e-mail, tel quel.</p></div>';return}
-const K=D.q,org=D.g||"",KEY="fpq:"+K+":"+D.n+":"+(D.nm||"");
+if(!D||!D.n||!/^(auto|post|bilan|veille)$/.test(D.q||"")||(D.q==="veille"&&!D.v)){app.innerHTML='<div class="card"><h1>Lien incomplet</h1><p>Ce lien est incomplet ou a été modifié. Merci de rouvrir le lien reçu par e-mail, tel quel.</p></div>';return}
+const K=D.q,org=D.g||"",KEY="fpq:"+K+":"+D.n+":"+(K==="veille"?D.v+":"+(D.em||""):"")+(D.nm||"");
 let done=null;try{done=localStorage.getItem(KEY)}catch(e){}
 const SAT=[["😀","Très satisfaisant"],["🙂","Satisfaisant"],["😕","Peu satisfaisant"],["😞","Insatisfaisant"]];
 const QUAL=[["😀","Très bien"],["🙂","Bien"],["😕","Moyen"],["😞","Insuffisant"]];
@@ -106,6 +106,10 @@ let DEF={
    {id:"pf",t:"Points forts de la formation",k:"area"},
    {id:"ame",t:"Axes d’amélioration / suggestions",k:"area"},
    {id:"bes",t:"Besoins de formation complémentaires",k:"area"}]},
+ veille:{title:"Information de veille",intro:"Merci de nous dire en un clic si cette information vous est utile. Votre réponse sert de preuve de diffusion (Qualiopi, indicateur 23).",
+  items:(D.nm?[]:[{id:"nm",t:"Vos nom et prénom",k:"text",req:1},{id:"em",t:"Votre e-mail",k:"text"}]).concat([
+   {id:"ch",t:"Cette information vous est-elle utile ?",k:"radio",o:["Utile, je vais l’utiliser","Pour information","Ne me concerne pas"],req:1},
+   {id:"cm",t:"Comment allez-vous l’utiliser ?",k:"area"}])},
  bilan:{title:"Bilan post-formation du formateur",intro:"Merci de faire le bilan de votre intervention. Ces informations alimentent notre démarche d’amélioration continue.",
   items:[
    {id:"niv",t:"Niveau général du groupe",k:"radio",o:["Débutant","Intermédiaire","Avancé","Hétérogène"],req:1},
@@ -134,7 +138,7 @@ function field(q){
 function val(q){if(q.k==="text"||q.k==="area")return($("#f_"+q.id).value||"").trim();const e=document.querySelector("input[name="+q.id+"]:checked");return e?e.value:""}
 function render(){
  const who=K==="bilan"?"Formateur : "+esc(D.nm||""):esc(D.nm||"");
- QN=0;const KI={auto:["🎯","Auto-évaluation"],post:["⭐","Votre avis compte"],bilan:["🧑‍🏫","Bilan formateur"]}[K]||["📋","Questionnaire"];
+ QN=0;const KI={auto:["🎯","Auto-évaluation"],post:["⭐","Votre avis compte"],bilan:["🧑‍🏫","Bilan formateur"],veille:["📚","Veille réglementaire"]}[K]||["📋","Questionnaire"];
  app.innerHTML=`<div class="sh"><div class="hd"><img src="logo.jpg" alt="${esc(org||"TOPAS informatique")}"><div class="adv"><b>Administration des Ventes</b>${D.m?`<br>✉️ <a href="mailto:${esc(D.m)}">${esc(D.m)}</a>`:""}</div><div class="qb"><b>Qualiopi <i>▶</i>▶</b><br>processus certifié<br>🇫🇷 RÉPUBLIQUE FRANÇAISE</div></div><div class="band">🌐 www.topas.fr</div>
  <div class="bd"><div class="kk">${KI[0]} ${esc(KI[1])}</div>${D.nm?`<div class="hi"><span>✦</span> Bonjour ${esc(String(D.nm).split(" ")[0])},</div>`:""}<h1>${esc(DEF.title)}</h1>${DEF.intro?`<div class="box"><span class="ic">📋</span><div>${esc(DEF.intro)}</div></div>`:""}
  <div class="box"><span class="ic">🎓</span><div><h2>${esc(D.f||"")}</h2><div class="mu">${D.a?"Du "+esc(fd(D.a))+" au "+esc(fd(D.b)):""}${D.c?" · "+esc(D.c):""}${who?" · "+who:""}</div></div></div>`+
@@ -156,6 +160,7 @@ async function submit(){
   payload={t:"fp-q",q:K,n:D.n,ti:D.ti,nm:D.nm||"",dl,hl,tsl:fd(dl)+" à "+hl};
   if(K==="auto"){payload.v={};ans.forEach(a=>{if(/^(soc|nom|hand|niv|obj|obj2|att|inf)$/.test(a[0].id))payload.v[a[0].id]=cut(a[1],lim)})}
   payload.a=ans.filter(a=>a[1]!=="").map(a=>[cut(a[0].t,90),cut(a[1],lim)]);
+  if(K==="veille"){const g=id=>(ans.find(a=>a[0].id===id)||[])[1]||"";payload.v=String(D.v);payload.ch=g("ch");payload.cm=cut(g("cm"),lim);if(!D.nm)payload.nm=cut(g("nm"),80);payload.em=cut(D.em||g("em"),120);delete payload.a}
   body=JSON.stringify(payload);
   if(new TextEncoder().encode(body).length<=3800||lim<=40)break;lim=Math.floor(lim*.7);
  }
