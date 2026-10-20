@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Réclamation – TOPAS informatique</title>
+<style>
+:root{--bg:#eef3fa;--card:#fff;--tx:#1f2937;--mu:#5a6275;--br:#d6dfeb;--pr:#1e3a8a;--bl:#1565c0;--gr:#16a34a;--grd:#15803d;--sf:#f1f6fc;--ok:#157347;--ko:#b42318;--sel:#e8f6ed;--sh:0 4px 18px rgba(15,23,42,.08)}
+@media (prefers-color-scheme:dark){:root{--bg:#10131a;--card:#1a1e29;--tx:#e8eaf0;--mu:#a7aec0;--br:#2c3242;--pr:#a9bdff;--bl:#1e4f9a;--gr:#22c55e;--grd:#16a34a;--sf:#1f2636;--ok:#5fd08a;--ko:#ff8a7a;--sel:#173322;--sh:0 4px 18px rgba(0,0,0,.4)}}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--tx);font:17px/1.5 'Segoe UI',system-ui,-apple-system,Roboto,Arial,sans-serif}
+.w{max-width:640px;margin:0 auto;padding:16px 12px 32px}
+.sh{background:var(--card);border-radius:20px;overflow:hidden;box-shadow:var(--sh)}
+.top{background:var(--bl);color:#fff;padding:12px 18px;display:flex;align-items:center;gap:12px}
+.top img{height:40px;background:#fff;border-radius:8px;padding:3px 6px}
+.top .tt{flex:1;min-width:0;font-weight:700;font-size:16px;line-height:1.25;overflow-wrap:anywhere}
+.top .ql{font-size:12px;font-weight:700;background:rgba(255,255,255,.18);border-radius:999px;padding:3px 10px;white-space:nowrap}
+.pg{padding:12px 20px 0}
+.pgt{display:flex;justify-content:space-between;font-size:15px;color:var(--mu);font-weight:600}
+.pgb{height:8px;background:var(--sf);border-radius:99px;overflow:hidden;margin-top:6px}
+.pgb i{display:block;height:100%;background:var(--gr);border-radius:99px;transition:width .35s ease}
+.bd{padding:18px 20px 22px}
+.kk{font-size:14px;font-weight:800;color:var(--gr);text-transform:uppercase;letter-spacing:.6px}
+h1{font-size:25px;line-height:1.25;margin:6px 0 4px;color:var(--pr)}
+.hi{font-size:21px;font-weight:700;margin:4px 0 10px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.chip{display:inline-flex;align-items:center;gap:6px;background:var(--sf);border-radius:999px;padding:6px 12px;font-size:15px}
+.intro{background:var(--sf);border-radius:14px;padding:14px 16px;margin:12px 0;font-size:16px}
+.qb{margin:6px 0 22px}
+.qb:last-of-type{margin-bottom:8px}
+.ql2{display:block;font-size:19px;font-weight:700;line-height:1.35;margin:0 0 12px}
+.req{color:var(--ko);margin-left:2px}
+.opt{font-size:14px;color:var(--mu);font-weight:400}
+.qerr{color:var(--ko);font-weight:600;font-size:16px;margin-top:8px;min-height:0}
+.qb.bad .cards .cd,.qb.bad .yn label,.qb.bad .sm label,.qb.bad input[type=text],.qb.bad textarea{border-color:var(--ko)}
+/* cartes de choix */
+.cards{display:grid;gap:10px}
+.cd,.yn label,.sm label,.st label{position:relative;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.cards input,.yn input,.sm input,.st input{position:absolute;opacity:0;width:1px;height:1px;margin:0}
+.cd{display:flex;align-items:center;gap:12px;min-height:56px;padding:12px 16px;border:2px solid var(--br);border-radius:14px;background:var(--card);font-size:17px;transition:border-color .15s,background .15s}
+.cd .ck{flex:none;width:26px;height:26px;border-radius:50%;border:2px solid var(--br);display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;font-size:15px}
+.cd:has(input:checked){border-color:var(--gr);background:var(--sel)}
+.cd:has(input:checked) .ck{background:var(--gr);border-color:var(--gr)}
+.cd:has(input:checked) .ck::after{content:"✓"}
+.yn{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.yn label{display:flex;align-items:center;justify-content:center;gap:8px;min-height:64px;border:2px solid var(--br);border-radius:16px;background:var(--card);font-size:19px;font-weight:700}
+.yn label:has(input:checked){border-color:var(--gr);background:var(--gr);color:#fff}
+.sm{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.sm label{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 4px;border:2px solid var(--br);border-radius:14px;background:var(--card);text-align:center;font-size:13.5px;line-height:1.2;min-height:96px}
+.sm .e{font-size:36px;line-height:1.1;transition:transform .18s ease}
+.sm label:has(input:checked){border-color:var(--gr);background:var(--sel);font-weight:700}
+.sm label:has(input:checked) .e{transform:scale(1.22)}
+.st{display:flex;gap:6px;justify-content:space-between;max-width:420px}
+.st label{flex:1;display:flex;flex-direction:column;align-items:center;min-height:64px;justify-content:center;border-radius:14px;font-size:13px;color:var(--mu)}
+.st .s{font-size:40px;line-height:1;color:#cbd5e1;transition:transform .18s ease,color .15s}
+.st label.on .s{color:#f59e0b}
+.st label:has(input:checked) .s{transform:scale(1.18)}
+.lg{display:flex;justify-content:space-between;font-size:14px;color:var(--mu);margin-top:6px;max-width:420px}
+input[type=text],textarea{width:100%;font:inherit;font-size:17px;padding:13px 14px;border:2px solid var(--br);border-radius:12px;background:var(--card);color:var(--tx)}
+textarea{min-height:96px;resize:none;overflow:hidden}
+::placeholder{color:#8a93a6}
+.cd:focus-within,.yn label:focus-within,.sm label:focus-within,.st label:focus-within{outline:3px solid var(--bl);outline-offset:2px}
+input[type=text]:focus-visible,textarea:focus-visible,button:focus-visible,a:focus-visible{outline:3px solid var(--bl);outline-offset:2px}
+@media (hover:hover){.cd:hover,.yn label:hover,.sm label:hover{border-color:var(--bl)}.st label:hover .s{transform:scale(1.1)}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+/* boutons */
+.nav{display:flex;gap:10px;margin-top:18px}
+button,a.btn{font:inherit;font-weight:700;border:0;border-radius:14px;padding:14px 20px;min-height:52px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:8px;font-size:17px}
+.go{background:var(--gr);color:#fff;flex:1}
+.go:hover{background:var(--grd)}
+.go[disabled]{opacity:.6;cursor:wait}
+.sec{background:var(--sf);color:var(--tx);border:2px solid var(--br)}
+.lnk{background:none;color:var(--bl);text-decoration:underline;padding:8px 6px;min-height:44px;font-weight:600}
+.big{width:100%;font-size:19px;min-height:58px}
+/* récapitulatif */
+.rc{border-top:1px solid var(--br)}
+.rr{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--br)}
+.rr>div{flex:1;min-width:0}
+.rr .q{font-size:15px;color:var(--mu)}
+.rr .a{font-size:17px;font-weight:600;overflow-wrap:anywhere;white-space:pre-line}
+.rr .a.v{color:var(--mu);font-weight:400}
+.rr button{flex:none;padding:8px 12px;min-height:44px;font-size:15px}
+/* merci */
+.thx{text-align:center;padding:28px 18px 10px}
+.thx .ckb{width:96px;height:96px;border-radius:50%;background:var(--gr);color:#fff;font-size:54px;font-weight:800;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;animation:pop .45s ease}
+@keyframes pop{0%{transform:scale(.4);opacity:0}70%{transform:scale(1.08)}100%{transform:scale(1);opacity:1}}
+.thx h1{font-size:30px}
+.thx p{font-size:17px;margin:8px 0}
+.links{display:grid;gap:10px;margin:18px 0 0}
+.links a{background:var(--sf);color:var(--pr);border:2px solid var(--br)}
+.err{color:var(--ko);font-weight:600}
+.ft{text-align:center;font-size:14px;color:var(--mu);padding:16px 12px 0}
+.hide{display:none!important}
+@media (max-width:480px){.w{padding:10px 8px 24px}.bd{padding:16px 16px 20px}h1{font-size:23px}.sm .e{font-size:32px}.sm label{font-size:12.5px;min-height:90px;padding:8px 2px}.st .s{font-size:36px}.ql2{font-size:18px}}
+
+label.fl{display:block;font-size:17px;font-weight:700;margin:16px 0 6px}
+input[type=email],input[type=tel],select{width:100%;font:inherit;font-size:17px;padding:13px 14px;border:2px solid var(--br);border-radius:12px;background:var(--card);color:var(--tx)}
+.cards.two{grid-template-columns:1fr 1fr}
+@media (max-width:480px){.cards.two{grid-template-columns:1fr}}
+.fz{display:flex;align-items:center;justify-content:center;border:2px dashed var(--br);border-radius:12px;min-height:56px;padding:10px;cursor:pointer;text-align:center;color:var(--mu)}
+.fz input{position:absolute;opacity:0;width:1px;height:1px}
+.code{font-family:monospace;font-size:13px;word-break:break-all;background:var(--sf);border-radius:10px;padding:10px;margin:8px 0}
+</style>
+</head>
+<body>
+<div class="w"><div id="app" aria-live="polite"></div><div class="ft" id="ft"></div></div>
+<script>
+const SBU="https://kbfnxqyxqualmqhiufnq.supabase.co",SBK="sb_publishable_5vjNCP7zREh5upGu_pTAIA_mgUPG8Cx";
+const sbDep=(c,p)=>fetch(SBU+"/rest/v1/rpc/deposer",{method:"POST",headers:{apikey:SBK,"Content-Type":"application/json"},body:JSON.stringify({p_canal:c,p_data:p})}).then(r=>{if(!r.ok)throw 0;return 1});
+
+
+(function(){
+"use strict";
+const $=s=>document.querySelector(s);
+const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const b64u=o=>btoa(unescape(encodeURIComponent(JSON.stringify(o)))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
+const P=new URLSearchParams(location.search),C=(P.get("c")||"").replace(/[^A-Za-z0-9_-]/g,""),M=(P.get("m")||"adv@topas.fr").trim(),ORG=P.get("o")||"TOPAS informatique";
+const QUI=[["client","🏢 Entreprise cliente"],["stagiaire","🎓 Stagiaire"],["formateur","🧑‍🏫 Formateur"],["financeur","💼 Financeur"],["autre","✉ Autre"]];
+const app=$("#app");$("#ft").textContent=ORG+" – organisme de formation certifié Qualiopi · vos informations servent uniquement au traitement de votre demande";
+const shell=inner=>`<div class="sh"><div class="top"><img src="logo.jpg" alt="${esc(ORG)}"><div class="tt">Réclamation ou difficulté</div><span class="ql">Qualiopi ✓</span></div><div class="bd">${inner}</div></div>`;
+let pj="";
+function form(){app.innerHTML=shell(`<div class="kk">📮 Nous sommes à votre écoute</div><h1>Signaler une difficulté ou faire une réclamation</h1>
+ <div class="intro">Décrivez-nous la situation : nous vous envoyons un accusé de réception, puis notre réponse avec la suite donnée.</div>
+ <form id="f" novalidate>
+ <div class="qb" id="b_qui"><span class="ql2" id="l_qui">Vous êtes<span class="req" aria-hidden="true">*</span></span><div class="cards two" role="radiogroup" aria-labelledby="l_qui">${QUI.map(([k,l])=>`<label class="cd"><input type="radio" name="qui" value="${k}"><span class="ck"></span><span>${l}</span></label>`).join("")}</div><div class="qerr" id="e_qui"></div></div>
+ <label class="fl" for="nm">Vos nom et prénom<span class="req" aria-hidden="true">*</span></label><input type="text" id="nm" autocomplete="name"><div class="qerr" id="e_nm"></div>
+ <label class="fl" for="em">Votre e-mail<span class="req" aria-hidden="true">*</span></label><input type="email" id="em" autocomplete="email" inputmode="email"><div class="qerr" id="e_em"></div>
+ <label class="fl" for="tel">Téléphone <span class="opt">(facultatif)</span></label><input type="tel" id="tel" autocomplete="tel" inputmode="tel">
+ <label class="fl" for="fo">Formation concernée <span class="opt">(facultatif)</span></label><input type="text" id="fo" placeholder="Ex. : Excel niveau 1, mars 2026, N° CONV…">
+ <label class="fl" for="ob">Objet<span class="req" aria-hidden="true">*</span></label><input type="text" id="ob" placeholder="Ex. : retard de convocation"><div class="qerr" id="e_ob"></div>
+ <label class="fl" for="de">Décrivez la situation<span class="req" aria-hidden="true">*</span></label><textarea id="de" placeholder="Qui, quoi, quand… et ce que vous attendez de nous"></textarea><div class="qerr" id="e_de"></div>
+ <label class="fl">Pièce jointe <span class="opt">(facultatif – seul le nom du fichier nous est transmis ; nous vous la redemanderons si besoin)</span></label><label class="fz"><input type="file" id="pj"><span id="pjn">📎 Choisir un fichier</span></label>
+ <div class="nav"><button type="submit" class="go big" id="send">✔ Envoyer</button></div><div class="err" id="err" role="alert"></div></form>`);
+ const de=$("#de");de.addEventListener("input",()=>{de.style.height="auto";de.style.height=Math.max(96,de.scrollHeight+4)+"px"});
+ $("#pj").onchange=e=>{const f=e.target.files[0];pj=f?f.name.slice(0,120):"";$("#pjn").textContent=f?"✅ "+f.name:"📎 Choisir un fichier"};
+ $("#f").addEventListener("input",e=>{const k=e.target.name==="qui"?"qui":e.target.id,x=document.getElementById("e_"+k);if(x)x.textContent=""});$("#f").addEventListener("change",e=>{if(e.target.name==="qui")$("#e_qui").textContent=""});
+ $("#f").onsubmit=e=>{e.preventDefault();submit()}}
+async function submit(){const v=id=>($("#"+id).value||"").trim(),qui=(document.querySelector('input[name="qui"]:checked')||{}).value||"",E={qui:!qui&&"Indiquez qui vous êtes.",nm:!v("nm")&&"Indiquez vos nom et prénom.",em:!/^[^\s@,;]+@[^\s@,;]+\.[^\s@,;]+$/.test(v("em"))&&"Indiquez une adresse e-mail valide (pour vous répondre).",ob:!v("ob")&&"Indiquez l’objet.",de:!v("de")&&"Décrivez la situation."};
+ let first=null;Object.entries(E).forEach(([k,m])=>{$("#e_"+k).textContent=m||"";if(m&&!first)first=k});if(first){const el=$("#"+(first==="qui"?"b_qui":first));el.scrollIntoView({behavior:"smooth",block:"center"});const i=first==="qui"?document.querySelector('input[name="qui"]'):$("#"+first);if(i)i.focus({preventScroll:true});return}
+ const btn=$("#send");btn.disabled=true;btn.textContent="Envoi en cours…";
+ const now=new Date(),p2=n=>String(n).padStart(2,"0"),dl=now.getFullYear()+"-"+p2(now.getMonth()+1)+"-"+p2(now.getDate()),hl=p2(now.getHours())+":"+p2(now.getMinutes()),cut=(s,n)=>String(s).slice(0,n);
+ const p={t:"fp-rec",id:Date.now().toString(36)+Math.random().toString(36).slice(2,7),qui,nm:cut(v("nm"),80),em:cut(v("em"),120),tel:cut(v("tel"),30),f:cut(v("fo"),120),obj:cut(v("ob"),160),desc:cut(v("de"),2600),pj,dl,hl};
+ const code="FPREC:"+b64u(p),sends=[];if(C)sends.push(sbDep(C,p));
+ if(M){const f=new URLSearchParams({_subject:"Réclamation – "+p.obj,_captcha:"false",_template:"table","Vous êtes":qui,Nom:p.nm,"E-mail":p.em,"Téléphone":p.tel,Formation:p.f,Objet:p.obj,Description:p.desc,"Pièce jointe":pj,Date:dl+" "+hl,Code:code});sends.push(fetch("https://formsubmit.co/ajax/"+encodeURIComponent(M),{method:"POST",headers:{Accept:"application/json"},body:f}).then(r=>{if(!r.ok)throw 0;return 1}))}
+ const R=await Promise.allSettled(sends);if(R.some(r=>r.status==="fulfilled"))return thanks(p);
+ btn.disabled=false;btn.textContent="✔ Envoyer";const mt="mailto:"+encodeURIComponent(M)+"?subject="+encodeURIComponent("Réclamation – "+p.obj)+"&body="+encodeURIComponent("Bonjour,\n\n"+p.desc+"\n\n"+p.nm+" – "+p.em+"\n\n"+code+"\n");
+ $("#err").innerHTML=`L’envoi automatique n’a pas fonctionné. <a href="${esc(mt)}">Envoyez-nous votre demande par e-mail</a> (le texte est prérempli), ou écrivez à ${esc(M)} en recopiant ce code :<div class="code">${esc(code)}</div>`}
+function thanks(p){app.innerHTML=shell(`<div class="thx"><div class="ckb" aria-hidden="true">✓</div><h1>Merci, c’est envoyé !</h1><p>Votre demande « ${esc(p.obj)} » a bien été transmise à ${esc(ORG)} le ${esc(p.dl.split("-").reverse().join("/"))} à ${esc(p.hl)}.</p><p>Vous allez recevoir un accusé de réception à <b>${esc(p.em)}</b>, puis notre réponse.</p><p style="color:var(--mu);font-size:15px;margin-top:18px">Vous pouvez fermer cette page.</p></div>`);window.scrollTo(0,0)}
+form();
+})();
+</script>
+</body>
+</html>
