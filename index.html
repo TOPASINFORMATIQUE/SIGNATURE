@@ -61,6 +61,7 @@ button,a.btn{display:inline-block;font:inherit;font-weight:700;border:0;border-r
 .pln .rw{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}.pln .box{background:#f6f6f8;border-radius:6px;padding:10px 14px;min-height:150px}.pln .dtp{margin:5px 0;padding:5px 8px;background:#fff;border-left:4px solid #12308f;border-radius:4px}.pln .ftp{margin-top:24px;text-align:center;font-size:15px;border-bottom:6px solid #12308f;padding-bottom:10px}
 @media(max-width:640px){.paper{padding:12px}.cv .hg,.pln .hg2,.pln .g2,.pln .rw,.cv .sg,.cv .trg{grid-template-columns:1fr}.cv .r{grid-template-columns:1fr;gap:0}.cv .r b{text-align:left;margin-top:6px}.cv .ttl{font-size:17px}.cv .tt .sl{display:block;width:auto;padding:10px 14px}.cv .tt,.cv .tt>tbody,.cv .tt>tbody>tr,.cv .tt>tbody>tr>td{display:block;width:100%}.cv .tt .am table{margin:4px 10px 8px auto}.cv .px td{padding:6px 3px;font-size:12px}}
 @media print{.paper{border:0;box-shadow:none;padding:0}}
+.dvc{font:11.5px/1.4 Arial,Helvetica,sans-serif;color:#111}.dvc *{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact}.dvc .hd{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;border-bottom:4px solid #12308f;padding-bottom:8px}.dvc .hd img{height:58px}.dvc .ti{text-align:right}.dvc .ti b{display:block;font-size:20px;color:#12308f}.dvc .g2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0}.dvc .bx{border:1px solid #9aa3b5;border-radius:6px;padding:7px 10px}.dvc .lb{font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:#475569;margin-bottom:2px;font-weight:700}.dvc .in{text-align:center;font-size:11px;color:#334155;margin:8px 0}.dvc table{width:100%;border-collapse:collapse}.dvc th,.dvc td{border:1px solid #9aa3b5;padding:5px 7px;text-align:left;vertical-align:top;font-size:11.5px}.dvc th{background:#e8edf7;font-size:10.5px}.dvc .r{text-align:right;white-space:nowrap}.dvc .ct{margin:2px 0 0 14px;padding:0}.dvc .eb{border:2px solid #12308f;border-radius:8px;padding:8px 10px;margin:8px 0}.dvc .eb h4{margin:0 0 4px;color:#12308f;font-size:12.5px}.dvc .eb th{width:30%;background:#f1f5fb}.dvc .st{display:grid;grid-template-columns:1fr 2fr;gap:10px;margin:8px 0}.dvc .fin{display:grid;grid-template-columns:1.2fr 1fr;gap:12px;margin-top:10px}.dvc .sg{border:1px dashed #475569;border-radius:6px;padding:8px 10px;min-height:120px}.dvc .rg{font-size:10px;line-height:1.35;margin:4px 0 6px;white-space:pre-line}.dvc .tot .ttc td{background:#12308f;color:#fff;font-weight:700}.dvc .ac{font-size:10.5px;margin:6px 0;padding:5px 8px;background:#f1f5fb;border-radius:6px}.dvc .ft{margin-top:12px;border-top:3px solid #12308f;padding-top:5px;font-size:9.5px;text-align:center;color:#334155}@media(max-width:640px){.dvc .g2,.dvc .st,.dvc .fin{grid-template-columns:1fr}.dvc .hd{flex-direction:column}.dvc .ti{text-align:left}}
 .pdx{margin-top:22px;break-before:page;page-break-before:always}.pdj{border:1px solid #c9cde0;border-radius:6px;margin:8px 0;overflow:hidden}.pdh{background:#12308f;color:#fff;font-weight:700;padding:6px 10px}.pdb{padding:4px 10px 2px;break-inside:avoid}.pdt{font-weight:700;color:#12308f;margin-top:4px}.pdm{font-weight:600;margin-top:3px}.pdb ul{margin:2px 0 4px 18px;padding:0}
 </style>
 </head>
@@ -72,7 +73,7 @@ button,a.btn{display:inline-block;font:inherit;font-weight:700;border:0;border-r
 const SBU="https://kbfnxqyxqualmqhiufnq.supabase.co",SBK="sb_publishable_5vjNCP7zREh5upGu_pTAIA_mgUPG8Cx";
 const sbDep=(c,p)=>fetch(SBU+"/rest/v1/rpc/deposer",{method:"POST",headers:{apikey:SBK,"Content-Type":"application/json"},body:JSON.stringify({p_canal:c,p_data:p})}).then(r=>{if(!r.ok)throw 0;return 1});
 
-(function(){
+(async function(){
 "use strict";
 const $=s=>document.querySelector(s);
 const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -81,15 +82,18 @@ const fd=d=>{if(!d)return"—";const x=new Date(d+"T12:00:00");return isNaN(x)?d
 const fdl=d=>{const x=new Date(d+"T12:00:00");return isNaN(x)?d:x.toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long",year:"numeric"})};
 const b64u=o=>btoa(unescape(encodeURIComponent(JSON.stringify(o)))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
 function unb64u(t){t=String(t).replace(/-/g,"+").replace(/_/g,"/");while(t.length%4)t+="=";return JSON.parse(decodeURIComponent(escape(atob(t))))}
+async function load(h){if(h.startsWith("z.")){let t=h.slice(2).replace(/-/g,"+").replace(/_/g,"/");while(t.length%4)t+="=";const bin=atob(t),u=Uint8Array.from(bin,c=>c.charCodeAt(0)),ds=new DecompressionStream("deflate-raw"),w=ds.writable.getWriter();w.write(u);w.close();return JSON.parse(await new Response(ds.readable).text())}return unb64u(h)}
 let D=null;
-try{D=unb64u(location.hash.replace(/^#/,""))}catch(e){D=null}
+try{D=await load(location.hash.replace(/^#/,""))}catch(e){D=null}
 const app=$("#app");
 if(!D||!D.n||!D.g){app.innerHTML='<div class="card"><h1>Lien incomplet</h1><p>Ce lien de signature est incomplet ou a été modifié. Merci de rouvrir le lien reçu par e-mail, tel quel, ou de contacter l’organisme de formation.</p></div>';return}
-const plan=D.k==="plan",G=D.g,C=D.c||["","",""],tr=D.tr||[];
+const plan=D.k==="plan",dev=D.k==="dev",ro=!!D.ro,G=D.g,C=D.c||D.cl||["","",""],tr=D.tr||[];
 const org=G[0]||"",addr=G[1]||"",tel=G[2]||"",mail=G[3]||"",web=G[4]||"",nda=G[5]||"",siret=G[6]||"";
-document.title=(plan?"Validation de la planification":"Signature de la convention")+" "+D.n;
-const KEY="fpsig:"+D.k+":"+D.n;
+const TIT=dev?(ro?"Devis accepté":"Signature du devis"):plan?(ro?"Planification validée":"Validation de la planification"):(ro?"Convention signée":"Signature de la convention");
+document.title=TIT+" "+(dev?D.dn||D.n:D.n);
+const KEY="fpsig:"+D.k+":"+D.n+(dev?":"+(D.dn||""):"");
 let done=null;try{done=JSON.parse(localStorage.getItem(KEY)||"null")}catch(e){}
+if(ro)done=D.sig||null;
 
 const frd=d=>{if(!d)return"—";const x=d.split("-");return (+x[2])+"/"+(+x[1])+"/"+x[0].slice(2)};
 const fjn=n=>String(n).replace(".",",");
@@ -117,6 +121,19 @@ ${row("Intitulé du stage :",`<b>${esc(D.f)}</b>`)}${row("Objectif :",esc(D.o||"
 <div class="sg"><div><b class="mr">Cachet &amp; Signature de l’Organisme</b><br><img src="stamp.jpg" alt="Cachet TOPAS"></div><div id="sigent"><b class="mr">Cachet &amp; Signature de l’Entreprise</b>${sigBlock()}</div></div>
 <div class="ft"><span>S.A.S au capital de ${esc(G[11]||"")}</span><span>APE ${esc(G[9]||"")}</span><span>TVA INTRA : ${esc(G[10]||"")}</span><span>N° Siret : ${esc((siret||"").replace(/\s/g,""))}</span></div></div>`;
 }
+function docDev(){const E=esc,g=G,ca=D.ca||[],cl=D.cl||[],en=D.en||[],L=D.L||[],be=D.be||[],st=D.st||[],li=D.li||[],rf=D.rf;
+ const sgn=done?`<div style="margin-top:8px;border:2px solid #16a34a;border-radius:6px;padding:6px 8px"><b style="color:#166534">✅ ${done.mode==="mail"?"Accepté par mail (« BON POUR ACCORD »)":done.mode==="papier"?"Accepté (bon pour commande)":"Accepté en ligne – signature électronique"}</b><br>${done.nm?"par "+E(done.nm)+(done.fn?" ("+E(done.fn)+")":"")+"<br>":""}le ${E(done.tsl||"")}${done.sg?`<br>${sigSvg(done.sg)}`:""}</div>`:"";
+ return `<div class="dvc"><div class="hd"><div><img src="logo.jpg" alt="TOPAS informatique"><div style="font-size:10.5px;margin-top:4px"><b>${E(org)}</b><br>${E(addr)}<br>Tél ${E(tel)} · ${E(mail)}</div></div><div class="ti"><b>DEVIS Prestation de Formation</b>N° <b style="display:inline;font-size:15px;color:#111">${E(D.dn||"")}</b><br>Date : ${fd(D.dt)}<br>Valable jusqu’au : ${fd(D.vd)}<br>Dossier : ${E(D.n)}${rf?`<br><span style="font-size:10.5px">Réf. : devis ${E(rf[0])}${rf[1]?" du "+fd(rf[1]):""}${rf[2]?" – "+E(rf[2]):""}</span>`:""}</div></div>
+<div class="g2"><div><div class="bx"><div class="lb">Votre chargé d’affaires</div><b>${E(ca[0]||"—")}</b>${ca[1]?"<br>Tél "+E(ca[1]):""}${ca[2]?"<br>"+E(ca[2]):""}</div><div class="bx" style="margin-top:6px"><div class="lb">Centre de formation</div>N° de déclaration d’activité ${E(nda)} – cet enregistrement ne vaut pas agrément de l’État<br>inscrit auprès de la Préfecture de la Région Rhône-Alpes${g[8]?"<br>URSSAF : "+E(g[8]):""}<br>N° de SIRET : ${E(siret)}${g[9]?" / APE : "+E(g[9]):""}</div></div>
+<div><div class="bx"><div class="lb">Client</div><b>${E(cl[0]||"")}</b>${cl.slice(1).map(l=>"<br>"+E(l)).join("")}</div><div class="bx" style="margin-top:6px"><div class="lb">Envoyée à</div>${E(en[0]||"")}${en[1]?" – "+E(en[1]):""}${en[2]?"<br>Tél "+E(en[2]):""}${en[3]?"<br>"+E(en[3]):""}</div></div></div>
+<div class="in">Suite à votre demande et à l’étude par nos soins de vos besoins en formation, vous trouverez ci-dessous le détail de la prestation à réaliser.</div>
+<table><thead><tr><th>Intitulé du stage</th><th class="r">Durée<br>en jours</th><th class="r">Coût jour<br>H.T.</th><th class="r">Coût total<br>H.T.</th></tr></thead><tbody>${L.map(l=>`<tr><td><b>${E(l[0])}</b>${(l[4]||[]).length?`<ul class="ct">${l[4].map(x=>`<li>${E(x)}</li>`).join("")}</ul>`:""}</td><td class="r">${fjn(l[1])}</td><td class="r">${eur(l[2])} €</td><td class="r"><b>${eur(l[3])} €</b></td></tr>`).join("")}</tbody></table>
+${D.cx?`<div style="margin:8px 0;font-weight:700">CONTEXTE : ${E(D.cx)}</div>`:""}
+<div class="eb"><h4>ÉTUDE DES BESOINS</h4>${D.bl?`<div style="margin-bottom:5px">${E(D.bl)}</div>`:""}${be.length?`<table>${be.map(r=>`<tr><th>${E(r[0])}</th><td style="white-space:pre-line">${E(r[1])}</td></tr>`).join("")}</table><div style="margin-top:5px"><b>La formation proposée en tient compte.</b></div>`:`<div>Étude des besoins à compléter avec le client.</div>`}</div>
+${D.ac?`<div class="ac">♿ ${E(D.ac)}</div>`:""}
+<div class="st"><div class="bx"><div class="lb">Nombre de stagiaires</div><b style="font-size:14px">${E(D.ns||st.length||"—")}</b></div><div class="bx"><div class="lb">Stagiaires</div>${st.length?st.map(E).join("<br>"):"À préciser"}<div class="lb" style="margin-top:6px">Lieu du stage</div>${li.map(E).join("<br>")||"—"}</div></div>
+<div class="fin"><div class="sg"><b>Bon pour commande</b><br>${D.rp?"Représentée par "+E(D.rp)+"<br>":""}<div class="rg">${E(D.rg||"")}</div>Date, cachet et signature de l’entreprise :${sgn}</div><table class="tot"><tr><td>Total H.T.</td><td class="r">${eur(D.ht)} €</td></tr><tr><td>TVA 20 %</td><td class="r">${eur(D.tva)} €</td></tr><tr class="ttc"><td>Total TTC</td><td class="r">${eur(D.ttc)} €</td></tr></table></div>
+<div class="ft">${E(org)}${g[11]?" · S.A.S au capital de "+E(g[11]):""}${g[9]?" · APE "+E(g[9]):""}${g[10]?" · TVA intracommunautaire "+E(g[10]):""} · N° SIRET ${E(siret)}</div></div>`}
 function hrsT(d){const p=(D.hf||{})[d];return p==="m"?"½ journée : 9h00 – 12h30":p==="a"?"½ journée : 14h00 – 17h30":"9h00 – 12h30 / 14h00 – 17h30"}
 function docPlan(){
  const ds=D.ds||[],pe=D.pe||"",ad=D.ad||mail;
@@ -132,26 +149,27 @@ function docPlan(){
 <div class="ftp">*** Ce document vaut pour convocation aux Participants/Stagiaires concernés ***</div>${dero()}</div>`;
 }
 function dero(){const R=Array.isArray(D.dr)?D.dr:[];if(!R.length)return"";return `<div class="pdx"><div class="bar">Déroulé de l’intervention</div><div style="font-size:12px;margin:0 0 8px">Horaires indicatifs, adaptés sur place au rythme des stagiaires.</div>${R.map(d=>!(d[1]||[]).length?`<div style="border:2px solid #d97706;background:#fff7ed;color:#7c2d12;border-radius:6px;padding:8px 12px;margin:0 0 8px;font-weight:700">${esc(d[0])}</div>`:`<div class="pdj"><div class="pdh">${esc(d[0])}</div>${(d[1]||[]).map(b=>`<div class="pdb"><div class="pdt">${esc(b[0])}</div>${(b[1]||[]).map(g=>(g[0]?`<div class="pdm">${esc(g[0])}</div>`:"")+((g[1]||[]).length?`<ul>${g[1].map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`:"")).join("")}</div>`).join("")}</div>`).join("")}</div>`}
-function head(){return `<img src="logo.jpg" alt="TOPAS informatique" style="height:56px;margin-bottom:8px"><h1>${plan?"Validation de la planification":"Signature de la convention"}</h1><div class="mu">Vérifiez le document ci-dessous, puis signez en bas de page.</div>`}
+function head(){return `<img src="logo.jpg" alt="TOPAS informatique" style="height:56px;margin-bottom:8px"><h1>${TIT}</h1><div class="mu">${ro?"Votre exemplaire, à conserver : imprimez-le ou enregistrez-le en PDF.":"Vérifiez le document ci-dessous, puis signez en bas de page."}</div>`}
+const docX=()=>dev?docDev():plan?docPlan():docConv(),W1=dev?"accepté":plan?"validée":"signée";
 
 function render(){
  app.innerHTML=head()+
- `<div class="paper" id="doc">${plan?docPlan():docConv()}</div>`+
- (done?`<div class="card okb noprint"><div class="okt">✔ Déjà ${plan?"validée":"signée"}</div><p>Ce document a déjà été ${plan?"validé":"signé"} depuis cet appareil par <b>${esc(done.nm)}</b> le ${esc(done.tsl)}.</p><button class="sec" id="prt">🖨 Imprimer / enregistrer ma copie</button></div>`:
+ `<div class="paper" id="doc">${docX()}</div>`+
+ (ro?`<div class="card okb noprint"><div class="okt">✔ Exemplaire ${W1}</div><p>${done&&done.nm?"Par <b>"+esc(done.nm)+"</b>"+(done.fn?" ("+esc(done.fn)+")":"")+" ":""}${done&&done.tsl?"le "+esc(done.tsl)+".":""}</p><button class="sec" id="prt">🖨 Imprimer / enregistrer mon exemplaire (PDF)</button></div>`:done?`<div class="card okb noprint"><div class="okt">✔ Déjà ${W1}</div><p>Ce document a déjà été ${dev?"accepté":plan?"validé":"signé"} depuis cet appareil par <b>${esc(done.nm)}</b> le ${esc(done.tsl)}.</p><button class="sec" id="prt">🖨 Imprimer / enregistrer ma copie</button></div>`:
  `<div class="card noprint" id="form">
-  <h2>${plan?"Valider les dates":"Signer la convention"}</h2>
+  <h2>${dev?"Accepter le devis":plan?"Valider les dates":"Signer la convention"}</h2>
   <p class="mu">Vérifiez le document ci-dessus, puis renseignez les champs. Cela ne prend qu’une minute.</p>
   <label for="nm">Nom et prénom du signataire</label><input type="text" id="nm" autocomplete="name">
   <label for="fn">Fonction</label><input type="text" id="fn" autocomplete="organization-title">
   <label id="sl">Votre signature (au doigt ou à la souris)</label>
   <div class="pad"><canvas id="cv" tabindex="0" aria-labelledby="sl"></canvas><div class="ph" id="ph">Signez ici</div></div>
   <div style="margin-top:6px"><button class="sec" id="clr" type="button">Effacer la signature</button></div>
-  <label class="chk"><input type="checkbox" id="ok"><span>${plan?"J’ai pris connaissance des dates d’intervention et je les valide.":"Lu et approuvé, bon pour accord."}</span></label>
+  <label class="chk"><input type="checkbox" id="ok"><span>${dev?"J’accepte ce devis et l’étude des besoins qu’il contient.":plan?"J’ai pris connaissance des dates d’intervention et je les valide.":"Lu et approuvé, bon pour accord."}</span></label>
   <div class="err" id="err" role="alert"></div>
-  <button class="go" id="go" type="button">${plan?"Valider la planification":"Signer la convention"}</button>
+  <button class="go" id="go" type="button">${dev?"Valider":plan?"Valider la planification":"Signer la convention"}</button>
   <p class="mu">Les informations saisies sont transmises uniquement à ${esc(org)}. Cette signature électronique simple a valeur d’accord.</p>
  </div>`)+`<div id="res"></div>`;
- if(done){const p=$("#prt");if(p)p.onclick=()=>window.print();return}
+ if(done||ro){const p=$("#prt");if(p)p.onclick=()=>window.print();return}
  pad();
 }
 function sigSvg(sg){let d="";String(sg||"").split(";").forEach(st=>{const P=st.split(",").map(q=>q.split(".").map(v=>parseInt(v,36))).filter(q=>q.length===2&&!isNaN(q[0])&&!isNaN(q[1]));if(!P.length)return;if(P.length===1)P.push([P[0][0]+1,P[0][1]]);d+="M"+P.map(q=>q[0]+" "+q[1]).join("L")});return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 140" width="200" height="87"><path d="${d}" fill="none" stroke="#12308f" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`}
@@ -186,18 +204,18 @@ async function submit(){
  if(!$("#ok").checked)return err.textContent="Merci de cocher la case pour confirmer.";
  const go=$("#go");go.disabled=true;go.textContent="Envoi en cours…";
  const now=new Date(),p2=n=>String(n).padStart(2,"0"),dl=now.getFullYear()+"-"+p2(now.getMonth()+1)+"-"+p2(now.getDate()),hl=p2(now.getHours())+":"+p2(now.getMinutes());
- const payload={t:"fp-sign",k:plan?"plan":"conv",n:D.n,nm,fn,dl,hl,tsl:fd(dl)+" à "+hl,sg:compact()};
+ const payload={t:"fp-sign",k:dev?"dev":plan?"plan":"conv",n:D.n,nm,fn,dl,hl,tsl:fd(dl)+" à "+hl,sg:compact()};if(dev)payload.dn=D.dn||"";
  const code="FPSIG:"+b64u(payload),body=JSON.stringify(payload);
  const sends=[];
  if(D.t)sends.push(sbDep(D.t,payload));
- if(D.m){const f=new URLSearchParams({_subject:(plan?"Planification validée":"Convention signée")+" – "+D.n+" – "+nm,_captcha:"false",_template:"table",Document:(plan?"Planification ":"Convention ")+D.n,Signataire:nm,Fonction:fn,"Société":C[0],Date:payload.tsl,Code:code});sends.push(fetch("https://formsubmit.co/ajax/"+encodeURIComponent(D.m),{method:"POST",headers:{Accept:"application/json"},body:f}).then(r=>{if(!r.ok)throw 0;return 1}))}
+ if(D.m){const f=new URLSearchParams({_subject:(dev?"Devis accepté "+(D.dn||""):plan?"Planification validée":"Convention signée")+" – "+D.n+" – "+nm,_captcha:"false",_template:"table",Document:(dev?"Devis "+(D.dn||"")+" – dossier ":plan?"Planification ":"Convention ")+D.n,Signataire:nm,Fonction:fn,"Société":C[0],Date:payload.tsl,Code:code});sends.push(fetch("https://formsubmit.co/ajax/"+encodeURIComponent(D.m),{method:"POST",headers:{Accept:"application/json"},body:f}).then(r=>{if(!r.ok)throw 0;return 1}))}
  const R=await Promise.allSettled(sends),ok=R.some(r=>r.status==="fulfilled");
  done={nm,fn,tsl:payload.tsl,sg:payload.sg};
  if(ok){try{localStorage.setItem(KEY,JSON.stringify(done))}catch(e){}}
- $("#form").classList.add("hide");$("#doc").innerHTML=plan?docPlan():docConv();
- const mailto="mailto:"+encodeURIComponent(D.m||"")+"?subject="+encodeURIComponent((plan?"Planification validée":"Convention signée")+" – "+D.n+" – "+nm)+"&body="+encodeURIComponent("Bonjour,\n\n"+nm+(fn?" ("+fn+")":"")+" a "+(plan?"validé la planification":"signé la convention")+" "+D.n+" en ligne.\n\n"+code+"\n");
+ $("#form").classList.add("hide");$("#doc").innerHTML=docX();
+ const mailto="mailto:"+encodeURIComponent(D.m||"")+"?subject="+encodeURIComponent((dev?"Devis accepté "+(D.dn||""):plan?"Planification validée":"Convention signée")+" – "+D.n+" – "+nm)+"&body="+encodeURIComponent("Bonjour,\n\n"+nm+(fn?" ("+fn+")":"")+" a "+(dev?"accepté le devis "+(D.dn||"")+" (dossier "+D.n+")":plan?"validé la planification "+D.n:"signé la convention "+D.n)+" en ligne.\n\n"+code+"\n");
  $("#res").innerHTML=ok?
-  `<div class="card okb noprint"><div class="okt">✔ Merci, c’est ${plan?"validé":"signé"} !</div><p>${esc(org)} a bien reçu votre ${plan?"validation":"signature"}. Vous pouvez fermer cette page.</p><button class="sec" id="prt">🖨 Imprimer / enregistrer ma copie</button> <a class="sec btn" href="${mailto}" style="margin-top:6px">✉ Envoyer aussi une confirmation par e-mail</a></div>`:
+  `<div class="card okb noprint"><div class="okt">✔ Merci, c’est ${dev?"accepté":plan?"validé":"signé"} !</div><p>${esc(org)} a bien reçu votre ${dev?"acceptation du devis":plan?"validation":"signature"}.${dev?" Vous recevrez par mail votre exemplaire et la convention de formation.":""} Vous pouvez fermer cette page.</p><button class="sec" id="prt">🖨 Imprimer / enregistrer ma copie</button> <a class="sec btn" href="${mailto}" style="margin-top:6px">✉ Envoyer aussi une confirmation par e-mail</a></div>`:
   `<div class="card noprint" style="border-color:var(--ko)"><div class="err">La transmission automatique n’a pas fonctionné.</div><p>Appuyez sur le bouton ci-dessous pour envoyer votre ${plan?"validation":"signature"} par e-mail (un message est déjà prêt, il suffit de l’envoyer).</p><a class="btn go" href="${mailto}">✉ Envoyer par e-mail</a></div>`;
  const pr=$("#prt");if(pr)pr.onclick=()=>window.print();
  window.scrollTo(0,0);
