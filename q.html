@@ -113,7 +113,7 @@ const ls={get:k=>{try{return localStorage.getItem(k)}catch(e){return null}},set:
 let D=null;try{D=unb64u(location.hash.replace(/^#/,""))}catch(e){D=null}
 const app=$("#app");
 if(!D||!D.n||!/^(auto|post|bilan|veille|entreprise|financeur)$/.test(D.q||"")||(D.q==="veille"&&!D.v)){app.innerHTML='<div class="sh"><div class="bd"><h1>Lien incomplet</h1><p>Ce lien est incomplet ou a été modifié. Merci de rouvrir le lien reçu par e-mail, tel quel.</p></div></div>';return}
-const K=D.q,org=D.g||"",KEY="fpq:"+K+":"+D.n+":"+(K==="veille"?D.v+":"+(D.em||""):"")+(D.nm||""),DK=KEY+":brouillon";
+const K=D.q,PP=K==="entreprise"||K==="financeur",org=D.g||"",KEY="fpq:"+K+":"+D.n+":"+(K==="veille"?D.v+":"+(D.em||""):PP?(D.v||"")+":":"")+(D.nm||""),DK=KEY+":brouillon";
 let done=null;try{done=localStorage.getItem(KEY)}catch(e){}
 const SAT=[["😀","Très satisfaisant"],["🙂","Satisfaisant"],["😕","Peu satisfaisant"],["😞","Insatisfaisant"]];
 const QUAL=[["😀","Très bien"],["🙂","Bien"],["😕","Moyen"],["😞","Insuffisant"]];
@@ -160,11 +160,27 @@ let DEF={
    {id:"dif",t:"Difficultés rencontrées",k:"area"},
    {id:"cpl",t:"Stagiaires ayant besoin d’un accompagnement ou d’une formation complémentaire",k:"area"},
    {id:"sug",t:"Suggestions d’amélioration",k:"area"}]},
- // types à venir (questions définies dans TOPAS Formation et transmises dans le lien) : version minimale de secours
- entreprise:{title:"Avis de l’entreprise",intro:"Merci de nous donner votre avis sur la formation suivie par vos collaborateurs.",
-  items:[{id:"g",t:"Note globale",k:"star",req:1},{id:"org",t:"Organisation administrative (devis, convention, planification)",k:"scale",o:SAT,req:1},{id:"res",t:"La formation répond-elle à vos besoins ?",k:"radio",o:["Oui, totalement","En partie","Non"],req:1},{id:"sug",t:"Remarques et suggestions",k:"area"}]},
- financeur:{title:"Avis du financeur",intro:"Merci de nous donner votre avis sur notre collaboration.",
-  items:[{id:"adm",t:"Qualité des documents administratifs transmis",k:"scale",o:SAT,req:1},{id:"del",t:"Respect des délais",k:"scale",o:SAT,req:1},{id:"sug",t:"Remarques et suggestions",k:"area"}]}
+ // appréciations des parties prenantes (Qualiopi ind. 30) : alignées avec QD0 de TOPAS Formation
+ entreprise:{title:"Votre avis sur nos formations",intro:"Ce court questionnaire (environ 3 minutes) nous aide à améliorer nos formations et notre accompagnement.",
+  items:[
+   {id:"g",t:"Satisfaction globale",k:"star",req:1},
+   {id:"bes",t:"Étude de vos besoins et devis adaptés à votre demande",k:"scale",o:SAT,req:1},
+   {id:"org",t:"Organisation (délais, documents, planification)",k:"scale",o:SAT,req:1},
+   {id:"ada",t:"Formation adaptée aux besoins de vos salariés",k:"scale",o:SAT,req:1},
+   {id:"fmt",t:"Qualité du formateur",k:"scale",o:SAT,req:1},
+   {id:"pra",t:"Avez-vous constaté une mise en pratique chez vos salariés ?",k:"radio",o:["Oui","En partie","Non","Trop tôt pour le dire"],req:1},
+   {id:"adv",t:"Échanges avec l’administration des ventes",k:"scale",o:SAT,req:1},
+   {id:"bfa",t:"Besoins de formation à venir",k:"area"},
+   {id:"rec",t:"Recommanderiez-vous TOPAS informatique ?",k:"radio",o:["Oui","Non"],req:1},
+   {id:"cm",t:"Commentaire",k:"area"}]},
+ financeur:{title:"Votre avis sur notre collaboration",intro:"Ce court questionnaire (environ 2 minutes) nous aide à améliorer la gestion des dossiers que vous financez.",
+  items:[
+   {id:"dos",t:"Dossiers complets et transmis dans les délais",k:"scale",o:SAT,req:1},
+   {id:"doc",t:"Documents conformes (convention, émargements, certificats de réalisation)",k:"scale",o:SAT,req:1},
+   {id:"rea",t:"Réactivité de TOPAS informatique",k:"scale",o:SAT,req:1},
+   {id:"ech",t:"Facilité des échanges",k:"scale",o:SAT,req:1},
+   {id:"ame",t:"Points à améliorer",k:"area"},
+   {id:"cm",t:"Commentaire",k:"area"}]}
 }[K];
 if(D.x&&Array.isArray(D.x.i)&&D.x.i.length){const KM={t:"text",a:"area",r:"radio",s:"scale",g:"star"};DEF={title:D.x.ti||DEF.title,intro:D.x.in||"",items:D.x.i.map(a=>({id:String(a[0]),k:KM[a[1]]||"text",t:String(a[2]||""),req:a[3]?1:0,o:a[1]==="s"?(a[4]==="qual"?QUAL:SAT):(Array.isArray(a[4])?a[4]:[]),pre:a[0]==="soc"?(D.c||""):a[0]==="nom"?((D.nm||"")+(D.fn?" / "+D.fn:"")):""}))}}
 const PREV=D.n==="APERCU",IT=DEF.items;
@@ -190,7 +206,7 @@ const PH={att:"Ex. : travailler sur nos propres dossiers",inf:"Ex. : contraintes
 function shell(inner,prog){return `<div class="sh"><div class="top"><img src="logo.jpg" alt="${esc(org||"TOPAS informatique")}"><div class="tt">${esc(DEF.title)}</div><span class="ql">Qualiopi ✓</span></div>${prog?`<div class="pg" role="progressbar" aria-valuemin="1" aria-valuemax="${SCR.length}" aria-valuenow="${cur+1}" aria-label="Progression"><div class="pgt"><span>Étape ${cur+1} sur ${SCR.length}</span><span>${Math.round((cur+1)/SCR.length*100)} %</span></div><div class="pgb"><i style="width:${Math.round((cur+1)/SCR.length*100)}%"></i></div></div>`:""}<div class="bd">${inner}</div></div>`}
 function welcome(){const per=D.a?(D.b&&D.b!==D.a?"du "+fd(D.a)+" au "+fd(D.b):"le "+fd(D.a)):"";const resume=draft&&draft.a&&((+draft.s||0)>0||Object.keys(draft.a).some(k=>draft.a[k]&&!(IT.find(q=>q.id===k)||{}).pre));
  app.innerHTML=shell(`<div class="kk">${KI[0]} ${esc(KI[1])}</div><h1>${esc(DEF.title)}</h1>${prenom?`<div class="hi">Bonjour ${esc(prenom)} 👋</div>`:""}
- <div class="chips">${D.f?`<span class="chip">🎓 ${esc(D.f)}</span>`:""}${per?`<span class="chip">📅 ${esc(per)}</span>`:""}${D.c&&K!=="veille"?`<span class="chip">🏢 ${esc(D.c)}</span>`:""}<span class="chip">⏱ environ ${mins} minute${mins>1?"s":""}</span></div>
+ <div class="chips">${D.f?`<span class="chip">${PP?"📋":"🎓"} ${esc(D.f)}</span>`:""}${per?`<span class="chip">📅 ${esc(per)}</span>`:""}${D.c&&K!=="veille"?`<span class="chip">🏢 ${esc(D.c)}</span>`:""}<span class="chip">⏱ environ ${mins} minute${mins>1?"s":""}</span></div>
  ${DEF.intro?`<div class="intro">${esc(DEF.intro)}</div>`:""}
  ${resume?`<p style="margin:14px 0 8px"><b>Vous aviez commencé ce questionnaire.</b> Vos réponses ont été gardées.</p><div class="nav"><button type="button" class="go big" id="resume">▶ Reprendre où j’en étais</button></div><div style="text-align:center"><button type="button" class="lnk" id="restart">Recommencer depuis le début</button></div>`:`<div class="nav"><button type="button" class="go big" id="start">Commencer ›</button></div>`}`,0);
  const st=$("#start");if(st){st.onclick=()=>go(0);st.focus()}
@@ -223,7 +239,7 @@ function recap(){cur=SCR.length;saveDraft();
  <div class="err" id="err" role="alert"></div><div class="nav"><button type="button" class="sec" id="prev">‹ Précédent</button><button type="button" class="go" id="send">✔ Envoyer</button></div>`,0);
  $$("[data-edit]").forEach(b=>b.onclick=()=>{fromRecap=true;go(+b.dataset.edit)});$("#prev").onclick=()=>go(SCR.length-1);$("#send").onclick=submit;window.scrollTo(0,0)}
 function thanks(already){const L=[];if(K==="post"&&D.sp)L.push(`<a class="btn" href="${esc(D.sp)}" target="_blank" rel="noopener">📚 Retrouver les supports de cours</a>`);if(K==="bilan"&&D.ie)L.push(`<a class="btn" href="${esc(D.ie)}" target="_blank" rel="noopener">🧑‍🏫 Mon espace formateur</a>`);
- app.innerHTML=shell(`<div class="thx"><div class="ckb" aria-hidden="true">✓</div><h1>Merci${prenom?" "+esc(prenom):""} !</h1><p>${already?"Vos réponses ont déjà été transmises depuis cet appareil.":"Vos réponses sont bien envoyées à "+esc(org||"TOPAS informatique")+"."}</p>${K==="bilan"?"<p>Merci pour votre intervention.</p>":K==="post"?"<p>Votre avis nous aide à améliorer nos formations.</p>":""}${L.length?`<div class="links">${L.join("")}</div>`:""}<p style="color:var(--mu);font-size:15px;margin-top:18px">Vous pouvez fermer cette page.</p></div>`,0);window.scrollTo(0,0)}
+ app.innerHTML=shell(`<div class="thx"><div class="ckb" aria-hidden="true">✓</div><h1>Merci${prenom?" "+esc(prenom):""} !</h1><p>${already?"Vos réponses ont déjà été transmises depuis cet appareil.":"Vos réponses sont bien envoyées à "+esc(org||"TOPAS informatique")+"."}</p>${K==="bilan"?"<p>Merci pour votre intervention.</p>":K==="post"?"<p>Votre avis nous aide à améliorer nos formations.</p>":PP?"<p>Merci pour votre retour : il nous aide à nous améliorer.</p>":""}${L.length?`<div class="links">${L.join("")}</div>`:""}<p style="color:var(--mu);font-size:15px;margin-top:18px">Vous pouvez fermer cette page.</p></div>`,0);window.scrollTo(0,0)}
 async function submit(){const btn=$("#send"),err=$("#err");err.textContent="";
  const miss=IT.find(q=>q.req&&!String(A[q.id]||"").trim());if(miss){fromRecap=true;go(SCR.findIndex(x=>x.includes(miss)));next();return}
  const ans=IT.map(q=>[q,String(A[q.id]||"").trim()]);
@@ -233,6 +249,7 @@ async function submit(){const btn=$("#send"),err=$("#err");err.textContent="";
  for(;;){payload={t:"fp-q",q:K,n:D.n,ti:D.ti,nm:D.nm||"",dl,hl,tsl:fd(dl)+" à "+hl};
   if(K==="auto"){payload.v={};ans.forEach(a=>{if(/^(soc|nom|hand|niv|obj|obj2|att|inf)$/.test(a[0].id))payload.v[a[0].id]=cut(a[1],lim)})}
   payload.a=ans.filter(a=>a[1]!=="").map(a=>[cut(a[0].t,90),cut(a[1],lim)]);
+  if(PP){payload.v=String(D.v||"");payload.k={};ans.forEach(a=>{if(a[1])payload.k[a[0].id]=cut(a[1],lim)});if(D.em)payload.em=cut(D.em,120)}
   if(K==="veille"){const g=id=>(ans.find(a=>a[0].id===id)||[])[1]||"";payload.v=String(D.v);payload.ch=g("ch");payload.cm=cut(g("cm"),lim);if(!D.nm)payload.nm=cut(g("nm"),80);payload.em=cut(D.em||g("em"),120);delete payload.a}
   body=JSON.stringify(payload);if(new TextEncoder().encode(body).length<=3800||lim<=40)break;lim=Math.floor(lim*.7)}
  if(PREV){app.innerHTML=shell(`<div class="thx"><div class="ckb" aria-hidden="true">👁</div><h1>Aperçu</h1><p>Voici ce que verra la personne. Rien n’a été envoyé.</p><button type="button" class="sec" onclick="location.reload()">Recommencer</button></div>`,0);return}
