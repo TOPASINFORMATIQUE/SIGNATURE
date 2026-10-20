@@ -6,62 +6,98 @@
 <meta name="robots" content="noindex,nofollow">
 <title>Questionnaire</title>
 <style>
-:root{--bg:#eef3fa;--card:#fff;--tx:#1f2937;--mu:#5a6275;--br:#d9dce5;--pr:#1e3a8a;--bl:#1565c0;--gr:#16a34a;--sf:#eef4fb;--ok:#157347;--ko:#b42318}
-@media (prefers-color-scheme:dark){:root{--bg:#10131a;--card:#1a1e29;--tx:#e8eaf0;--mu:#a0a7b8;--br:#2c3242;--pr:#9db4ff;--bl:#1e4f9a;--gr:#22c55e;--sf:#1f2636;--ok:#5fd08a;--ko:#ff8a7a}}
+:root{--bg:#eef3fa;--card:#fff;--tx:#1f2937;--mu:#5a6275;--br:#d6dfeb;--pr:#1e3a8a;--bl:#1565c0;--gr:#16a34a;--grd:#15803d;--sf:#f1f6fc;--ok:#157347;--ko:#b42318;--sel:#e8f6ed;--sh:0 4px 18px rgba(15,23,42,.08)}
+@media (prefers-color-scheme:dark){:root{--bg:#10131a;--card:#1a1e29;--tx:#e8eaf0;--mu:#a7aec0;--br:#2c3242;--pr:#a9bdff;--bl:#1e4f9a;--gr:#22c55e;--grd:#16a34a;--sf:#1f2636;--ok:#5fd08a;--ko:#ff8a7a;--sel:#173322;--sh:0 4px 18px rgba(0,0,0,.4)}}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 'Segoe UI',system-ui,-apple-system,Roboto,Arial,sans-serif}
-.w{max-width:720px;margin:0 auto;padding:16px}
-.sh{background:var(--card);border-radius:16px;overflow:hidden;box-shadow:0 2px 10px rgba(15,23,42,.06)}
-.hd{display:flex;align-items:center;gap:14px;padding:14px 18px;flex-wrap:wrap}
-.hd img{height:52px;background:#fff;border-radius:6px;padding:2px}
-.adv{border-left:1px solid var(--br);padding-left:14px;font-size:14px;line-height:1.45}.adv b{color:var(--pr)}.adv a{color:var(--bl);overflow-wrap:anywhere}
-.qb{border-left:1px solid var(--br);padding-left:14px;color:var(--pr);font-size:11px;line-height:1.3}
-.qb b{font-size:20px;font-weight:800}.qb i{color:#e11d48;font-style:normal}
-.band{background:var(--bl);color:#fff;text-align:center;font-size:14px;font-weight:600;padding:8px}
-.bd{padding:20px 20px 8px}
-.kk{font-size:13px;font-weight:700;color:var(--gr);text-transform:uppercase;letter-spacing:.5px}
-.hi{font-size:26px;font-weight:800;color:var(--pr);margin:2px 0 4px}.hi span{color:var(--gr)}
-h1{font-size:19px;margin:8px 0 6px;color:#fff;background:#1e3a8a;border-radius:12px;padding:12px 16px;text-transform:uppercase;font-weight:800;line-height:1.3}
-.box{display:flex;gap:14px;align-items:center;background:var(--sf);border-radius:14px;padding:14px 16px;margin:12px 0}
-.ic{flex:none;width:48px;height:48px;border-radius:50%;background:#d6e6f7;display:flex;align-items:center;justify-content:center;font-size:22px}
-.box h2{font-size:16px;margin:0 0 2px;color:var(--pr)}
-.mu{color:var(--mu);font-size:14px}
-.q{margin:14px 0;display:flex;gap:12px;align-items:flex-start}
-.qn{flex:none;width:32px;height:32px;border-radius:50%;background:var(--gr);color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center;font-size:15px;margin-top:6px}
-.qc{flex:1;min-width:0;background:var(--sf);border-radius:12px;padding:12px 14px;border:2px solid transparent}
-.qc>b{display:block;margin-bottom:8px}
-.opts{display:flex;flex-wrap:wrap;gap:8px}
-.opt{position:relative;display:flex;align-items:center;gap:8px;border:1.5px solid #c9d8ea;border-radius:999px;padding:10px 16px;min-height:44px;cursor:pointer;background:var(--card)}
-.opt:has(input:checked){border-color:var(--gr);background:rgba(22,163,74,.12);font-weight:600}
-.opt input{position:absolute;opacity:0;width:1px;height:1px;margin:0}
-.opt:has(input:checked)::before{content:"✔";color:var(--gr);font-weight:800}
-.scale{display:flex;flex-wrap:wrap;gap:8px}
-.scale .opt{font-size:14px}
-.scale .opt .e{font-size:20px;line-height:1}
-.scale .opt input,.star .opt input{position:absolute;opacity:0;width:1px;height:1px}
-.star{display:flex;flex-wrap:wrap;gap:8px}
-.star .opt{justify-content:center;font-size:17px;white-space:nowrap;font-weight:700;color:#f59e0b;min-width:58px}
-input[type=text],textarea{width:100%;font:inherit;padding:12px;border:1px solid var(--br);border-radius:8px;background:var(--card);color:var(--tx)}
-input:focus-visible,textarea:focus-visible,button:focus-visible,.opt:focus-within{outline:3px solid var(--bl);outline-offset:2px}
-button,a.btn{display:inline-block;font:inherit;font-weight:800;border:0;border-radius:10px;padding:15px 22px;cursor:pointer;text-decoration:none;text-align:center}
-.go{background:var(--gr);color:#fff;width:100%;font-size:18px;margin-top:6px}
-.go[disabled]{opacity:.5}
-.sec{background:transparent;border:1px solid var(--br);color:var(--tx);padding:8px 14px;font-weight:600;font-size:14px}
-.err{color:var(--ko);font-weight:600;min-height:1.4em}
-.bad,.q.bad .qc{border-color:var(--ko)!important}
-.okb{border:2px solid var(--gr)}
-.okt{color:var(--ok);font-weight:800;font-size:18px}
-.thx{text-align:center;padding:26px 18px}.thx .ck{width:76px;height:76px;border-radius:50%;background:var(--gr);color:#fff;font-size:42px;font-weight:800;display:flex;align-items:center;justify-content:center;margin:0 auto 12px}.thx .okt{font-size:22px;color:var(--pr)}.thx p{margin:8px 0 0}
-.card{background:var(--card);border-radius:14px;padding:16px;margin:12px 0}
-.ft{padding:6px 20px 20px}
-.bye{font-family:'Segoe Script','Brush Script MT','Comic Sans MS',cursive;font-size:28px;color:var(--pr);font-style:italic}
-.bl{height:3px;width:150px;background:var(--gr);border-radius:3px;margin:2px 0 12px}
-.hide{display:none}
-@media (max-width:480px){.hi{font-size:22px}.hd{gap:10px}.hd img{height:44px}.adv,.qb{border:0;padding:0}.qb{flex-basis:100%}.q{gap:8px}.qn{width:28px;height:28px;font-size:13px}.qc{padding:10px 12px}.bd{padding:16px 14px 6px}.opt{padding:9px 13px}.star .opt{min-width:0;flex:1}}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--tx);font:17px/1.5 'Segoe UI',system-ui,-apple-system,Roboto,Arial,sans-serif}
+.w{max-width:640px;margin:0 auto;padding:16px 12px 32px}
+.sh{background:var(--card);border-radius:20px;overflow:hidden;box-shadow:var(--sh)}
+.top{background:var(--bl);color:#fff;padding:12px 18px;display:flex;align-items:center;gap:12px}
+.top img{height:40px;background:#fff;border-radius:8px;padding:3px 6px}
+.top .tt{flex:1;min-width:0;font-weight:700;font-size:16px;line-height:1.25;overflow-wrap:anywhere}
+.top .ql{font-size:12px;font-weight:700;background:rgba(255,255,255,.18);border-radius:999px;padding:3px 10px;white-space:nowrap}
+.pg{padding:12px 20px 0}
+.pgt{display:flex;justify-content:space-between;font-size:15px;color:var(--mu);font-weight:600}
+.pgb{height:8px;background:var(--sf);border-radius:99px;overflow:hidden;margin-top:6px}
+.pgb i{display:block;height:100%;background:var(--gr);border-radius:99px;transition:width .35s ease}
+.bd{padding:18px 20px 22px}
+.kk{font-size:14px;font-weight:800;color:var(--gr);text-transform:uppercase;letter-spacing:.6px}
+h1{font-size:25px;line-height:1.25;margin:6px 0 4px;color:var(--pr)}
+.hi{font-size:21px;font-weight:700;margin:4px 0 10px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.chip{display:inline-flex;align-items:center;gap:6px;background:var(--sf);border-radius:999px;padding:6px 12px;font-size:15px}
+.intro{background:var(--sf);border-radius:14px;padding:14px 16px;margin:12px 0;font-size:16px}
+.qb{margin:6px 0 22px}
+.qb:last-of-type{margin-bottom:8px}
+.ql2{display:block;font-size:19px;font-weight:700;line-height:1.35;margin:0 0 12px}
+.req{color:var(--ko);margin-left:2px}
+.opt{font-size:14px;color:var(--mu);font-weight:400}
+.qerr{color:var(--ko);font-weight:600;font-size:16px;margin-top:8px;min-height:0}
+.qb.bad .cards .cd,.qb.bad .yn label,.qb.bad .sm label,.qb.bad input[type=text],.qb.bad textarea{border-color:var(--ko)}
+/* cartes de choix */
+.cards{display:grid;gap:10px}
+.cd,.yn label,.sm label,.st label{position:relative;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.cards input,.yn input,.sm input,.st input{position:absolute;opacity:0;width:1px;height:1px;margin:0}
+.cd{display:flex;align-items:center;gap:12px;min-height:56px;padding:12px 16px;border:2px solid var(--br);border-radius:14px;background:var(--card);font-size:17px;transition:border-color .15s,background .15s}
+.cd .ck{flex:none;width:26px;height:26px;border-radius:50%;border:2px solid var(--br);display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;font-size:15px}
+.cd:has(input:checked){border-color:var(--gr);background:var(--sel)}
+.cd:has(input:checked) .ck{background:var(--gr);border-color:var(--gr)}
+.cd:has(input:checked) .ck::after{content:"✓"}
+.yn{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.yn label{display:flex;align-items:center;justify-content:center;gap:8px;min-height:64px;border:2px solid var(--br);border-radius:16px;background:var(--card);font-size:19px;font-weight:700}
+.yn label:has(input:checked){border-color:var(--gr);background:var(--gr);color:#fff}
+.sm{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.sm label{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 4px;border:2px solid var(--br);border-radius:14px;background:var(--card);text-align:center;font-size:13.5px;line-height:1.2;min-height:96px}
+.sm .e{font-size:36px;line-height:1.1;transition:transform .18s ease}
+.sm label:has(input:checked){border-color:var(--gr);background:var(--sel);font-weight:700}
+.sm label:has(input:checked) .e{transform:scale(1.22)}
+.st{display:flex;gap:6px;justify-content:space-between;max-width:420px}
+.st label{flex:1;display:flex;flex-direction:column;align-items:center;min-height:64px;justify-content:center;border-radius:14px;font-size:13px;color:var(--mu)}
+.st .s{font-size:40px;line-height:1;color:#cbd5e1;transition:transform .18s ease,color .15s}
+.st label.on .s{color:#f59e0b}
+.st label:has(input:checked) .s{transform:scale(1.18)}
+.lg{display:flex;justify-content:space-between;font-size:14px;color:var(--mu);margin-top:6px;max-width:420px}
+input[type=text],textarea{width:100%;font:inherit;font-size:17px;padding:13px 14px;border:2px solid var(--br);border-radius:12px;background:var(--card);color:var(--tx)}
+textarea{min-height:96px;resize:none;overflow:hidden}
+::placeholder{color:#8a93a6}
+.cd:focus-within,.yn label:focus-within,.sm label:focus-within,.st label:focus-within{outline:3px solid var(--bl);outline-offset:2px}
+input[type=text]:focus-visible,textarea:focus-visible,button:focus-visible,a:focus-visible{outline:3px solid var(--bl);outline-offset:2px}
+@media (hover:hover){.cd:hover,.yn label:hover,.sm label:hover{border-color:var(--bl)}.st label:hover .s{transform:scale(1.1)}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+/* boutons */
+.nav{display:flex;gap:10px;margin-top:18px}
+button,a.btn{font:inherit;font-weight:700;border:0;border-radius:14px;padding:14px 20px;min-height:52px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:8px;font-size:17px}
+.go{background:var(--gr);color:#fff;flex:1}
+.go:hover{background:var(--grd)}
+.go[disabled]{opacity:.6;cursor:wait}
+.sec{background:var(--sf);color:var(--tx);border:2px solid var(--br)}
+.lnk{background:none;color:var(--bl);text-decoration:underline;padding:8px 6px;min-height:44px;font-weight:600}
+.big{width:100%;font-size:19px;min-height:58px}
+/* récapitulatif */
+.rc{border-top:1px solid var(--br)}
+.rr{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--br)}
+.rr>div{flex:1;min-width:0}
+.rr .q{font-size:15px;color:var(--mu)}
+.rr .a{font-size:17px;font-weight:600;overflow-wrap:anywhere;white-space:pre-line}
+.rr .a.v{color:var(--mu);font-weight:400}
+.rr button{flex:none;padding:8px 12px;min-height:44px;font-size:15px}
+/* merci */
+.thx{text-align:center;padding:28px 18px 10px}
+.thx .ckb{width:96px;height:96px;border-radius:50%;background:var(--gr);color:#fff;font-size:54px;font-weight:800;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;animation:pop .45s ease}
+@keyframes pop{0%{transform:scale(.4);opacity:0}70%{transform:scale(1.08)}100%{transform:scale(1);opacity:1}}
+.thx h1{font-size:30px}
+.thx p{font-size:17px;margin:8px 0}
+.links{display:grid;gap:10px;margin:18px 0 0}
+.links a{background:var(--sf);color:var(--pr);border:2px solid var(--br)}
+.err{color:var(--ko);font-weight:600}
+.ft{text-align:center;font-size:14px;color:var(--mu);padding:16px 12px 0}
+.hide{display:none!important}
+@media (max-width:480px){.w{padding:10px 8px 24px}.bd{padding:16px 16px 20px}h1{font-size:23px}.sm .e{font-size:32px}.sm label{font-size:12.5px;min-height:90px;padding:8px 2px}.st .s{font-size:36px}.ql2{font-size:18px}}
 </style>
 </head>
 <body>
-<div class="w"><div id="app"></div></div>
+<div class="w"><div id="app" aria-live="polite"></div><div class="ft" id="ft"></div></div>
 <script>
 const SBU="https://kbfnxqyxqualmqhiufnq.supabase.co",SBK="sb_publishable_5vjNCP7zREh5upGu_pTAIA_mgUPG8Cx";
 const sbDep=(c,p)=>fetch(SBU+"/rest/v1/rpc/deposer",{method:"POST",headers:{apikey:SBK,"Content-Type":"application/json"},body:JSON.stringify({p_canal:c,p_data:p})}).then(r=>{if(!r.ok)throw 0;return 1});
@@ -73,13 +109,15 @@ const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;"
 const fd=d=>{if(!d)return"";const x=new Date(d+"T12:00:00");return isNaN(x)?d:x.toLocaleDateString("fr-FR",{day:"2-digit",month:"2-digit",year:"numeric"})};
 const b64u=o=>btoa(unescape(encodeURIComponent(JSON.stringify(o)))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
 function unb64u(t){t=String(t).replace(/-/g,"+").replace(/_/g,"/");while(t.length%4)t+="=";return JSON.parse(decodeURIComponent(escape(atob(t))))}
+const ls={get:k=>{try{return localStorage.getItem(k)}catch(e){return null}},set:(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}},del:k=>{try{localStorage.removeItem(k)}catch(e){}}};
 let D=null;try{D=unb64u(location.hash.replace(/^#/,""))}catch(e){D=null}
 const app=$("#app");
-if(!D||!D.n||!/^(auto|post|bilan|veille)$/.test(D.q||"")||(D.q==="veille"&&!D.v)){app.innerHTML='<div class="card"><h1>Lien incomplet</h1><p>Ce lien est incomplet ou a été modifié. Merci de rouvrir le lien reçu par e-mail, tel quel.</p></div>';return}
-const K=D.q,org=D.g||"",KEY="fpq:"+K+":"+D.n+":"+(K==="veille"?D.v+":"+(D.em||""):"")+(D.nm||"");
+if(!D||!D.n||!/^(auto|post|bilan|veille|entreprise|financeur)$/.test(D.q||"")||(D.q==="veille"&&!D.v)){app.innerHTML='<div class="sh"><div class="bd"><h1>Lien incomplet</h1><p>Ce lien est incomplet ou a été modifié. Merci de rouvrir le lien reçu par e-mail, tel quel.</p></div></div>';return}
+const K=D.q,org=D.g||"",KEY="fpq:"+K+":"+D.n+":"+(K==="veille"?D.v+":"+(D.em||""):"")+(D.nm||""),DK=KEY+":brouillon";
 let done=null;try{done=localStorage.getItem(KEY)}catch(e){}
 const SAT=[["😀","Très satisfaisant"],["🙂","Satisfaisant"],["😕","Peu satisfaisant"],["😞","Insatisfaisant"]];
 const QUAL=[["😀","Très bien"],["🙂","Bien"],["😕","Moyen"],["😞","Insuffisant"]];
+// Questions d'origine (copie de secours, alignée avec QD0 de TOPAS Formation) ; les questions personnalisées arrivent dans D.x
 let DEF={
  auto:{title:"Auto-évaluation avant la formation",intro:"Ce court questionnaire (2 minutes) nous permet d’adapter la formation à votre niveau et à vos attentes.",
   items:[
@@ -121,63 +159,92 @@ let DEF={
    {id:"han",t:"Situation de handicap : une adaptation a-t-elle été nécessaire et satisfaisante ?",k:"radio",o:["Sans objet","Oui, satisfaisante","Oui, à améliorer"]},
    {id:"dif",t:"Difficultés rencontrées",k:"area"},
    {id:"cpl",t:"Stagiaires ayant besoin d’un accompagnement ou d’une formation complémentaire",k:"area"},
-   {id:"sug",t:"Suggestions d’amélioration",k:"area"}]}
+   {id:"sug",t:"Suggestions d’amélioration",k:"area"}]},
+ // types à venir (questions définies dans TOPAS Formation et transmises dans le lien) : version minimale de secours
+ entreprise:{title:"Avis de l’entreprise",intro:"Merci de nous donner votre avis sur la formation suivie par vos collaborateurs.",
+  items:[{id:"g",t:"Note globale",k:"star",req:1},{id:"org",t:"Organisation administrative (devis, convention, planification)",k:"scale",o:SAT,req:1},{id:"res",t:"La formation répond-elle à vos besoins ?",k:"radio",o:["Oui, totalement","En partie","Non"],req:1},{id:"sug",t:"Remarques et suggestions",k:"area"}]},
+ financeur:{title:"Avis du financeur",intro:"Merci de nous donner votre avis sur notre collaboration.",
+  items:[{id:"adm",t:"Qualité des documents administratifs transmis",k:"scale",o:SAT,req:1},{id:"del",t:"Respect des délais",k:"scale",o:SAT,req:1},{id:"sug",t:"Remarques et suggestions",k:"area"}]}
 }[K];
 if(D.x&&Array.isArray(D.x.i)&&D.x.i.length){const KM={t:"text",a:"area",r:"radio",s:"scale",g:"star"};DEF={title:D.x.ti||DEF.title,intro:D.x.in||"",items:D.x.i.map(a=>({id:String(a[0]),k:KM[a[1]]||"text",t:String(a[2]||""),req:a[3]?1:0,o:a[1]==="s"?(a[4]==="qual"?QUAL:SAT):(Array.isArray(a[4])?a[4]:[]),pre:a[0]==="soc"?(D.c||""):a[0]==="nom"?((D.nm||"")+(D.fn?" / "+D.fn:"")):""}))}}
-const PREV=D.n==="APERCU";
+const PREV=D.n==="APERCU",IT=DEF.items;
 document.title=DEF.title;
-let QN=0;
-function wrap(q,inner){QN++;return `<div class="q" data-id="${q.id}"><span class="qn" aria-hidden="true">${QN}</span><div class="qc">${inner}</div></div>`}
-function field(q){
- const req=q.req?" *":"";
- if(q.k==="text")return wrap(q,`<b>${esc(q.t)}${req}</b><input type="text" id="f_${q.id}" value="${esc(q.pre||"")}">`);
- if(q.k==="area")return wrap(q,`<b>${esc(q.t)}</b><textarea id="f_${q.id}" rows="3" maxlength="500"></textarea>`);
- if(q.k==="radio")return wrap(q,`<b>${esc(q.t)}${req}</b><div class="opts">${q.o.map(o=>`<label class="opt"><input type="radio" name="${q.id}" value="${esc(o)}"><span>${esc(o)}</span></label>`).join("")}</div>`);
- if(q.k==="scale")return wrap(q,`<b>${esc(q.t)}${req}</b><div class="scale">${q.o.map(o=>`<label class="opt"><input type="radio" name="${q.id}" value="${esc(o[1])}"><span class="e">${o[0]}</span><span>${esc(o[1])}</span></label>`).join("")}</div>`);
- if(q.k==="star")return wrap(q,`<b>${esc(q.t)}${req}</b><div class="star">${[1,2,3,4,5].map(n=>`<label class="opt"><input type="radio" name="${q.id}" value="${n}/5"><span>${n} ★</span></label>`).join("")}</div><div class="mu">1 = très insuffisant · 5 = excellent</div>`)}
-function val(q){if(q.k==="text"||q.k==="area")return($("#f_"+q.id).value||"").trim();const e=document.querySelector("input[name="+q.id+"]:checked");return e?e.value:""}
-function render(){
- const who=K==="bilan"?"Formateur : "+esc(D.nm||""):esc(D.nm||"");
- QN=0;const KI={auto:["🎯","Auto-évaluation"],post:["⭐","Votre avis compte"],bilan:["🧑‍🏫","Bilan formateur"],veille:["📚","Veille réglementaire"]}[K]||["📋","Questionnaire"];
- app.innerHTML=`<div class="sh"><div class="hd"><img src="logo.jpg" alt="${esc(org||"TOPAS informatique")}"><div class="adv"><b>Administration des Ventes</b>${D.m?`<br>✉️ <a href="mailto:${esc(D.m)}">${esc(D.m)}</a>`:""}</div><div class="qb"><b>Qualiopi <i>▶</i>▶</b><br>processus certifié<br>🇫🇷 RÉPUBLIQUE FRANÇAISE</div></div><div class="band">🌐 www.topas.fr</div>
- <div class="bd"><div class="kk">${KI[0]} ${esc(KI[1])}</div>${D.nm?`<div class="hi"><span>✦</span> Bonjour ${esc(String(D.nm).split(" ")[0])},</div>`:""}<h1>${esc(DEF.title)}</h1>${DEF.intro?`<div class="box"><span class="ic">📋</span><div>${esc(DEF.intro)}</div></div>`:""}
- <div class="box"><span class="ic">🎓</span><div><h2>${esc(D.f||"")}</h2><div class="mu">${D.a?"Du "+esc(fd(D.a))+" au "+esc(fd(D.b)):""}${D.c?" · "+esc(D.c):""}${who?" · "+who:""}</div></div></div>`+
- (done?`<div class="card okb thx"><div class="ck">✔</div><div class="okt">Déjà envoyé</div><p>Votre réponse a déjà été transmise depuis cet appareil. Merci !</p></div>`:
- `<div id="form">${DEF.items.map(field).join("")}<div class="err" id="err" role="alert"></div><button class="go" id="go" type="button">✔ Envoyer mes réponses</button><p class="mu" style="text-align:center">Vos réponses sont transmises uniquement à ${esc(org)}.</p></div>`)+`<div id="res"></div></div>
- <div class="ft"><div class="bye">Merci !</div><div class="bl"></div><div class="mu" style="font-size:12px">${esc(org)} · Organisme de formation certifié Qualiopi</div></div></div>`;
- if(!done)$("#go").onclick=submit;
-}
-async function submit(){
- const err=$("#err");err.textContent="";$$(".bad").forEach(e=>e.classList.remove("bad"));
- const ans=[];let bad=null;
- DEF.items.forEach(q=>{const v=val(q);if(q.req&&!v&&!bad){bad=q}ans.push([q,v])});
- if(bad){const e=document.querySelector('[data-id="'+bad.id+'"]');if(e){e.classList.add("bad");e.scrollIntoView({block:"center",behavior:"smooth"})}return err.textContent="Merci de répondre à la question « "+bad.t.slice(0,60)+(bad.t.length>60?"…":"")+" »."}
- const go=$("#go");go.disabled=true;go.textContent="Envoi en cours…";
+$("#ft").textContent="Vos réponses servent uniquement à améliorer nos formations – "+(org||"TOPAS informatique")+", organisme certifié Qualiopi";
+// ---- écrans de 1 à 3 questions : un choix seul (passage automatique), jusqu'à 3 échelles identiques, jusqu'à 3 champs texte ; « Si … précisez » reste avec son choix
+const CH=q=>q.k==="radio"||q.k==="scale"||q.k==="star",YN=q=>q.k==="radio"&&(q.o||[]).length===2&&q.o.every(o=>String(o).length<=14);
+const SCR=[];{let cur=[];const flush=()=>{if(cur.length){SCR.push(cur);cur=[]}};
+ IT.forEach((q,i)=>{const prev=IT[i-1];
+  if(q.k==="text"&&/^si\b/i.test(q.t)&&prev&&CH(prev)&&SCR.length&&!cur.length){SCR[SCR.length-1].push(q);return}
+  if(q.k==="scale"){if(cur.length&&(cur[0].k!=="scale"||cur[0].o!==q.o||cur.length>=3))flush();cur.push(q);return}
+  if(CH(q)){flush();SCR.push([q]);return}
+  if(cur.length&&(cur[0].k==="scale"||cur.length>=3))flush();cur.push(q)});flush()}
+const AUTO=s=>SCR[s]&&SCR[s].length===1&&CH(SCR[s][0]);
+// ---- réponses (brouillon gardé dans le navigateur : reprise après fermeture)
+let A={},cur=-1,fromRecap=false;IT.forEach(q=>{if(q.pre)A[q.id]=q.pre});
+let draft=null;try{draft=JSON.parse(ls.get(DK)||"null")}catch(e){draft=null}
+const saveDraft=()=>{if(PREV)return;ls.set(DK,JSON.stringify({a:A,s:cur,t:Date.now()}))};
+const mins=Math.max(1,Math.round(IT.length/4));
+const KI={auto:["🎯","Auto-évaluation"],post:["⭐","Votre avis compte"],bilan:["🧑‍🏫","Bilan formateur"],veille:["📚","Veille réglementaire"],entreprise:["🏢","Avis de l’entreprise"],financeur:["💼","Avis du financeur"]}[K]||["📋","Questionnaire"];
+const prenom=String(D.nm||"").trim().split(/\s+/)[0]||"";
+const PH={att:"Ex. : travailler sur nos propres dossiers",inf:"Ex. : contraintes d’horaires, matériel…",pf:"Ex. : exercices concrets, formateur disponible",ame:"Ex. : plus de temps sur la TVA",bes:"Ex. : module de perfectionnement",dif:"Ex. : connexion internet instable",cpl:"Ex. : Marie, à revoir sur les rapprochements",sug:"Ex. : prévoir une demi-journée de plus",cm:"Ex. : mise à jour de nos procédures",obj2:"Précisez votre objectif"};
+function shell(inner,prog){return `<div class="sh"><div class="top"><img src="logo.jpg" alt="${esc(org||"TOPAS informatique")}"><div class="tt">${esc(DEF.title)}</div><span class="ql">Qualiopi ✓</span></div>${prog?`<div class="pg" role="progressbar" aria-valuemin="1" aria-valuemax="${SCR.length}" aria-valuenow="${cur+1}" aria-label="Progression"><div class="pgt"><span>Étape ${cur+1} sur ${SCR.length}</span><span>${Math.round((cur+1)/SCR.length*100)} %</span></div><div class="pgb"><i style="width:${Math.round((cur+1)/SCR.length*100)}%"></i></div></div>`:""}<div class="bd">${inner}</div></div>`}
+function welcome(){const per=D.a?(D.b&&D.b!==D.a?"du "+fd(D.a)+" au "+fd(D.b):"le "+fd(D.a)):"";const resume=draft&&draft.a&&((+draft.s||0)>0||Object.keys(draft.a).some(k=>draft.a[k]&&!(IT.find(q=>q.id===k)||{}).pre));
+ app.innerHTML=shell(`<div class="kk">${KI[0]} ${esc(KI[1])}</div><h1>${esc(DEF.title)}</h1>${prenom?`<div class="hi">Bonjour ${esc(prenom)} 👋</div>`:""}
+ <div class="chips">${D.f?`<span class="chip">🎓 ${esc(D.f)}</span>`:""}${per?`<span class="chip">📅 ${esc(per)}</span>`:""}${D.c&&K!=="veille"?`<span class="chip">🏢 ${esc(D.c)}</span>`:""}<span class="chip">⏱ environ ${mins} minute${mins>1?"s":""}</span></div>
+ ${DEF.intro?`<div class="intro">${esc(DEF.intro)}</div>`:""}
+ ${resume?`<p style="margin:14px 0 8px"><b>Vous aviez commencé ce questionnaire.</b> Vos réponses ont été gardées.</p><div class="nav"><button type="button" class="go big" id="resume">▶ Reprendre où j’en étais</button></div><div style="text-align:center"><button type="button" class="lnk" id="restart">Recommencer depuis le début</button></div>`:`<div class="nav"><button type="button" class="go big" id="start">Commencer ›</button></div>`}`,0);
+ const st=$("#start");if(st){st.onclick=()=>go(0);st.focus()}
+ const rs=$("#resume");if(rs){rs.onclick=()=>{A=Object.assign(A,draft.a||{});go(Math.min(Math.max(0,+draft.s||0),SCR.length))};rs.focus()}
+ const rt=$("#restart");if(rt)rt.onclick=()=>{ls.del(DK);draft=null;A={};IT.forEach(q=>{if(q.pre)A[q.id]=q.pre});go(0)}}
+function field(q){const v=A[q.id]||"",L=`<span class="ql2" id="l_${q.id}">${esc(q.t)}${q.req?'<span class="req" aria-hidden="true">*</span><span class="hide"> (obligatoire)</span>':' <span class="opt">(facultatif)</span>'}</span>`,nm="q_"+q.id;
+ let h="";
+ if(q.k==="text")h=`<label for="f_${q.id}">${L}</label><input type="text" id="f_${q.id}" data-q="${q.id}" value="${esc(v)}" placeholder="${esc(PH[q.id]||"")}" autocomplete="off">`;
+ else if(q.k==="area")h=`<label for="f_${q.id}">${L}</label><textarea id="f_${q.id}" data-q="${q.id}" maxlength="500" placeholder="${esc(PH[q.id]||"Votre réponse")}">${esc(v)}</textarea>`;
+ else if(YN(q))h=`<div role="radiogroup" aria-labelledby="l_${q.id}">${L}<div class="yn">${q.o.map((o,i)=>`<label><input type="radio" name="${nm}" data-q="${q.id}" value="${esc(o)}" ${v===o?"checked":""}><span>${/^(oui)$/i.test(o)?"👍 ":/^(non)$/i.test(o)?"👎 ":""}${esc(o)}</span></label>`).join("")}</div></div>`;
+ else if(q.k==="radio")h=`<div role="radiogroup" aria-labelledby="l_${q.id}">${L}<div class="cards">${(q.o||[]).map(o=>`<label class="cd"><input type="radio" name="${nm}" data-q="${q.id}" value="${esc(o)}" ${v===o?"checked":""}><span class="ck" aria-hidden="true"></span><span>${esc(o)}</span></label>`).join("")}</div></div>`;
+ else if(q.k==="scale")h=`<div role="radiogroup" aria-labelledby="l_${q.id}">${L}<div class="sm">${q.o.map(o=>`<label><input type="radio" name="${nm}" data-q="${q.id}" value="${esc(o[1])}" ${v===o[1]?"checked":""}><span class="e" aria-hidden="true">${o[0]}</span><span>${esc(o[1])}</span></label>`).join("")}</div></div>`;
+ else if(q.k==="star"){const n=+(String(v).split("/")[0])||0;h=`<div role="radiogroup" aria-labelledby="l_${q.id}">${L}<div class="st">${[1,2,3,4,5].map(i=>`<label class="${i<=n?"on":""}"><input type="radio" name="${nm}" data-q="${q.id}" value="${i}/5" ${n===i?"checked":""} aria-label="${i} sur 5"><span class="s" aria-hidden="true">★</span><span>${i}</span></label>`).join("")}</div><div class="lg"><span>1 = très insuffisant</span><span>5 = excellent</span></div></div>`}
+ return `<div class="qb" data-id="${q.id}">${h}<div class="qerr" id="e_${q.id}" role="alert"></div></div>`}
+function grow(t){t.style.height="auto";t.style.height=Math.max(96,t.scrollHeight+4)+"px"}
+function go(s){cur=s;if(s>=SCR.length)return recap();saveDraft();const Q=SCR[s],last=s===SCR.length-1;
+ app.innerHTML=shell(Q.map(field).join("")+`<div class="nav"><button type="button" class="sec" id="prev">‹ Précédent</button><button type="button" class="go" id="next">${fromRecap?"Retour au récapitulatif ›":last?"Vérifier mes réponses ›":"Suivant ›"}</button></div>`,1);
+ $$("#app [data-q]").forEach(e=>{const ev=()=>{const q=IT.find(x=>x.id===e.dataset.q);A[q.id]=e.type==="radio"?e.value:e.value;const b=e.closest(".qb");if(b){b.classList.remove("bad");const r=b.querySelector(".qerr");if(r)r.textContent=""}
+   if(q.k==="star"){const n=+String(e.value).split("/")[0];b.querySelectorAll(".st label").forEach((l,i)=>l.classList.toggle("on",i<n))}
+   saveDraft();if(e.type==="radio"){if(AUTO(cur)&&!fromRecap)setTimeout(()=>{if(SCR[cur]&&SCR[cur][0].id===q.id)next()},380);else{const nx=Q.find(x=>CH(x)&&!A[x.id]);if(nx){const el=document.querySelector('[data-id="'+nx.id+'"]');if(el&&el.scrollIntoView)el.scrollIntoView({behavior:"smooth",block:"center"})}}}};
+  e.addEventListener(e.type==="radio"?"change":"input",ev);if(e.tagName==="TEXTAREA"){grow(e);e.addEventListener("input",()=>grow(e))}});
+ $("#prev").onclick=()=>{if(fromRecap){fromRecap=false;return recap()}if(s===0)return welcome();go(s-1)};$("#next").onclick=next;
+ const f=document.querySelector("#app .qb input:not([type=radio]),#app .qb textarea")||document.querySelector("#app .qb input:checked")||document.querySelector("#app .qb input");if(f&&!AUTO(s))try{f.focus({preventScroll:true})}catch(e){}
+ window.scrollTo(0,0)}
+function next(){const Q=SCR[cur];let bad=null;Q.forEach(q=>{const v=String(A[q.id]||"").trim();if(q.req&&!v){const b=document.querySelector('[data-id="'+q.id+'"]');if(b){b.classList.add("bad");b.querySelector(".qerr").textContent="Merci de répondre à cette question."}if(!bad)bad=q}});
+ if(bad){const e=document.querySelector('[data-id="'+bad.id+'"] input,[data-id="'+bad.id+'"] textarea');if(e)try{e.focus()}catch(x){}return}
+ if(fromRecap){fromRecap=false;return recap()}go(cur+1)}
+function recap(){cur=SCR.length;saveDraft();
+ app.innerHTML=shell(`<div class="kk">✅ Dernière étape</div><h1>Vérifiez vos réponses</h1><div class="rc">${IT.map(q=>{const s=SCR.findIndex(x=>x.includes(q)),v=String(A[q.id]||"").trim();return `<div class="rr"><div><div class="q">${esc(q.t)}</div><div class="a ${v?"":"v"}">${v?esc(q.k==="star"?"★".repeat(+v.split("/")[0])+" ("+v+")":v):"— (sans réponse)"}</div></div><button type="button" class="sec" data-edit="${s}" aria-label="Modifier : ${esc(q.t)}">Modifier</button></div>`}).join("")}</div>
+ <div class="err" id="err" role="alert"></div><div class="nav"><button type="button" class="sec" id="prev">‹ Précédent</button><button type="button" class="go" id="send">✔ Envoyer</button></div>`,0);
+ $$("[data-edit]").forEach(b=>b.onclick=()=>{fromRecap=true;go(+b.dataset.edit)});$("#prev").onclick=()=>go(SCR.length-1);$("#send").onclick=submit;window.scrollTo(0,0)}
+function thanks(already){const L=[];if(K==="post"&&D.sp)L.push(`<a class="btn" href="${esc(D.sp)}" target="_blank" rel="noopener">📚 Retrouver les supports de cours</a>`);if(K==="bilan"&&D.ie)L.push(`<a class="btn" href="${esc(D.ie)}" target="_blank" rel="noopener">🧑‍🏫 Mon espace formateur</a>`);
+ app.innerHTML=shell(`<div class="thx"><div class="ckb" aria-hidden="true">✓</div><h1>Merci${prenom?" "+esc(prenom):""} !</h1><p>${already?"Vos réponses ont déjà été transmises depuis cet appareil.":"Vos réponses sont bien envoyées à "+esc(org||"TOPAS informatique")+"."}</p>${K==="bilan"?"<p>Merci pour votre intervention.</p>":K==="post"?"<p>Votre avis nous aide à améliorer nos formations.</p>":""}${L.length?`<div class="links">${L.join("")}</div>`:""}<p style="color:var(--mu);font-size:15px;margin-top:18px">Vous pouvez fermer cette page.</p></div>`,0);window.scrollTo(0,0)}
+async function submit(){const btn=$("#send"),err=$("#err");err.textContent="";
+ const miss=IT.find(q=>q.req&&!String(A[q.id]||"").trim());if(miss){fromRecap=true;go(SCR.findIndex(x=>x.includes(miss)));next();return}
+ const ans=IT.map(q=>[q,String(A[q.id]||"").trim()]);
+ btn.disabled=true;btn.textContent="Envoi en cours…";
  const now=new Date(),p2=n=>String(n).padStart(2,"0"),dl=now.getFullYear()+"-"+p2(now.getMonth()+1)+"-"+p2(now.getDate()),hl=p2(now.getHours())+":"+p2(now.getMinutes());
- const cut=(s,n)=>String(s).slice(0,n);
- let lim=300,payload,body;
- for(;;){
-  payload={t:"fp-q",q:K,n:D.n,ti:D.ti,nm:D.nm||"",dl,hl,tsl:fd(dl)+" à "+hl};
+ const cut=(s,n)=>String(s).slice(0,n);let lim=300,payload,body;
+ for(;;){payload={t:"fp-q",q:K,n:D.n,ti:D.ti,nm:D.nm||"",dl,hl,tsl:fd(dl)+" à "+hl};
   if(K==="auto"){payload.v={};ans.forEach(a=>{if(/^(soc|nom|hand|niv|obj|obj2|att|inf)$/.test(a[0].id))payload.v[a[0].id]=cut(a[1],lim)})}
   payload.a=ans.filter(a=>a[1]!=="").map(a=>[cut(a[0].t,90),cut(a[1],lim)]);
   if(K==="veille"){const g=id=>(ans.find(a=>a[0].id===id)||[])[1]||"";payload.v=String(D.v);payload.ch=g("ch");payload.cm=cut(g("cm"),lim);if(!D.nm)payload.nm=cut(g("nm"),80);payload.em=cut(D.em||g("em"),120);delete payload.a}
-  body=JSON.stringify(payload);
-  if(new TextEncoder().encode(body).length<=3800||lim<=40)break;lim=Math.floor(lim*.7);
- }
- const code="FPQ:"+b64u(payload);
- const subj=DEF.title+" – "+D.n+" – "+(D.nm||"");
- const sends=[];if(PREV){$("#form").classList.add("hide");$("#res").innerHTML='<div class="card okb"><div class="okt">Aperçu</div><p>Voici ce que verra le destinataire. Rien n’a été envoyé.</p><button class="sec" onclick="location.reload()">Recommencer</button></div>';window.scrollTo(0,0);return}
- if(D.t&&!PREV)sends.push(sbDep(D.t,payload));
+  body=JSON.stringify(payload);if(new TextEncoder().encode(body).length<=3800||lim<=40)break;lim=Math.floor(lim*.7)}
+ if(PREV){app.innerHTML=shell(`<div class="thx"><div class="ckb" aria-hidden="true">👁</div><h1>Aperçu</h1><p>Voici ce que verra la personne. Rien n’a été envoyé.</p><button type="button" class="sec" onclick="location.reload()">Recommencer</button></div>`,0);return}
+ const code="FPQ:"+b64u(payload),subj=DEF.title+" – "+D.n+" – "+(D.nm||""),sends=[];
+ if(D.t)sends.push(sbDep(D.t,payload));
  if(D.m){const f=new URLSearchParams({_subject:subj,_captcha:"false",_template:"table",Questionnaire:DEF.title,Dossier:D.n+" – "+(D.f||""),Nom:D.nm||"",Date:payload.tsl,Code:code});ans.forEach(a=>{if(a[1])f.append(a[0].t.slice(0,80),a[1])});sends.push(fetch("https://formsubmit.co/ajax/"+encodeURIComponent(D.m),{method:"POST",headers:{Accept:"application/json"},body:f}).then(r=>{if(!r.ok)throw 0;return 1}))}
  const R=await Promise.allSettled(sends),ok=R.some(r=>r.status==="fulfilled");
- if(ok){try{localStorage.setItem(KEY,"1")}catch(e){}}
- $("#form").classList.add("hide");
+ if(ok){ls.set(KEY,"1");ls.del(DK);return thanks(false)}
+ btn.disabled=false;btn.textContent="✔ Envoyer";
  const mailto="mailto:"+encodeURIComponent(D.m||"")+"?subject="+encodeURIComponent(subj)+"&body="+encodeURIComponent("Bonjour,\n\nVoici mes réponses au questionnaire.\n\n"+code+"\n");
- $("#res").innerHTML=ok?`<div class="card okb thx"><div class="ck">✔</div><div class="okt">Merci, vos réponses sont envoyées !</div><p>${esc(org)} les a bien reçues${K==="bilan"?" : merci pour votre intervention":""}.</p><p class="mu">Vous pouvez fermer cette page.</p></div>`:
- `<div class="card" style="border-color:var(--ko)"><div class="err">La transmission automatique n’a pas fonctionné.</div><p>Appuyez sur le bouton ci-dessous : un e-mail est déjà prêt, il suffit de l’envoyer.</p><a class="btn go" href="${mailto}">✉ Envoyer par e-mail</a></div>`;
- window.scrollTo(0,0);
-}
-render();
+ err.innerHTML=`La transmission automatique n’a pas fonctionné. Vos réponses sont gardées sur cet appareil.<br><a class="btn go" style="margin-top:10px;width:100%" href="${mailto}">✉ Envoyer par e-mail</a>`}
+if(done)thanks(true);else welcome();
 })();
 </script>
 </body>
