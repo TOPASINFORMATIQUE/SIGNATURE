@@ -207,6 +207,7 @@ function shell(inner,prog){return `<div class="sh"><div class="top"><img src="lo
 function welcome(){const per=D.a?(D.b&&D.b!==D.a?"du "+fd(D.a)+" au "+fd(D.b):"le "+fd(D.a)):"";const resume=draft&&draft.a&&((+draft.s||0)>0||Object.keys(draft.a).some(k=>draft.a[k]&&!(IT.find(q=>q.id===k)||{}).pre));
  app.innerHTML=shell(`<div class="kk">${KI[0]} ${esc(KI[1])}</div><h1>${esc(DEF.title)}</h1>${prenom?`<div class="hi">Bonjour ${esc(prenom)} 👋</div>`:""}
  <div class="chips">${D.f?`<span class="chip">${PP?"📋":"🎓"} ${esc(D.f)}</span>`:""}${per?`<span class="chip">📅 ${esc(per)}</span>`:""}${D.c&&K!=="veille"?`<span class="chip">🏢 ${esc(D.c)}</span>`:""}<span class="chip">⏱ environ ${mins} minute${mins>1?"s":""}</span></div>
+ ${D.ob&&!PP?`<div class="intro obj">🎯 <b>Objectifs de la formation :</b> ${esc(D.ob)}</div>`:""}
  ${DEF.intro?`<div class="intro">${esc(DEF.intro)}</div>`:""}
  ${resume?`<p style="margin:14px 0 8px"><b>Vous aviez commencé ce questionnaire.</b> Vos réponses ont été gardées.</p><div class="nav"><button type="button" class="go big" id="resume">▶ Reprendre où j’en étais</button></div><div style="text-align:center"><button type="button" class="lnk" id="restart">Recommencer depuis le début</button></div>`:`<div class="nav"><button type="button" class="go big" id="start">Commencer ›</button></div>`}`,0);
  const st=$("#start");if(st){st.onclick=()=>go(0);st.focus()}
