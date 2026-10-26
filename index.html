@@ -77,6 +77,11 @@ input[type=date]{font:inherit;padding:10px;border:1px solid var(--br);border-rad
 <script>
 const SBU="https://kbfnxqyxqualmqhiufnq.supabase.co",SBK="sb_publishable_5vjNCP7zREh5upGu_pTAIA_mgUPG8Cx";
 const sbDep=(c,p)=>fetch(SBU+"/rest/v1/rpc/deposer",{method:"POST",headers:{apikey:SBK,"Content-Type":"application/json"},body:JSON.stringify({p_canal:c,p_data:p})}).then(r=>{if(!r.ok)throw 0;return 1});
+const FB_MAIL="adv@topas.fr";
+// Secours si le dépôt Supabase échoue : code à coller dans TOPAS Formation (« Coller un code ») + e-mail préparé que la personne envoie elle-même (aucun service tiers)
+function fbHtml(code,subj,intro){const E=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])),mt="mailto:"+FB_MAIL+"?subject="+encodeURIComponent(subj)+"&body="+encodeURIComponent(intro+"\n\n"+code+"\n");
+ return `<div class="fbx" role="alert"><p><b>La transmission automatique n’a pas fonctionné.</b> Rien n’a été envoyé à un autre service.</p><p>Appuyez sur « ✉ Envoyer par e-mail » : un message prêt à partir s’ouvre, adressé à ${E(FB_MAIL)}. Ou copiez le code ci-dessous et envoyez-le à ${E(FB_MAIL)}.</p><textarea readonly class="fbc" rows="3" aria-label="Code à transmettre" onclick="this.select()">${E(code)}</textarea><div class="fbb"><button type="button" class="fbbt" onclick="fbCopy(this)">📋 Copier le code</button><a class="fbbt fbgo" href="${E(mt)}">✉ Envoyer par e-mail</a></div></div>`}
+function fbCopy(b){const t=b.closest(".fbx").querySelector("textarea");t.focus();t.select();let c=false;try{c=document.execCommand("copy")}catch(e){}try{if(navigator.clipboard)navigator.clipboard.writeText(t.value).then(()=>{b.textContent="✔ Code copié"},()=>{})}catch(e){}b.textContent=c?"✔ Code copié":"Code sélectionné : faites Ctrl+C (ou « Copier »)"}
 
 (async function(){
 "use strict";
@@ -98,6 +103,9 @@ const TIT=dev?(ro?"Devis accepté":"Signature du devis"):plan?(ro?"Planification
 document.title=TIT+" "+(dev?D.dn||D.n:D.n);
 const KEY="fpsig:"+D.k+":"+D.n+(dev?":"+(D.dn||""):"");
 let done=null;try{done=JSON.parse(localStorage.getItem(KEY)||"null")}catch(e){}
+// Lien expiré (date x ajoutée par TOPAS Formation, 90 jours par défaut) : plus de document, seulement le contact. Les copies signées (ro) restent lisibles.
+{const n=new Date(),p2=v=>String(v).padStart(2,"0"),T=n.getFullYear()+"-"+p2(n.getMonth()+1)+"-"+p2(n.getDate()),cm=D.m||mail||FB_MAIL;
+ if(!ro&&!done&&/^\d{4}-\d\d-\d\d$/.test(D.x||"")&&T>D.x){document.title="Lien expiré";app.innerHTML='<div class="card" id="expire"><h1>Ce lien a expiré</h1><p>Ce lien a expiré, contactez-nous : '+esc(org||"TOPAS informatique")+' – <a href="mailto:'+esc(cm)+'">'+esc(cm)+'</a>'+(tel?' – '+esc(tel):'')+'.</p><p style="color:#5b6475">Lien valable jusqu’au '+esc(fd(D.x))+'. Nous vous enverrons un nouveau lien.</p></div>';return}}
 if(ro)done=D.sig||null;
 
 const frd=d=>{if(!d)return"—";const x=d.split("-");return (+x[2])+"/"+(+x[1])+"/"+x[0].slice(2)};
@@ -193,7 +201,7 @@ function render(){
   $("#chno").onclick=()=>{$("#form").classList.add("hide");$("#refus").classList.remove("hide");$("#refus").scrollIntoView({behavior:"smooth",block:"start"});setTimeout(()=>{try{$("#rnm").focus()}catch(e){}},300)};
   $("#rback").onclick=()=>$("#chok").onclick();$("#rgo").onclick=refuse}
 }
-// Refus des dates : pas de signature, commentaire obligatoire + contraintes facultatives ; même dépôt (Supabase « depots », secours formsubmit / e-mail)
+// Refus des dates : pas de signature, commentaire obligatoire + contraintes facultatives ; même dépôt (Supabase « depots », secours : code + e-mail préparé)
 async function refuse(){
  const err=$("#rerr"),nm=$("#rnm").value.trim(),fn=$("#rfn").value.trim(),cm=$("#rcm").value.trim().slice(0,600);err.textContent="";
  if(nm.length<3)return(err.textContent="Merci d’indiquer votre nom et prénom.",$("#rnm").focus());
@@ -204,12 +212,11 @@ async function refuse(){
  const payload={t:"fp-sign",k:"plan",ref:1,n:D.n,nm,fn,dl,hl,tsl:fd(dl)+" à "+hl,cm,ct};
  const code="FPSIG:"+b64u(payload),JN=["","lundi","mardi","mercredi","jeudi","vendredi"],ctt=[ct.j?"Jours à éviter : "+ct.j.map(i=>JN[i]).join(", "):"",ct.m?"Matin à éviter":"",ct.a?"Après-midi à éviter":"",ct.dp?"À partir du "+fd(ct.dp):""].filter(Boolean).join(" · ");
  const sends=[];if(D.t)sends.push(sbDep(D.t,payload));
- if(D.m){const f=new URLSearchParams({_subject:"Planification refusée – "+D.n+" – "+nm,_captcha:"false",_template:"table",Document:"Planification "+D.n,"Réponse":"Les dates ne conviennent pas",Signataire:nm,Fonction:fn,"Société":C[0],Commentaire:cm,Contraintes:ctt,Date:payload.tsl,Code:code});sends.push(fetch("https://formsubmit.co/ajax/"+encodeURIComponent(D.m),{method:"POST",headers:{Accept:"application/json"},body:f}).then(r=>{if(!r.ok)throw 0;return 1}))}
  const R=await Promise.allSettled(sends),ok=R.some(r=>r.status==="fulfilled");
  const mailto="mailto:"+encodeURIComponent(D.m||"")+"?subject="+encodeURIComponent("Planification refusée – "+D.n+" – "+nm)+"&body="+encodeURIComponent("Bonjour,\n\nLes dates proposées pour la planification "+D.n+" ne nous conviennent pas.\n\n"+cm+(ctt?"\n"+ctt:"")+"\n\n"+nm+(fn?" ("+fn+")":"")+"\n\n"+code+"\n");
  $("#refus").classList.add("hide");$("#choix").classList.add("hide");$("#form").classList.add("hide");
  $("#res").innerHTML=ok?`<div class="card okb noprint" id="rok"><div class="okt">✔ Merci, nous avons bien reçu votre réponse.</div><p>Nous revenons vers vous avec de nouvelles dates. Vous pouvez fermer cette page.</p></div>`
-  :`<div class="card noprint" style="border-color:var(--ko)"><div class="err">La transmission automatique n’a pas fonctionné.</div><p>Appuyez sur le bouton ci-dessous pour nous envoyer votre réponse par e-mail (un message est déjà prêt, il suffit de l’envoyer).</p><a class="btn go" href="${mailto}">✉ Envoyer par e-mail</a></div>`;
+  :`<div class="card noprint" style="border-color:var(--ko)">${fbHtml(code,"Planification refusée – "+D.n+" – "+nm,"Bonjour,\n\nLes dates proposées pour la planification "+D.n+" ne nous conviennent pas.\n\n"+cm+(ctt?"\n"+ctt:"")+"\n\n"+nm+(fn?" ("+fn+")":""))}</div>`;
  window.scrollTo(0,0)}
 function sigSvg(sg){let d="";String(sg||"").split(";").forEach(st=>{const P=st.split(",").map(q=>q.split(".").map(v=>parseInt(v,36))).filter(q=>q.length===2&&!isNaN(q[0])&&!isNaN(q[1]));if(!P.length)return;if(P.length===1)P.push([P[0][0]+1,P[0][1]]);d+="M"+P.map(q=>q[0]+" "+q[1]).join("L")});return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 140" width="200" height="87"><path d="${d}" fill="none" stroke="#12308f" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`}
 function sigDoc(p){return `<div style="margin-top:16px;border:1px solid var(--br);border-radius:8px;padding:10px 14px"><b>${plan?"Validée":"Signée"} en ligne</b> par ${esc(p.nm)}${p.fn?" ("+esc(p.fn)+")":""}, ${esc(C[0])}, le ${esc(p.tsl)}<br><span style="background:#fff;display:inline-block;border-radius:6px">${sigSvg(p.sg)}</span></div>`}
@@ -247,7 +254,6 @@ async function submit(){
  const code="FPSIG:"+b64u(payload),body=JSON.stringify(payload);
  const sends=[];
  if(D.t)sends.push(sbDep(D.t,payload));
- if(D.m){const f=new URLSearchParams({_subject:(dev?"Devis accepté "+(D.dn||""):plan?"Planification validée":"Convention signée")+" – "+D.n+" – "+nm,_captcha:"false",_template:"table",Document:(dev?"Devis "+(D.dn||"")+" – dossier ":plan?"Planification ":"Convention ")+D.n,Signataire:nm,Fonction:fn,"Société":C[0],Date:payload.tsl,Code:code});sends.push(fetch("https://formsubmit.co/ajax/"+encodeURIComponent(D.m),{method:"POST",headers:{Accept:"application/json"},body:f}).then(r=>{if(!r.ok)throw 0;return 1}))}
  const R=await Promise.allSettled(sends),ok=R.some(r=>r.status==="fulfilled");
  done={nm,fn,tsl:payload.tsl,sg:payload.sg};
  if(ok){try{localStorage.setItem(KEY,JSON.stringify(done))}catch(e){}}
@@ -255,11 +261,24 @@ async function submit(){
  const mailto="mailto:"+encodeURIComponent(D.m||"")+"?subject="+encodeURIComponent((dev?"Devis accepté "+(D.dn||""):plan?"Planification validée":"Convention signée")+" – "+D.n+" – "+nm)+"&body="+encodeURIComponent("Bonjour,\n\n"+nm+(fn?" ("+fn+")":"")+" a "+(dev?"accepté le devis "+(D.dn||"")+" (dossier "+D.n+")":plan?"validé la planification "+D.n:"signé la convention "+D.n)+" en ligne.\n\n"+code+"\n");
  $("#res").innerHTML=ok?
   `<div class="card okb noprint"><div class="okt">✔ Merci, c’est ${dev?"accepté":plan?"validé":"signé"} !</div><p>${esc(org)} a bien reçu votre ${dev?"acceptation du devis":plan?"validation":"signature"}.${dev?" Vous recevrez par mail votre exemplaire et la convention de formation.":""} Vous pouvez fermer cette page.</p><button class="sec" id="prt">🖨 Imprimer / enregistrer ma copie</button> <a class="sec btn" href="${mailto}" style="margin-top:6px">✉ Envoyer aussi une confirmation par e-mail</a></div>`:
-  `<div class="card noprint" style="border-color:var(--ko)"><div class="err">La transmission automatique n’a pas fonctionné.</div><p>Appuyez sur le bouton ci-dessous pour envoyer votre ${plan?"validation":"signature"} par e-mail (un message est déjà prêt, il suffit de l’envoyer).</p><a class="btn go" href="${mailto}">✉ Envoyer par e-mail</a></div>`;
+  `<div class="card noprint" style="border-color:var(--ko)">${fbHtml(code,(dev?"Devis accepté "+(D.dn||""):plan?"Planification validée":"Convention signée")+" – "+D.n+" – "+nm,"Bonjour,\n\n"+nm+(fn?" ("+fn+")":"")+" a "+(dev?"accepté le devis "+(D.dn||"")+" (dossier "+D.n+")":plan?"validé la planification "+D.n:"signé la convention "+D.n)+" en ligne.")}</div>`;
  const pr=$("#prt");if(pr)pr.onclick=()=>window.print();
  window.scrollTo(0,0);
 }
 render();
+})();
+</script>
+<!-- Mention d'information RGPD (identique sur les 4 pages publiques ; texte modifiable dans TOPAS Formation › Gestionnaire › RGPD) -->
+<style>.rgpdm{max-width:820px;margin:18px auto 24px;padding:0 14px;font:12.5px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;color:#5b6475}.rgpdm details{margin-top:4px}.rgpdm summary{cursor:pointer;color:#12308f;font-weight:600;display:inline-block;min-height:24px}.rgpdm p{margin:4px 0}@media print{.rgpdm{display:none}}.fbx{border:2px solid #dc2626;background:#fef2f2;border-radius:10px;padding:10px 12px;margin:10px 0;color:#1e293b;font-size:15px;line-height:1.45;text-align:left}.fbx p{margin:4px 0}.fbc{width:100%;box-sizing:border-box;font:12px/1.35 ui-monospace,Consolas,monospace;padding:8px;border:1px solid #cbd5e1;border-radius:8px;margin:6px 0;resize:vertical;word-break:break-all}.fbb{display:flex;gap:8px;flex-wrap:wrap}.fbbt{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 14px;border-radius:10px;border:1px solid #12308f;background:#fff;color:#12308f;font:600 15px system-ui,sans-serif;text-decoration:none;cursor:pointer}.fbgo{background:#12308f;color:#fff}</style>
+<div class="rgpdm" id="rgpdm" role="contentinfo"></div>
+<script>
+(function(){
+const DEF={c:"Les informations saisies sur cette page sont utilisées par TOPAS informatique uniquement pour la gestion de votre formation et de sa qualité.",
+ d:"Responsable du traitement : TOPAS informatique, organisme de formation enregistré sous le N° 82 38 02069 38.\nFinalité : gestion de la formation (inscription, convention, planification, signature, évaluation) et suivi de sa qualité, y compris les obligations de la certification Qualiopi.\nBase légale : exécution du contrat de formation et respect des obligations légales des organismes de formation.\nDestinataires : TOPAS informatique et son hébergeur Supabase (données hébergées en France). Aucune donnée n’est vendue ni transmise à des fins commerciales.\nDurée de conservation : le temps de la formation, puis 5 ans pour le dossier de formation, 3 ans pour les réponses aux questionnaires, 5 ans pour les réclamations et 10 ans pour les pièces comptables.\nVos droits : vous pouvez demander l’accès à vos données, leur rectification, leur effacement ou vous opposer à leur traitement en écrivant à adv@topas.fr. Vous pouvez aussi adresser une réclamation à la CNIL (www.cnil.fr)."};
+const E=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const draw=M=>{const b=document.getElementById("rgpdm");if(!b)return;const o=b.querySelector("details"),op=!!(o&&o.open);b.innerHTML="<p>🔒 "+E(M.c)+"</p><details"+(op?" open":"")+"><summary>En savoir plus</summary>"+String(M.d).split(/\n+/).filter(Boolean).map(l=>"<p>"+E(l)+"</p>").join("")+"</details>"};
+draw(DEF);
+try{fetch(SBU+"/rest/v1/rpc/mention_rgpd",{method:"POST",headers:{apikey:SBK,"Content-Type":"application/json"},body:"{}"}).then(r=>r.ok?r.json():null).then(j=>{if(j&&j.c&&j.d)draw(j)}).catch(()=>{})}catch(e){}
 })();
 </script>
 </body>

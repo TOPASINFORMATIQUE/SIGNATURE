@@ -96,6 +96,11 @@ button:focus-visible,a:focus-visible,summary:focus-visible,textarea:focus-visibl
 <script>
 const SBU="https://kbfnxqyxqualmqhiufnq.supabase.co",SBK="sb_publishable_5vjNCP7zREh5upGu_pTAIA_mgUPG8Cx";
 const sbDep=(c,p)=>fetch(SBU+"/rest/v1/rpc/deposer",{method:"POST",headers:{apikey:SBK,"Content-Type":"application/json"},body:JSON.stringify({p_canal:c,p_data:p})}).then(r=>{if(!r.ok)throw 0;return 1});
+const FB_MAIL="adv@topas.fr";
+// Secours si le dépôt Supabase échoue : code à coller dans TOPAS Formation (« Coller un code ») + e-mail préparé que la personne envoie elle-même (aucun service tiers)
+function fbHtml(code,subj,intro){const E=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])),mt="mailto:"+FB_MAIL+"?subject="+encodeURIComponent(subj)+"&body="+encodeURIComponent(intro+"\n\n"+code+"\n");
+ return `<div class="fbx" role="alert"><p><b>La transmission automatique n’a pas fonctionné.</b> Rien n’a été envoyé à un autre service.</p><p>Appuyez sur « ✉ Envoyer par e-mail » : un message prêt à partir s’ouvre, adressé à ${E(FB_MAIL)}. Ou copiez le code ci-dessous et envoyez-le à ${E(FB_MAIL)}.</p><textarea readonly class="fbc" rows="3" aria-label="Code à transmettre" onclick="this.select()">${E(code)}</textarea><div class="fbb"><button type="button" class="fbbt" onclick="fbCopy(this)">📋 Copier le code</button><a class="fbbt fbgo" href="${E(mt)}">✉ Envoyer par e-mail</a></div></div>`}
+function fbCopy(b){const t=b.closest(".fbx").querySelector("textarea");t.focus();t.select();let c=false;try{c=document.execCommand("copy")}catch(e){}try{if(navigator.clipboard)navigator.clipboard.writeText(t.value).then(()=>{b.textContent="✔ Code copié"},()=>{})}catch(e){}b.textContent=c?"✔ Code copié":"Code sélectionné : faites Ctrl+C (ou « Copier »)"}
 
 (function(){
 "use strict";
@@ -200,13 +205,25 @@ async function main(){
   b.disabled=true;b.textContent="Envoi en cours…";const now=new Date(),p2=n=>String(n).padStart(2,"0"),dl=now.getFullYear()+"-"+p2(now.getMonth()+1)+"-"+p2(now.getDate()),hl=p2(now.getHours())+":"+p2(now.getMinutes()),tsl=fds(dl)+" à "+hl;
   const pl={t:"fp-pb",id:now.getTime().toString(36)+Math.random().toString(36).slice(2,6),n:f.n,iv:D.i||"",em:D.e||"",msg:msg.slice(0,2000),dl,hl},code="FPPB:"+b64u(pl),S2=[];
   if(D.t)S2.push(sbDep(D.t,pl));
-  if(D.m)S2.push(fetch("https://formsubmit.co/ajax/"+encodeURIComponent(D.m),{method:"POST",headers:{Accept:"application/json"},body:new URLSearchParams({_subject:"⚠ Problème signalé – "+f.n+" – "+(D.i||""),_captcha:"false",_template:"table",Formation:f.t+" ("+f.n+")",Formateur:D.i||"",Date:tsl,Probleme:msg,Code:code})}).then(r=>{if(!r.ok)throw 0;return 1}));
   const R2=await Promise.allSettled(S2),ok=R2.some(r=>r.status==="fulfilled");b.disabled=false;b.textContent="Envoyer à TOPAS informatique";
   if(ok){const H=pbHist(f.n);H.push({msg,tsl});try{localStorage.setItem(PBK(f.n),JSON.stringify(H))}catch(e){}document.getElementById("pbh"+i).insertAdjacentHTML("beforeend",`<div class="pbok">✔ Problème envoyé le ${esc(tsl)} : TOPAS informatique est prévenu.</div>`);ta.value="";document.getElementById("pbf"+i).classList.add("hide")}
-  else{er.innerHTML='L’envoi automatique n’a pas fonctionné. <a href="mailto:'+esc(D.m||"")+"?subject="+encodeURIComponent("⚠ Problème signalé – "+f.n)+"&body="+encodeURIComponent(msg+"\n\n"+code)+'">Envoyer par e-mail</a>'}});
+  else{er.innerHTML=fbHtml(code,"⚠ Problème signalé – "+f.n+" – "+(D.i||""),"Bonjour,\n\n"+msg)}});
  document.querySelectorAll("[data-ics]").forEach(b=>b.onclick=()=>{const f=D.f.find(x=>x.n===b.dataset.ics);if(!f)return;const bl=new Blob([ics(f)],{type:"text/calendar"}),a=document.createElement("a");a.href=URL.createObjectURL(bl);a.download=f.n+"-planning.ics";document.body.appendChild(a);a.click();setTimeout(()=>a.remove(),500)});
 }
 main();
+})();
+</script>
+<!-- Mention d'information RGPD (identique sur les 4 pages publiques ; texte modifiable dans TOPAS Formation › Gestionnaire › RGPD) -->
+<style>.rgpdm{max-width:820px;margin:18px auto 24px;padding:0 14px;font:12.5px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;color:#5b6475}.rgpdm details{margin-top:4px}.rgpdm summary{cursor:pointer;color:#12308f;font-weight:600;display:inline-block;min-height:24px}.rgpdm p{margin:4px 0}@media print{.rgpdm{display:none}}.fbx{border:2px solid #dc2626;background:#fef2f2;border-radius:10px;padding:10px 12px;margin:10px 0;color:#1e293b;font-size:15px;line-height:1.45;text-align:left}.fbx p{margin:4px 0}.fbc{width:100%;box-sizing:border-box;font:12px/1.35 ui-monospace,Consolas,monospace;padding:8px;border:1px solid #cbd5e1;border-radius:8px;margin:6px 0;resize:vertical;word-break:break-all}.fbb{display:flex;gap:8px;flex-wrap:wrap}.fbbt{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 14px;border-radius:10px;border:1px solid #12308f;background:#fff;color:#12308f;font:600 15px system-ui,sans-serif;text-decoration:none;cursor:pointer}.fbgo{background:#12308f;color:#fff}</style>
+<div class="rgpdm" id="rgpdm" role="contentinfo"></div>
+<script>
+(function(){
+const DEF={c:"Les informations saisies sur cette page sont utilisées par TOPAS informatique uniquement pour la gestion de votre formation et de sa qualité.",
+ d:"Responsable du traitement : TOPAS informatique, organisme de formation enregistré sous le N° 82 38 02069 38.\nFinalité : gestion de la formation (inscription, convention, planification, signature, évaluation) et suivi de sa qualité, y compris les obligations de la certification Qualiopi.\nBase légale : exécution du contrat de formation et respect des obligations légales des organismes de formation.\nDestinataires : TOPAS informatique et son hébergeur Supabase (données hébergées en France). Aucune donnée n’est vendue ni transmise à des fins commerciales.\nDurée de conservation : le temps de la formation, puis 5 ans pour le dossier de formation, 3 ans pour les réponses aux questionnaires, 5 ans pour les réclamations et 10 ans pour les pièces comptables.\nVos droits : vous pouvez demander l’accès à vos données, leur rectification, leur effacement ou vous opposer à leur traitement en écrivant à adv@topas.fr. Vous pouvez aussi adresser une réclamation à la CNIL (www.cnil.fr)."};
+const E=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const draw=M=>{const b=document.getElementById("rgpdm");if(!b)return;const o=b.querySelector("details"),op=!!(o&&o.open);b.innerHTML="<p>🔒 "+E(M.c)+"</p><details"+(op?" open":"")+"><summary>En savoir plus</summary>"+String(M.d).split(/\n+/).filter(Boolean).map(l=>"<p>"+E(l)+"</p>").join("")+"</details>"};
+draw(DEF);
+try{fetch(SBU+"/rest/v1/rpc/mention_rgpd",{method:"POST",headers:{apikey:SBK,"Content-Type":"application/json"},body:"{}"}).then(r=>r.ok?r.json():null).then(j=>{if(j&&j.c&&j.d)draw(j)}).catch(()=>{})}catch(e){}
 })();
 </script>
 </body>
