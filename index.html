@@ -41,6 +41,11 @@ button,a.btn{display:inline-block;font:inherit;font-weight:700;border:0;border-r
 .okb{border-color:var(--ok)}
 .okt{color:var(--ok);font-weight:700;font-size:18px}
 .hide{display:none}
+.chx{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}@media(max-width:560px){.chx{grid-template-columns:1fr}}
+.chx button{min-height:56px;font-size:16px}.chx .ok2{background:var(--pr);color:#fff}.chx .no2{background:transparent;border:2px solid var(--ko);color:var(--ko)}@media (prefers-color-scheme:dark){.chx .ok2{color:#0b1020}}
+textarea{width:100%;min-height:96px;font:inherit;padding:12px;border:1px solid var(--br);border-radius:8px;background:var(--card);color:var(--tx);resize:vertical}textarea::placeholder{color:#9aa0b0}
+.pls{display:flex;flex-wrap:wrap;gap:8px;margin:4px 0}.pls label{display:inline-flex;align-items:center;gap:6px;margin:0;font-weight:500;border:1px solid var(--br);border-radius:999px;padding:8px 14px;min-height:44px;cursor:pointer}.pls input{width:20px;height:20px}
+input[type=date]{font:inherit;padding:10px;border:1px solid var(--br);border-radius:8px;background:var(--card);color:var(--tx);min-height:44px}
 @media print{body{background:#fff;color:#000}.noprint{display:none!important}.card{border:0;padding:0}}
 
 .paper{background:#fff;color:#111;border:1px solid var(--br);border-radius:6px;padding:22px 22px;margin:12px 0;box-shadow:0 1px 6px rgba(0,0,0,.08)}
@@ -156,6 +161,19 @@ function render(){
  app.innerHTML=head()+
  `<div class="paper" id="doc">${docX()}</div>`+
  (ro?`<div class="card okb noprint"><div class="okt">✔ Exemplaire ${W1}</div><p>${done&&done.nm?"Par <b>"+esc(done.nm)+"</b>"+(done.fn?" ("+esc(done.fn)+")":"")+" ":""}${done&&done.tsl?"le "+esc(done.tsl)+".":""}</p><button class="sec" id="prt">🖨 Imprimer / enregistrer mon exemplaire (PDF)</button></div>`:done?`<div class="card okb noprint"><div class="okt">✔ Déjà ${W1}</div><p>Ce document a déjà été ${dev?"accepté":plan?"validé":"signé"} depuis cet appareil par <b>${esc(done.nm)}</b> le ${esc(done.tsl)}.</p><button class="sec" id="prt">🖨 Imprimer / enregistrer ma copie</button></div>`:
+ (plan?`<div class="card noprint" id="choix"><h2>Ces dates vous conviennent-elles ?</h2><div class="chx"><button type="button" class="ok2" id="chok">✍ Ces dates me conviennent — signer</button><button type="button" class="no2" id="chno">✖ Ces dates ne me conviennent pas</button></div></div>
+ <div class="card noprint hide" id="refus"><h2>Les dates ne vous conviennent pas</h2><p class="mu">Pas de signature à faire : dites-nous simplement ce qui ne va pas.</p>
+  <label for="rnm">Votre nom et prénom</label><input type="text" id="rnm" autocomplete="name">
+  <label for="rfn">Fonction <span class="mu">(facultatif)</span></label><input type="text" id="rfn" autocomplete="organization-title">
+  <label for="rcm">Dites-nous ce qui ne va pas, nous vous proposerons d’autres dates</label><textarea id="rcm" maxlength="600" placeholder="Par exemple : pas le mercredi · pas disponible l’après-midi · à décaler après le 15"></textarea>
+  <p class="mu" style="margin:10px 0 4px"><b>Pour aller plus vite</b> (facultatif) :</p>
+  <div class="mu" style="font-size:14px">Jours à éviter</div><div class="pls" id="rj">${["Lundi","Mardi","Mercredi","Jeudi","Vendredi"].map((j,i)=>`<label><input type="checkbox" value="${i+1}"> ${j}</label>`).join("")}</div>
+  <div class="mu" style="font-size:14px">Moment à éviter</div><div class="pls"><label><input type="checkbox" id="rm"> Le matin</label><label><input type="checkbox" id="ra"> L’après-midi</label></div>
+  <label for="rdp" style="font-weight:500">Période souhaitée : à partir du</label><input type="date" id="rdp">
+  <div class="err" id="rerr" role="alert"></div>
+  <button class="go" id="rgo" type="button">Envoyer ma réponse</button>
+  <div style="margin-top:8px"><button class="sec" id="rback" type="button">← Finalement, ces dates me conviennent</button></div>
+ </div>`:"")+
  `<div class="card noprint" id="form">
   <h2>${dev?"Accepter le devis":plan?"Valider les dates":"Signer la convention"}</h2>
   <p class="mu">Vérifiez le document ci-dessus, puis renseignez les champs. Cela ne prend qu’une minute.</p>
@@ -171,7 +189,28 @@ function render(){
  </div>`)+`<div id="res"></div>`;
  if(done||ro){const p=$("#prt");if(p)p.onclick=()=>window.print();return}
  pad();
+ if(plan){$("#chok").onclick=()=>{$("#refus").classList.add("hide");$("#form").classList.remove("hide");$("#form").scrollIntoView({behavior:"smooth",block:"start"});setTimeout(()=>{try{$("#nm").focus()}catch(e){}},300)};
+  $("#chno").onclick=()=>{$("#form").classList.add("hide");$("#refus").classList.remove("hide");$("#refus").scrollIntoView({behavior:"smooth",block:"start"});setTimeout(()=>{try{$("#rnm").focus()}catch(e){}},300)};
+  $("#rback").onclick=()=>$("#chok").onclick();$("#rgo").onclick=refuse}
 }
+// Refus des dates : pas de signature, commentaire obligatoire + contraintes facultatives ; même dépôt (Supabase « depots », secours formsubmit / e-mail)
+async function refuse(){
+ const err=$("#rerr"),nm=$("#rnm").value.trim(),fn=$("#rfn").value.trim(),cm=$("#rcm").value.trim().slice(0,600);err.textContent="";
+ if(nm.length<3)return(err.textContent="Merci d’indiquer votre nom et prénom.",$("#rnm").focus());
+ if(cm.length<3)return(err.textContent="Merci d’indiquer ce qui ne va pas (par exemple : pas le mercredi).",$("#rcm").focus());
+ const ct={};const J=[...document.querySelectorAll("#rj input:checked")].map(x=>+x.value);if(J.length)ct.j=J;if($("#rm").checked)ct.m=1;if($("#ra").checked)ct.a=1;const dp=$("#rdp").value;if(/^\d{4}-\d\d-\d\d$/.test(dp))ct.dp=dp;
+ const go=$("#rgo");go.disabled=true;go.textContent="Envoi en cours…";
+ const now=new Date(),p2=n=>String(n).padStart(2,"0"),dl=now.getFullYear()+"-"+p2(now.getMonth()+1)+"-"+p2(now.getDate()),hl=p2(now.getHours())+":"+p2(now.getMinutes());
+ const payload={t:"fp-sign",k:"plan",ref:1,n:D.n,nm,fn,dl,hl,tsl:fd(dl)+" à "+hl,cm,ct};
+ const code="FPSIG:"+b64u(payload),JN=["","lundi","mardi","mercredi","jeudi","vendredi"],ctt=[ct.j?"Jours à éviter : "+ct.j.map(i=>JN[i]).join(", "):"",ct.m?"Matin à éviter":"",ct.a?"Après-midi à éviter":"",ct.dp?"À partir du "+fd(ct.dp):""].filter(Boolean).join(" · ");
+ const sends=[];if(D.t)sends.push(sbDep(D.t,payload));
+ if(D.m){const f=new URLSearchParams({_subject:"Planification refusée – "+D.n+" – "+nm,_captcha:"false",_template:"table",Document:"Planification "+D.n,"Réponse":"Les dates ne conviennent pas",Signataire:nm,Fonction:fn,"Société":C[0],Commentaire:cm,Contraintes:ctt,Date:payload.tsl,Code:code});sends.push(fetch("https://formsubmit.co/ajax/"+encodeURIComponent(D.m),{method:"POST",headers:{Accept:"application/json"},body:f}).then(r=>{if(!r.ok)throw 0;return 1}))}
+ const R=await Promise.allSettled(sends),ok=R.some(r=>r.status==="fulfilled");
+ const mailto="mailto:"+encodeURIComponent(D.m||"")+"?subject="+encodeURIComponent("Planification refusée – "+D.n+" – "+nm)+"&body="+encodeURIComponent("Bonjour,\n\nLes dates proposées pour la planification "+D.n+" ne nous conviennent pas.\n\n"+cm+(ctt?"\n"+ctt:"")+"\n\n"+nm+(fn?" ("+fn+")":"")+"\n\n"+code+"\n");
+ $("#refus").classList.add("hide");$("#choix").classList.add("hide");$("#form").classList.add("hide");
+ $("#res").innerHTML=ok?`<div class="card okb noprint" id="rok"><div class="okt">✔ Merci, nous avons bien reçu votre réponse.</div><p>Nous revenons vers vous avec de nouvelles dates. Vous pouvez fermer cette page.</p></div>`
+  :`<div class="card noprint" style="border-color:var(--ko)"><div class="err">La transmission automatique n’a pas fonctionné.</div><p>Appuyez sur le bouton ci-dessous pour nous envoyer votre réponse par e-mail (un message est déjà prêt, il suffit de l’envoyer).</p><a class="btn go" href="${mailto}">✉ Envoyer par e-mail</a></div>`;
+ window.scrollTo(0,0)}
 function sigSvg(sg){let d="";String(sg||"").split(";").forEach(st=>{const P=st.split(",").map(q=>q.split(".").map(v=>parseInt(v,36))).filter(q=>q.length===2&&!isNaN(q[0])&&!isNaN(q[1]));if(!P.length)return;if(P.length===1)P.push([P[0][0]+1,P[0][1]]);d+="M"+P.map(q=>q[0]+" "+q[1]).join("L")});return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 140" width="200" height="87"><path d="${d}" fill="none" stroke="#12308f" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`}
 function sigDoc(p){return `<div style="margin-top:16px;border:1px solid var(--br);border-radius:8px;padding:10px 14px"><b>${plan?"Validée":"Signée"} en ligne</b> par ${esc(p.nm)}${p.fn?" ("+esc(p.fn)+")":""}, ${esc(C[0])}, le ${esc(p.tsl)}<br><span style="background:#fff;display:inline-block;border-radius:6px">${sigSvg(p.sg)}</span></div>`}
 
