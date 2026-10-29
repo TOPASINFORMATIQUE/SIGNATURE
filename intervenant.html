@@ -134,6 +134,7 @@ button:focus-visible,a:focus-visible,summary:focus-visible,textarea:focus-visibl
 .rmz{margin-top:8px;padding:12px;background:var(--ds-p-orange);border:1px solid var(--ds-b-orange);border-radius:var(--ds-r-tile)}.rml{display:block;font-size:16px;font-weight:700;color:var(--ds-orange-d);margin:0 0 6px;line-height:1.35}
 textarea.rmt{display:block;width:100%;box-sizing:border-box;margin:0;min-height:calc(5.8em + 22px);font:inherit;font-size:16px;line-height:1.45;padding:10px 12px;border:1px solid var(--ds-b-orange);border-radius:var(--ds-r-btn);background:var(--ds-card);color:var(--ds-tx);resize:none;overflow:hidden}
 @media (prefers-color-scheme:dark){.rml{color:var(--ds-b-orange)}}.urow .m{font-size:15px;margin-top:2px;overflow-wrap:anywhere}.utag{flex:none;border-radius:999px;padding:5px 12px;font-size:15px;font-weight:800;letter-spacing:.2px}.utag.ub{background:#fff1e6;color:#c2410c;border:1px solid #fdba74}.utag.uf{background:#e8f0fb;color:#1e4f9a;border:1px solid #93b4e0}
+.nsov{position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:60;display:flex;align-items:flex-end;justify-content:center;padding:12px}.nsbx{background:var(--card);color:var(--tx);border-radius:18px;padding:16px;width:100%;max-width:520px;max-height:92vh;overflow:auto}.nsbx h3{margin:0 0 6px;font-size:19px}.nsr{display:grid;gap:8px;margin-top:10px}.nsrb[aria-checked="true"]{background:var(--pr);color:#fff;border-color:var(--pr)}
 </style>
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
@@ -315,7 +316,7 @@ async function main(){
  let FP=null;
  function flush(){if(FP||!D.t)return FP||Promise.resolve();FP=(async()=>{await 0;try{for(const p of Q()){try{await sbDep(D.t,p)}catch(e){break}LS.set(QK,Q().filter(x=>!(x.id===p.id&&x.i===p.i)));banner()}}finally{FP=null;banner()}})();return FP}
  function enqueue(pls){const q=Q().concat(pls);if(!LS.set(QK,q))return false;flush();return true}
- const bannerHtml=()=>{const q=Q(),n=q.length,nb=q.filter(x=>x.k==="bl"||x.k==="blrep").length,ns=n-nb,any=F.some(x=>recs(x.f.n).length)||IT.some(x=>recs("bl:"+x.t.i).length);
+ const bannerHtml=()=>{const q=Q(),n=q.length,nb=q.filter(x=>x.k==="bl"||x.k==="blrep"||x.k==="blns").length,ns=n-nb,any=F.some(x=>recs(x.f.n).length)||IT.some(x=>recs("bl:"+x.t.i).length);
   if(n)return `<div class="qb qw" role="status"><b>⏳ ${[nb?nb+" bon"+(nb>1?"s":"")+" de livraison":"",ns?ns+" signature"+(ns>1?"s":""):""].filter(Boolean).join(" et ")} en attente d’envoi</b><span>${D.t?(navigator.onLine===false?"Pas de connexion : elles partiront toutes seules dès son retour.":"Envoi en cours… sinon elles repartiront toutes seules."):"Ce lien ne permet pas l’envoi : contactez "+esc(D.m||"TOPAS informatique")+"."}</span>${D.t?'<button type="button" class="btn" data-qgo>Renvoyer maintenant</button>':""}</div>`;
   return any?'<div class="qb qk" role="status"><b>✔ Tout est transmis</b></div>':""};
  function banner(){const e=document.getElementById("qbn");if(e){e.innerHTML=bannerHtml();const b=e.querySelector("[data-qgo]");if(b)b.onclick=flush}}
@@ -392,8 +393,10 @@ async function main(){
  async function prefetch(){for(const x of IT){if(x.t.pf&&!IMG[x.t.pf]&&blSt(x).k==="faire")try{await blImg(x.t)}catch(e){}}}
  const repRec=i=>recs("blrep:"+i).sort((a,b)=>String(b.dl+b.hl).localeCompare(String(a.dl+a.hl)))[0];
  const blRec=i=>recs("bl:"+i).sort((a,b)=>b.v-a.v)[0];
- const blSt=x=>{const r=blRec(x.t.i),sd=x.t.sd||"";if(r){const pd=!!pend(r.id);return{k:pd?"att":"sig",r,txt:(pd?"⏳ Signé le ":"✔ Signé le ")+dm(r.dl)+" à "+r.hl+(pd?" · en attente d’envoi":" · transmis")}}if(x.t.s)return{k:"sig",txt:"✔ Signé"+(sd?" le "+dm(sd.slice(0,10))+(sd.length>10?" à "+sd.slice(11):""):"")};return{k:"faire"}};
- function itGroups(){const fa=IT.filter(x=>blSt(x).k==="faire"),by=(a,b)=>String(a.t.d||"9999").localeCompare(String(b.t.d||"9999"));return{auj:fa.filter(x=>x.t.d&&x.t.d<=T).sort(by),ven:fa.filter(x=>!x.t.d||x.t.d>T).sort(by),sig:IT.filter(x=>blSt(x).k!=="faire").sort((a,b)=>by(b,a))}}
+ // « 📤 Envoyé sans signature » : relevé local blns ; si TOPAS a « renvoyé à faire signer » depuis (t.rs plus récent), le bon revient
+ const nsRec=i=>recs("blns:"+i).sort((a,b)=>String(b.dl+" "+b.hl).localeCompare(String(a.dl+" "+a.hl)))[0];
+ const blSt=x=>{const r=blRec(x.t.i),sd=x.t.sd||"",ns=r?null:nsRec(x.t.i);if(ns&&!(x.t.rs&&String(x.t.rs)>String(ns.dl+" "+ns.hl))){const pd=!!pend(ns.id);return{k:"ns",r:ns,txt:"📤 Envoyé sans signature le "+dm(ns.dl)+" à "+ns.hl+(pd?" · en attente d’envoi":" · transmis")}}if(r){const pd=!!pend(r.id);return{k:pd?"att":"sig",r,txt:(pd?"⏳ Signé le ":"✔ Signé le ")+dm(r.dl)+" à "+r.hl+(pd?" · en attente d’envoi":" · transmis")}}if(x.t.s)return{k:"sig",txt:"✔ Signé"+(sd?" le "+dm(sd.slice(0,10))+(sd.length>10?" à "+sd.slice(11):""):"")};return{k:"faire"}};
+ function itGroups(){const fa=IT.filter(x=>blSt(x).k==="faire"),by=(a,b)=>String(a.t.d||"9999").localeCompare(String(b.t.d||"9999"));return{auj:fa.filter(x=>x.t.d&&x.t.d<=T).sort(by),ven:fa.filter(x=>!x.t.d||x.t.d>T).sort(by),sig:IT.filter(x=>{const k=blSt(x).k;return k==="sig"||k==="att"}).sort((a,b)=>by(b,a))}}
  const itMaps=t=>"https://www.google.com/maps/search/?api=1&query="+encodeURIComponent((t.c||"")+" "+(t.a||""));
  const itCity=t=>{const a=String(t.a||"").split(",").pop().trim();return a||t.c||""};
  const itRow=x=>{const t=x.t,s=blSt(x),late=s.k==="faire"&&t.d&&t.d<T;return `<button type="button" class="row" data-it="${x.ix}" style="--c:${s.k!=="faire"?"var(--gy)":t.d&&t.d<=T?"var(--gr)":"var(--bl)"}"><div class="r1"><b>${esc(t.c||t.nm||"Intervention")}</b><span class="st">${s.k==="att"?"À transmettre":s.k==="sig"?"Signé":t.d===T?"Aujourd’hui":late?"À faire signer":"À venir"}</span></div><div class="t">🚚 ${esc(t.nm||("BL N° "+(t.b||"—")))}</div><div class="m">📅 ${t.d?esc(fds(t.d))+(t.h?" · "+esc(t.h):""):"date à préciser"} · 📍 ${esc(itCity(t))}${s.k!=="faire"?" · "+esc(s.txt):""}</div></button>`};
@@ -404,7 +407,7 @@ async function main(){
    <div class="ln"><i>📍</i><div><b>Adresse d’intervention</b><br>${t.a?esc(t.a):'<span class="mu">non précisée</span>'}<div class="btns" style="margin-top:6px"><a class="btn" href="${itMaps(t)}" target="_blank" rel="noopener">🧭 Itinéraire</a></div></div></div>
    <div class="ln"><i>📅</i><div><b>${t.d?esc(fdl(t.d)):"Date à préciser"}</b>${t.h?` · ${esc(t.h)}`:""}</div></div>
    <div class="ln"><i>☎</i><div><b>TOPAS informatique</b>${D.m?`<br><a href="mailto:${esc(D.m)}">✉ ${esc(D.m)}</a>`:""}${G[1]?`<br><a href="tel:${esc(G[1].replace(/\s/g,""))}">☎ ${esc(G[1])}</a>`:""}</div></div></div>
-  ${s.k==="faire"?`${(r=>r?`<div class="qb ${pend(r.id)?"qw":"qk"}" role="status"><b>⏸ Signature reportée le ${esc(dm(r.dl))} à ${esc(r.hl)}</b><span>${pend(r.id)?"en attente d’envoi":"TOPAS informatique est prévenu"}</span></div>`:"")(repRec(t.i))}<div class="btns"><button type="button" class="btn gn big2" data-bls="${ix}">✍ Faire signer le client</button></div><div id="blch"></div>`:`<div class="qb ${s.k==="att"?"qw":"qk"}" role="status"><b>${esc(s.txt)}</b>${s.r&&s.r.res?'<span class="ko">avec remarque</span>':""}</div>`}
+  ${s.k==="faire"?`${(r=>r?`<div class="qb ${pend(r.id)?"qw":"qk"}" role="status"><b>⏸ Signature reportée le ${esc(dm(r.dl))} à ${esc(r.hl)}</b><span>${pend(r.id)?"en attente d’envoi":"TOPAS informatique est prévenu"}</span></div>`:"")(repRec(t.i))}<div class="btns"><button type="button" class="btn gn big2" data-bls="${ix}">✍ Faire signer le client</button>${t.d&&t.d<T?`<button type="button" class="btn" data-blns="${ix}">📤 Envoyer sans signature</button>`:""}</div><div id="blch"></div>`:`<div class="qb ${s.k==="att"?"qw":"qk"}" role="status"><b>${esc(s.txt)}</b>${s.r&&s.r.res?'<span class="ko">avec remarque</span>':""}</div>`}
   <section class="sec" style="--c:var(--bl)"><h2>📄 Le bon de livraison</h2><div class="fc s-venir">${imgBox(ix)}</div></section>
   ${s.k==="faire"?blForm(ix):""}
   ${foot()}`}
@@ -432,6 +435,16 @@ async function main(){
   <div id="blrepf" class="hide"><label class="fl" for="blrepm">Pourquoi ? <span class="mu">(facultatif)</span></label><textarea class="fl" id="blrepm" rows="3" style="font-weight:400"></textarea><button type="button" class="btn p" data-blrepok="${ix}">Confirmer le report</button></div></div>`;
   el.querySelector("[data-blany]").onclick=()=>blStart(ix,1);el.querySelector("[data-blrep]").onclick=()=>{document.getElementById("blrepf").classList.remove("hide");document.getElementById("blrepm").focus()};
   el.querySelector("[data-blrepok]").onclick=()=>blReport(ix,document.getElementById("blrepm").value.trim());el.scrollIntoView({block:"nearest"})}
+ const NSR=["Client absent","Client a refusé de signer","Oubli","Autre…"];
+ function blNsAsk(ix){const t=IT[ix].t,o=document.createElement("div");o.className="nsov";o.setAttribute("role","dialog");o.setAttribute("aria-modal","true");o.setAttribute("aria-label","Envoyer sans signature");let rs="";
+  o.innerHTML=`<div class="nsbx"><h3>📤 Envoyer sans signature</h3><p><b>${esc(t.nm||("BL N° "+(t.b||"—")))}</b>${t.c?" · "+esc(t.c):""}</p><p class="mu">Le bon quitte votre espace. TOPAS informatique saura qu’il n’a pas été signé.</p><div class="nsr" role="radiogroup" aria-label="Raison">${NSR.map((r,i)=>`<button type="button" class="btn nsrb" role="radio" aria-checked="false" data-nsr="${i}">${esc(r)}</button>`).join("")}</div><div class="nsaw hide"><label class="fl" for="nsat">Précisez la raison *</label><textarea id="nsat" rows="3"></textarea></div><div class="pberr" id="nse" role="alert"></div><div class="btns"><button type="button" class="btn" data-nsx>Annuler</button><button type="button" class="btn gn" data-nsok>Confirmer l’envoi sans signature</button></div></div>`;
+  document.body.appendChild(o);const q=s=>o.querySelector(s),aw=q(".nsaw"),ta=q("#nsat"),er=q("#nse");
+  o.querySelectorAll("[data-nsr]").forEach(b=>b.onclick=()=>{rs=NSR[+b.dataset.nsr];o.querySelectorAll("[data-nsr]").forEach(z=>z.setAttribute("aria-checked",String(z===b)));aw.classList.toggle("hide",rs!=="Autre…");er.textContent="";if(rs==="Autre…")ta.focus()});
+  q("[data-nsx]").onclick=()=>o.remove();
+  q("[data-nsok]").onclick=()=>{const m=ta.value.trim();if(!rs){er.textContent="Choisissez la raison.";return}if(rs==="Autre…"&&m.length<3){er.textContent="Précisez la raison en quelques mots.";ta.focus();return}o.remove();blNsSend(ix,rs==="Autre…"?"Autre":rs,rs==="Autre…"?m:"")}}
+ function blNsSend(ix,rs,motif,mat){const t=IT[ix].t,now=nowS(),rid=Date.now().toString(36)+Math.random().toString(36).slice(2,6),p={t:"fp-sign",k:"blns",id:rid,it:t.i,n:t.b||"",c:String(t.c||"").slice(0,120),bv:t.v||1,iv:D.i||"",rs:String(rs).slice(0,60),motif:String(motif||"").slice(0,500),mat:Array.isArray(mat)?mat.slice(0,40):[],dl:now.dl,hl:now.hl};
+  const R=recs("blns:"+t.i);R.push({id:rid,dl:now.dl,hl:now.hl,rs:p.rs});if(!LS.set(RK("blns:"+t.i),R)||!enqueue([p])){const el=document.getElementById("blch");if(el)el.insertAdjacentHTML("beforeend",'<p class="ko">Impossible d’enregistrer sur ce téléphone.</p>');return}
+  nav({v:"list"});flush().then(()=>view())}
  function blReport(ix,motif){const t=IT[ix].t,now=nowS(),rid=Date.now().toString(36)+Math.random().toString(36).slice(2,6),p={t:"fp-sign",k:"blrep",id:rid,it:t.i,n:t.b||"",iv:D.i||"",motif:String(motif||"").slice(0,500),dl:now.dl,hl:now.hl};
   const R=recs("blrep:"+t.i);R.push({id:rid,dl:now.dl,hl:now.hl});if(!LS.set(RK("blrep:"+t.i),R)||!enqueue([p])){const el=document.getElementById("blch");if(el)el.insertAdjacentHTML("beforeend",'<p class="ko">Impossible d’enregistrer sur ce téléphone.</p>');return}view();flush().then(()=>view())}
  function blView(){if(!BS)return listView();const t=IT[BS.ix].t;
@@ -531,6 +544,7 @@ async function main(){
   if(V.v==="bls"&&BS){if(BS.step==="form"){BS.open=1;return nav({v:"it",ix:BS.ix})}blBind()}
   if(V.v==="it")blFormBind();
   document.querySelectorAll("[data-it]").forEach(b=>b.onclick=()=>nav({v:"it",ix:+b.dataset.it}));
+  document.querySelectorAll("[data-blns]").forEach(b=>b.onclick=()=>blNsAsk(+b.dataset.blns));
   document.querySelectorAll("[data-bls]").forEach(b=>b.onclick=async()=>{const ix=+b.dataset.bls;b.disabled=true;const P=await blImg(IT[ix].t);b.disabled=false;if(P)blStart(ix);else if(BS&&BS.ix===ix&&BS.noimg)blStart(ix,1);else blChoice(ix)});
   if(document.querySelector("[data-blim]"))fillImgs();
   document.querySelectorAll("[data-pbo]").forEach(b=>b.onclick=()=>{const i=b.dataset.pbo,fm=document.getElementById("pbf"+i);fm.classList.toggle("hide");b.setAttribute("aria-expanded",fm.classList.contains("hide")?"false":"true");if(!fm.classList.contains("hide"))document.getElementById("pbt"+i).focus()});
