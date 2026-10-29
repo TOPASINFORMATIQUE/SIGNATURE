@@ -109,8 +109,11 @@ const SIGW=(()=>{
   let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9;P.forEach(s=>s.forEach(([x,y])=>{if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y}));
   const bw=Math.max(1,x1-x0),bh=Math.max(1,y1-y0),sc=Math.min(296/bw,108/bh,.11),L=(320-bw*sc)/2,T=(140-bh*sc)/2;
   return P.map(s=>{const r=[];s.forEach(([x,y])=>{const q=[Math.round(L+(x-x0)*sc),Math.round(T+(y1-y)*sc)];const l=r[r.length-1];if(!l||l[0]!==q[0]||l[1]!==q[1])r.push(q)});return r}).filter(s=>s.length)}
- // traits → texte compact (même format que le tracé au doigt), allégé si besoin pour tenir dans « max » caractères
- function toSg(S,max){max=max||2200;let th=0,out="";for(;;){const R=S.map(s=>{const r=[];let l=null;s.forEach((q,i)=>{if(!l||Math.hypot(q[0]-l[0],q[1]-l[1])>=th||i===s.length-1){if(!l||q[0]!==l[0]||q[1]!==l[1])r.push(q);l=q}});return r});
+ // traits → texte compact (même format que le tracé au doigt), allégé si besoin pour tenir dans « max » caractères.
+ // Les petites marques (accents, points des i, cédilles, trémas : traits de MARK points au plus) ne sont JAMAIS allégées : la simplification
+ // rogne seulement les traits des lettres (29/10 : sur un nom très long, un accent de 3 points pouvait tomber à 2 et perdre la moitié de sa longueur).
+ const MARK=5;
+ function toSg(S,max){max=max||2200;let th=0,out="";const keep=S.map(s=>s.length<=MARK);for(;;){const R=S.map((s,j)=>{const r=[];let l=null;s.forEach((q,i)=>{if(!l||keep[j]||Math.hypot(q[0]-l[0],q[1]-l[1])>=th||i===s.length-1){if(!l||q[0]!==l[0]||q[1]!==l[1])r.push(q);l=q}});return r});
   out=R.map(s=>s.map(q=>Math.max(0,q[0]).toString(36)+"."+Math.max(0,q[1]).toString(36)).join(",")).join(";");if(out.length<=max||th>40)return out;th+=th?1.5:1.2}}
  function paint(cv,S,lw){const r=cv.getBoundingClientRect(),dp=window.devicePixelRatio||1;if(r.width){const w=Math.round(r.width*dp),h=Math.round(r.height*dp);if(cv.width!==w||cv.height!==h){cv.width=w;cv.height=h}}
   const ctx=cv.getContext("2d"),k=cv.width/320;ctx.clearRect(0,0,cv.width,cv.height);ctx.strokeStyle=INK;ctx.lineWidth=(lw||2.4)*k;ctx.lineCap="round";ctx.lineJoin="round";
