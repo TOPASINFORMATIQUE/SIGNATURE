@@ -4,6 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1565c0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="TOPAS Intervenants">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <title>Espace formateur</title>
 <style>
 :root{--bg:#eef3fa;--card:#fff;--tx:#1f2937;--mu:#5a6275;--br:#d9dce5;--pr:#1e3a8a;--bl:#1565c0;--gr:#16a34a;--sf:#eef4fb;--ok:#157347;--ko:#b42318;--or:#ea580c;--gy:#94a3b8}
@@ -15,6 +23,7 @@ body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 'Segoe UI',syst
 .hd{display:flex;align-items:center;gap:14px;padding:14px 18px;flex-wrap:wrap}
 .hd img{height:52px;background:#fff;border-radius:6px;padding:2px}
 .adv{border-left:1px solid var(--br);padding-left:14px;font-size:14px;line-height:1.45}.adv b{color:var(--pr)}.adv a{color:var(--bl);overflow-wrap:anywhere}
+.inst{margin:10px 0;background:var(--sf);border-radius:12px;padding:10px 12px;font-size:15px}.inst summary{cursor:pointer;font-weight:700;color:var(--pr);min-height:44px;display:flex;align-items:center}.inst p{margin:6px 0}
 .band{background:var(--bl);color:#fff;text-align:center;font-size:15px;font-weight:600;padding:8px}
 .bd{padding:16px 18px 18px}
 .hi{font-size:26px;font-weight:800;color:var(--pr);margin:0 0 2px}
@@ -193,9 +202,26 @@ const PARTL={m:"Matin",a:"Après-midi"},PARTH={m:"9h00 – 12h30",a:"14h00 – 1
 // demi-journées d'une formation (une journée entière = matin + après-midi)
 const SLOTS=f=>DS(f).flatMap(d=>{const h=(f.hf||{})[d];return(h==="m"?["m"]:h==="a"?["a"]:["m","a"]).map(p=>({day:d,part:p}))});
 const strokeCompact=(strokes,max)=>{let th=2,out;for(;;){out=strokes.map(s=>{const r=[];let l=null;s.forEach((q,i)=>{if(!l||Math.hypot(q[0]-l[0],q[1]-l[1])>=th||i===s.length-1){if(!l||q[0]!==l[0]||q[1]!==l[1])r.push(q);l=q}});return r});const str=out.map(s=>s.map(q=>Math.max(0,q[0]).toString(36)+"."+Math.max(0,q[1]).toString(36)).join(",")).join(";");if(str.length<=max||th>40)return str;th+=1.5}};
+// ===== Espace permanent « TOPAS Intervenants » : adresse …/intervenant.html?e=<jeton> sans aucune donnée ; les données à jour sont lues
+// à chaque ouverture par espace_lire (la base ne connaît que l'empreinte du jeton) ; dernière version gardée sur le téléphone pour l'usage hors connexion.
+// Lien réinitialisé ou inconnu : l'espace et sa copie locale sont effacés de ce téléphone (les signatures en attente d'envoi restent).
+const EK="fpiv:E",EDK="fpiv:E:D";let EJ="";
+function espTok(){const q=new URLSearchParams(location.search),e=q.get("e");if(e&&/^[A-Za-z0-9_-]{32,80}$/.test(e)){LS.set(EK,e);return e}
+ if(e!=null)return e;if(!q.get("l")&&!location.hash.replace(/^#/,"")){const s=LS.get(EK,"");if(s&&/^[A-Za-z0-9_-]{32,80}$/.test(s))return s}return ""}
+async function espLoad(tok){let j=null,net=false;
+ try{const ac=window.AbortController?new AbortController():null,tm=setTimeout(()=>{try{ac&&ac.abort()}catch(e){}},9000);
+  const r=await fetch(SBU+"/rest/v1/rpc/espace_lire",{method:"POST",headers:{apikey:SBK,"Content-Type":"application/json"},body:JSON.stringify({p_jeton:tok}),signal:ac?ac.signal:undefined,cache:"no-store"});clearTimeout(tm);j=r.ok?await r.json():null;net=!r.ok&&r.status>=500}
+ catch(e){net=true}
+ if(j&&j.ok&&j.data&&typeof j.data==="object"){const n=new Date(),at=p2(n.getDate())+"/"+p2(n.getMonth()+1)+" à "+p2(n.getHours())+":"+p2(n.getMinutes());LS.set(EDK,{at,tok,D:j.data});return{D:j.data,hors:""}}
+ if(j&&j.ok===false&&j.etat){try{localStorage.removeItem(EDK);localStorage.removeItem(EK)}catch(e){}throw Object.assign(new Error("espace"),{etat:j.etat})}
+ const c=LS.get(EDK,null);if(c&&c.D&&c.tok===tok)return{D:c.D,hors:c.at||""};
+ throw Object.assign(new Error("espace"),{etat:net||!j?"reseau":"erreur"})}
+function espDead(el,etat){const rs=etat==="reseau";document.title="TOPAS Intervenants";el.innerHTML='<div class="fc" id="espko"><h3>'+(rs?"📴 Pas de connexion":"🔒 Ce lien n’est plus actif")+'</h3><p>'+(rs?"Votre espace n’a pas encore été enregistré sur ce téléphone. Connectez-vous à Internet (Wi-Fi ou données mobiles) puis rouvrez-le : il restera ensuite disponible même sans réseau.":"Il a peut-être été réinitialisé (nouveau téléphone, téléphone perdu…) ou n’existe pas. Contactez TOPAS informatique pour recevoir votre nouvelle adresse personnelle : <a href=\"mailto:"+FB_MAIL+"\">"+FB_MAIL+"</a>.")+'</p>'+(rs?'<button type="button" class="btn" onclick="location.reload()">🔄 Réessayer</button>':"")+'</div>'}
 async function main(){
- let D=null,hors="";
- try{D=await lnLoad()||await load(location.hash.replace(/^#/,""));if(D&&D.k==="iv")LS.set("fpiv:D",{at:nowS().dl+" "+nowS().hl,D})}catch(e){
+ let D=null,hors="";EJ=espTok();
+ if(EJ){try{const r=await espLoad(EJ);D=r.D;hors=r.hors}catch(e){espDead(app,e&&e.etat);return}
+  (Array.isArray(D.it)?D.it:[]).forEach(t=>{if(t&&t.pe&&t.i)t.pf="e:"+t.i+":"+(t.v||1)})}
+ else try{D=await lnLoad()||await load(location.hash.replace(/^#/,""));if(D&&D.k==="iv")LS.set("fpiv:D",{at:nowS().dl+" "+nowS().hl,D})}catch(e){
   if(e&&e.lien&&e.lien!=="erreur"){lnDead(app,e.lien);return}
   if(!(e&&e.lien)||e.lien==="erreur"){const c=LS.get("fpiv:D",null);if(c&&c.D&&c.D.k==="iv"){D=c.D;hors=c.at||""}else if(e&&e.lien){lnDead(app,e.lien);return}}}
  if(!D||D.k!=="iv"||!D.f){app.innerHTML='<div class="fc"><h3>Lien incomplet</h3><p>Ce lien est incomplet ou a été modifié. Merci de rouvrir le lien reçu par e-mail, tel quel, ou de contacter l’organisme de formation.</p></div>';return}
@@ -234,13 +260,16 @@ async function main(){
  const lnk=t=>esc(t).replace(/(https?:\/\/[^\s<]+)/g,u=>`<a href="${u}" target="_blank" rel="noopener">formulaire en ligne</a>`).replace(/([\w.+-]+@[\w-]+\.[\w.-]+)/g,m=>`<a href="mailto:${m}">${m}</a>`);
  const foot=()=>`<div class="ft">${esc(G[0]||"")}${G[1]?" · ☎ "+esc(G[1]):""}${G[2]?" · ✉ <a href=\"mailto:"+esc(G[2])+"\">"+esc(G[2])+"</a>":""}${G[3]?" · "+esc(G[3]):""}</div>${D.rc?`<div class="ft">${lnk(D.rc)}</div>`:""}`;
  const top=()=>`<div class="sh"><div class="hd"><img src="logo.jpg" alt="TOPAS informatique"><div class="adv"><b>${ESP}</b>${D.m?`<br>✉️ <a href="mailto:${esc(D.m)}">${esc(D.m)}</a>`:""}${G[1]?`<br>☎ <a href="tel:${esc(G[1].replace(/\s/g,""))}">${esc(G[1])}</a>`:""}</div></div><div class="band">🔒 Votre lien personnel – ne le partagez pas</div>`;
- const horsH=()=>hors?`<div class="qb qw" role="status"><b>📴 Pas de connexion</b><span>Dernière version enregistrée le ${esc(hors)}. Vos signatures partiront dès que la connexion reviendra.</span></div>`:"";
+ const horsH=()=>hors?(EJ?`<div class="qb qw" id="eshors" role="status"><b>📴 Données du ${esc(hors)} — hors connexion</b><span>Vos signatures partiront toutes seules dès que la connexion reviendra.</span></div>`:`<div class="qb qw" role="status"><b>📴 Pas de connexion</b><span>Dernière version enregistrée le ${esc(hors)}. Vos signatures partiront dès que la connexion reviendra.</span></div>`):"";
+ // « Ajouter à l'écran d'accueil » : rappel discret tant que l'espace n'est pas ouvert comme une application
+ const standalone=()=>{try{return matchMedia("(display-mode: standalone)").matches||navigator.standalone===true}catch(e){return false}};
+ const instH=()=>standalone()||LS.get("fpiv:inst",0)?"":`<details class="inst" id="inst"><summary>📲 Garder l’espace sur votre téléphone</summary><p><b>iPhone</b> : touchez « Partager » <span aria-hidden="true">⬆</span> puis « Sur l’écran d’accueil ».<br><b>Android</b> : touchez « ⋮ » puis « Installer l’application » (ou « Ajouter à l’écran d’accueil »).</p><p>L’icône « TOPAS Intervenants » s’ouvre en plein écran, toujours à jour, et même sans réseau.</p><button type="button" class="btn" data-insok>C’est fait</button></details>`;
 
  // ---- 1. liste
  function listView(){const V2=D.v;
   const L=(t,c,arr,open,empty,k)=>`<section class="sec" id="s-${k}" style="--c:${c}"><details ${open?"open":""}><summary class="lh">${t} <span class="n">${arr.length}</span></summary>${arr.map(row).join("")||`<div class="empty">${empty}</div>`}</details></section>`;
   const LI=(t,c,arr,open,empty,k)=>`<section class="sec" id="s-${k}" style="--c:${c}"><details ${open?"open":""}><summary class="lh">${t} <span class="n">${arr.length}</span></summary>${arr.map(itRow).join("")||`<div class="empty">${empty}</div>`}</details></section>`,G3=itGroups();
-  return top()+`<div class="bd"><div class="hi">Bonjour${pr?" "+esc(pr):""} 👋</div><p class="upd">Mis à jour le <b>${esc(fds(D.u||T))}</b>. Si le planning change, un nouveau lien vous est envoyé : utilisez toujours le plus récent.</p>
+  return top()+`<div class="bd"><div class="hi">Bonjour${pr?" "+esc(pr):""} 👋</div><p class="upd">Mis à jour le <b>${esc(fds(D.u||T))}</b>. ${EJ?"Votre espace se met à jour tout seul : gardez ce lien (ou l’icône sur votre écran d’accueil).":"Si le planning change, un nouveau lien vous est envoyé : utilisez toujours le plus récent."}</p>${EJ?instH():""}
   ${shF?`<div class="kpi"><div><b>${nUp}</b><span>À venir</span></div><div><b>${nMo}</b><span>Ce mois-ci <small>(jour${nMo>1?"s":""})</small></span></div><div><b>${String(hUp).replace(".",",")} h</b><span>Heures planifiées</span></div></div>`:`<div class="kpi"><div><b>${G3.auj.length}</b><span>Aujourd’hui</span></div><div><b>${G3.ven.length}</b><span>À venir</span></div><div><b>${G3.sig.length}</b><span>Signées</span></div></div>`}</div></div>
   <div id="qbn">${bannerHtml()}</div>${horsH()}
   ${shF?`${shT?'<h2 class="secT">🎓 Mes formations</h2>':""}
@@ -262,12 +291,13 @@ async function main(){
   async put(k,v){const d=await this.open();if(!d)return false;return new Promise(res=>{try{const x=d.transaction("img","readwrite");x.objectStore("img").put(v,k);x.oncomplete=()=>res(true);x.onerror=()=>res(false)}catch(e){res(false)}})}};
  const IMG={};
  async function blImg(t){if(!t||!t.pf)return null;if(IMG[t.pf])return IMG[t.pf];const c=await IDB.get(t.pf);if(Array.isArray(c)&&c.length)return IMG[t.pf]=c;
-  try{const r=await fetch(SBU+"/rest/v1/rpc/lien_lire",{method:"POST",headers:{apikey:SBK,"Content-Type":"application/json"},body:JSON.stringify({p_id:t.pf})}),j=r.ok?await r.json():null,P=j&&j.ok&&j.data&&Array.isArray(j.data.p)?j.data.p.filter(x=>typeof x==="string"&&x.length>100):null;
+  try{let P=null;if(t.pf.startsWith("e:")){const r=await fetch(SBU+"/rest/v1/rpc/espace_doc",{method:"POST",headers:{apikey:SBK,"Content-Type":"application/json"},body:JSON.stringify({p_jeton:EJ,p_itv:t.i})}),j=r.ok?await r.json():null;let a=null;try{a=j&&j.ok?JSON.parse(j.b64):null}catch(e){}P=Array.isArray(a)?a.filter(x=>typeof x==="string"&&x.length>100):null}
+   else{const r=await fetch(SBU+"/rest/v1/rpc/lien_lire",{method:"POST",headers:{apikey:SBK,"Content-Type":"application/json"},body:JSON.stringify({p_id:t.pf})}),j=r.ok?await r.json():null;P=j&&j.ok&&j.data&&Array.isArray(j.data.p)?j.data.p.filter(x=>typeof x==="string"&&x.length>100):null}
    if(P&&P.length){IMG[t.pf]=P;await IDB.put(t.pf,P);return P}}catch(e){}return null}
  const imgBox=ix=>`<div class="blim" data-blim="${ix}"><p class="mu">⏳ Chargement du bon de livraison…</p></div>`;
  async function fillImgs(){for(const el of document.querySelectorAll("[data-blim]")){const ix=+el.dataset.blim,x=IT[ix];if(!x)continue;const P=await blImg(x.t);if(!document.body.contains(el))continue;
   el.innerHTML=P?P.map((b,i)=>`<button type="button" class="blpg" data-zoom="${ix}:${i}" aria-label="Agrandir la page ${i+1} du bon"><img alt="Bon de livraison ${esc(x.t.nm||x.t.b||"")}, page ${i+1}" src="data:image/jpeg;base64,${b}"></button>`).join("")+'<p class="mu" style="margin:0">🔍 Touchez le bon pour l’agrandir (zoom avec deux doigts).</p>'
-   :`<div class="qb qw" role="status"><b>⚠ Le bon de livraison n’est pas disponible sur ce téléphone</b><span>${x.t.pf?"Il n’a pas encore pu être téléchargé (pas de connexion ?).":"TOPAS informatique ne l’a pas encore transmis : demandez un nouvel envoi de votre espace."}</span>${x.t.pf?'<button type="button" class="btn" data-blretry>🔄 Réessayer</button>':""}</div>`;
+   :`<div class="qb qw" role="status"><b>⚠ Le bon de livraison n’est pas disponible sur ce téléphone</b><span>${x.t.pf?"Il n’a pas encore pu être téléchargé (pas de connexion ?).":(EJ?"TOPAS informatique ne l’a pas encore transmis : il apparaîtra ici tout seul dès qu’il le sera.":"TOPAS informatique ne l’a pas encore transmis : demandez un nouvel envoi de votre espace.")}</span>${x.t.pf?'<button type="button" class="btn" data-blretry>🔄 Réessayer</button>':""}</div>`;
   el.querySelectorAll("[data-zoom]").forEach(b=>b.onclick=()=>{const [i,k]=b.dataset.zoom.split(":").map(Number);zoom(IMG[IT[i].t.pf]||[],k)});const rt=el.querySelector("[data-blretry]");if(rt)rt.onclick=()=>{el.innerHTML='<p class="mu">⏳ Nouvel essai…</p>';fillImgs()}}}
  function zoom(P,k){let z=100;const o=document.createElement("div");o.className="zov";o.setAttribute("role","dialog");o.setAttribute("aria-label","Bon de livraison agrandi");
   o.innerHTML=`<div class="zbar"><button type="button" class="btn" data-zm="-1" aria-label="Réduire">－</button><span>100 %</span><button type="button" class="btn" data-zm="1" aria-label="Agrandir">＋</button><button type="button" class="btn p" data-zx>✕ Fermer</button></div><div class="zsc">${P.map(b=>`<img alt="Bon de livraison" src="data:image/jpeg;base64,${b}" style="width:100%">`).join("")}</div>`;
@@ -422,6 +452,9 @@ async function main(){
  }
  try{history.replaceState({v:{v:"list"}},"")}catch(e){}
  view();flush();setTimeout(()=>{prefetch().catch(()=>{})},400);window.addEventListener("online",()=>prefetch().catch(()=>{}));
+ if(EJ){window.addEventListener("online",async()=>{if(!hors||V.v!=="list")return;try{const r=await espLoad(EJ);if(!r.hors){D=r.D;location.reload()}}catch(e){}});
+  document.addEventListener("click",e=>{if(e.target.closest("[data-insok]")){LS.set("fpiv:inst",1);const i=document.getElementById("inst");if(i)i.remove()}});
+  try{if("serviceWorker" in navigator&&location.protocol==="https:")navigator.serviceWorker.register("sw.js").catch(()=>{})}catch(e){}}
 }
 main();
 })();
