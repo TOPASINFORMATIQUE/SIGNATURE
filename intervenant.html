@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
 <link rel="manifest" href="manifest.webmanifest">
-<meta name="theme-color" content="#1565c0">
+<meta name="theme-color" content="#0C4FA0">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -14,8 +14,16 @@
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <title>Espace formateur</title>
 <style>
-:root{--ds-orange:#ea580c;--ds-orange-d:#c2410c;--ds-p-orange:#fff4e8;--ds-b-orange:#fed7aa;--ds-green-d:#15803d;--ds-on:#ffffff;--ds-tx:#1e293b;--ds-tx2:#334155;--ds-mu:#64748b;--ds-mu2:#94a3b8;--ds-card:#ffffff;--ds-line:#e5e7eb;--ds-r-tile:12px;--ds-r-btn:10px;--ds-r-pill:999px;--ds-sh:0 1px 3px rgba(15,23,42,.06),0 1px 2px rgba(15,23,42,.04);--bg:#eef3fa;--card:#fff;--tx:#1f2937;--mu:#5a6275;--br:#d9dce5;--pr:#1e3a8a;--bl:#1565c0;--gr:#16a34a;--sf:#eef4fb;--ok:#157347;--ko:#b42318;--or:#ea580c;--gy:#94a3b8}
-@media (prefers-color-scheme:dark){:root{--ds-p-orange:#2d2116;--ds-card:#1a1f2a;--ds-tx:#e8ebf2;--ds-tx2:#cbd5e1;--ds-mu:#9aa3b5;--ds-line:#2b3240;--bg:#10131a;--card:#1a1e29;--tx:#e8eaf0;--mu:#a0a7b8;--br:#2c3242;--pr:#9db4ff;--bl:#1e4f9a;--gr:#22c55e;--sf:#1f2636;--ok:#5fd08a;--ko:#ff8a7a;--or:#fb923c;--gy:#64748b}}
+:root{/* Jetons --ds-* : copie EXACTE de ceux de TOPAS Formation (même palette que l'application et les mails) ; les anciens noms (--bg, --bl…) pointent dessus */
+ --ds-pri:#4f46e5;--ds-pri-d:#4338ca;--ds-pri-l:#eef2ff;--ds-navy:#1e3a8a;--ds-topas:#0C4FA0;--ds-sky:#1565c0;--ds-night:#101b45;--ds-night-2:#1a2860;
+ --ds-green:#16a34a;--ds-green-d:#15803d;--ds-orange:#ea580c;--ds-orange-d:#c2410c;--ds-red:#dc2626;--ds-red-d:#b42318;--ds-violet:#7c3aed;--ds-pink:#db2777;--ds-amber:#d97706;
+ --ds-p-blue:#eef4ff;--ds-p-green:#eafaf0;--ds-p-orange:#fff4e8;--ds-p-violet:#f3f0ff;--ds-p-pink:#fdf0f6;--ds-p-grey:#f1f5f9;--ds-p-red:#fef2f2;--ds-p-amber:#fffbeb;
+ --ds-b-blue:#c7d7fb;--ds-b-green:#bfe8cf;--ds-b-orange:#fed7aa;--ds-b-red:#fecaca;--ds-b-amber:#fde68a;--ds-b-violet:#ddd6fe;--ds-on:#ffffff;
+ --ds-tx:#1e293b;--ds-tx2:#334155;--ds-mu:#64748b;--ds-mu2:#94a3b8;--ds-bg:#f5f7fc;--ds-card:#ffffff;--ds-line:#e5e7eb;--ds-line2:#f1f5f9;
+ --ds-r-card:16px;--ds-r-tile:12px;--ds-r-btn:10px;--ds-r-pill:999px;--ds-sh:0 1px 3px rgba(15,23,42,.06),0 1px 2px rgba(15,23,42,.04);--ds-sh-h:0 6px 18px rgba(15,23,42,.08);
+ --ip-grad:linear-gradient(125deg,var(--ds-topas),var(--ds-violet));
+ --bg:var(--ds-bg);--card:var(--ds-card);--tx:var(--ds-tx);--mu:var(--ds-mu);--br:var(--ds-line);--pr:var(--ds-navy);--bl:var(--ds-sky);--gr:var(--ds-green);--sf:var(--ds-p-blue);--ok:var(--ds-green-d);--ko:var(--ds-red-d);--or:var(--ds-orange);--gy:var(--ds-mu2)}
+@media (prefers-color-scheme:dark){:root{--ds-b-violet:#3b2f63;--ds-card:#1a1f2a;--ds-tx:#e8ebf2;--ds-tx2:#cbd5e1;--ds-mu:#9aa3b5;--ds-line:#2b3240;--ds-line2:#232a36;--ds-bg:#11141b;--ds-p-blue:#1d2740;--ds-p-green:#16291f;--ds-p-orange:#2d2116;--ds-p-violet:#241d3a;--ds-p-pink:#2d1a26;--ds-p-grey:#222a36;--ds-p-red:#2d1a1a;--ds-p-amber:#2b2615;--ds-pri-l:#23264a;--pr:#9db4ff;--bl:#1e4f9a;--gr:#22c55e;--ok:#5fd08a;--ko:#ff8a7a;--or:#fb923c;--gy:#64748b}}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 'Segoe UI',system-ui,-apple-system,Roboto,Arial,sans-serif}
 .w{max-width:760px;margin:0 auto;padding:16px 14px 40px}
@@ -128,13 +136,136 @@ button:focus-visible,a:focus-visible,summary:focus-visible,textarea:focus-visibl
 @media (prefers-color-scheme:dark){.blch{background:#3a2412;color:#fed7aa}}
 .rsv{flex-basis:100%;white-space:pre-wrap;background:#fff7ed;border-left:4px solid var(--or);padding:8px 10px;border-radius:8px;color:#7c2d12}
 .ureg details{background:#fff7ed;border-radius:14px}@media (prefers-color-scheme:dark){.ureg details{background:#2a1a0e}}.ureg .lh{color:var(--or)}.ulate{display:block;color:var(--or);font-weight:700;font-size:15px;margin-top:2px}.urow{display:flex;align-items:center;gap:10px;justify-content:space-between;min-height:64px}.urow .ul{display:flex;flex-direction:column;min-width:0;flex:1}.urow .ul b{font-size:16px;overflow-wrap:anywhere}.urow .ul b.uc{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;overflow-wrap:normal;max-width:100%}
-.rmk{margin:14px 0 0}.rmsw{display:flex;align-items:center;gap:12px;min-height:48px;padding:4px 2px;font-size:17px;font-weight:800;color:var(--ds-tx);cursor:pointer}.rmsw input{position:absolute;opacity:0;width:1px;height:1px;margin:0}
-.rmtr{position:relative;flex:none;width:54px;height:32px;border-radius:var(--ds-r-pill);background:var(--ds-mu2);transition:background .15s}.rmth{position:absolute;top:3px;left:3px;width:26px;height:26px;border-radius:50%;background:var(--ds-on);box-shadow:var(--ds-sh);transition:left .15s}
-.rmsw input:checked+.rmtr{background:var(--ds-orange)}.rmsw input:checked+.rmtr .rmth{left:25px}.rmsw input:focus-visible+.rmtr{outline:3px solid var(--ds-orange-d);outline-offset:2px}
-.rmz{margin-top:8px;padding:12px;background:var(--ds-p-orange);border:1px solid var(--ds-b-orange);border-radius:var(--ds-r-tile)}.rml{display:block;font-size:16px;font-weight:700;color:var(--ds-orange-d);margin:0 0 6px;line-height:1.35}
 textarea.rmt{display:block;width:100%;box-sizing:border-box;margin:0;min-height:calc(5.8em + 22px);font:inherit;font-size:16px;line-height:1.45;padding:10px 12px;border:1px solid var(--ds-b-orange);border-radius:var(--ds-r-btn);background:var(--ds-card);color:var(--ds-tx);resize:none;overflow:hidden}
-@media (prefers-color-scheme:dark){.rml{color:var(--ds-b-orange)}}.urow .m{font-size:15px;margin-top:2px;overflow-wrap:anywhere}.utag{flex:none;border-radius:999px;padding:5px 12px;font-size:15px;font-weight:800;letter-spacing:.2px}.utag.ub{background:#fff1e6;color:#c2410c;border:1px solid #fdba74}.utag.uf{background:#e8f0fb;color:#1e4f9a;border:1px solid #93b4e0}
+.urow .m{font-size:15px;margin-top:2px;overflow-wrap:anywhere}
 .nsov{position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:60;display:flex;align-items:flex-end;justify-content:center;padding:12px}.nsbx{background:var(--card);color:var(--tx);border-radius:18px;padding:16px;width:100%;max-width:520px;max-height:92vh;overflow:auto}.nsbx h3{margin:0 0 6px;font-size:19px}.nsr{display:grid;gap:8px;margin-top:10px}.nsrb[aria-checked="true"]{background:var(--pr);color:#fff;border-color:var(--pr)}
+/* ===== Présentation « maquette » (29/10) : jetons --ds-* de TOPAS Formation, dégradé de marque à 125°, contenu ≥ 16 px, cibles ≥ 44 px ===== */
+body{background:var(--ds-bg);color:var(--ds-tx)}
+body.ip-nb{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
+.ip-hero,.ip-hd{margin:-16px -14px 16px;background:var(--ip-grad);color:var(--ds-on);box-shadow:0 8px 22px rgba(12,79,160,.22)}
+.ip-hero{padding:14px 18px 22px;border-radius:0 0 26px 26px}
+.ip-hd{padding:12px 18px 20px;border-radius:0 0 22px 22px}
+.ip-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.ip-logo{display:flex;align-items:center;justify-content:center;width:78px;height:42px;flex:none;background:var(--ds-on);border-radius:10px;padding:4px 7px}
+.ip-logo img{display:block;max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain}
+.ip-net{font-size:14px;font-weight:700;white-space:nowrap;padding:6px 12px;border-radius:var(--ds-r-pill);background:rgba(255,255,255,.18)}
+.ip-net.off{background:rgba(15,23,42,.3)}
+.ip-me{display:flex;align-items:center;gap:14px;margin-top:18px}
+.ip-av{width:50px;height:50px;flex:none;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;letter-spacing:.02em;color:var(--ds-on);background:linear-gradient(135deg,var(--a),var(--b));border:2.5px solid var(--ds-on);box-shadow:0 3px 10px rgba(15,23,42,.22)}
+.ip-mt{min-width:0}
+.ip-hi.hi{font-size:22px;font-weight:800;line-height:1.2;margin:0;color:var(--ds-on);overflow-wrap:anywhere}
+.ip-n{font-size:14px;margin-top:2px;opacity:.95}
+.ip-gs{display:flex;flex-direction:column;gap:13px;margin:14px 0}
+.ip-g{background:var(--gp);border:1.5px solid var(--gb);border-radius:20px;padding:2px 10px}
+.ip-g>details{margin:0}.ip-g>details[open]{padding-bottom:10px}
+.ip-g summary.lh{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:48px;margin:0;padding:4px 2px 2px 4px;font-size:13px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--gt)}
+.ip-g summary.lh::-webkit-details-marker{display:none}
+.ip-gt{min-width:0}
+.ip-g .ip-gn.n{min-width:26px;height:26px;margin:0;padding:0 7px;border-radius:13px;display:inline-flex;align-items:center;justify-content:center;background:var(--gc);color:var(--ds-on);font-size:13px;font-weight:800;letter-spacing:0;flex:none}
+.ip-gx{margin:0 4px 2px;font-size:14px;color:var(--ds-mu)}
+.ip-g-reg{--gc:var(--ds-orange);--gt:var(--ds-orange-d);--gp:var(--ds-p-orange);--gb:var(--ds-b-orange)}
+.ip-g-auj{--gc:var(--ds-topas);--gt:var(--ds-topas);--gp:var(--ds-p-blue);--gb:var(--ds-b-blue)}
+.ip-g-ven{--gc:var(--ds-violet);--gt:var(--ds-violet);--gp:var(--ds-p-violet);--gb:var(--ds-b-violet)}
+.ip-g-sig{--gc:var(--ds-green);--gt:var(--ds-green-d);--gp:var(--ds-p-green);--gb:var(--ds-b-green)}
+.ip-g-arc{--gc:var(--ds-mu);--gt:var(--ds-mu);--gp:var(--ds-p-grey);--gb:var(--ds-line)}
+@media (prefers-color-scheme:dark){.ip-g[class]{--gt:var(--ds-tx2)}}
+.row.ip-row{display:flex;align-items:center;gap:10px;width:100%;min-height:58px;margin:8px 0 0;padding:8px 12px 8px 4px;background:var(--ds-card);color:var(--ds-tx);border:0;border-radius:15px;box-shadow:0 1px 2px rgba(15,23,42,.06),0 3px 10px rgba(15,23,42,.06);text-align:left;font-weight:400;cursor:pointer}
+.ip-row .ip-d{width:46px;flex:none;display:flex;flex-direction:column;align-items:center;line-height:1.15}
+.ip-row .ip-d b{font-size:15px;font-weight:800}
+.ip-row .ip-d small{font-size:11px;font-variant:small-caps;letter-spacing:.03em;color:var(--ds-mu)}
+.ip-row .ip-c{flex:1;min-width:0;display:flex;flex-direction:column}
+.ip-row .ip-c b.uc{font-size:15.5px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.ip-row .ip-s.m{font-size:13px;color:var(--ds-mu);margin:1px 0 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;overflow-wrap:normal}
+.ip-row .ulate{font-size:13px;font-weight:800;color:var(--ds-orange-d);margin:1px 0 0}
+@media (prefers-color-scheme:dark){.ip-row .ulate{color:var(--ds-b-orange)}}
+.ip-r{flex:none;display:flex;align-items:center;gap:6px}
+.utag.ip-tag{border:0;border-radius:var(--ds-r-pill);padding:4px 9px;font-size:11.5px;font-weight:800;letter-spacing:.02em;line-height:1.2;color:var(--ds-on)}
+.utag.ip-tag.ub{background:var(--ds-topas)}.utag.ip-tag.uf{background:var(--ds-violet)}
+.ip-st{font-size:18px;line-height:1;min-width:20px;text-align:center}
+.ip-empty{margin:14px 0}
+.ip-ft{margin-top:26px}.ip-ft p{margin:3px 0}
+.ip-ft .band{background:none;color:var(--ds-mu);padding:0;font-size:14px;font-weight:600}
+.ip-nav{position:fixed;left:0;right:0;bottom:0;z-index:40;display:flex;background:var(--ds-card);border-top:1px solid var(--ds-line);padding-bottom:env(safe-area-inset-bottom,0px);box-shadow:0 -2px 10px rgba(15,23,42,.05)}
+.ip-nav button{flex:1;height:69px;min-height:69px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:0;border-radius:0;background:none;color:var(--ds-mu);font-size:14px;font-weight:700;padding:6px 4px}
+.ip-nav button i{font-style:normal;font-size:22px;line-height:1}
+.ip-nav button.on{color:var(--ds-topas);box-shadow:inset 0 3px 0 var(--ds-topas)}
+@media (prefers-color-scheme:dark){.ip-nav button.on{color:var(--ds-b-blue);box-shadow:inset 0 3px 0 var(--ds-b-blue)}}
+.ip-flash{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:45;max-width:calc(100% - 32px);padding:10px 16px;border-radius:12px;background:var(--ds-tx);color:var(--ds-card);font-size:15px;font-weight:600;box-shadow:var(--ds-sh-h)}
+.ip-sheet .nsbx{padding:18px}.ip-sheet h3{font-size:19px}.ip-ad{margin:4px 0 10px;font-size:16px}
+.ip-back{min-height:44px;padding:6px 14px 6px 10px;border:0;border-radius:var(--ds-r-pill);background:rgba(255,255,255,.2);color:var(--ds-on);font-size:16px;font-weight:700}
+.ip-k{margin-top:12px;font-size:13px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;opacity:.92}
+.ip-num{font-size:23px;font-weight:800;line-height:1.2;overflow-wrap:anywhere}.ip-num.ip-num2{font-size:20px}
+.ip-sub{font-size:15px;margin-top:3px;opacity:.95;overflow-wrap:anywhere}
+.ip-tt{margin:12px 0 0;font-size:21px;font-weight:800;line-height:1.2;color:var(--ds-on)}
+.ip-sub2{font-size:14px;margin-top:3px;opacity:.95;overflow-wrap:anywhere}
+.ip-card{background:var(--ds-card);border-radius:var(--ds-r-card);box-shadow:var(--ds-sh-h);padding:14px;margin:0 0 14px}
+.ip-h{margin:0 0 10px;font-size:13px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--ds-tx2)}
+.ip-card .blim{margin:0}.ip-card .blpg,.ip-sg .blpg{position:relative;border-radius:12px;border-color:var(--ds-line)}
+.ip-zp{position:absolute;right:10px;bottom:10px;padding:7px 12px;border-radius:var(--ds-r-pill);background:rgba(15,23,42,.78);color:var(--ds-on);font-size:14px;font-weight:700;pointer-events:none}
+.ip-sum{background:var(--ds-p-blue);border:1.5px solid var(--ds-b-blue);border-radius:var(--ds-r-card);padding:12px 16px 14px;margin:0 0 16px}
+.ip-sum .ip-h{color:var(--ds-topas)}
+@media (prefers-color-scheme:dark){.ip-sum .ip-h{color:var(--ds-b-blue)}}
+.ip-kv{display:flex;justify-content:space-between;align-items:baseline;gap:14px;padding:8px 0;border-top:1px solid var(--ds-b-blue);font-size:16px}
+.ip-kv:first-of-type{border-top:0}
+.ip-kv>span{flex:none;font-size:14px;color:var(--ds-mu)}
+.ip-kv>b{text-align:right;overflow-wrap:anywhere;min-width:0}
+.ip-cta{display:flex;width:100%;min-height:58px;align-items:center;justify-content:center;gap:8px;margin:4px 0 0;border:0;border-radius:16px;background:var(--ip-grad);color:var(--ds-on);font-size:17px;font-weight:800;box-shadow:0 8px 20px rgba(12,79,160,.28);text-decoration:none}
+.ip-cta[disabled]{opacity:.6}
+.ip-b2{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+.ip-btn2{display:flex;width:100%;min-height:52px;align-items:center;justify-content:center;gap:8px;border:1.5px solid var(--ds-line);border-radius:14px;background:var(--ds-card);color:var(--ds-tx);font-size:16px;font-weight:700;text-decoration:none}
+.ip-map{margin-top:10px;min-height:48px}
+.ip-sg{background:var(--ds-card);border-radius:var(--ds-r-card);box-shadow:var(--ds-sh-h);padding:16px 14px;margin:0 0 14px}
+.ip-lead{margin:0 0 12px;font-size:16px;color:var(--ds-tx2)}
+.ip-fd{margin:0 0 14px}
+.ip-lb{display:block;margin:0 0 6px;font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--ds-mu)}
+.ip-in{display:block;width:100%;min-height:50px;padding:10px 12px;border:1.5px solid var(--ds-line);border-radius:12px;background:var(--ds-card);color:var(--ds-tx);font:inherit;font-size:16px;font-weight:400}
+.ip-in:focus{outline:none;border-color:var(--ds-topas);box-shadow:0 0 0 3px rgba(12,79,160,.16)}
+.ip-2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.ip-sg .sgw-tabs{background:var(--ds-line2);border-radius:16px;padding:4px;gap:4px;margin:4px 0 8px}
+.ip-sg .sgw-tb{min-height:46px;border:0;border-radius:12px;background:transparent;color:var(--ds-mu);font-size:15px}
+.ip-sg .sgw-tb[aria-selected="true"]{border:0;background:var(--ds-card);color:var(--ds-topas);box-shadow:0 1px 3px rgba(15,23,42,.12),0 2px 8px rgba(15,23,42,.06)}
+@media (prefers-color-scheme:dark){.ip-sg .sgw-tb[aria-selected="true"]{color:var(--ds-b-blue)}}
+.ip-sg .sgw{position:relative}
+.ip-sg .sgw-pad,.ip-sg .sgw-pad.dr{border:2px dashed var(--ds-b-blue);border-radius:14px;background:var(--ds-on)}
+.ip-sg .sgw-act{position:absolute;right:8px;bottom:8px;margin:0}
+.ip-sg .sgw-act button{min-height:44px;border-radius:var(--ds-r-pill);border:1px solid var(--ds-b-blue);background:var(--ds-on);color:var(--ds-topas);font-size:15px}
+.ip-opt{margin:14px 0 0;padding:2px 14px;border:1.5px solid var(--ds-line);border-radius:16px;background:var(--ds-card);transition:background .15s,border-color .15s}
+.ip-opt.on{background:var(--op);border-color:var(--ob);padding-bottom:14px}
+.ip-rem{--sc:var(--ds-orange);--op:var(--ds-p-orange);--ob:var(--ds-b-orange);--ot:var(--ds-orange-d)}
+.ip-mat{--sc:var(--ds-pink);--op:var(--ds-p-pink);--ob:var(--ds-b-red);--ot:var(--ds-pink)}
+.ip-mat.on{border-color:var(--ds-b-red);border-color:color-mix(in srgb,var(--ds-pink) 30%,var(--ds-card))}
+@media (prefers-color-scheme:dark){.ip-rem{--ot:var(--ds-b-orange)}}
+.ip-ot{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:52px;margin:0;cursor:pointer}
+.ip-otl{font-size:14px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--ds-tx2)}
+.ip-opt.on .ip-otl{color:var(--ot)}
+.ip-ot input{position:absolute;opacity:0;width:1px;height:1px;margin:0}
+.ip-sw{position:relative;flex:none;width:52px;height:30px;border-radius:var(--ds-r-pill);background:var(--ds-mu2);transition:background .15s}
+.ip-sw>span{position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:var(--ds-on);box-shadow:0 1px 3px rgba(15,23,42,.25);transition:left .15s}
+.ip-ot input:checked+.ip-sw{background:var(--sc)}.ip-ot input:checked+.ip-sw>span{left:25px}
+.ip-ot input:focus-visible+.ip-sw{outline:3px solid var(--ot);outline-offset:2px}
+.ip-oh{display:block;margin:2px 0 8px;font-size:13.5px;font-weight:700;color:var(--ot)}
+.ip-mat .ip-oh{color:var(--ds-tx2)}
+.ip-opt textarea.rmt{border-color:var(--ob)}
+.ip-it{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 8px;padding:6px 6px 6px 12px;border-radius:12px;background:var(--ds-card);box-shadow:var(--ds-sh)}
+.ip-it b{min-width:0;font-size:15px;font-weight:800;overflow-wrap:anywhere}
+.ip-qty{display:flex;align-items:center;gap:4px;flex:none}
+.ip-qty button{width:44px;min-width:44px;height:44px;min-height:44px;padding:0;border:1.5px solid var(--ds-line);border-radius:12px;background:var(--ds-card);color:var(--ds-tx);font-size:20px;font-weight:800}
+.ip-qty output{min-width:30px;text-align:center;font-size:17px;font-weight:800}
+.ip-mk{display:block;margin:12px 0 6px;font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--ds-mu)}
+.ip-ms{display:flex;flex-wrap:wrap;gap:8px}
+.ip-ms button{min-height:44px;padding:6px 14px;border:1.5px solid var(--ds-line);border-radius:var(--ds-r-pill);background:var(--ds-card);color:var(--ds-tx);font-size:15px;font-weight:700}
+.ip-ma{display:flex;gap:8px}.ip-ma .ip-in{flex:1;min-width:0}
+.ip-madd{flex:none;width:54px;min-height:50px;padding:0;border:0;border-radius:12px;background:var(--ds-pink);color:var(--ds-on);font-size:24px;font-weight:800}
+.ip-done{margin:0 0 14px;padding:16px;border:1.5px solid var(--ds-b-green);border-radius:20px;background:var(--ds-p-green)}
+.ip-done h2{margin:0 0 8px;font-size:20px;line-height:1.25;color:var(--ds-green-d)}.ip-done.pend h2{color:var(--ds-orange-d)}
+@media (prefers-color-scheme:dark){.ip-done h2{color:var(--ds-b-green)}.ip-done.pend h2{color:var(--ds-b-orange)}}
+.ip-done .ip-kv,.ip-sg .ip-kv{border-top-color:var(--ds-line)}
+.ip-proof{margin:10px 0 0;font-size:14px;color:var(--ds-green-d)}
+@media (prefers-color-scheme:dark){.ip-proof{color:var(--ds-b-green)}}
+.ip-ml{margin:4px 0 0;padding-left:22px;font-size:16px}.ip-ml li{margin:2px 0}
+.ip-rv{flex-basis:100%;margin:4px 0 0;padding:8px 10px;border-radius:10px;background:var(--ds-p-orange);color:var(--ds-tx);white-space:pre-wrap;font-size:16px;text-align:left}
+.ip-sg .sgprev{border-color:var(--ds-line)}
+.ip-rep{margin-top:12px}
 </style>
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
@@ -272,6 +403,11 @@ const progH=f=>`${f.ob?`<h4>Objectif</h4><div>${esc(f.ob)}</div>`:""}<h4 style="
 const LS={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){return false}}};
 const p2=n=>String(n).padStart(2,"0"),nowS=()=>{const n=new Date();return{dl:n.getFullYear()+"-"+p2(n.getMonth()+1)+"-"+p2(n.getDate()),hl:p2(n.getHours())+":"+p2(n.getMinutes())}};
 const dm=d=>{const x=new Date(d+"T12:00:00");return isNaN(x)?d:p2(x.getDate())+"/"+p2(x.getMonth()+1)};
+// couleur stable de la personne : MÊME calcul que TOPAS Formation (nrm / ITVPAL / itvPal), l'avatar a la couleur de sa carte dans Interventions
+const nrm=x=>String(x||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9 ]+/g," ").replace(/\s+/g," ").trim();
+const ITVPAL=[["#3b82f6","#eaf2ff","#d6e6ff"],["#14b8a6","#e6f8f5","#c9efe9"],["#f97316","#fff1e6","#ffdfc6"],["#8b5cf6","#f1ecff","#e1d6ff"],["#f43f5e","#ffeaee","#ffd3dc"]];
+function itvPal(nom){let h=0;for(const c of nrm(nom))h=(h*31+c.charCodeAt(0))>>>0;return ITVPAL[h%ITVPAL.length]}
+const shade=(hx,k)=>{const n=parseInt(String(hx).slice(1),16);return "#"+[16,8,0].map(b=>Math.round(((n>>b)&255)*(1-k)).toString(16).padStart(2,"0")).join("")};
 const PARTL={m:"Matin",a:"Après-midi"},PARTH={m:"9h00 – 12h30",a:"14h00 – 17h30"};
 // demi-journées d'une formation (une journée entière = matin + après-midi)
 const SLOTS=f=>DS(f).flatMap(d=>{const h=(f.hf||{})[d];return(h==="m"?["m"]:h==="a"?["a"]:["m","a"]).map(p=>({day:d,part:p}))});
@@ -323,31 +459,71 @@ async function main(){
  window.addEventListener("online",flush);setInterval(()=>{if(Q().length)flush()},20000);
  // ---- navigation interne (le bouton « retour » du téléphone fonctionne)
  let V={v:"list"};
- const nav=(v,push)=>{V=v;if(push!==false)try{history.pushState({v},"")}catch(e){}view();window.scrollTo(0,0)};
+ const nav=(v,push)=>{V=v;TAB="home";if(push!==false)try{history.pushState({v},"")}catch(e){}view();window.scrollTo(0,0)};
  window.addEventListener("popstate",e=>{V=(e.state&&e.state.v)||{v:"list"};view()});
  const SL2={auj:"Aujourd’hui",cours:"En cours",venir:"À venir",clo:"À clôturer",fini:"Terminée"},COL={auj:"var(--gr)",cours:"var(--gr)",venir:"var(--bl)",clo:"var(--or)",fini:"var(--gy)"};
  const dates=f=>{const d=DS(f);return !d.length?"dates à définir":d.length===1?fds(d[0]):fds(d[0])+" → "+fds(d[d.length-1])+" · "+d.length+" j"};
  const city=f=>{const a=String(f.a||"").split(",").pop().trim();return a||f.c};
- const row=x=>{const f=x.f,due=x.s==="fini"?0:dueEm(f);return `<button type="button" class="row" data-f="${x.ix}" style="--c:${COL[x.s]}"><div class="r1"><b>${esc(f.c)}</b><span class="st">${SL2[x.s]}</span></div><div class="t">${esc(f.t)}</div><div class="m">📅 ${esc(dates(f))} · 📍 ${esc(city(f))} · 👥 ${(f.tr||[]).length}${due?` · <b class="wt2">✍ ${due} à signer</b>`:""}</div></button>`};
  const lim12=new Date(Date.now()-365*864e5).toISOString().slice(0,10);
  const encours=F.filter(x=>x.s==="auj"||x.s==="cours"||x.s==="clo"),venir=by("venir"),passees=by("fini").filter(x=>(DS(x.f).pop()||"")>=lim12).reverse();
  const lnk=t=>esc(t).replace(/(https?:\/\/[^\s<]+)/g,u=>`<a href="${u}" target="_blank" rel="noopener">formulaire en ligne</a>`).replace(/([\w.+-]+@[\w-]+\.[\w.-]+)/g,m=>`<a href="mailto:${m}">${m}</a>`);
- const foot=()=>`<div class="ft">${esc(G[0]||"")}${G[1]?" · ☎ "+esc(G[1]):""}${G[2]?" · ✉ <a href=\"mailto:"+esc(G[2])+"\">"+esc(G[2])+"</a>":""}${G[3]?" · "+esc(G[3]):""}</div>${D.rc?`<div class="ft">${lnk(D.rc)}</div>`:""}`;
- const top=()=>`<div class="sh"><div class="hd"><img src="logo.jpg" alt="TOPAS informatique"><div class="adv"><b>${ESP}</b>${D.m?`<br>✉️ <a href="mailto:${esc(D.m)}">${esc(D.m)}</a>`:""}${G[1]?`<br>☎ <a href="tel:${esc(G[1].replace(/\s/g,""))}">${esc(G[1])}</a>`:""}</div></div><div class="band">🔒 Votre lien personnel – ne le partagez pas</div>`;
+ // pied : mise à jour, consigne du lien, coordonnées (fiche Gestionnaire) ; le contact TOPAS est aussi dans la barre du bas « ☎ TOPAS »
+ const foot=()=>`<div class="ft ip-ft"><p class="upd">Mis à jour le <b>${esc(fds(D.u||T))}</b>. ${EJ?"Votre espace se met à jour tout seul : gardez ce lien (ou l’icône sur votre écran d’accueil).":"Si le planning change, un nouveau lien vous est envoyé : utilisez toujours le plus récent."}</p><p class="band">🔒 Votre lien personnel – ne le partagez pas</p><p>${esc(G[0]||"")}${G[1]?" · ☎ "+esc(G[1]):""}${G[2]?" · ✉ <a href=\"mailto:"+esc(G[2])+"\">"+esc(G[2])+"</a>":""}${G[3]?" · "+esc(G[3]):""}</p></div>${D.rc?`<div class="ft">${lnk(D.rc)}</div>`:""}`;
  const horsH=()=>hors?(EJ?`<div class="qb qw" id="eshors" role="status"><b>📴 Données du ${esc(hors)} — hors connexion</b><span>Vos signatures partiront toutes seules dès que la connexion reviendra.</span></div>`:`<div class="qb qw" role="status"><b>📴 Pas de connexion</b><span>Dernière version enregistrée le ${esc(hors)}. Vos signatures partiront dès que la connexion reviendra.</span></div>`):"";
  // « Ajouter à l'écran d'accueil » : rappel discret tant que l'espace n'est pas ouvert comme une application
  const standalone=()=>{try{return matchMedia("(display-mode: standalone)").matches||navigator.standalone===true}catch(e){return false}};
  const instH=()=>standalone()||LS.get("fpiv:inst",0)?"":`<details class="inst" id="inst"><summary>📲 Garder l’espace sur votre téléphone</summary><p><b>iPhone</b> : touchez « Partager » <span aria-hidden="true">⬆</span> puis « Sur l’écran d’accueil ».<br><b>Android</b> : touchez « ⋮ » puis « Installer l’application » (ou « Ajouter à l’écran d’accueil »).</p><p>L’icône « TOPAS Intervenants » s’ouvre en plein écran, toujours à jour, et même sans réseau.</p><button type="button" class="btn" data-insok>C’est fait</button></details>`;
+ // ===== Présentation « maquette » (29/10) : bandeau dégradé, groupes colorés, lignes date / client / étiquette, barre du bas, fiche du bon, signature =====
+ let NET=!hors&&navigator.onLine!==false,TAB="home";
+ const netH=()=>`<span class="ip-net${NET?"":" off"}" id="ipnet" role="status">${NET?"● En ligne":"○ Hors connexion"}</span>`;
+ function netUpd(on){NET=on;const e=document.getElementById("ipnet");if(e){e.className="ip-net"+(on?"":" off");e.textContent=on?"● En ligne":"○ Hors connexion"}}
+ window.addEventListener("online",()=>netUpd(true));window.addEventListener("offline",()=>netUpd(false));
+ // rond d'initiales : couleur stable itvPal(nom complet), comme sa carte dans TOPAS Formation
+ const avH=()=>{const nm=String(D.i||pr||"").trim(),P=itvPal(nm||"?"),p0=(pr||nm.split(/\s+/)[0]||"").trim(),n0=(D.p&&nm.startsWith(D.p)?nm.slice(D.p.length):nm.split(/\s+/).slice(1).join(" ")).trim();
+  return `<span class="ip-av" aria-hidden="true" style="--a:${P[0]};--b:${shade(P[0],.3)}">${esc(((p0[0]||"")+(n0[0]||"")).toUpperCase()||"?")}</span>`};
+ const MOI=d=>{const x=new Date(d+"T12:00:00");return isNaN(x)?"":x.toLocaleDateString("fr-FR",{month:"short"})};
+ const dCol=d=>/^\d{4}-\d\d-\d\d$/.test(d||"")?`<span class="ip-d"><b>${new Date(d+"T12:00:00").getDate()}</b><small>${esc(MOI(d))}</small></span>`:`<span class="ip-d"><b>?</b><small>date</small></span>`;
+ // barre du bas : 🏠 Accueil · 📄 Signées (fait défiler jusqu'au groupe) · ☎ TOPAS (numéro et adresse de la fiche Gestionnaire)
+ const navH=()=>{const on=k=>(k==="home"&&V.v==="list"&&TAB!=="sig")||(k==="sig"&&V.v==="list"&&TAB==="sig");
+  return `<nav class="ip-nav" aria-label="Navigation">${[["home","🏠","Accueil"],["sig","📄","Signées"],["topas","☎","TOPAS"]].map(([k,i,t])=>`<button type="button" data-tab="${k}" class="${on(k)?"on":""}"${on(k)?' aria-current="page"':""}><i aria-hidden="true">${i}</i>${t}</button>`).join("")}</nav>`};
+ function markTabs(sheet){document.querySelectorAll(".ip-nav [data-tab]").forEach(b=>{const k=b.dataset.tab,on=sheet?k==="topas":(k==="home"&&V.v==="list"&&TAB!=="sig")||(k==="sig"&&V.v==="list"&&TAB==="sig");b.classList.toggle("on",on);if(on)b.setAttribute("aria-current","page");else b.removeAttribute("aria-current")})}
+ function flash(t){const o=document.createElement("div");o.className="ip-flash";o.setAttribute("role","status");o.textContent=t;document.body.appendChild(o);setTimeout(()=>o.remove(),2600)}
+ function goSig(){const s=document.getElementById("s-usig")||document.getElementById("s-uarc");if(!s){flash("Rien de signé pour l’instant.");return}const d=s.querySelector("details");if(d)d.open=true;s.scrollIntoView({behavior:"smooth",block:"start"})}
+ function tabGo(k){if(k==="topas")return topasSheet();if(k==="sig"){if(V.v!=="list")nav({v:"list"});TAB="sig";markTabs();setTimeout(goSig,30);return}
+  TAB="home";if(V.v!=="list")nav({v:"list"});else{markTabs();window.scrollTo({top:0,behavior:"smooth"})}}
+ function topasSheet(){const tel=String(G[1]||"").replace(/[^\d+]/g,""),ad=String(G[4]||"").trim(),ml=D.m||G[2]||"",o=document.createElement("div");
+  o.className="nsov ip-sheet";o.setAttribute("role","dialog");o.setAttribute("aria-modal","true");o.setAttribute("aria-label","Contacter TOPAS informatique");
+  o.innerHTML=`<div class="nsbx"><h3>☎ ${esc(G[0]||"TOPAS informatique")}</h3>${ad?`<p class="ip-ad">📍 ${esc(ad)}</p>`:""}<div class="ip-b2">${tel?`<a class="ip-cta" href="tel:${esc(tel)}">📞 Appeler le ${esc(G[1])}</a>`:""}${ml?`<a class="ip-btn2" href="mailto:${esc(ml)}">✉ ${esc(ml)}</a>`:""}${ad?`<a class="ip-btn2" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent((G[0]||"")+" "+ad)}" target="_blank" rel="noopener">🧭 Itinéraire</a>`:""}${G[3]?`<a class="ip-btn2" href="${esc(/^https?:/i.test(G[3])?G[3]:"https://"+G[3])}" target="_blank" rel="noopener">🌐 ${esc(G[3])}</a>`:""}</div><div class="btns"><button type="button" class="btn" data-shx>Fermer</button></div></div>`;
+  const close=()=>{o.remove();document.removeEventListener("keydown",ek);markTabs()},ek=e=>{if(e.key==="Escape")close()};
+  o.onclick=e=>{if(e.target===o||e.target.closest("[data-shx]"))close()};document.addEventListener("keydown",ek);document.body.appendChild(o);markTabs(1);const f=o.querySelector("a,button");if(f)f.focus()}
+ // ---- 📦 Matériel laissé : articles saisis par CE technicien, mémorisés sur son téléphone (aucune proposition par défaut ; ni prix, ni référence, ni photo)
+ const MK="fpiv:mat:"+NS,matK=t=>String(t||"").trim().toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/\s+/g," ");
+ function matUse(n){const k=matK(n);if(!k)return;const M=LS.get(MK,{});const o=M[k]&&typeof M[k]==="object"?M[k]:{c:0};o.n=n;o.c=(o.c||0)+1;o.t=Date.now();M[k]=o;const ks=Object.keys(M);if(ks.length>80)ks.sort((a,b)=>(M[a].c-M[b].c)||(M[a].t-M[b].t)).slice(0,ks.length-80).forEach(x=>delete M[x]);LS.set(MK,M)}
+ const matSug=Lm=>{const inL=new Set(Lm.map(x=>matK(x[0])));return Object.values(LS.get(MK,{})).filter(o=>o&&o.n&&!inL.has(matK(o.n))).sort((a,b)=>(b.c-a.c)||(b.t-a.t)).slice(0,12).map(o=>o.n)};
+ const matNew=()=>({on:false,L:[]});
+ const matOut=st=>st&&st.on?st.L.filter(x=>x[1]>0).slice(0,30).map(x=>[String(x[0]).slice(0,80),Math.min(999,x[1])]):[];
+ // bloc à interrupteur (même présentation pour la remarque et le matériel)
+ const optH=(cls,id,title,on,body)=>`<div class="ip-opt ${cls}${on?" on":""}"><label class="ip-ot" for="${id}"><span class="ip-otl">${title}</span><input type="checkbox" role="switch" id="${id}" ${on?"checked":""}><span class="ip-sw" aria-hidden="true"><span></span></span></label>${body}</div>`;
+ const matH=(st,p)=>optH("ip-mat",p+"mon","📦 Matériel laissé",st.on,`<div class="ip-ob${st.on?"":" hide"}" id="${p}mw"><p class="ip-oh">Ce que vous laissez et qui n’est pas sur le bon</p><div id="${p}ml"></div><div id="${p}msg"></div><label class="ip-mk" for="${p}mn">Autre article</label><div class="ip-ma"><input class="ip-in" id="${p}mn" maxlength="80" autocomplete="off" enterkeyhint="done"><button type="button" class="ip-madd" id="${p}madd" aria-label="Ajouter cet article">＋</button></div></div>`);
+ function matBind(root,st,p){const g=s=>root.querySelector("#"+p+s),sw=g("mon"),w=g("mw"),inp=g("mn");if(!sw)return;
+  const draw=()=>{g("ml").innerHTML=st.L.map((x,i)=>`<div class="ip-it"><b>${esc(x[0])}</b><span class="ip-qty" role="group" aria-label="Quantité : ${esc(x[0])}"><button type="button" data-mq="${i}:-1" aria-label="Un de moins">−</button><output aria-live="polite">${x[1]}</output><button type="button" data-mq="${i}:1" aria-label="Un de plus">＋</button></span></div>`).join("");
+   const S=matSug(st.L);g("msg").innerHTML=S.length?`<div class="ip-mk">Un toucher pour ajouter</div><div class="ip-ms">${S.map((n,i)=>`<button type="button" data-ms="${i}">${esc(n)}</button>`).join("")}</div>`:"";
+   g("ml").querySelectorAll("[data-mq]").forEach(b=>b.onclick=()=>{const[i,d]=b.dataset.mq.split(":").map(Number),x=st.L[i];if(!x)return;x[1]=Math.max(0,Math.min(999,x[1]+d));if(!x[1])st.L.splice(i,1);draw()});
+   g("msg").querySelectorAll("[data-ms]").forEach(b=>b.onclick=()=>add(S[+b.dataset.ms]))};
+  const add=n=>{n=String(n||"").replace(/\s+/g," ").trim().slice(0,80);if(!n)return false;const x=st.L.find(z=>matK(z[0])===matK(n));if(x)x[1]=Math.min(999,x[1]+1);else if(st.L.length<30)st.L.push([n,1]);matUse(n);draw();return true};
+  st.flush=()=>{if(st.on&&inp.value.trim()){add(inp.value);inp.value=""}};
+  sw.onchange=()=>{st.on=sw.checked;sw.closest(".ip-opt").classList.toggle("on",st.on);w.classList.toggle("hide",!st.on)};
+  g("madd").onclick=()=>{if(add(inp.value))inp.value="";inp.focus()};inp.onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();if(add(inp.value))inp.value=""}};draw()}
 
  // ---- 1. liste
  // ---- liste unique : formations et bons de livraison mélangés, dans l'ordre des dates (▶ Aujourd'hui · 🔜 À venir · ✅ Signées 12 mois, repliée)
  // chaque ligne : le client, la date et l'heure, le lieu ; à droite l'étiquette « BL » (orange) ou « Formation » (bleu). Le détail au clic est inchangé.
  const uHr=t=>String(t||"").replace(/^[^·]*·\s*/,"");
- const uF=(x,d,late)=>{const f=x.f,dd=DS(f),dt=d||dd[0]||"";return {k:dt+" "+((HRS[(f.hf||{})[dt]]||FULL)[0]),h:`<button type="button" class="row urow" data-f="${x.ix}" style="--c:var(--bl)"><span class="ul"><b>${esc(f.c||"")}</b><span class="m">${dt?esc(fds(dt))+(dd.length>1?" <small>("+dd.length+" j)</small>":"")+" · "+esc(uHr(slot(f,dt)[2])):"Dates à définir"}</span>${late&&dt?uAgo(dt)+`<span class="m">✍ ${pastDue(f).length} émargement${pastDue(f).length>1?"s":""} à faire signer</span>`:""}<span class="m">${esc(f.a||city(f)||"")}</span></span><span class="utag uf">Formation</span></button>`}};
+ const uF=(x,d,late)=>{const f=x.f,dd=DS(f),dt=d||dd[0]||"",j=dd.indexOf(dt),dn=x.s==="fini",pd=late?pastDue(f).length:0;return {k:dt+" "+((HRS[(f.hf||{})[dt]]||FULL)[0]),h:`<button type="button" class="row urow ip-row" data-f="${x.ix}">${dCol(dt)}<span class="ip-c ul"><b class="uc" title="${esc(f.c||"")}">${esc(f.c||"")}</b><span class="ip-s m">${esc(f.t||"Formation")}${dd.length>1?(dn||j<0?" · "+dd.length+" jours":" · jour "+(j+1)+"/"+dd.length):""}</span>${late&&dt?uAgo(dt)+(pd?`<span class="ip-s m">✍ ${pd} émargement${pd>1?"s":""} à faire signer</span>`:""):""}</span><span class="ip-r"><span class="utag uf ip-tag">Formation</span><span class="ip-st" aria-label="${dn?"terminée":"à faire"}">${dn?"✓":"⏳"}</span></span></button>`}};
  // retard : « il y a N jours » (bon ou émargement daté d'avant aujourd'hui, pas signé)
- const uAgo=d=>{const n=Math.round((Date.parse(T)-Date.parse(d))/864e5);return n>0?`<span class="ulate">⏰ il y a ${n} jour${n>1?"s":""}</span>`:""};
+ const uAgo=d=>{const n=Math.round((Date.parse(T)-Date.parse(d))/864e5);return n>0?`<span class="ulate">il y a ${n} jour${n>1?"s":""}</span>`:""};
  const pastDue=f=>SLOTS(f).filter(sl=>sl.day<T&&!emState(f,sl)).map(sl=>sl.day).sort();
- const uB=(x,late,kd)=>{const t=x.t,ok=blSt(x).k!=="faire",cn=t.c||t.nm||"Intervention";return {k:kd||((t.d||"9999-12-31")+" "+(t.h||"00:00")),h:`<button type="button" class="row urow" data-it="${x.ix}" data-b="${esc(t.b||"")}" style="--c:var(--or)"><span class="ul"><b class="uc" title="${esc(cn)}">${esc(cn)}</b><span class="m">${t.d?esc(fds(t.d))+(t.h?" · "+esc(t.h):""):"Date à préciser"}${t.b?" · N° "+esc(t.b):""}</span>${late&&t.d?uAgo(t.d):""}<span class="m">${esc(t.a||itCity(t)||"")}</span></span><span class="utag ub">BL <span aria-label="${ok?"signé":"non signé"}">${ok?"✓":"⏳"}</span></span></button>`}};
+ const uB=(x,late,kd)=>{const t=x.t,s=blSt(x),ok=s.k!=="faire",cn=t.c||t.nm||"Intervention",dd=kd?String(kd).slice(0,10):t.d||"",hh=kd?String(kd).slice(11,16):t.h||"";return {k:kd||((t.d||"9999-12-31")+" "+(t.h||"00:00")),h:`<button type="button" class="row urow ip-row" data-it="${x.ix}" data-b="${esc(t.b||"")}">${dCol(dd)}<span class="ip-c ul"><b class="uc" title="${esc(cn)}">${esc(cn)}</b><span class="ip-s m">${t.b?"BL N° "+esc(t.b):esc(t.nm||"Bon de livraison")}${hh?" · "+esc(hh):""}</span>${late&&t.d?uAgo(t.d):""}</span><span class="ip-r"><span class="utag ub ip-tag">BL</span><span class="ip-st" aria-label="${ok?(s.k==="att"?"signé, en attente d’envoi":s.k==="ns"?"envoyé sans signature":"signé"):"à faire signer"}">${ok?"✓":"⏳"}</span></span></button>`}};
  // bon signé : classé par sa date de SIGNATURE (pas d'intervention) ; plus de 12 mois → « 🗄 Archives » (jamais invisible)
  const sdOf=x=>{const s=blSt(x);return s.r?String(s.r.dl||"")+" "+String(s.r.hl||""):String(x.t.sd||"")||String(x.t.d||"")};
  // ⏰ À régulariser : tout ce qui est daté d'avant aujourd'hui et pas signé (bons de livraison + émargements), en tête, le plus ancien d'abord
@@ -358,16 +534,15 @@ async function main(){
    ven:inF(venir).map(x=>uF(x,nxt(x))).concat(G3.ven.map(x=>uB(x))).sort(up),
    sig:inF(passees).filter(x=>!lateF(x)).map(x=>uF(x,last(x))).concat(G3.sig.filter(x=>{const d=sdOf(x).slice(0,10);return !d||d>=lim12}).map(x=>uB(x,0,sdOf(x)))).sort(dn),
    arc:G3.sig.filter(x=>{const d=sdOf(x).slice(0,10);return d&&d<lim12}).map(x=>uB(x,0,sdOf(x))).sort(dn)}}
- function uList(){const U=uGroups(),S3=(t,c,arr,open,empty,k)=>`<section class="sec" id="s-${k}" style="--c:${c}"><details ${open?"open":""}><summary class="lh">${t} <span class="n">${arr.length}</span></summary>${arr.map(o=>o.h).join("")||`<div class="empty">${empty}</div>`}</details></section>`;
-  return (U.reg.length?S3("⏰ À régulariser","var(--or)",U.reg,true,"","ureg").replace('class="sec"','class="sec ureg"'):"")+S3("▶ Aujourd’hui","var(--gr)",U.auj,true,"Rien de prévu aujourd’hui.","uauj")+S3("🔜 À venir","var(--bl)",U.ven,true,"Rien de prévu pour le moment.","uven")+S3("✅ Signées <small>(12 derniers mois)</small>","var(--gy)",U.sig,false,"Rien de signé pour l’instant.","usig")+(U.arc.length?S3("🗄 Archives <small>(signés il y a plus d’un an)</small>","var(--gy)",U.arc,false,"","uarc"):"")}
- function listView(){const V2=D.v;
-  const L=(t,c,arr,open,empty,k)=>`<section class="sec" id="s-${k}" style="--c:${c}"><details ${open?"open":""}><summary class="lh">${t} <span class="n">${arr.length}</span></summary>${arr.map(row).join("")||`<div class="empty">${empty}</div>`}</details></section>`;
-  const LI=(t,c,arr,open,empty,k)=>`<section class="sec" id="s-${k}" style="--c:${c}"><details ${open?"open":""}><summary class="lh">${t} <span class="n">${arr.length}</span></summary>${arr.map(itRow).join("")||`<div class="empty">${empty}</div>`}</details></section>`,G3=itGroups();
-  return top()+`<div class="bd"><div class="hi">Bonjour${pr?" "+esc(pr):""} 👋</div><p class="upd">Mis à jour le <b>${esc(fds(D.u||T))}</b>. ${EJ?"Votre espace se met à jour tout seul : gardez ce lien (ou l’icône sur votre écran d’accueil).":"Si le planning change, un nouveau lien vous est envoyé : utilisez toujours le plus récent."}</p>${EJ?instH():""}
-  ${shF?`<div class="kpi"><div><b>${nUp}</b><span>À venir</span></div><div><b>${nMo}</b><span>Ce mois-ci <small>(jour${nMo>1?"s":""})</small></span></div><div><b>${String(hUp).replace(".",",")} h</b><span>Heures planifiées</span></div></div>`:`<div class="kpi"><div><b>${G3.auj.filter(x=>x.t.d===T).length}</b><span>Aujourd’hui</span></div><div><b>${G3.ven.length}</b><span>À venir</span></div><div><b>${G3.sig.length}</b><span>Signées</span></div></div>`}</div></div>
-  <div id="qbn">${bannerHtml()}</div>${horsH()}
-  ${shF&&nx?`<div class="hero"><div class="kk">Prochaine intervention</div><h2>${esc(nx.x.f.t)}</h2><div class="li"><b>${esc(nx.x.f.c)}</b></div><div class="cd">${esc(rel(nx.d).replace(/^./,c=>c.toUpperCase()))}</div><div class="li">📅 ${esc(fdl(nx.d))}${DS(nx.x.f).length>1?` <span style="opacity:.8">(${DS(nx.x.f).map(fdm).join(", ")})</span>`:""}</div><div class="li">🕘 ${esc(slot(nx.x.f,nx.d)[2])}</div><div class="li">📍 ${esc(nx.x.f.c)}${nx.x.f.a?" – "+esc(nx.x.f.a):""}</div><div class="btns"><a class="btn" href="${maps(nx.x.f)}" target="_blank" rel="noopener">🧭 Itinéraire</a></div></div>`:""}
-  ${uList()}
+ // groupes, dans l'ordre ; un groupe vide n'est pas affiché ; « Signées » et « Archives » repliés
+ const GRP=[["reg","⏰ À régulariser",1],["auj","📅 Aujourd’hui",1],["ven","⏳ À venir",1],["sig","✓ Signées",0],["arc","🗄 Archives",0]];
+ function uList(U){U=U||uGroups();const H=GRP.filter(g=>U[g[0]].length).map(([k,t,op])=>`<section class="sec ip-g ip-g-${k}${k==="reg"?" ureg":""}" id="s-u${k}"><details ${op?"open":""}><summary class="lh"><span class="ip-gt">${t}</span><span class="ip-gn n">${U[k].length}</span></summary>${k==="sig"?'<p class="ip-gx">Les 12 derniers mois.</p>':k==="arc"?'<p class="ip-gx">Signés il y a plus d’un an.</p>':""}${U[k].map(o=>o.h).join("")}</details></section>`).join("");
+  return H?`<div class="ip-gs">${H}</div>`:`<div class="empty ip-empty">Rien de prévu pour le moment.</div>`}
+ function listView(){const V2=D.v,U=uGroups(),nT=U.reg.length+U.auj.length;
+  return `<header class="ip-hero"><div class="ip-top"><span class="ip-logo"><img src="logo.jpg" alt="TOPAS informatique"></span>${netH()}</div>
+  <div class="ip-me">${avH()}<div class="ip-mt"><h1 class="ip-hi hi">Bonjour${pr?" "+esc(pr):""}</h1><div class="ip-n">${nT?nT+" chose"+(nT>1?"s":"")+" à faire aujourd’hui":"Rien à faire aujourd’hui"}</div></div></div></header>
+  <div id="qbn">${bannerHtml()}</div>${horsH()}${EJ?instH():""}
+  ${uList(U)}
   ${V2&&V2.t?`<div class="vei"><div class="kk">📢 Info réglementaire</div><h3>${esc(V2.t)}</h3>${V2.r?`<div class="mu" style="color:var(--tx)">${esc(V2.r)}</div>`:""}<div class="mu" style="margin-top:4px">Transmise le ${esc(fds(V2.dd||V2.d||T))}${V2.u?` · <a href="${esc(V2.u)}" target="_blank" rel="noopener">Voir la source</a>`:""}</div><div class="btns">${V2.lu?'<span class="pbok" style="margin:0">✔ Vous l’avez lue, merci</span>':V2.a?`<a class="btn gn" href="${esc(V2.a)}" target="_blank" rel="noopener">✅ J’ai lu – donner mon avis</a>`:""}</div></div>`:""}
   ${foot()}`}
 
@@ -383,7 +558,7 @@ async function main(){
    if(P&&P.length){IMG[t.pf]=P;await IDB.put(t.pf,P);return P}}catch(e){}return null}
  const imgBox=ix=>`<div class="blim" data-blim="${ix}"><p class="mu">⏳ Chargement du bon de livraison…</p></div>`;
  async function fillImgs(){for(const el of document.querySelectorAll("[data-blim]")){const ix=+el.dataset.blim,x=IT[ix];if(!x)continue;const P=await blImg(x.t);if(!document.body.contains(el))continue;
-  el.innerHTML=P?P.map((b,i)=>`<button type="button" class="blpg" data-zoom="${ix}:${i}" aria-label="Agrandir la page ${i+1} du bon"><img alt="Bon de livraison ${esc(x.t.nm||x.t.b||"")}, page ${i+1}" src="data:image/jpeg;base64,${b}"></button>`).join("")+'<p class="mu" style="margin:0">🔍 Touchez le bon pour l’agrandir (zoom avec deux doigts).</p>'
+  el.innerHTML=P?P.map((b,i)=>`<button type="button" class="blpg" data-zoom="${ix}:${i}" aria-label="Agrandir la page ${i+1} du bon"><img alt="Bon de livraison ${esc(x.t.nm||x.t.b||"")}, page ${i+1}" src="data:image/jpeg;base64,${b}">${i?"":'<span class="ip-zp" aria-hidden="true">🔍 Agrandir</span>'}</button>`).join("")
    :`<div class="qb qw" role="status"><b>⚠ Le bon de livraison n’est pas disponible sur ce téléphone</b><span>${x.t.pf?"Il n’a pas encore pu être téléchargé (pas de connexion ?).":(EJ?"TOPAS informatique ne l’a pas encore transmis : il apparaîtra ici tout seul dès qu’il le sera.":"TOPAS informatique ne l’a pas encore transmis : demandez un nouvel envoi de votre espace.")}</span>${x.t.pf?'<button type="button" class="btn" data-blretry>🔄 Réessayer</button>':""}</div>`;
   el.querySelectorAll("[data-zoom]").forEach(b=>b.onclick=()=>{const [i,k]=b.dataset.zoom.split(":").map(Number);zoom(IMG[IT[i].t.pf]||[],k)});const rt=el.querySelector("[data-blretry]");if(rt)rt.onclick=()=>{el.innerHTML='<p class="mu">⏳ Nouvel essai…</p>';fillImgs()}}}
  function zoom(P,k){let z=100;const o=document.createElement("div");o.className="zov";o.setAttribute("role","dialog");o.setAttribute("aria-label","Bon de livraison agrandi");
@@ -399,17 +574,18 @@ async function main(){
  function itGroups(){const fa=IT.filter(x=>blSt(x).k==="faire"),by=(a,b)=>String(a.t.d||"9999").localeCompare(String(b.t.d||"9999"));return{auj:fa.filter(x=>x.t.d&&x.t.d<=T).sort(by),ven:fa.filter(x=>!x.t.d||x.t.d>T).sort(by),sig:IT.filter(x=>{const k=blSt(x).k;return k==="sig"||k==="att"}).sort((a,b)=>by(b,a))}}
  const itMaps=t=>"https://www.google.com/maps/search/?api=1&query="+encodeURIComponent((t.c||"")+" "+(t.a||""));
  const itCity=t=>{const a=String(t.a||"").split(",").pop().trim();return a||t.c||""};
- const itRow=x=>{const t=x.t,s=blSt(x),late=s.k==="faire"&&t.d&&t.d<T;return `<button type="button" class="row" data-it="${x.ix}" style="--c:${s.k!=="faire"?"var(--gy)":t.d&&t.d<=T?"var(--gr)":"var(--bl)"}"><div class="r1"><b>${esc(t.c||t.nm||"Intervention")}</b><span class="st">${s.k==="att"?"À transmettre":s.k==="sig"?"Signé":t.d===T?"Aujourd’hui":late?"À faire signer":"À venir"}</span></div><div class="t">🚚 ${esc(t.nm||("BL N° "+(t.b||"—")))}</div><div class="m">📅 ${t.d?esc(fds(t.d))+(t.h?" · "+esc(t.h):""):"date à préciser"} · 📍 ${esc(itCity(t))}${s.k!=="faire"?" · "+esc(s.txt):""}</div></button>`};
- function itView(ix){const x=IT[ix];if(!x)return listView();const t=x.t,s=blSt(x);
-  return top()+`<div class="bd"><button type="button" class="btn" data-back>← Mon espace</button></div></div>
+ function itView(ix){const x=IT[ix];if(!x)return listView();const t=x.t,s=blSt(x),late=s.k==="faire"&&t.d&&t.d<T,cn=t.c||t.nm||"Intervention",rr=s.k==="faire"?repRec(t.i):null,nl=+t.nl||0;
+  return `<header class="ip-hd"><button type="button" class="ip-back" data-back>‹ Retour</button><div class="ip-k">Bon de livraison</div><div class="ip-num">${t.b?"N° "+esc(t.b):esc(t.nm||"N° —")}</div><div class="ip-sub">${esc(cn)} · ${t.d?esc(fdm(t.d)):"date à préciser"}${t.h?" · "+esc(t.h):""}</div></header>
   <div id="qbn">${bannerHtml()}</div>
-  <div class="fc s-${s.k==="faire"?(t.d&&t.d<=T?"auj":"venir"):"fini"}"><div><span class="st">${s.k==="faire"?(t.d===T?"Aujourd’hui":t.d&&t.d<T?"À faire signer":"À venir"):"Signé"}</span><span class="num">${esc(t.nm||("BL N° "+(t.b||"—")))}</span></div><h3>${esc(t.c||t.nm||"Intervention")}</h3>
-   <div class="ln"><i>📍</i><div><b>Adresse d’intervention</b><br>${t.a?esc(t.a):'<span class="mu">non précisée</span>'}<div class="btns" style="margin-top:6px"><a class="btn" href="${itMaps(t)}" target="_blank" rel="noopener">🧭 Itinéraire</a></div></div></div>
-   <div class="ln"><i>📅</i><div><b>${t.d?esc(fdl(t.d)):"Date à préciser"}</b>${t.h?` · ${esc(t.h)}`:""}</div></div>
-   <div class="ln"><i>☎</i><div><b>TOPAS informatique</b>${D.m?`<br><a href="mailto:${esc(D.m)}">✉ ${esc(D.m)}</a>`:""}${G[1]?`<br><a href="tel:${esc(G[1].replace(/\s/g,""))}">☎ ${esc(G[1])}</a>`:""}</div></div></div>
-  ${s.k==="faire"?`${(r=>r?`<div class="qb ${pend(r.id)?"qw":"qk"}" role="status"><b>⏸ Signature reportée le ${esc(dm(r.dl))} à ${esc(r.hl)}</b><span>${pend(r.id)?"en attente d’envoi":"TOPAS informatique est prévenu"}</span></div>`:"")(repRec(t.i))}<div class="btns"><button type="button" class="btn gn big2" data-bls="${ix}">✍ Faire signer le client</button>${t.d&&t.d<T?`<button type="button" class="btn" data-blns="${ix}">📤 Envoyer sans signature</button>`:""}</div><div id="blch"></div>`:`<div class="qb ${s.k==="att"?"qw":"qk"}" role="status"><b>${esc(s.txt)}</b>${s.r&&s.r.res?'<span class="ko">avec remarque</span>':""}</div>`}
-  <section class="sec" style="--c:var(--bl)"><h2>📄 Le bon de livraison</h2><div class="fc s-venir">${imgBox(ix)}</div></section>
-  ${s.k==="faire"?blForm(ix):""}
+  ${s.k!=="faire"?`<div class="qb ${s.k==="att"?"qw":"qk"}" role="status"><b>${esc(s.txt)}</b>${s.r&&s.r.res?'<span class="ko">avec remarque</span>':""}</div>`:""}
+  ${rr?`<div class="qb ${pend(rr.id)?"qw":"qk"}" role="status"><b>⏸ Signature reportée le ${esc(dm(rr.dl))} à ${esc(rr.hl)}</b><span>${pend(rr.id)?"en attente d’envoi":"TOPAS informatique est prévenu"}</span></div>`:""}
+  <section class="ip-card" aria-labelledby="ipbon"><h2 class="ip-h" id="ipbon">📄 Le bon</h2>${imgBox(ix)}</section>
+  <section class="ip-sum" aria-labelledby="ipsum"><h2 class="ip-h" id="ipsum">🧾 Résumé</h2>
+   <div class="ip-kv"><span>Client</span><b>${esc(cn)}</b></div>
+   <div class="ip-kv"><span>Date</span><b>${t.d?esc(fdl(t.d)):"à préciser"}${t.h?" · "+esc(t.h):""}</b></div>
+   <div class="ip-kv"><span>Lignes</span><b>${nl?nl+" ligne"+(nl>1?"s":"")+" sur le bon":"voir le bon ci-dessus"}</b></div>
+   ${t.a?`<div class="ip-kv"><span>Adresse</span><b>${esc(t.a)}</b></div><a class="ip-btn2 ip-map" href="${itMaps(t)}" target="_blank" rel="noopener">🧭 Itinéraire</a>`:""}</section>
+  ${s.k==="faire"?`<button type="button" class="ip-cta" data-bls="${ix}">✍ Faire signer le client</button><div class="ip-b2"><button type="button" class="ip-btn2" data-blrep2="${ix}">⏸ Reporter la signature</button>${late?`<button type="button" class="ip-btn2" data-blns="${ix}">📤 Envoyer sans signature</button>`:""}</div><div id="blch"></div>`:""}
   ${foot()}`}
  // ---- signature du BL : ce que le client signe (au-dessus), nom, fonction, réserves, tracé ; vérification ; rien n'est envoyé avant « Terminer »
  let BS=null;
@@ -417,17 +593,20 @@ async function main(){
  const svgOf=st=>"data:image/svg+xml;charset=utf-8,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 140"><path d="'+st.map(s=>"M"+s.map(q=>q[0]+" "+q[1]).join(" L")).join(" ")+'" fill="none" stroke="#12308f" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>');
  const blWhat=(t,ix,noimg)=>`<div class="pan"><h4>Ce que vous signez</h4><div><b>${esc(t.nm||("Bon de livraison N° "+(t.b||"—")))}</b>${t.c?" · "+esc(t.c):""}</div><div>Intervention du ${t.d?esc(fdl(t.d)):"(date à préciser)"}</div>${noimg?'<div class="qb qw" style="margin:8px 0 0"><b>⚠ Le bon n’a pas pu être affiché</b><span>Le client signe sans le voir : ce sera noté sur le bon signé.</span></div>':imgBox(ix)}</div>`;
  // encart « Signature électronique » DANS la fiche, sous le bon : prénom, nom, fonction, réserves, signature composée ou au doigt
- const blNew=ix=>({ix,step:"form",pr:"",no:"",nm:"",fn:"",res:false,rc:"",sg:"",sm:"",noimg:0,open:0});
- const blForm=ix=>{if(!BS||BS.ix!==ix)BS=blNew(ix);return `<section class="sec${BS.open?"":" hide"}" id="blsig" style="--c:var(--gr)"><h2>✍ Signature électronique du client</h2><div class="fc s-clo sgc">
-  ${BS.noimg?'<div class="qb qw" style="margin:0 0 8px"><b>⚠ Le bon n’a pas pu être affiché</b><span>Le client signe sans le voir : ce sera noté sur le bon signé.</span></div>':'<p class="mu" style="margin-top:0">Le client vérifie le bon ci-dessus, puis indique son prénom, son nom et sa fonction : sa signature se compose toute seule (ou il signe à la main).</p>'}
-  <label class="fl" for="blpr">Prénom du signataire *</label><input class="fl" id="blpr" autocomplete="given-name" value="${esc(BS.pr)}" style="font-weight:400">
-  <label class="fl" for="blno">Nom du signataire *</label><input class="fl" id="blno" autocomplete="family-name" value="${esc(BS.no)}" style="font-weight:400">
-  <label class="fl" for="blfn">Fonction</label><input class="fl" id="blfn" value="${esc(BS.fn)}" style="font-weight:400">
-  <div class="rmk"><label class="rmsw" for="blres"><input type="checkbox" role="switch" id="blres" ${BS.res?"checked":""}><span class="rmtr" aria-hidden="true"><span class="rmth"></span></span><span class="rmlb">Remarque</span></label>
-  <div id="blrw" class="rmz${BS.res?"":" hide"}"><label class="rml" for="blrc">Remarque du client (ce qui ne va pas, ce qui manque…)</label><textarea class="rmt" id="blrc" rows="4">${esc(BS.rc)}</textarea></div></div>
+ const blNew=ix=>({ix,step:"form",pr:"",no:"",nm:"",fn:"",res:false,rc:"",sg:"",sm:"",noimg:0,mt:matNew()});
+ // écran « Signature du client » : nom et prénom, fonction, deux façons de signer, ✎ remarque et 📦 matériel laissé (interrupteurs), puis vérification
+ const blForm=ix=>{if(!BS||BS.ix!==ix)BS=blNew(ix);const t=IT[ix].t,cn=t.c||t.nm||"";
+  return `<header class="ip-hd"><button type="button" class="ip-back" data-blbon>‹ Le bon</button><h1 class="ip-tt">Signature du client</h1><div class="ip-sub2">${t.b?"N° "+esc(t.b):esc(t.nm||"")}${cn?" · "+esc(cn):""}</div></header>
+  <div id="qbn">${bannerHtml()}</div>
+  <section class="ip-sg sgc" id="blsig">
+  ${BS.noimg?'<div class="qb qw" style="margin:0 0 12px"><b>⚠ Le bon n’a pas pu être affiché</b><span>Le client signe sans le voir : ce sera noté sur le bon signé.</span></div>':'<p class="ip-lead">Le client a vérifié le bon. Il indique son nom et sa fonction, puis signe.</p>'}
+  <div class="ip-fd" role="group" aria-labelledby="blnml"><span class="ip-lb" id="blnml">Nom et prénom du signataire *</span><div class="ip-2"><input class="ip-in" id="blpr" autocomplete="given-name" placeholder="Prénom" aria-label="Prénom du signataire" value="${esc(BS.pr)}"><input class="ip-in" id="blno" autocomplete="family-name" placeholder="Nom" aria-label="Nom du signataire" value="${esc(BS.no)}"></div></div>
+  <div class="ip-fd"><label class="ip-lb" for="blfn">Fonction</label><input class="ip-in" id="blfn" value="${esc(BS.fn)}"></div>
   <div id="blsw"></div>
-  <div class="btns" style="margin-top:12px"><button type="button" class="btn gn big2" id="blval">✔ Valider la signature</button></div><div class="pberr" id="sge" role="alert"></div></div></section>`};
- function blStart(ix,noimg){if(!BS||BS.ix!==ix)BS=blNew(ix);if(noimg)BS.noimg=1;BS.open=1;BS.step="form";if(V.v!=="it"||V.ix!==ix)nav({v:"it",ix});else view();setTimeout(()=>{const e=document.getElementById("blsig");if(e)e.scrollIntoView({behavior:"smooth",block:"start"})},60)}
+  ${optH("ip-rem","blres","✎ Ajouter une remarque",BS.res,`<div id="blrw" class="ip-ob${BS.res?"":" hide"}"><label class="ip-oh" for="blrc">Ce qui ne va pas, ce qui manque…</label><textarea class="rmt" id="blrc" rows="4">${esc(BS.rc)}</textarea></div>`)}
+  ${matH(BS.mt,"bl")}
+  <div style="margin-top:16px"><button type="button" class="ip-cta" id="blval">✔ Valider la signature</button></div><div class="pberr" id="sge" role="alert"></div></section>`};
+ function blStart(ix,noimg){if(!BS||BS.ix!==ix)BS=blNew(ix);if(noimg)BS.noimg=1;BS.step="form";nav({v:"bls"})}
  // bon indisponible : choix explicite, tracé dans l'intervention (signer quand même / reporter)
  function blChoice(ix){const el=document.getElementById("blch");if(!el)return;el.innerHTML=`<div class="blch" role="alert"><b>⚠ Le bon de livraison n’est pas disponible sur ce téléphone.</b><p>Le client ne peut pas voir ce qu’il signe. Choisissez :</p>
   <button type="button" class="btn gn" data-blany="${ix}">✍ Faire signer quand même<br><small style="font-weight:400">ce sera noté sur le bon signé</small></button>
@@ -435,41 +614,56 @@ async function main(){
   <div id="blrepf" class="hide"><label class="fl" for="blrepm">Pourquoi ? <span class="mu">(facultatif)</span></label><textarea class="fl" id="blrepm" rows="3" style="font-weight:400"></textarea><button type="button" class="btn p" data-blrepok="${ix}">Confirmer le report</button></div></div>`;
   el.querySelector("[data-blany]").onclick=()=>blStart(ix,1);el.querySelector("[data-blrep]").onclick=()=>{document.getElementById("blrepf").classList.remove("hide");document.getElementById("blrepm").focus()};
   el.querySelector("[data-blrepok]").onclick=()=>blReport(ix,document.getElementById("blrepm").value.trim());el.scrollIntoView({block:"nearest"})}
+ function blRepAsk(ix){const el=document.getElementById("blch");if(!el)return;el.innerHTML=`<div class="blch ip-rep" role="group" aria-label="Reporter la signature"><label class="fl" for="blrepm">Pourquoi reporter ? <span class="mu">(facultatif)</span></label><textarea class="ip-in" id="blrepm" rows="3"></textarea><div class="btns"><button type="button" class="btn" data-blrepx>Annuler</button><button type="button" class="btn p" data-blrepok="${ix}">Confirmer le report</button></div></div>`;
+  el.querySelector("[data-blrepx]").onclick=()=>{el.innerHTML=""};el.querySelector("[data-blrepok]").onclick=()=>blReport(ix,document.getElementById("blrepm").value.trim());document.getElementById("blrepm").focus();el.scrollIntoView({block:"nearest"})}
  const NSR=["Client absent","Client a refusé de signer","Oubli","Autre…"];
- function blNsAsk(ix){const t=IT[ix].t,o=document.createElement("div");o.className="nsov";o.setAttribute("role","dialog");o.setAttribute("aria-modal","true");o.setAttribute("aria-label","Envoyer sans signature");let rs="";
-  o.innerHTML=`<div class="nsbx"><h3>📤 Envoyer sans signature</h3><p><b>${esc(t.nm||("BL N° "+(t.b||"—")))}</b>${t.c?" · "+esc(t.c):""}</p><p class="mu">Le bon quitte votre espace. TOPAS informatique saura qu’il n’a pas été signé.</p><div class="nsr" role="radiogroup" aria-label="Raison">${NSR.map((r,i)=>`<button type="button" class="btn nsrb" role="radio" aria-checked="false" data-nsr="${i}">${esc(r)}</button>`).join("")}</div><div class="nsaw hide"><label class="fl" for="nsat">Précisez la raison *</label><textarea id="nsat" rows="3"></textarea></div><div class="pberr" id="nse" role="alert"></div><div class="btns"><button type="button" class="btn" data-nsx>Annuler</button><button type="button" class="btn gn" data-nsok>Confirmer l’envoi sans signature</button></div></div>`;
-  document.body.appendChild(o);const q=s=>o.querySelector(s),aw=q(".nsaw"),ta=q("#nsat"),er=q("#nse");
+ function blNsAsk(ix){const t=IT[ix].t,o=document.createElement("div");o.className="nsov";o.setAttribute("role","dialog");o.setAttribute("aria-modal","true");o.setAttribute("aria-label","Envoyer sans signature");let rs="";const NM=matNew();
+  o.innerHTML=`<div class="nsbx"><h3>📤 Envoyer sans signature</h3><p><b>${esc(t.nm||("BL N° "+(t.b||"—")))}</b>${t.c?" · "+esc(t.c):""}</p><p class="mu">Le bon quitte votre espace. TOPAS informatique saura qu’il n’a pas été signé.</p><div class="nsr" role="radiogroup" aria-label="Raison">${NSR.map((r,i)=>`<button type="button" class="btn nsrb" role="radio" aria-checked="false" data-nsr="${i}">${esc(r)}</button>`).join("")}</div><div class="nsaw hide"><label class="fl" for="nsat">Précisez la raison *</label><textarea id="nsat" rows="3"></textarea></div>${matH(NM,"ns")}<div class="pberr" id="nse" role="alert"></div><div class="btns"><button type="button" class="btn" data-nsx>Annuler</button><button type="button" class="btn gn" data-nsok>Confirmer l’envoi sans signature</button></div></div>`;
+  document.body.appendChild(o);matBind(o,NM,"ns");const q=s=>o.querySelector(s),aw=q(".nsaw"),ta=q("#nsat"),er=q("#nse");
   o.querySelectorAll("[data-nsr]").forEach(b=>b.onclick=()=>{rs=NSR[+b.dataset.nsr];o.querySelectorAll("[data-nsr]").forEach(z=>z.setAttribute("aria-checked",String(z===b)));aw.classList.toggle("hide",rs!=="Autre…");er.textContent="";if(rs==="Autre…")ta.focus()});
   q("[data-nsx]").onclick=()=>o.remove();
-  q("[data-nsok]").onclick=()=>{const m=ta.value.trim();if(!rs){er.textContent="Choisissez la raison.";return}if(rs==="Autre…"&&m.length<3){er.textContent="Précisez la raison en quelques mots.";ta.focus();return}o.remove();blNsSend(ix,rs==="Autre…"?"Autre":rs,rs==="Autre…"?m:"")}}
+  q("[data-nsok]").onclick=()=>{const m=ta.value.trim();if(NM.flush)NM.flush();if(!rs){er.textContent="Choisissez la raison.";return}if(rs==="Autre…"&&m.length<3){er.textContent="Précisez la raison en quelques mots.";ta.focus();return}if(NM.on&&!NM.L.length){er.textContent="Ajoutez l’article laissé, ou éteignez « Matériel laissé ».";return}o.remove();blNsSend(ix,rs==="Autre…"?"Autre":rs,rs==="Autre…"?m:"",matOut(NM))}}
  function blNsSend(ix,rs,motif,mat){const t=IT[ix].t,now=nowS(),rid=Date.now().toString(36)+Math.random().toString(36).slice(2,6),p={t:"fp-sign",k:"blns",id:rid,it:t.i,n:t.b||"",c:String(t.c||"").slice(0,120),bv:t.v||1,iv:D.i||"",rs:String(rs).slice(0,60),motif:String(motif||"").slice(0,500),mat:Array.isArray(mat)?mat.slice(0,40):[],dl:now.dl,hl:now.hl};
   const R=recs("blns:"+t.i);R.push({id:rid,dl:now.dl,hl:now.hl,rs:p.rs});if(!LS.set(RK("blns:"+t.i),R)||!enqueue([p])){const el=document.getElementById("blch");if(el)el.insertAdjacentHTML("beforeend",'<p class="ko">Impossible d’enregistrer sur ce téléphone.</p>');return}
   nav({v:"list"});flush().then(()=>view())}
  function blReport(ix,motif){const t=IT[ix].t,now=nowS(),rid=Date.now().toString(36)+Math.random().toString(36).slice(2,6),p={t:"fp-sign",k:"blrep",id:rid,it:t.i,n:t.b||"",iv:D.i||"",motif:String(motif||"").slice(0,500),dl:now.dl,hl:now.hl};
   const R=recs("blrep:"+t.i);R.push({id:rid,dl:now.dl,hl:now.hl});if(!LS.set(RK("blrep:"+t.i),R)||!enqueue([p])){const el=document.getElementById("blch");if(el)el.insertAdjacentHTML("beforeend",'<p class="ko">Impossible d’enregistrer sur ce téléphone.</p>');return}view();flush().then(()=>view())}
- function blView(){if(!BS)return listView();const t=IT[BS.ix].t;
-  if(BS.step==="done")return `<div class="fc s-auj sgc"><h3>${BS.pending?"⏳ Signé, envoi en attente":"✔ Bon de livraison signé et transmis"}</h3><p><b>${esc(t.nm||("BL N° "+t.b))}</b>${t.c?" – "+esc(t.c):""} : signé par <b>${esc(BS.nm)}</b>${BS.res?' <span class="ko">avec remarque</span>':""}.</p><p class="ok" style="font-size:14px">✅ Signé électroniquement par ${esc(BS.nm)}${BS.fn?" ("+esc(BS.fn)+")":""} le ${esc(fds(BS.dl||T))} à ${esc(BS.hl||"")}${BS.rf?" · réf. "+esc(BS.rf):""}${sigKTxt(BS.sk)}</p><p class="mu">${BS.pending?"Pas de connexion pour l’instant : l’envoi se fera tout seul au retour du réseau. Gardez cette page dans votre téléphone.":"TOPAS informatique a reçu le bon signé : il est classé avec l’intervention."}</p><div class="btns"><button type="button" class="btn p" data-blend>← Mes interventions</button></div></div><div id="qbn">${bannerHtml()}</div>`;
-  if(BS.step==="recap")return `<div class="sgh"><button type="button" class="btn" data-sgx>← Quitter</button><div class="sgp">Vérification</div></div>
-  <div class="fc s-clo sgc">${blWhat(t,BS.ix,BS.noimg)}<div class="task"><span>Signataire</span><b>${esc(BS.nm)}${BS.fn?" – "+esc(BS.fn):""}</b></div><div class="task"><span>Remarque</span>${BS.res?`<b class="ko">Remarque</b><div class="rsv">${esc(BS.rc)}</div>`:"<b>Aucune</b>"}</div>
-  <div class="sgprev"><img alt="Signature du client" src="${svgOf(sgPts(BS.sg))}"></div><div class="mu" style="font-size:14px">Signature ${esc(BS.sm||"")}</div><p class="mu">Rien n’est envoyé tant que vous n’avez pas touché « Terminer l’intervention ».</p><div class="pberr" id="sge" role="alert"></div>
-  <div class="btns"><button type="button" class="btn" data-blback>← Modifier</button><button type="button" class="btn gn big2" id="blfin">✔ Terminer l’intervention</button></div></div><div id="qbn">${bannerHtml()}</div>`;
-  return itView(BS.ix)}
+ const matLi=m=>m&&m.length?`<ul class="ip-ml">${m.map(x=>`<li>${x[1]} × ${esc(x[0])}</li>`).join("")}</ul>`:"";
+ function blView(){if(!BS)return listView();const t=IT[BS.ix].t,cn=t.c||t.nm||"",num=t.b?"N° "+esc(t.b):esc(t.nm||""),mat=matOut(BS.mt);
+  if(BS.step==="done")return `<header class="ip-hd"><div class="ip-k">Bon de livraison</div><div class="ip-num">${num}</div><div class="ip-sub">${esc(cn)}</div></header>
+  <section class="ip-done${BS.pending?" pend":""}" role="status"><h2>${BS.pending?"⏳ Signé, envoi en attente":"✔ Signé et transmis"}</h2>
+   <div class="ip-kv"><span>Signataire</span><b>${esc(BS.nm)}${BS.fn?" ("+esc(BS.fn)+")":""}</b></div>
+   <div class="ip-kv"><span>Signé le</span><b>${esc(fds(BS.dl||T))} à ${esc(BS.hl||"")}</b></div>
+   <div class="ip-kv"><span>Remarque</span><b>${BS.res?"oui":"aucune"}</b></div>${BS.res?`<div class="ip-rv">${esc(BS.rc)}</div>`:""}
+   <div class="ip-kv"><span>Matériel laissé</span><b>${mat.length?mat.length+" article"+(mat.length>1?"s":""):"aucun"}</b></div>${matLi(mat)}
+   <p class="ip-proof">✅ Signé électroniquement par ${esc(BS.nm)}${BS.fn?" ("+esc(BS.fn)+")":""} le ${esc(fds(BS.dl||T))} à ${esc(BS.hl||"")}${BS.rf?" · réf. "+esc(BS.rf):""}${sigKTxt(BS.sk)}</p>
+   <p class="mu">${BS.pending?"Pas de connexion pour l’instant : l’envoi se fera tout seul au retour du réseau. Gardez cette page dans votre téléphone.":"TOPAS informatique a reçu le bon signé : il est classé avec l’intervention."}</p></section>
+  <button type="button" class="ip-cta" data-blend>🏠 Retour à l’accueil</button><div id="qbn">${bannerHtml()}</div>`;
+  if(BS.step==="recap")return `<header class="ip-hd"><button type="button" class="ip-back" data-blback>‹ Modifier</button><h1 class="ip-tt">Vérification</h1><div class="ip-sub2">${num}${cn?" · "+esc(cn):""}</div></header>
+  <section class="ip-sg sgc">${blWhat(t,BS.ix,BS.noimg)}
+   <div class="ip-kv"><span>Signataire</span><b>${esc(BS.nm)}${BS.fn?" – "+esc(BS.fn):""}</b></div>
+   <div class="ip-kv"><span>Remarque</span><b>${BS.res?'<span class="ko">Remarque</span>':"Aucune"}</b></div>${BS.res?`<div class="ip-rv">${esc(BS.rc)}</div>`:""}
+   <div class="ip-kv"><span>Matériel laissé</span><b>${mat.length?mat.length+" article"+(mat.length>1?"s":""):"Aucun"}</b></div>${matLi(mat)}
+   <div class="sgprev"><img alt="Signature du client" src="${svgOf(sgPts(BS.sg))}"></div><div class="mu" style="font-size:14px">Signature ${esc(BS.sm||"")}</div><p class="mu">Rien n’est envoyé tant que vous n’avez pas touché « Terminer l’intervention ».</p><div class="pberr" id="sge" role="alert"></div>
+   <button type="button" class="ip-cta" id="blfin">✔ Terminer l’intervention</button><div class="ip-b2"><button type="button" class="ip-btn2" data-blback>✏ Modifier</button><button type="button" class="ip-btn2" data-sgx>Quitter sans enregistrer</button></div></section><div id="qbn">${bannerHtml()}</div>`;
+  return blForm(BS.ix)}
  let BW=null;
  function blFormBind(){const g=id=>document.getElementById(id),pr=g("blpr");if(!pr||!BS)return;const no=g("blno"),fn=g("blfn"),rs=g("blres"),rc=g("blrc");
   BW=SIGW.mount(g("blsw"),{name:()=>pr.value+" "+no.value,max:2500,label:"Signature du client, composée à partir de son prénom et de son nom.",keep:BS.sw=BS.sw||{}});
-  pr.oninput=()=>{BS.pr=pr.value;BW.refresh()};no.oninput=()=>{BS.no=no.value;BW.refresh()};fn.oninput=()=>BS.fn=fn.value;const grow=()=>{rc.style.height="auto";rc.style.height=Math.max(rc.scrollHeight,0)+"px"};rc.oninput=()=>{BS.rc=rc.value;grow()};
-  rs.onchange=()=>{BS.res=rs.checked;g("blrw").classList.toggle("hide",!rs.checked);if(rs.checked){grow();rc.focus()}};if(rs.checked)setTimeout(grow,0);
-  g("blval").onclick=()=>{const e=g("sge");BS.pr=pr.value.trim().replace(/\s+/g," ");BS.no=no.value.trim().replace(/\s+/g," ");BS.fn=fn.value.trim();BS.rc=rc.value.trim();
+  matBind(document,BS.mt,"bl");pr.oninput=()=>{BS.pr=pr.value;BW.refresh()};no.oninput=()=>{BS.no=no.value;BW.refresh()};fn.oninput=()=>BS.fn=fn.value;const grow=()=>{rc.style.height="auto";rc.style.height=Math.max(rc.scrollHeight,0)+"px"};rc.oninput=()=>{BS.rc=rc.value;grow()};
+  rs.onchange=()=>{BS.res=rs.checked;rs.closest(".ip-opt").classList.toggle("on",rs.checked);g("blrw").classList.toggle("hide",!rs.checked);if(rs.checked){grow();rc.focus()}};if(rs.checked)setTimeout(grow,0);
+  g("blval").onclick=()=>{const e=g("sge");if(BS.mt.flush)BS.mt.flush();BS.pr=pr.value.trim().replace(/\s+/g," ");BS.no=no.value.trim().replace(/\s+/g," ");BS.fn=fn.value.trim();BS.rc=rc.value.trim();
    if(!BS.pr){e.textContent="Indiquez le prénom du signataire.";pr.focus();return}if(BS.no.length<2){e.textContent="Indiquez le nom du signataire.";no.focus();return}
-   if(BS.res&&BS.rc.length<3){e.textContent="Écrivez la remarque du client, ou décochez « Remarque ».";rc.focus();return}
+   if(BS.res&&BS.rc.length<3){e.textContent="Écrivez la remarque du client, ou éteignez « Ajouter une remarque ».";rc.focus();return}
+    if(BS.mt.on&&!BS.mt.L.length){e.textContent="Ajoutez l’article laissé, ou éteignez « Matériel laissé ».";g("blmn").focus();return}
    if(BW.empty()){e.textContent=BW.mode()==="draw"?"Le client doit signer dans le cadre (ou choisir « ✍ Signature simple »).":"Indiquez le prénom et le nom du signataire.";return}
    BS.nm=BS.pr+" "+BS.no.toLocaleUpperCase("fr-FR");BS.sg=BW.get();BS.sm=BW.how();BS.sk=BW.kind();BS.step="recap";nav({v:"bls"})}}
  function blBind(){const g=id=>document.getElementById(id);
-  document.querySelectorAll("[data-blback]").forEach(b=>b.onclick=()=>{BS.step="form";BS.open=1;const ix=BS.ix;nav({v:"it",ix});setTimeout(()=>{const e=document.getElementById("blsig");if(e)e.scrollIntoView({block:"start"})},60)});
+  document.querySelectorAll("[data-blback]").forEach(b=>b.onclick=()=>{BS.step="form";nav({v:"bls"})});
   const f=g("blfin");if(f)f.onclick=()=>{f.disabled=true;blFinish()};
   document.querySelectorAll("[data-blend]").forEach(b=>b.onclick=()=>{BS=null;nav({v:"list"})})}
  function blFinish(){const t=IT[BS.ix].t,now=nowS(),rid=Date.now().toString(36)+Math.random().toString(36).slice(2,6),prev=blRec(t.i),v=(prev?prev.v:0)+1;
-  const p={t:"fp-sign",k:"bl",id:rid,it:t.i,n:t.b||"",bv:t.v||1,v,iv:D.i||"",nm:BS.nm.slice(0,80),pr:BS.pr.slice(0,60),no:BS.no.slice(0,60),fn:BS.fn.slice(0,80),res:BS.res?1:0,lb:"rem",rc:BS.res?BS.rc.slice(0,1500):"",noimg:BS.noimg?1:0,sg:BS.sg,sm:BS.sm,sk:BS.sk||"",rf:sigRef(),dl:now.dl,hl:now.hl};BS.rf=p.rf;BS.dl=now.dl;BS.hl=now.hl;
+  const p={t:"fp-sign",k:"bl",id:rid,it:t.i,n:t.b||"",bv:t.v||1,v,iv:D.i||"",nm:BS.nm.slice(0,80),pr:BS.pr.slice(0,60),no:BS.no.slice(0,60),fn:BS.fn.slice(0,80),res:BS.res?1:0,lb:"rem",rc:BS.res?BS.rc.slice(0,1500):"",noimg:BS.noimg?1:0,sg:BS.sg,sm:BS.sm,sk:BS.sk||"",rf:sigRef(),mat:matOut(BS.mt),dl:now.dl,hl:now.hl};BS.rf=p.rf;BS.dl=now.dl;BS.hl=now.hl;BS.hl=now.hl;
   const R=recs("bl:"+t.i);R.push({id:rid,v,dl:now.dl,hl:now.hl,nm:p.nm,res:p.res});
   if(!LS.set(RK("bl:"+t.i),R)||!enqueue([p])){const ee=document.getElementById("sge");if(ee)ee.textContent="Impossible d’enregistrer sur ce téléphone (mémoire pleine ou navigation privée). Rien n’a été envoyé.";const fb=document.getElementById("blfin");if(fb)fb.disabled=false;return}
   BS.step="done";BS.pending=true;view();window.scrollTo(0,0);flush().then(()=>{if(BS&&BS.step==="done"){BS.pending=!!pend(rid);view()}})}
@@ -481,9 +675,9 @@ async function main(){
   const bil=(f.cl||[]).find(z=>z[0]==="bilan"),ended=s==="clo"||s==="fini";
   const itemB=`<div class="task"><span>📝 Bilan de la formation<br><small class="mu">Après la fin de la formation</small></span>${bil&&bil[1]?'<span class="ok">✔ Reçu, merci</span>':!ended?'<span class="mu">Après la formation</span>':f.bl?`<a class="btn gn" href="${esc(f.bl)}" target="_blank" rel="noopener">📝 Remplir mon bilan</a>`:'<span class="mu">Le lien vous sera envoyé par mail.</span>'}</div>`;
   const ct=f.ct||[];
-  return top()+`<div class="bd"><button type="button" class="btn" data-back>← Mes formations</button></div></div>
+  return `<header class="ip-hd"><button type="button" class="ip-back" data-back>‹ Retour</button><div class="ip-k">Formation · ${SL2[s]}</div><div class="ip-num ip-num2">${esc(f.t)}</div><div class="ip-sub">${esc(f.c)} · N° ${esc(f.n)}</div></header>
   <div id="qbn">${bannerHtml()}</div>
-  <div class="fc s-${s}"><div><span class="st">${SL2[s]}</span><span class="num">N° ${esc(f.n)}</span></div><h3>${esc(f.t)}</h3><div class="cli">${esc(f.c)}</div>
+  <div class="fc s-${s}"><div class="cli">${esc(f.c)}</div>
    <div class="ln"><i>📅</i><div>${DS(f).map(x=>{const t=slot(f,x);return `<div class="dt${x===T?" now":x<T?" past":""}"><b>${esc(fdl(x))}</b><span>${esc(t[2])}</span></div>`}).join("")||"À définir"}<span class="mu">${esc(f.h)} h au total</span></div></div>
    ${lieu(f,1)}${ctLine(f,1)}
    <div class="ln"><i>☎</i><div><b>TOPAS informatique</b>${D.m?`<br><a href="mailto:${esc(D.m)}">✉ ${esc(D.m)}</a>`:""}${G[1]?`<br><a href="tel:${esc(G[1].replace(/\s/g,""))}">☎ ${esc(G[1])}</a>`:""}</div></div>
@@ -504,7 +698,7 @@ async function main(){
  const stepScreen=()=>{const f=D.f[SG.ix],st=SG.steps[SG.i],n=SG.steps.length,re=SG.res[SG.i];
   const ctx=SG.kd==="der"?`<div class="pan" style="max-height:34vh;overflow:auto"><h4>Déroulé d’intervention – ${esc(f.t)}</h4>${scAll(f)||"<div class='mu'>Aucun scénario détaillé pour cette formation.</div>"}</div>`:"";
   return `<div class="sgh"><button type="button" class="btn" data-sgx>← Quitter</button><div class="sgp">${SG.kd==="em"?`Étape ${SG.i+1} sur ${n}`:"Validation du déroulé"}</div></div>
-  <div class="fc s-clo sgc"><div class="num">${esc(f.c)} · N° ${esc(f.n)}</div>${SG.kd==="em"?`<div class="num"><b>${esc(fdm(SG.day))}</b> · ${PARTL[SG.part]} · ${PARTH[SG.part]}</div>`:""}
+  <div class="fc s-clo sgc ip-sg"><div class="num">${esc(f.c)} · N° ${esc(f.n)}</div>${SG.kd==="em"?`<div class="num"><b>${esc(fdm(SG.day))}</b> · ${PARTL[SG.part]} · ${PARTH[SG.part]}</div>`:""}
   <div class="sgw">${st.tr?"Vous signez d’abord":"Passez le téléphone à"}</div><div class="nm2">${esc(st.nm)}</div>${ctx}
   <div id="emw"></div>
   <div class="sgb sgb2">${SG.kd==="em"&&!st.tr?'<button type="button" class="btn" id="abs">🚫 Absent</button>':"<span></span>"}<button type="button" class="btn gn" id="val">✔ Valider</button></div><div class="pberr" id="sge" role="alert"></div>
@@ -530,19 +724,19 @@ async function main(){
   if(!LS.set(RK(f.n),R)||!enqueue(pls)){const ee=document.getElementById("sge");if(ee)ee.textContent="Impossible d’enregistrer sur ce téléphone (mémoire pleine ou navigation privée). Rien n’a été envoyé.";const fb=document.getElementById("fin");if(fb)fb.disabled=false;return}
   SG.done={pending:true,sig:ents.length-abs,abs,rf};view();window.scrollTo(0,0);flush().then(()=>{if(SG&&SG.done){SG.done.pending=!!pend(rid);view()}})}
 
- function view(){const h=V.v==="f"?formView(V.ix):V.v==="sign"?signView():V.v==="it"?itView(V.ix):V.v==="bls"?blView():listView();app.innerHTML=h;bind()}
+ function view(){const h=V.v==="f"?formView(V.ix):V.v==="sign"?signView():V.v==="it"?itView(V.ix):V.v==="bls"?blView():listView(),nb=V.v==="list"||V.v==="it"||V.v==="f";app.innerHTML=h+(nb?navH():"");document.body.classList.toggle("ip-nb",nb);bind()}
  function bind(){
   document.querySelectorAll("[data-f]").forEach(b=>b.onclick=()=>nav({v:"f",ix:+b.dataset.f}));
   document.querySelectorAll("[data-back]").forEach(b=>b.onclick=()=>nav({v:"list"}));
   document.querySelectorAll("[data-qgo]").forEach(b=>b.onclick=flush);
   document.querySelectorAll("[data-sg]").forEach(b=>b.onclick=()=>startSign(V.ix,b.dataset.sg,b.dataset.day,b.dataset.part));
-  const sx=document.querySelector("[data-sgx]");if(sx)sx.onclick=()=>{if(!sx._a){sx._a=1;sx.textContent="Quitter sans enregistrer ?";setTimeout(()=>{sx._a=0;sx.textContent="← Quitter"},4000);return}if(V.v==="bls"&&BS){const ix=BS.ix;BS=null;return nav({v:"it",ix})}const ix=SG?SG.ix:0;SG=null;nav({v:"f",ix})};
+  const sx=document.querySelector("[data-sgx]");if(sx)sx.onclick=()=>{if(!sx._a){sx._a=1;const t0=sx.textContent;sx.textContent="Quitter sans enregistrer ?";setTimeout(()=>{sx._a=0;sx.textContent=t0},4000);return}if(V.v==="bls"&&BS){const ix=BS.ix;BS=null;return nav({v:"it",ix})}const ix=SG?SG.ix:0;SG=null;nav({v:"f",ix})};
   const sx2=document.querySelector("[data-back2]");if(sx2)sx2.onclick=()=>{const ix=SG.ix;SG=null;nav({v:"f",ix})};
   document.querySelectorAll("[data-sgr]").forEach(b=>b.onclick=()=>{SG.i=+b.dataset.sgr;SG.recap=false;SG.res[SG.i]=null;view()});
   const fin=document.getElementById("fin");if(fin)fin.onclick=()=>{fin.disabled=true;finish()};
   if(V.v==="sign"&&SG&&!SG.recap&&!SG.done)padInit();
-  if(V.v==="bls"&&BS){if(BS.step==="form"){BS.open=1;return nav({v:"it",ix:BS.ix})}blBind()}
-  if(V.v==="it")blFormBind();
+  if(V.v==="bls"&&BS){if(BS.step==="form")blFormBind();else blBind()}
+  document.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>tabGo(b.dataset.tab));document.querySelectorAll("[data-blbon]").forEach(b=>b.onclick=()=>nav({v:"it",ix:BS.ix}));document.querySelectorAll("[data-blrep2]").forEach(b=>b.onclick=()=>blRepAsk(+b.dataset.blrep2));
   document.querySelectorAll("[data-it]").forEach(b=>b.onclick=()=>nav({v:"it",ix:+b.dataset.it}));
   document.querySelectorAll("[data-blns]").forEach(b=>b.onclick=()=>blNsAsk(+b.dataset.blns));
   document.querySelectorAll("[data-bls]").forEach(b=>b.onclick=async()=>{const ix=+b.dataset.bls;b.disabled=true;const P=await blImg(IT[ix].t);b.disabled=false;if(P)blStart(ix);else if(BS&&BS.ix===ix&&BS.noimg)blStart(ix,1);else blChoice(ix)});
