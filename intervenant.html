@@ -127,6 +127,7 @@ button:focus-visible,a:focus-visible,summary:focus-visible,textarea:focus-visibl
 .blch{margin-top:12px;padding:12px 14px;border:2px solid var(--or);border-radius:12px;background:#fff7ed;color:#7c2d12}.blch p{margin:4px 0 8px}.blch .btn{width:100%;justify-content:center;margin-top:8px;min-height:52px}
 @media (prefers-color-scheme:dark){.blch{background:#3a2412;color:#fed7aa}}
 .rsv{flex-basis:100%;white-space:pre-wrap;background:#fff7ed;border-left:4px solid var(--or);padding:8px 10px;border-radius:8px;color:#7c2d12}
+.urow{display:flex;align-items:center;gap:10px;justify-content:space-between;min-height:64px}.urow .ul{display:flex;flex-direction:column;min-width:0;flex:1}.urow .ul b{font-size:16px;overflow-wrap:anywhere}.urow .m{font-size:15px;margin-top:2px;overflow-wrap:anywhere}.utag{flex:none;border-radius:999px;padding:5px 12px;font-size:15px;font-weight:800;letter-spacing:.2px}.utag.ub{background:#fff1e6;color:#c2410c;border:1px solid #fdba74}.utag.uf{background:#e8f0fb;color:#1e4f9a;border:1px solid #93b4e0}
 </style>
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
@@ -319,21 +320,25 @@ async function main(){
  const instH=()=>standalone()||LS.get("fpiv:inst",0)?"":`<details class="inst" id="inst"><summary>📲 Garder l’espace sur votre téléphone</summary><p><b>iPhone</b> : touchez « Partager » <span aria-hidden="true">⬆</span> puis « Sur l’écran d’accueil ».<br><b>Android</b> : touchez « ⋮ » puis « Installer l’application » (ou « Ajouter à l’écran d’accueil »).</p><p>L’icône « TOPAS Intervenants » s’ouvre en plein écran, toujours à jour, et même sans réseau.</p><button type="button" class="btn" data-insok>C’est fait</button></details>`;
 
  // ---- 1. liste
+ // ---- liste unique : formations et bons de livraison mélangés, dans l'ordre des dates (▶ Aujourd'hui · 🔜 À venir · ✅ Signées 12 mois, repliée)
+ // chaque ligne : le client, la date et l'heure, le lieu ; à droite l'étiquette « BL » (orange) ou « Formation » (bleu). Le détail au clic est inchangé.
+ const uHr=t=>String(t||"").replace(/^[^·]*·\s*/,"");
+ const uF=(x,d)=>{const f=x.f,dd=DS(f),dt=d||dd[0]||"";return {k:dt+" "+((HRS[(f.hf||{})[dt]]||FULL)[0]),h:`<button type="button" class="row urow" data-f="${x.ix}" style="--c:var(--bl)"><span class="ul"><b>${esc(f.c||"")}</b><span class="m">${dt?esc(fds(dt))+(dd.length>1?" <small>("+dd.length+" j)</small>":"")+" · "+esc(uHr(slot(f,dt)[2])):"Dates à définir"}</span><span class="m">${esc(f.a||city(f)||"")}</span></span><span class="utag uf">Formation</span></button>`}};
+ const uB=x=>{const t=x.t;return {k:(t.d||"9999-12-31")+" "+(t.h||"00:00"),h:`<button type="button" class="row urow" data-it="${x.ix}" data-b="${esc(t.b||"")}" style="--c:var(--or)"><span class="ul"><b>${esc(t.c||t.nm||"Intervention")}</b><span class="m">${t.d?esc(fds(t.d))+(t.h?" · "+esc(t.h):""):"Date à préciser"}</span><span class="m">${esc(t.a||itCity(t)||"")}</span></span><span class="utag ub">BL</span></button>`}};
+ function uGroups(){const G3=itGroups(),inF=x=>shF?x:[],last=x=>DS(x.f).slice(-1)[0]||"",nxt=x=>DS(x.f).find(d=>d>=T)||DS(x.f)[0]||"",up=(a,b)=>a.k.localeCompare(b.k),dn=(a,b)=>b.k.localeCompare(a.k);
+  return {auj:inF(encours).map(x=>uF(x,DS(x.f).includes(T)?T:x.s==="clo"?last(x):nxt(x))).concat(G3.auj.map(uB)).sort(up),
+   ven:inF(venir).map(x=>uF(x,nxt(x))).concat(G3.ven.map(uB)).sort(up),
+   sig:inF(passees).map(x=>uF(x,last(x))).concat(G3.sig.filter(x=>!x.t.d||x.t.d>=lim12).map(uB)).sort(dn)}}
+ function uList(){const U=uGroups(),S3=(t,c,arr,open,empty,k)=>`<section class="sec" id="s-${k}" style="--c:${c}"><details ${open?"open":""}><summary class="lh">${t} <span class="n">${arr.length}</span></summary>${arr.map(o=>o.h).join("")||`<div class="empty">${empty}</div>`}</details></section>`;
+  return S3("▶ Aujourd’hui","var(--gr)",U.auj,true,"Rien de prévu aujourd’hui.","uauj")+S3("🔜 À venir","var(--bl)",U.ven,true,"Rien de prévu pour le moment.","uven")+S3("✅ Signées <small>(12 derniers mois)</small>","var(--gy)",U.sig,false,"Rien de signé pour l’instant.","usig")}
  function listView(){const V2=D.v;
   const L=(t,c,arr,open,empty,k)=>`<section class="sec" id="s-${k}" style="--c:${c}"><details ${open?"open":""}><summary class="lh">${t} <span class="n">${arr.length}</span></summary>${arr.map(row).join("")||`<div class="empty">${empty}</div>`}</details></section>`;
   const LI=(t,c,arr,open,empty,k)=>`<section class="sec" id="s-${k}" style="--c:${c}"><details ${open?"open":""}><summary class="lh">${t} <span class="n">${arr.length}</span></summary>${arr.map(itRow).join("")||`<div class="empty">${empty}</div>`}</details></section>`,G3=itGroups();
   return top()+`<div class="bd"><div class="hi">Bonjour${pr?" "+esc(pr):""} 👋</div><p class="upd">Mis à jour le <b>${esc(fds(D.u||T))}</b>. ${EJ?"Votre espace se met à jour tout seul : gardez ce lien (ou l’icône sur votre écran d’accueil).":"Si le planning change, un nouveau lien vous est envoyé : utilisez toujours le plus récent."}</p>${EJ?instH():""}
   ${shF?`<div class="kpi"><div><b>${nUp}</b><span>À venir</span></div><div><b>${nMo}</b><span>Ce mois-ci <small>(jour${nMo>1?"s":""})</small></span></div><div><b>${String(hUp).replace(".",",")} h</b><span>Heures planifiées</span></div></div>`:`<div class="kpi"><div><b>${G3.auj.length}</b><span>Aujourd’hui</span></div><div><b>${G3.ven.length}</b><span>À venir</span></div><div><b>${G3.sig.length}</b><span>Signées</span></div></div>`}</div></div>
   <div id="qbn">${bannerHtml()}</div>${horsH()}
-  ${shF?`${shT?'<h2 class="secT">🎓 Mes formations</h2>':""}
-  ${nx?`<div class="hero"><div class="kk">Prochaine intervention</div><h2>${esc(nx.x.f.t)}</h2><div class="li"><b>${esc(nx.x.f.c)}</b></div><div class="cd">${esc(rel(nx.d).replace(/^./,c=>c.toUpperCase()))}</div><div class="li">📅 ${esc(fdl(nx.d))}${DS(nx.x.f).length>1?` <span style="opacity:.8">(${DS(nx.x.f).map(fdm).join(", ")})</span>`:""}</div><div class="li">🕘 ${esc(slot(nx.x.f,nx.d)[2])}</div><div class="li">📍 ${esc(nx.x.f.c)}${nx.x.f.a?" – "+esc(nx.x.f.a):""}</div><div class="btns"><a class="btn" href="${maps(nx.x.f)}" target="_blank" rel="noopener">🧭 Itinéraire</a></div></div>`:""}
-  ${L("▶ En cours","var(--gr)",encours,true,"Aucune formation en cours.","cours")}
-  ${L("🔜 À venir","var(--bl)",venir,true,"Aucune formation à venir pour le moment.","venir")}
-  ${L("✅ Passées <small>(12 derniers mois)</small>","var(--gy)",passees,false,"Aucune formation passée.","fini")}`:""}
-  ${shT?`<h2 class="secT" id="s-itv">🚚 Mes interventions</h2>
-  ${LI("▶ Aujourd’hui","var(--gr)",G3.auj,true,"Aucune intervention à faire signer aujourd’hui.","iauj")}
-  ${LI("🔜 À venir","var(--bl)",G3.ven,true,"Aucune intervention à venir pour le moment.","iven")}
-  ${LI("✅ Signées","var(--gy)",G3.sig,false,"Aucun bon de livraison signé pour l’instant.","isig")}`:""}
+  ${shF&&nx?`<div class="hero"><div class="kk">Prochaine intervention</div><h2>${esc(nx.x.f.t)}</h2><div class="li"><b>${esc(nx.x.f.c)}</b></div><div class="cd">${esc(rel(nx.d).replace(/^./,c=>c.toUpperCase()))}</div><div class="li">📅 ${esc(fdl(nx.d))}${DS(nx.x.f).length>1?` <span style="opacity:.8">(${DS(nx.x.f).map(fdm).join(", ")})</span>`:""}</div><div class="li">🕘 ${esc(slot(nx.x.f,nx.d)[2])}</div><div class="li">📍 ${esc(nx.x.f.c)}${nx.x.f.a?" – "+esc(nx.x.f.a):""}</div><div class="btns"><a class="btn" href="${maps(nx.x.f)}" target="_blank" rel="noopener">🧭 Itinéraire</a></div></div>`:""}
+  ${uList()}
   ${V2&&V2.t?`<div class="vei"><div class="kk">📢 Info réglementaire</div><h3>${esc(V2.t)}</h3>${V2.r?`<div class="mu" style="color:var(--tx)">${esc(V2.r)}</div>`:""}<div class="mu" style="margin-top:4px">Transmise le ${esc(fds(V2.dd||V2.d||T))}${V2.u?` · <a href="${esc(V2.u)}" target="_blank" rel="noopener">Voir la source</a>`:""}</div><div class="btns">${V2.lu?'<span class="pbok" style="margin:0">✔ Vous l’avez lue, merci</span>':V2.a?`<a class="btn gn" href="${esc(V2.a)}" target="_blank" rel="noopener">✅ J’ai lu – donner mon avis</a>`:""}</div></div>`:""}
   ${foot()}`}
 
