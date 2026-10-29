@@ -139,8 +139,10 @@ button:focus-visible,a:focus-visible,summary:focus-visible,textarea:focus-visibl
 /*SIGW*/
 // ===== Signature composée (bloc commun aux pages publiques, copié par outils/sigfonts.py — ne pas modifier dans les pages) =====
 // La signature est composée à partir du prénom et du nom dans une police manuscrite « à un seul trait » embarquée (SIGF, licence SIL OFL),
-// en 3 styles au choix avec aperçu immédiat ; sur téléphone et tablette, « ✍ Dessiner ma signature au doigt » reste possible (pas de tracé
-// à la souris sur ordinateur). Le résultat est un tracé au même format qu'avant (points en base 36, cadre 320 × 140, encre bleu foncé) :
+// en 3 styles au choix avec aperçu immédiat. TOUJOURS deux choix, côte à côte, sur téléphone comme sur ordinateur : « ✍ Signature simple »
+// (composée) et « ✏ Signer à la main » (doigt, stylet, souris ou pavé tactile) ; par défaut « simple » sur ordinateur, « à la main » sur tactile ;
+// on bascule sans perdre ce qui a été saisi. kind() = « simple » | « manuscrite » (mode inscrit dans la mention, propriété sk).
+// Le résultat est un tracé au même format qu'avant (points en base 36, cadre 320 × 140, encre bleu foncé) :
 // les documents, les PDF et les dépôts existants le dessinent sans aucun changement.
 const SIGW=(()=>{
  const ST=[["a","Élégante"],["f","Calligraphiée"],["r","Simple"]],INK="#12308f",SK="fpsig:st";
@@ -164,28 +166,36 @@ const SIGW=(()=>{
  // traits → texte compact (même format que le tracé au doigt), allégé si besoin pour tenir dans « max » caractères
  function toSg(S,max){max=max||2200;let th=0,out="";for(;;){const R=S.map(s=>{const r=[];let l=null;s.forEach((q,i)=>{if(!l||Math.hypot(q[0]-l[0],q[1]-l[1])>=th||i===s.length-1){if(!l||q[0]!==l[0]||q[1]!==l[1])r.push(q);l=q}});return r});
   out=R.map(s=>s.map(q=>Math.max(0,q[0]).toString(36)+"."+Math.max(0,q[1]).toString(36)).join(",")).join(";");if(out.length<=max||th>40)return out;th+=th?1.5:1.2}}
- function paint(cv,S){const r=cv.getBoundingClientRect(),dp=window.devicePixelRatio||1;if(r.width){const w=Math.round(r.width*dp),h=Math.round(r.height*dp);if(cv.width!==w||cv.height!==h){cv.width=w;cv.height=h}}
-  const ctx=cv.getContext("2d"),k=cv.width/320;ctx.clearRect(0,0,cv.width,cv.height);ctx.strokeStyle=INK;ctx.lineWidth=2.4*k;ctx.lineCap="round";ctx.lineJoin="round";
+ function paint(cv,S,lw){const r=cv.getBoundingClientRect(),dp=window.devicePixelRatio||1;if(r.width){const w=Math.round(r.width*dp),h=Math.round(r.height*dp);if(cv.width!==w||cv.height!==h){cv.width=w;cv.height=h}}
+  const ctx=cv.getContext("2d"),k=cv.width/320;ctx.clearRect(0,0,cv.width,cv.height);ctx.strokeStyle=INK;ctx.lineWidth=(lw||2.4)*k;ctx.lineCap="round";ctx.lineJoin="round";
   S.forEach(s=>{if(!s.length)return;ctx.beginPath();ctx.moveTo(s[0][0]*k,s[0][1]*k);if(s.length===1)ctx.lineTo(s[0][0]*k+.1,s[0][1]*k);s.forEach(q=>ctx.lineTo(q[0]*k,q[1]*k));ctx.stroke()})}
- const CSS=`<style>.sgw{margin-top:6px}.sgw [hidden]{display:none!important}.sgw-l{font-size:15px;font-weight:600;margin:10px 0 6px}.sgw-st{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.sgw-b{border:2px solid #cbd5e1;border-radius:10px;background:#fff;padding:4px 4px 6px;min-height:44px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;font:600 14px system-ui,-apple-system,"Segoe UI",sans-serif;color:#334155}.sgw-b[aria-checked="true"]{border-color:${INK};box-shadow:0 0 0 2px rgba(18,48,143,.18);color:${INK}}.sgw-b canvas{width:100%;aspect-ratio:320/140;height:auto;display:block}.sgw-pad{position:relative;margin-top:10px;border:2px dashed #9fb3d9;border-radius:12px;background:#fff;aspect-ratio:320/140;max-height:240px;width:100%}.sgw-cv{position:absolute;inset:0;width:100%;height:100%}.sgw-pad.dr{border-style:solid;border-color:${INK}}.sgw-pad.dr .sgw-cv{touch-action:none;cursor:crosshair}.sgw-ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#94a3b8;font:15px system-ui,sans-serif;pointer-events:none;text-align:center;padding:0 10px}.sgw-act{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}.sgw-act button{min-height:44px;font:600 15px system-ui,sans-serif;border-radius:10px;border:1px solid #cbd5e1;background:#f8fafc;color:#1e293b;padding:8px 12px;cursor:pointer}.sgw-act .sgw-dr{border-color:${INK};color:${INK};background:#fff}</style>`;
+ const CSS=`<style>.sgw{margin-top:6px}.sgw [hidden]{display:none!important}.sgw-l{font-size:15px;font-weight:600;margin:10px 0 6px}.sgw-st{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.sgw-b{border:2px solid #cbd5e1;border-radius:10px;background:#fff;padding:4px 4px 6px;min-height:44px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;font:600 14px system-ui,-apple-system,"Segoe UI",sans-serif;color:#334155}.sgw-b[aria-checked="true"]{border-color:${INK};box-shadow:0 0 0 2px rgba(18,48,143,.18);color:${INK}}.sgw-b canvas{width:100%;aspect-ratio:320/140;height:auto;display:block}.sgw-pad{position:relative;margin-top:10px;border:2px dashed #9fb3d9;border-radius:12px;background:#fff;aspect-ratio:320/140;max-height:240px;width:100%}.sgw-cv{position:absolute;inset:0;width:100%;height:100%}.sgw-pad.dr{border-style:solid;border-color:${INK}}.sgw-pad.dr .sgw-cv{touch-action:none;cursor:crosshair}.sgw-ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#94a3b8;font:15px system-ui,sans-serif;pointer-events:none;text-align:center;padding:0 10px}.sgw-act{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}.sgw-act button{min-height:44px;font:600 15px system-ui,sans-serif;border-radius:10px;border:1px solid #cbd5e1;background:#f8fafc;color:#1e293b;padding:8px 12px;cursor:pointer}.sgw-tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:4px 0 6px}.sgw-tb{min-height:48px;font:700 15px system-ui,-apple-system,"Segoe UI",sans-serif;border-radius:12px;border:2px solid #cbd5e1;background:#f8fafc;color:#334155;padding:8px 10px;cursor:pointer}.sgw-tb[aria-selected="true"]{border-color:${INK};background:${INK};color:#fff}.sgw-tb:focus-visible{outline:3px solid rgba(18,48,143,.35);outline-offset:2px}</style>`;
  // o = {name: () => « Prénom Nom », max: longueur maximale du tracé, label}
- function mount(el,o){o=o||{};let st=(()=>{try{const v=localStorage.getItem(SK);return ST.some(x=>x[0]===v)?v:"a"}catch(e){return"a"}})(),mode="txt",drw=[],cur=null,comp=[];const T=touch();
-  el.innerHTML=CSS+`<div class="sgw"><div class="sgw-l" id="${el.id||"sgw"}-l">${o.label||"Choisissez le style de votre signature"}</div><div class="sgw-st" role="radiogroup" aria-labelledby="${el.id||"sgw"}-l">${ST.map(([k,l])=>`<button type="button" role="radio" class="sgw-b" data-st="${k}" aria-checked="${k===st}"><canvas aria-hidden="true"></canvas><span>${l}</span></button>`).join("")}</div>
-   <div class="sgw-pad"><canvas class="sgw-cv" role="img" aria-label="Aperçu de votre signature"></canvas><div class="sgw-ph">Indiquez votre prénom et votre nom : votre signature s’affiche ici</div></div>
-   ${T?`<div class="sgw-act"><button type="button" class="sgw-dr">✍ Dessiner ma signature au doigt</button><button type="button" class="sgw-cl" hidden>Effacer</button><button type="button" class="sgw-bk" hidden>↺ Revenir à la signature composée</button></div>`:""}</div>`;
+ // tracé à la main : renforcé (traits doublés d'un point) pour rester lisible une fois réduit dans le document — même format de données
+ const thick=S=>S.concat(S.map(s=>s.map(([x,y])=>[x+1,y])),S.map(s=>s.map(([x,y])=>[x,y+1])));
+ function mount(el,o){o=o||{};let st=(()=>{try{const v=localStorage.getItem(SK);return ST.some(x=>x[0]===v)?v:"a"}catch(e){return"a"}})(),cur=null,comp=[];const T=touch(),K=o.keep&&typeof o.keep==="object"?o.keep:null;let mode=K&&(K.mode==="draw"||K.mode==="txt")?K.mode:T?"draw":"txt",drw=K&&Array.isArray(K.drw)?K.drw:[];const id=el.id||"sgw";
+  const keep=()=>{if(K){K.mode=mode;K.drw=drw}};// o.keep : mémoire (mode + tracé) conservée si l'encart est reconstruit (retour en arrière)
+  el.innerHTML=CSS+`<div class="sgw"><div class="sgw-tabs" role="tablist" aria-label="Façon de signer"><button type="button" role="tab" class="sgw-tb" data-m="txt" id="${id}-tt">✍ Signature simple</button><button type="button" role="tab" class="sgw-tb" data-m="draw" id="${id}-td">✏ Signer à la main</button></div>
+   <div class="sgw-txt"><div class="sgw-l" id="${id}-l">${o.label||"Choisissez le style de votre signature"}</div><div class="sgw-st" role="radiogroup" aria-labelledby="${id}-l">${ST.map(([k,l])=>`<button type="button" role="radio" class="sgw-b" data-st="${k}" aria-checked="${k===st}"><canvas aria-hidden="true"></canvas><span>${l}</span></button>`).join("")}</div></div>
+   <div class="sgw-pad" role="tabpanel"><canvas class="sgw-cv" role="img" aria-label="Votre signature"></canvas><div class="sgw-ph"></div></div>
+   <div class="sgw-act"><button type="button" class="sgw-cl" hidden>↺ Effacer</button></div></div>`;
   const q=s=>el.querySelector(s),cv=q(".sgw-cv"),pad=q(".sgw-pad"),ph=q(".sgw-ph"),nm=()=>clean(o.name?o.name():"");
-  function draw(){if(mode==="draw"){paint(cv,drw.concat(cur?[cur]:[]));ph.style.display=drw.length||cur?"none":"flex";ph.textContent="Signez ici avec le doigt"}
+  function draw(){if(mode==="draw"){paint(cv,drw.concat(cur?[cur]:[]),3.4);ph.style.display=drw.length||cur?"none":"flex";ph.textContent=T?"Signez ici avec le doigt":"Signez ici avec la souris ou le pavé tactile"}
    else{comp=compose(nm(),st);paint(cv,comp);ph.style.display=comp.length?"none":"flex";ph.textContent="Indiquez votre prénom et votre nom : votre signature s’affiche ici"}
-   el.querySelectorAll(".sgw-b").forEach(b=>{b.setAttribute("aria-checked",String(mode==="txt"&&b.dataset.st===st));paint(b.querySelector("canvas"),compose(nm()||"Signature",b.dataset.st))})}
-  el.querySelectorAll(".sgw-b").forEach(b=>b.onclick=()=>{st=b.dataset.st;try{localStorage.setItem(SK,st)}catch(e){}if(mode==="draw")setMode("txt");else draw()});
-  function setMode(m){mode=m;pad.classList.toggle("dr",m==="draw");if(T){q(".sgw-dr").hidden=m==="draw";q(".sgw-cl").hidden=m!=="draw";q(".sgw-bk").hidden=m!=="draw"}draw()}
-  if(T){q(".sgw-dr").onclick=()=>{drw=[];cur=null;setMode("draw");try{pad.scrollIntoView({block:"center",behavior:"smooth"})}catch(e){}};q(".sgw-cl").onclick=()=>{drw=[];cur=null;draw()};q(".sgw-bk").onclick=()=>setMode("txt");
-   const pt=e=>{const r=cv.getBoundingClientRect();return[Math.round((e.clientX-r.left)/r.width*320),Math.round((e.clientY-r.top)/r.height*140)]};
-   cv.addEventListener("pointerdown",e=>{if(mode!=="draw")return;e.preventDefault();try{cv.setPointerCapture(e.pointerId)}catch(x){}cur=[pt(e)];draw()});
-   cv.addEventListener("pointermove",e=>{if(mode!=="draw"||!cur)return;e.preventDefault();cur.push(pt(e));draw()});
-   const end=()=>{if(!cur)return;drw.push(cur);cur=null;draw()};cv.addEventListener("pointerup",end);cv.addEventListener("pointercancel",end);cv.addEventListener("pointerleave",end)}
-  window.addEventListener("resize",()=>draw());setTimeout(draw,0);draw();
-  return {refresh:draw,mode:()=>mode,style:()=>st,touch:T,empty:()=>mode==="draw"?!drw.length:!comp.length,get:()=>mode==="draw"?(drw.length?toSg(drw,o.max):""):(comp.length?toSg(comp,o.max):""),how:()=>mode==="draw"?"doigt":"composée ("+(ST.find(x=>x[0]===st)||ST[0])[1].toLowerCase()+")"}}
+   el.querySelectorAll(".sgw-b").forEach(b=>{b.setAttribute("aria-checked",String(b.dataset.st===st));paint(b.querySelector("canvas"),compose(nm()||"Signature",b.dataset.st))})}
+  el.querySelectorAll(".sgw-b").forEach(b=>b.onclick=()=>{st=b.dataset.st;try{localStorage.setItem(SK,st)}catch(e){}draw()});
+  function setMode(m){mode=m;keep();pad.classList.toggle("dr",m==="draw");q(".sgw-txt").hidden=m==="draw";q(".sgw-cl").hidden=m!=="draw";
+   el.querySelectorAll(".sgw-tb").forEach(b=>{const on=b.dataset.m===m;b.setAttribute("aria-selected",String(on));b.tabIndex=on?0:-1});pad.setAttribute("aria-labelledby",id+(m==="draw"?"-td":"-tt"));draw()}
+  el.querySelectorAll(".sgw-tb").forEach(b=>b.onclick=()=>{if(b.dataset.m!==mode)setMode(b.dataset.m)});
+  q(".sgw-tabs").addEventListener("keydown",e=>{if(e.key==="ArrowLeft"||e.key==="ArrowRight"){e.preventDefault();setMode(mode==="txt"?"draw":"txt");q('.sgw-tb[aria-selected="true"]').focus()}});
+  q(".sgw-cl").onclick=()=>{drw=[];cur=null;keep();draw()};
+  const pt=e=>{const r=cv.getBoundingClientRect();return[Math.round((e.clientX-r.left)/r.width*320),Math.round((e.clientY-r.top)/r.height*140)]};
+  cv.addEventListener("pointerdown",e=>{if(mode!=="draw")return;e.preventDefault();try{cv.setPointerCapture(e.pointerId)}catch(x){}cur=[pt(e)];draw()});
+  cv.addEventListener("pointermove",e=>{if(mode!=="draw"||!cur)return;e.preventDefault();cur.push(pt(e));draw()});
+  const end=()=>{if(!cur)return;drw.push(cur);cur=null;keep();draw()};cv.addEventListener("pointerup",end);cv.addEventListener("pointercancel",end);cv.addEventListener("pointerleave",end);
+  window.addEventListener("resize",()=>draw());setMode(mode);setTimeout(draw,0);
+  return {refresh:draw,mode:()=>mode,setMode,style:()=>st,touch:T,empty:()=>mode==="draw"?!drw.length:!comp.length,get:()=>mode==="draw"?(drw.length?toSg(thick(drw),o.max):""):(comp.length?toSg(comp,o.max):""),
+   how:()=>mode==="draw"?"doigt":"composée ("+(ST.find(x=>x[0]===st)||ST[0])[1].toLowerCase()+")",kind:()=>mode==="draw"?"manuscrite":"simple"}}
  return {mount,compose,toSg,styles:ST}})();
 /*/SIGW*/
 const SBU="https://kbfnxqyxqualmqhiufnq.supabase.co",SBK="sb_publishable_5vjNCP7zREh5upGu_pTAIA_mgUPG8Cx";
@@ -394,7 +404,7 @@ async function main(){
  // encart « Signature électronique » DANS la fiche, sous le bon : prénom, nom, fonction, réserves, signature composée ou au doigt
  const blNew=ix=>({ix,step:"form",pr:"",no:"",nm:"",fn:"",res:false,rc:"",sg:"",sm:"",noimg:0,open:0});
  const blForm=ix=>{if(!BS||BS.ix!==ix)BS=blNew(ix);return `<section class="sec${BS.open?"":" hide"}" id="blsig" style="--c:var(--gr)"><h2>✍ Signature électronique du client</h2><div class="fc s-clo sgc">
-  ${BS.noimg?'<div class="qb qw" style="margin:0 0 8px"><b>⚠ Le bon n’a pas pu être affiché</b><span>Le client signe sans le voir : ce sera noté sur le bon signé.</span></div>':'<p class="mu" style="margin-top:0">Le client vérifie le bon ci-dessus, puis indique son prénom, son nom et sa fonction : sa signature se compose toute seule (ou il la dessine au doigt).</p>'}
+  ${BS.noimg?'<div class="qb qw" style="margin:0 0 8px"><b>⚠ Le bon n’a pas pu être affiché</b><span>Le client signe sans le voir : ce sera noté sur le bon signé.</span></div>':'<p class="mu" style="margin-top:0">Le client vérifie le bon ci-dessus, puis indique son prénom, son nom et sa fonction : sa signature se compose toute seule (ou il signe à la main).</p>'}
   <label class="fl" for="blpr">Prénom du signataire *</label><input class="fl" id="blpr" autocomplete="given-name" value="${esc(BS.pr)}" style="font-weight:400">
   <label class="fl" for="blno">Nom du signataire *</label><input class="fl" id="blno" autocomplete="family-name" value="${esc(BS.no)}" style="font-weight:400">
   <label class="fl" for="blfn">Fonction</label><input class="fl" id="blfn" value="${esc(BS.fn)}" style="font-weight:400">
@@ -413,7 +423,7 @@ async function main(){
  function blReport(ix,motif){const t=IT[ix].t,now=nowS(),rid=Date.now().toString(36)+Math.random().toString(36).slice(2,6),p={t:"fp-sign",k:"blrep",id:rid,it:t.i,n:t.b||"",iv:D.i||"",motif:String(motif||"").slice(0,500),dl:now.dl,hl:now.hl};
   const R=recs("blrep:"+t.i);R.push({id:rid,dl:now.dl,hl:now.hl});if(!LS.set(RK("blrep:"+t.i),R)||!enqueue([p])){const el=document.getElementById("blch");if(el)el.insertAdjacentHTML("beforeend",'<p class="ko">Impossible d’enregistrer sur ce téléphone.</p>');return}view();flush().then(()=>view())}
  function blView(){if(!BS)return listView();const t=IT[BS.ix].t;
-  if(BS.step==="done")return `<div class="fc s-auj sgc"><h3>${BS.pending?"⏳ Signé, envoi en attente":"✔ Bon de livraison signé et transmis"}</h3><p><b>${esc(t.nm||("BL N° "+t.b))}</b>${t.c?" – "+esc(t.c):""} : signé par <b>${esc(BS.nm)}</b>${BS.res?' <span class="ko">avec remarque</span>':""}.</p><p class="ok" style="font-size:14px">✅ Signé électroniquement par ${esc(BS.nm)}${BS.fn?" ("+esc(BS.fn)+")":""} le ${esc(fds(BS.dl||T))} à ${esc(BS.hl||"")}${BS.rf?" · réf. "+esc(BS.rf):""}</p><p class="mu">${BS.pending?"Pas de connexion pour l’instant : l’envoi se fera tout seul au retour du réseau. Gardez cette page dans votre téléphone.":"TOPAS informatique a reçu le bon signé : il est classé avec l’intervention."}</p><div class="btns"><button type="button" class="btn p" data-blend>← Mes interventions</button></div></div><div id="qbn">${bannerHtml()}</div>`;
+  if(BS.step==="done")return `<div class="fc s-auj sgc"><h3>${BS.pending?"⏳ Signé, envoi en attente":"✔ Bon de livraison signé et transmis"}</h3><p><b>${esc(t.nm||("BL N° "+t.b))}</b>${t.c?" – "+esc(t.c):""} : signé par <b>${esc(BS.nm)}</b>${BS.res?' <span class="ko">avec remarque</span>':""}.</p><p class="ok" style="font-size:14px">✅ Signé électroniquement par ${esc(BS.nm)}${BS.fn?" ("+esc(BS.fn)+")":""} le ${esc(fds(BS.dl||T))} à ${esc(BS.hl||"")}${BS.rf?" · réf. "+esc(BS.rf):""}${sigKTxt(BS.sk)}</p><p class="mu">${BS.pending?"Pas de connexion pour l’instant : l’envoi se fera tout seul au retour du réseau. Gardez cette page dans votre téléphone.":"TOPAS informatique a reçu le bon signé : il est classé avec l’intervention."}</p><div class="btns"><button type="button" class="btn p" data-blend>← Mes interventions</button></div></div><div id="qbn">${bannerHtml()}</div>`;
   if(BS.step==="recap")return `<div class="sgh"><button type="button" class="btn" data-sgx>← Quitter</button><div class="sgp">Vérification</div></div>
   <div class="fc s-clo sgc">${blWhat(t,BS.ix,BS.noimg)}<div class="task"><span>Signataire</span><b>${esc(BS.nm)}${BS.fn?" – "+esc(BS.fn):""}</b></div><div class="task"><span>Remarque</span>${BS.res?`<b class="ko">Remarque</b><div class="rsv">${esc(BS.rc)}</div>`:"<b>Aucune</b>"}</div>
   <div class="sgprev"><img alt="Signature du client" src="${svgOf(sgPts(BS.sg))}"></div><div class="mu" style="font-size:14px">Signature ${esc(BS.sm||"")}</div><p class="mu">Rien n’est envoyé tant que vous n’avez pas touché « Terminer l’intervention ».</p><div class="pberr" id="sge" role="alert"></div>
@@ -421,20 +431,20 @@ async function main(){
   return itView(BS.ix)}
  let BW=null;
  function blFormBind(){const g=id=>document.getElementById(id),pr=g("blpr");if(!pr||!BS)return;const no=g("blno"),fn=g("blfn"),rs=g("blres"),rc=g("blrc");
-  BW=SIGW.mount(g("blsw"),{name:()=>pr.value+" "+no.value,max:2500,label:"Style de la signature du client"});
+  BW=SIGW.mount(g("blsw"),{name:()=>pr.value+" "+no.value,max:2500,label:"Style de la signature du client",keep:BS.sw=BS.sw||{}});
   pr.oninput=()=>{BS.pr=pr.value;BW.refresh()};no.oninput=()=>{BS.no=no.value;BW.refresh()};fn.oninput=()=>BS.fn=fn.value;rc.oninput=()=>BS.rc=rc.value;
   rs.onchange=()=>{BS.res=rs.checked;g("blrw").classList.toggle("hide",!rs.checked);if(rs.checked)rc.focus()};
   g("blval").onclick=()=>{const e=g("sge");BS.pr=pr.value.trim().replace(/\s+/g," ");BS.no=no.value.trim().replace(/\s+/g," ");BS.fn=fn.value.trim();BS.rc=rc.value.trim();
    if(!BS.pr){e.textContent="Indiquez le prénom du signataire.";pr.focus();return}if(BS.no.length<2){e.textContent="Indiquez le nom du signataire.";no.focus();return}
    if(BS.res&&BS.rc.length<3){e.textContent="Écrivez la remarque du client, ou décochez « Remarque ».";rc.focus();return}
-   if(BW.empty()){e.textContent=BW.mode()==="draw"?"Le client doit signer dans le cadre avec le doigt (ou revenir à la signature composée).":"Indiquez le prénom et le nom du signataire.";return}
-   BS.nm=BS.pr+" "+BS.no.toLocaleUpperCase("fr-FR");BS.sg=BW.get();BS.sm=BW.how();BS.step="recap";nav({v:"bls"})}}
+   if(BW.empty()){e.textContent=BW.mode()==="draw"?"Le client doit signer dans le cadre (ou choisir « ✍ Signature simple »).":"Indiquez le prénom et le nom du signataire.";return}
+   BS.nm=BS.pr+" "+BS.no.toLocaleUpperCase("fr-FR");BS.sg=BW.get();BS.sm=BW.how();BS.sk=BW.kind();BS.step="recap";nav({v:"bls"})}}
  function blBind(){const g=id=>document.getElementById(id);
   document.querySelectorAll("[data-blback]").forEach(b=>b.onclick=()=>{BS.step="form";BS.open=1;const ix=BS.ix;nav({v:"it",ix});setTimeout(()=>{const e=document.getElementById("blsig");if(e)e.scrollIntoView({block:"start"})},60)});
   const f=g("blfin");if(f)f.onclick=()=>{f.disabled=true;blFinish()};
   document.querySelectorAll("[data-blend]").forEach(b=>b.onclick=()=>{BS=null;nav({v:"list"})})}
  function blFinish(){const t=IT[BS.ix].t,now=nowS(),rid=Date.now().toString(36)+Math.random().toString(36).slice(2,6),prev=blRec(t.i),v=(prev?prev.v:0)+1;
-  const p={t:"fp-sign",k:"bl",id:rid,it:t.i,n:t.b||"",bv:t.v||1,v,iv:D.i||"",nm:BS.nm.slice(0,80),pr:BS.pr.slice(0,60),no:BS.no.slice(0,60),fn:BS.fn.slice(0,80),res:BS.res?1:0,lb:"rem",rc:BS.res?BS.rc.slice(0,1500):"",noimg:BS.noimg?1:0,sg:BS.sg,sm:BS.sm,rf:sigRef(),dl:now.dl,hl:now.hl};BS.rf=p.rf;BS.dl=now.dl;BS.hl=now.hl;
+  const p={t:"fp-sign",k:"bl",id:rid,it:t.i,n:t.b||"",bv:t.v||1,v,iv:D.i||"",nm:BS.nm.slice(0,80),pr:BS.pr.slice(0,60),no:BS.no.slice(0,60),fn:BS.fn.slice(0,80),res:BS.res?1:0,lb:"rem",rc:BS.res?BS.rc.slice(0,1500):"",noimg:BS.noimg?1:0,sg:BS.sg,sm:BS.sm,sk:BS.sk||"",rf:sigRef(),dl:now.dl,hl:now.hl};BS.rf=p.rf;BS.dl=now.dl;BS.hl=now.hl;
   const R=recs("bl:"+t.i);R.push({id:rid,v,dl:now.dl,hl:now.hl,nm:p.nm,res:p.res});
   if(!LS.set(RK("bl:"+t.i),R)||!enqueue([p])){const ee=document.getElementById("sge");if(ee)ee.textContent="Impossible d’enregistrer sur ce téléphone (mémoire pleine ou navigation privée). Rien n’a été envoyé.";const fb=document.getElementById("blfin");if(fb)fb.disabled=false;return}
   BS.step="done";BS.pending=true;view();window.scrollTo(0,0);flush().then(()=>{if(BS&&BS.step==="done"){BS.pending=!!pend(rid);view()}})}
@@ -485,10 +495,11 @@ async function main(){
  function padInit(){const host=document.getElementById("emw");if(!host||!SG)return;const st=SG.steps[SG.i];
   const W=SIGW.mount(host,{name:()=>st.nm,max:1300,label:"Style de la signature de "+st.nm});
   const next=()=>{if(SG.kd==="der")return finish();if(SG.steps.every((s,k)=>SG.res[k])||SG.i>=SG.steps.length-1){SG.recap=true;SG.i=SG.steps.length-1}else{SG.i=SG.res.findIndex((r,k)=>k>SG.i&&!r);if(SG.i<0)SG.i=SG.res.length}view();window.scrollTo(0,0)};
-  const vb=document.getElementById("val");if(vb)vb.onclick=()=>{if(W.empty()){document.getElementById("sge").textContent=W.mode()==="draw"?"Signez dans le cadre avec le doigt, ou touchez « Absent » si la personne n’est pas là.":"Nom manquant : dessinez la signature au doigt.";return}
-   SG.res[SG.i]={nm:st.nm,sg:W.get(),h:nowS().hl,tr:st.tr?1:0};next()};
+  const vb=document.getElementById("val");if(vb)vb.onclick=()=>{if(W.empty()){document.getElementById("sge").textContent=W.mode()==="draw"?"Signez dans le cadre, ou touchez « Absent » si la personne n’est pas là.":"Nom manquant : choisissez « ✏ Signer à la main ».";return}
+   SG.res[SG.i]={nm:st.nm,sg:W.get(),sk:W.kind(),h:nowS().hl,tr:st.tr?1:0};next()};
   const ab=document.getElementById("abs");if(ab)ab.onclick=()=>{SG.res[SG.i]={nm:st.nm,abs:1,h:nowS().hl};next()}}
- function finish(){const f=D.f[SG.ix],now=nowS(),rid=Date.now().toString(36)+Math.random().toString(36).slice(2,6),ents=SG.res.map((r,i)=>r.abs?{nm:r.nm,abs:1,h:r.h}:{nm:r.nm,sg:r.sg,h:r.h,tr:r.tr?1:0}),prev=latest(f.n,SG.kd,SG.day,SG.part),v=(prev?prev.v:0)+1;
+ function sigKTxt(k){return k==="manuscrite"?" · signature manuscrite":k==="simple"?" · signature électronique simple":""}
+ function finish(){const f=D.f[SG.ix],now=nowS(),rid=Date.now().toString(36)+Math.random().toString(36).slice(2,6),ents=SG.res.map((r,i)=>r.abs?{nm:r.nm,abs:1,h:r.h}:{nm:r.nm,sg:r.sg,sk:r.sk||"",h:r.h,tr:r.tr?1:0}),prev=latest(f.n,SG.kd,SG.day,SG.part),v=(prev?prev.v:0)+1;
   const rf=sigRef(),pls=ents.map((e,i)=>({t:"fp-sign",k:"emg",kd:SG.kd,n:f.n,id:rid,rf,v,day:SG.day,part:SG.part,iv:D.i||"",tot:ents.length,i,dl:now.dl,hl:now.hl,e}));
   const abs=ents.filter(e=>e.abs).length,R=recs(f.n);R.push({id:rid,kd:SG.kd,day:SG.day,part:SG.part,v,dl:now.dl,hl:now.hl,abs,n:ents.length});
   if(!LS.set(RK(f.n),R)||!enqueue(pls)){const ee=document.getElementById("sge");if(ee)ee.textContent="Impossible d’enregistrer sur ce téléphone (mémoire pleine ou navigation privée). Rien n’a été envoyé.";const fb=document.getElementById("fin");if(fb)fb.disabled=false;return}

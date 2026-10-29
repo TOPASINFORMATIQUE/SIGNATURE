@@ -83,8 +83,10 @@ input[type=date]{font:inherit;padding:10px;border:1px solid var(--br);border-rad
 /*SIGW*/
 // ===== Signature composée (bloc commun aux pages publiques, copié par outils/sigfonts.py — ne pas modifier dans les pages) =====
 // La signature est composée à partir du prénom et du nom dans une police manuscrite « à un seul trait » embarquée (SIGF, licence SIL OFL),
-// en 3 styles au choix avec aperçu immédiat ; sur téléphone et tablette, « ✍ Dessiner ma signature au doigt » reste possible (pas de tracé
-// à la souris sur ordinateur). Le résultat est un tracé au même format qu'avant (points en base 36, cadre 320 × 140, encre bleu foncé) :
+// en 3 styles au choix avec aperçu immédiat. TOUJOURS deux choix, côte à côte, sur téléphone comme sur ordinateur : « ✍ Signature simple »
+// (composée) et « ✏ Signer à la main » (doigt, stylet, souris ou pavé tactile) ; par défaut « simple » sur ordinateur, « à la main » sur tactile ;
+// on bascule sans perdre ce qui a été saisi. kind() = « simple » | « manuscrite » (mode inscrit dans la mention, propriété sk).
+// Le résultat est un tracé au même format qu'avant (points en base 36, cadre 320 × 140, encre bleu foncé) :
 // les documents, les PDF et les dépôts existants le dessinent sans aucun changement.
 const SIGW=(()=>{
  const ST=[["a","Élégante"],["f","Calligraphiée"],["r","Simple"]],INK="#12308f",SK="fpsig:st";
@@ -108,28 +110,36 @@ const SIGW=(()=>{
  // traits → texte compact (même format que le tracé au doigt), allégé si besoin pour tenir dans « max » caractères
  function toSg(S,max){max=max||2200;let th=0,out="";for(;;){const R=S.map(s=>{const r=[];let l=null;s.forEach((q,i)=>{if(!l||Math.hypot(q[0]-l[0],q[1]-l[1])>=th||i===s.length-1){if(!l||q[0]!==l[0]||q[1]!==l[1])r.push(q);l=q}});return r});
   out=R.map(s=>s.map(q=>Math.max(0,q[0]).toString(36)+"."+Math.max(0,q[1]).toString(36)).join(",")).join(";");if(out.length<=max||th>40)return out;th+=th?1.5:1.2}}
- function paint(cv,S){const r=cv.getBoundingClientRect(),dp=window.devicePixelRatio||1;if(r.width){const w=Math.round(r.width*dp),h=Math.round(r.height*dp);if(cv.width!==w||cv.height!==h){cv.width=w;cv.height=h}}
-  const ctx=cv.getContext("2d"),k=cv.width/320;ctx.clearRect(0,0,cv.width,cv.height);ctx.strokeStyle=INK;ctx.lineWidth=2.4*k;ctx.lineCap="round";ctx.lineJoin="round";
+ function paint(cv,S,lw){const r=cv.getBoundingClientRect(),dp=window.devicePixelRatio||1;if(r.width){const w=Math.round(r.width*dp),h=Math.round(r.height*dp);if(cv.width!==w||cv.height!==h){cv.width=w;cv.height=h}}
+  const ctx=cv.getContext("2d"),k=cv.width/320;ctx.clearRect(0,0,cv.width,cv.height);ctx.strokeStyle=INK;ctx.lineWidth=(lw||2.4)*k;ctx.lineCap="round";ctx.lineJoin="round";
   S.forEach(s=>{if(!s.length)return;ctx.beginPath();ctx.moveTo(s[0][0]*k,s[0][1]*k);if(s.length===1)ctx.lineTo(s[0][0]*k+.1,s[0][1]*k);s.forEach(q=>ctx.lineTo(q[0]*k,q[1]*k));ctx.stroke()})}
- const CSS=`<style>.sgw{margin-top:6px}.sgw [hidden]{display:none!important}.sgw-l{font-size:15px;font-weight:600;margin:10px 0 6px}.sgw-st{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.sgw-b{border:2px solid #cbd5e1;border-radius:10px;background:#fff;padding:4px 4px 6px;min-height:44px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;font:600 14px system-ui,-apple-system,"Segoe UI",sans-serif;color:#334155}.sgw-b[aria-checked="true"]{border-color:${INK};box-shadow:0 0 0 2px rgba(18,48,143,.18);color:${INK}}.sgw-b canvas{width:100%;aspect-ratio:320/140;height:auto;display:block}.sgw-pad{position:relative;margin-top:10px;border:2px dashed #9fb3d9;border-radius:12px;background:#fff;aspect-ratio:320/140;max-height:240px;width:100%}.sgw-cv{position:absolute;inset:0;width:100%;height:100%}.sgw-pad.dr{border-style:solid;border-color:${INK}}.sgw-pad.dr .sgw-cv{touch-action:none;cursor:crosshair}.sgw-ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#94a3b8;font:15px system-ui,sans-serif;pointer-events:none;text-align:center;padding:0 10px}.sgw-act{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}.sgw-act button{min-height:44px;font:600 15px system-ui,sans-serif;border-radius:10px;border:1px solid #cbd5e1;background:#f8fafc;color:#1e293b;padding:8px 12px;cursor:pointer}.sgw-act .sgw-dr{border-color:${INK};color:${INK};background:#fff}</style>`;
+ const CSS=`<style>.sgw{margin-top:6px}.sgw [hidden]{display:none!important}.sgw-l{font-size:15px;font-weight:600;margin:10px 0 6px}.sgw-st{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.sgw-b{border:2px solid #cbd5e1;border-radius:10px;background:#fff;padding:4px 4px 6px;min-height:44px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;font:600 14px system-ui,-apple-system,"Segoe UI",sans-serif;color:#334155}.sgw-b[aria-checked="true"]{border-color:${INK};box-shadow:0 0 0 2px rgba(18,48,143,.18);color:${INK}}.sgw-b canvas{width:100%;aspect-ratio:320/140;height:auto;display:block}.sgw-pad{position:relative;margin-top:10px;border:2px dashed #9fb3d9;border-radius:12px;background:#fff;aspect-ratio:320/140;max-height:240px;width:100%}.sgw-cv{position:absolute;inset:0;width:100%;height:100%}.sgw-pad.dr{border-style:solid;border-color:${INK}}.sgw-pad.dr .sgw-cv{touch-action:none;cursor:crosshair}.sgw-ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#94a3b8;font:15px system-ui,sans-serif;pointer-events:none;text-align:center;padding:0 10px}.sgw-act{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}.sgw-act button{min-height:44px;font:600 15px system-ui,sans-serif;border-radius:10px;border:1px solid #cbd5e1;background:#f8fafc;color:#1e293b;padding:8px 12px;cursor:pointer}.sgw-tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:4px 0 6px}.sgw-tb{min-height:48px;font:700 15px system-ui,-apple-system,"Segoe UI",sans-serif;border-radius:12px;border:2px solid #cbd5e1;background:#f8fafc;color:#334155;padding:8px 10px;cursor:pointer}.sgw-tb[aria-selected="true"]{border-color:${INK};background:${INK};color:#fff}.sgw-tb:focus-visible{outline:3px solid rgba(18,48,143,.35);outline-offset:2px}</style>`;
  // o = {name: () => « Prénom Nom », max: longueur maximale du tracé, label}
- function mount(el,o){o=o||{};let st=(()=>{try{const v=localStorage.getItem(SK);return ST.some(x=>x[0]===v)?v:"a"}catch(e){return"a"}})(),mode="txt",drw=[],cur=null,comp=[];const T=touch();
-  el.innerHTML=CSS+`<div class="sgw"><div class="sgw-l" id="${el.id||"sgw"}-l">${o.label||"Choisissez le style de votre signature"}</div><div class="sgw-st" role="radiogroup" aria-labelledby="${el.id||"sgw"}-l">${ST.map(([k,l])=>`<button type="button" role="radio" class="sgw-b" data-st="${k}" aria-checked="${k===st}"><canvas aria-hidden="true"></canvas><span>${l}</span></button>`).join("")}</div>
-   <div class="sgw-pad"><canvas class="sgw-cv" role="img" aria-label="Aperçu de votre signature"></canvas><div class="sgw-ph">Indiquez votre prénom et votre nom : votre signature s’affiche ici</div></div>
-   ${T?`<div class="sgw-act"><button type="button" class="sgw-dr">✍ Dessiner ma signature au doigt</button><button type="button" class="sgw-cl" hidden>Effacer</button><button type="button" class="sgw-bk" hidden>↺ Revenir à la signature composée</button></div>`:""}</div>`;
+ // tracé à la main : renforcé (traits doublés d'un point) pour rester lisible une fois réduit dans le document — même format de données
+ const thick=S=>S.concat(S.map(s=>s.map(([x,y])=>[x+1,y])),S.map(s=>s.map(([x,y])=>[x,y+1])));
+ function mount(el,o){o=o||{};let st=(()=>{try{const v=localStorage.getItem(SK);return ST.some(x=>x[0]===v)?v:"a"}catch(e){return"a"}})(),cur=null,comp=[];const T=touch(),K=o.keep&&typeof o.keep==="object"?o.keep:null;let mode=K&&(K.mode==="draw"||K.mode==="txt")?K.mode:T?"draw":"txt",drw=K&&Array.isArray(K.drw)?K.drw:[];const id=el.id||"sgw";
+  const keep=()=>{if(K){K.mode=mode;K.drw=drw}};// o.keep : mémoire (mode + tracé) conservée si l'encart est reconstruit (retour en arrière)
+  el.innerHTML=CSS+`<div class="sgw"><div class="sgw-tabs" role="tablist" aria-label="Façon de signer"><button type="button" role="tab" class="sgw-tb" data-m="txt" id="${id}-tt">✍ Signature simple</button><button type="button" role="tab" class="sgw-tb" data-m="draw" id="${id}-td">✏ Signer à la main</button></div>
+   <div class="sgw-txt"><div class="sgw-l" id="${id}-l">${o.label||"Choisissez le style de votre signature"}</div><div class="sgw-st" role="radiogroup" aria-labelledby="${id}-l">${ST.map(([k,l])=>`<button type="button" role="radio" class="sgw-b" data-st="${k}" aria-checked="${k===st}"><canvas aria-hidden="true"></canvas><span>${l}</span></button>`).join("")}</div></div>
+   <div class="sgw-pad" role="tabpanel"><canvas class="sgw-cv" role="img" aria-label="Votre signature"></canvas><div class="sgw-ph"></div></div>
+   <div class="sgw-act"><button type="button" class="sgw-cl" hidden>↺ Effacer</button></div></div>`;
   const q=s=>el.querySelector(s),cv=q(".sgw-cv"),pad=q(".sgw-pad"),ph=q(".sgw-ph"),nm=()=>clean(o.name?o.name():"");
-  function draw(){if(mode==="draw"){paint(cv,drw.concat(cur?[cur]:[]));ph.style.display=drw.length||cur?"none":"flex";ph.textContent="Signez ici avec le doigt"}
+  function draw(){if(mode==="draw"){paint(cv,drw.concat(cur?[cur]:[]),3.4);ph.style.display=drw.length||cur?"none":"flex";ph.textContent=T?"Signez ici avec le doigt":"Signez ici avec la souris ou le pavé tactile"}
    else{comp=compose(nm(),st);paint(cv,comp);ph.style.display=comp.length?"none":"flex";ph.textContent="Indiquez votre prénom et votre nom : votre signature s’affiche ici"}
-   el.querySelectorAll(".sgw-b").forEach(b=>{b.setAttribute("aria-checked",String(mode==="txt"&&b.dataset.st===st));paint(b.querySelector("canvas"),compose(nm()||"Signature",b.dataset.st))})}
-  el.querySelectorAll(".sgw-b").forEach(b=>b.onclick=()=>{st=b.dataset.st;try{localStorage.setItem(SK,st)}catch(e){}if(mode==="draw")setMode("txt");else draw()});
-  function setMode(m){mode=m;pad.classList.toggle("dr",m==="draw");if(T){q(".sgw-dr").hidden=m==="draw";q(".sgw-cl").hidden=m!=="draw";q(".sgw-bk").hidden=m!=="draw"}draw()}
-  if(T){q(".sgw-dr").onclick=()=>{drw=[];cur=null;setMode("draw");try{pad.scrollIntoView({block:"center",behavior:"smooth"})}catch(e){}};q(".sgw-cl").onclick=()=>{drw=[];cur=null;draw()};q(".sgw-bk").onclick=()=>setMode("txt");
-   const pt=e=>{const r=cv.getBoundingClientRect();return[Math.round((e.clientX-r.left)/r.width*320),Math.round((e.clientY-r.top)/r.height*140)]};
-   cv.addEventListener("pointerdown",e=>{if(mode!=="draw")return;e.preventDefault();try{cv.setPointerCapture(e.pointerId)}catch(x){}cur=[pt(e)];draw()});
-   cv.addEventListener("pointermove",e=>{if(mode!=="draw"||!cur)return;e.preventDefault();cur.push(pt(e));draw()});
-   const end=()=>{if(!cur)return;drw.push(cur);cur=null;draw()};cv.addEventListener("pointerup",end);cv.addEventListener("pointercancel",end);cv.addEventListener("pointerleave",end)}
-  window.addEventListener("resize",()=>draw());setTimeout(draw,0);draw();
-  return {refresh:draw,mode:()=>mode,style:()=>st,touch:T,empty:()=>mode==="draw"?!drw.length:!comp.length,get:()=>mode==="draw"?(drw.length?toSg(drw,o.max):""):(comp.length?toSg(comp,o.max):""),how:()=>mode==="draw"?"doigt":"composée ("+(ST.find(x=>x[0]===st)||ST[0])[1].toLowerCase()+")"}}
+   el.querySelectorAll(".sgw-b").forEach(b=>{b.setAttribute("aria-checked",String(b.dataset.st===st));paint(b.querySelector("canvas"),compose(nm()||"Signature",b.dataset.st))})}
+  el.querySelectorAll(".sgw-b").forEach(b=>b.onclick=()=>{st=b.dataset.st;try{localStorage.setItem(SK,st)}catch(e){}draw()});
+  function setMode(m){mode=m;keep();pad.classList.toggle("dr",m==="draw");q(".sgw-txt").hidden=m==="draw";q(".sgw-cl").hidden=m!=="draw";
+   el.querySelectorAll(".sgw-tb").forEach(b=>{const on=b.dataset.m===m;b.setAttribute("aria-selected",String(on));b.tabIndex=on?0:-1});pad.setAttribute("aria-labelledby",id+(m==="draw"?"-td":"-tt"));draw()}
+  el.querySelectorAll(".sgw-tb").forEach(b=>b.onclick=()=>{if(b.dataset.m!==mode)setMode(b.dataset.m)});
+  q(".sgw-tabs").addEventListener("keydown",e=>{if(e.key==="ArrowLeft"||e.key==="ArrowRight"){e.preventDefault();setMode(mode==="txt"?"draw":"txt");q('.sgw-tb[aria-selected="true"]').focus()}});
+  q(".sgw-cl").onclick=()=>{drw=[];cur=null;keep();draw()};
+  const pt=e=>{const r=cv.getBoundingClientRect();return[Math.round((e.clientX-r.left)/r.width*320),Math.round((e.clientY-r.top)/r.height*140)]};
+  cv.addEventListener("pointerdown",e=>{if(mode!=="draw")return;e.preventDefault();try{cv.setPointerCapture(e.pointerId)}catch(x){}cur=[pt(e)];draw()});
+  cv.addEventListener("pointermove",e=>{if(mode!=="draw"||!cur)return;e.preventDefault();cur.push(pt(e));draw()});
+  const end=()=>{if(!cur)return;drw.push(cur);cur=null;keep();draw()};cv.addEventListener("pointerup",end);cv.addEventListener("pointercancel",end);cv.addEventListener("pointerleave",end);
+  window.addEventListener("resize",()=>draw());setMode(mode);setTimeout(draw,0);
+  return {refresh:draw,mode:()=>mode,setMode,style:()=>st,touch:T,empty:()=>mode==="draw"?!drw.length:!comp.length,get:()=>mode==="draw"?(drw.length?toSg(thick(drw),o.max):""):(comp.length?toSg(comp,o.max):""),
+   how:()=>mode==="draw"?"doigt":"composée ("+(ST.find(x=>x[0]===st)||ST[0])[1].toLowerCase()+")",kind:()=>mode==="draw"?"manuscrite":"simple"}}
  return {mount,compose,toSg,styles:ST}})();
 /*/SIGW*/
 const SBU="https://kbfnxqyxqualmqhiufnq.supabase.co",SBK="sb_publishable_5vjNCP7zREh5upGu_pTAIA_mgUPG8Cx";
@@ -173,7 +183,7 @@ if(ro)done=D.sig||null;
 const frd=d=>{if(!d)return"—";const x=d.split("-");return (+x[2])+"/"+(+x[1])+"/"+x[0].slice(2)};
 const fjn=n=>String(n).replace(".",",");
 const nmT=i=>esc(tr[i]||"")+((D.tf||[])[i]?" "+esc(D.tf[i]):"");
-function sigMent(p){return `✅ Signé électroniquement par ${esc(p.nm)}${p.fn?" ("+esc(p.fn)+")":""} le ${esc(p.tsl)}${p.rf?" · réf. "+esc(p.rf):""}`}
+function sigMent(p){return `✅ Signé électroniquement par ${esc(p.nm)}${p.fn?" ("+esc(p.fn)+")":""} le ${esc(p.tsl)}${p.rf?" · réf. "+esc(p.rf):""}${sigKTxt(p.sk)}`}
 function sigBlock(){return done&&done.sg?`<br>${sigSvg(done.sg)}<div class="sgfm">${sigMent(done)}</div>`:""}
 // Encart de signature DANS le document : prénom, nom, fonction, signature composée (3 styles) ou au doigt sur téléphone / tablette
 function sigForm(){return ro||done?"":`<div class="sgf noprint" id="sgform"><div class="sgf-h">✍ SIGNATURE ÉLECTRONIQUE — ${dev?"accepter le devis":plan?"valider les dates":"signer la convention"}</div>
@@ -208,7 +218,7 @@ ${row("Intitulé du stage :",`<b>${esc(D.f)}</b>`)}${row("Objectif :",esc(D.o||"
 <div class="ft"><span>S.A.S au capital de ${esc(G[11]||"")}</span><span>APE ${esc(G[9]||"")}</span><span>TVA INTRA : ${esc(G[10]||"")}</span><span>N° Siret : ${esc((siret||"").replace(/\s/g,""))}</span></div></div>`;
 }
 function docDev(){const E=esc,g=G,ca=D.ca||[],cl=D.cl||[],en=D.en||[],L=D.L||[],be=D.be||[],st=D.st||[],li=D.li||[],rf=D.rf;
- const sgn=done?`<div style="margin-top:8px;border:2px solid #16a34a;border-radius:6px;padding:6px 8px"><b style="color:#166534">✅ ${done.mode==="mail"?"Accepté par mail (« BON POUR ACCORD »)":done.mode==="papier"?"Accepté (bon pour commande)":"Signé électroniquement"}</b><br>${done.sg?`${sigSvg(done.sg)}<br>`:""}${done.nm?"par "+E(done.nm)+(done.fn?" ("+E(done.fn)+")":"")+" ":""}le ${E(done.tsl||"")}${done.rf?" · réf. "+E(done.rf):""}</div>`:"";
+ const sgn=done?`<div style="margin-top:8px;border:2px solid #16a34a;border-radius:6px;padding:6px 8px"><b style="color:#166534">✅ ${done.mode==="mail"?"Accepté par mail (« BON POUR ACCORD »)":done.mode==="papier"?"Accepté (bon pour commande)":"Signé électroniquement"}</b><br>${done.sg?`${sigSvg(done.sg)}<br>`:""}${done.nm?"par "+E(done.nm)+(done.fn?" ("+E(done.fn)+")":"")+" ":""}le ${E(done.tsl||"")}${done.rf?" · réf. "+E(done.rf):""}${sigKTxt(done.sk)}</div>`:"";
  return `<div class="dvc"><div class="hd"><div><img src="logo.jpg" alt="TOPAS informatique"><div style="font-size:10.5px;margin-top:4px"><b>${E(org)}</b><br>${E(addr)}<br>Tél ${E(tel)} · ${E(mail)}</div></div><div class="ti"><b>DEVIS Prestation de Formation</b>N° <b style="display:inline;font-size:15px;color:#111">${E(D.dn||"")}</b><br>Date : ${fd(D.dt)}<br>Valable jusqu’au : ${fd(D.vd)}<br>Dossier : ${E(D.n)}${rf?`<br><span style="font-size:10.5px">Réf. : devis ${E(rf[0])}${rf[1]?" du "+fd(rf[1]):""}${rf[2]?" – "+E(rf[2]):""}</span>`:""}</div></div>
 <div class="g2"><div><div class="bx"><div class="lb">Votre chargé d’affaires</div><b>${E(ca[0]||"—")}</b>${ca[1]?"<br>Tél "+E(ca[1]):""}${ca[2]?"<br>"+E(ca[2]):""}</div><div class="bx" style="margin-top:6px"><div class="lb">Centre de formation</div>N° de déclaration d’activité ${E(nda)} – cet enregistrement ne vaut pas agrément de l’État<br>inscrit auprès de la Préfecture de la Région Rhône-Alpes${g[8]?"<br>URSSAF : "+E(g[8]):""}<br>N° de SIRET : ${E(siret)}${g[9]?" / APE : "+E(g[9]):""}</div></div>
 <div><div class="bx"><div class="lb">Client</div><b>${E(cl[0]||"")}</b>${cl.slice(1).map(l=>"<br>"+E(l)).join("")}</div><div class="bx" style="margin-top:6px"><div class="lb">Envoyée à</div>${E(en[0]||"")}${en[1]?" – "+E(en[1]):""}${en[2]?"<br>Tél "+E(en[2]):""}${en[3]?"<br>"+E(en[3]):""}</div></div></div>
@@ -286,6 +296,7 @@ function sigSvg(sg){let d="";String(sg||"").split(";").forEach(st=>{const P=st.s
 function sigDoc(p){return `<div style="margin-top:16px;border:1px solid var(--br);border-radius:8px;padding:10px 14px"><b>${plan?"Validée":"Signée"} en ligne</b> par ${esc(p.nm)}${p.fn?" ("+esc(p.fn)+")":""}, ${esc(C[0])}, le ${esc(p.tsl)}<br><span style="background:#fff;display:inline-block;border-radius:6px">${sigSvg(p.sg)}</span></div>`}
 
 let SW=null;
+function sigKTxt(k){return k==="manuscrite"?" · signature manuscrite":k==="simple"?" · signature électronique simple":""}
 function sigMount(){const el=$("#sgw");if(!el)return;SW=window.SGW_CUR=SIGW.mount(el,{name:()=>(($("#spr")||{}).value||"")+" "+(($("#sno")||{}).value||""),max:2200});["#spr","#sno"].forEach(k=>{const i=$(k);if(i)i.addEventListener("input",()=>SW.refresh())});$("#go").onclick=submit}
 const sigRef=()=>{const a="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";let t="";try{const u=new Uint8Array(6);crypto.getRandomValues(u);u.forEach(x=>t+=a[x%a.length])}catch(e){for(let i=0;i<6;i++)t+=a[Math.floor(Math.random()*a.length)]}return "S-"+t};
 async function submit(){
@@ -293,16 +304,16 @@ async function submit(){
  if(!pr)return(err.textContent="Merci d’indiquer votre prénom.",$("#spr").focus());
  if(no.length<2)return(err.textContent="Merci d’indiquer votre nom.",$("#sno").focus());
  const nm=pr+" "+no.toLocaleUpperCase("fr-FR");
- if(!SW||SW.empty())return err.textContent=SW&&SW.mode()==="draw"?"Merci de signer dans le cadre avec le doigt (ou revenez à la signature composée).":"Merci d’indiquer votre prénom et votre nom.";
+ if(!SW||SW.empty())return err.textContent=SW&&SW.mode()==="draw"?"Merci de signer dans le cadre (ou choisissez « ✍ Signature simple »).":"Merci d’indiquer votre prénom et votre nom.";
  if(!$("#ok").checked)return err.textContent="Merci de cocher la case pour confirmer.";
  const go=$("#go");go.disabled=true;go.textContent="Envoi en cours…";
  const now=new Date(),p2=n=>String(n).padStart(2,"0"),dl=now.getFullYear()+"-"+p2(now.getMonth()+1)+"-"+p2(now.getDate()),hl=p2(now.getHours())+":"+p2(now.getMinutes());
- const payload={t:"fp-sign",k:dev?"dev":plan?"plan":"conv",n:D.n,nm,pr,no,fn,dl,hl,tsl:fd(dl)+" à "+hl,sg:SW.get(),sm:SW.how(),rf:sigRef()};if(dev)payload.dn=D.dn||"";
+ const payload={t:"fp-sign",k:dev?"dev":plan?"plan":"conv",n:D.n,nm,pr,no,fn,dl,hl,tsl:fd(dl)+" à "+hl,sg:SW.get(),sm:SW.how(),sk:SW.kind(),rf:sigRef()};if(dev)payload.dn=D.dn||"";
  const code="FPSIG:"+b64u(payload),body=JSON.stringify(payload);
  const sends=[];
  if(D.t)sends.push(sbDep(D.t,payload));
  const R=await Promise.allSettled(sends),ok=R.some(r=>r.status==="fulfilled");
- done={nm,fn,tsl:payload.tsl,sg:payload.sg,rf:payload.rf};
+ done={nm,fn,tsl:payload.tsl,sg:payload.sg,rf:payload.rf,sk:payload.sk};
  if(ok){try{localStorage.setItem(KEY,JSON.stringify(done))}catch(e){}}
  {const f=$("#choix");if(f)f.classList.add("hide");const t=$("#tosig");if(t)t.remove()}$("#doc").innerHTML=docX();
  const mailto="mailto:"+encodeURIComponent(D.m||"")+"?subject="+encodeURIComponent((dev?"Devis accepté "+(D.dn||""):plan?"Planification validée":"Convention signée")+" – "+D.n+" – "+nm)+"&body="+encodeURIComponent("Bonjour,\n\n"+nm+(fn?" ("+fn+")":"")+" a "+(dev?"accepté le devis "+(D.dn||"")+" (dossier "+D.n+")":plan?"validé la planification "+D.n:"signé la convention "+D.n)+" en ligne (référence "+payload.rf+").\n\n"+code+"\n");
