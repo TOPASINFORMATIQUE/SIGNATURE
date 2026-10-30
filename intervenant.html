@@ -308,7 +308,7 @@ body.ip-nb{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
 .ip-csl button b{flex:1;min-width:0;font-weight:700}.ip-csl button span{color:var(--ds-mu);font-size:14px}.ip-csl .ip-cso{color:var(--ds-topas);font-weight:800}
 .ip-opt.ip-ph{padding:12px 14px 10px;border-color:var(--ds-line);background:var(--ds-card)}body.ip-nb{padding-bottom:calc(112px + env(safe-area-inset-bottom,0px))}.ip-pht{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:16px}.ip-pht b{color:var(--ds-teal)}.ip-pht span{color:var(--ds-mu);font-weight:700;font-size:14px}
 .ip-phl{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:10px 0 6px}
-.ip-phi{position:relative;width:84px;height:84px;border-radius:12px;overflow:hidden;background:var(--ds-line2)}.ip-phi img{display:block;width:100%;height:100%;object-fit:cover}
+.ip-phi{position:relative;width:84px;height:84px;border-radius:12px;overflow:hidden;background:var(--ds-line2)}.ip-phb{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:4px;text-align:center;font-size:14px;line-height:1.15;color:var(--ds-topas);border:1.5px dashed var(--ds-b-blue)}.ip-phb i{font-style:normal;font-size:20px}.ip-phr{display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;font-size:24px;color:var(--ds-topas)}.ip-phr b{font-size:14px}.ip-phs{margin:6px 0 0;font-size:15px;line-height:1.5}.ip-phs .ok{color:var(--ds-green-d,#15803d);font-weight:700}.ip-phs .ko{color:#b91c1c;font-weight:700}.ip-phs .wt{color:#b45309;font-weight:700}.ip-phi img{display:block;width:100%;height:100%;object-fit:cover}
 .ip-phx{position:absolute;right:2px;top:2px;width:30px;height:30px;border:0;border-radius:50%;background:rgba(15,23,42,.78);color:var(--ds-on);font-size:14px;cursor:pointer}
 .ip-phc{position:absolute;left:0;right:0;bottom:0;min-height:26px;padding:3px 4px;border:0;background:rgba(15,23,42,.72);color:var(--ds-on);font:inherit;font-size:14px;font-weight:700;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
 .ip-pha{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;width:84px;height:84px;border:2px dashed var(--ds-b-teal);border-radius:12px;background:var(--ds-p-teal);color:var(--ds-teal);font:inherit;font-size:14px;font-weight:800;line-height:1.15;text-align:center;cursor:pointer}.ip-pha i{font-style:normal;font-size:22px;line-height:1}
@@ -506,8 +506,9 @@ async function main(){
  const bannerHtml=()=>{const q=Q(),n=q.length,nb=q.filter(x=>x.k==="bl"||x.k==="blrep"||x.k==="blns").length,nbi=q.filter(x=>x.k==="bi").length,np=q.filter(x=>x.k==="ph").length,ns=n-nb-nbi-np,any=F.some(x=>recs(x.f.n).length)||IT.some(x=>recs("bl:"+x.t.i).length);
   if(n)return `<div class="qb qw" role="status"><b>⏳ ${[nb?nb+" bon"+(nb>1?"s":"")+" de livraison":"",nbi?nbi+" bon"+(nbi>1?"s":"")+" d’intervention":"",ns?ns+" signature"+(ns>1?"s":""):"",np?np+" photo"+(np>1?"s":""):""].filter(Boolean).join(" et ")} en attente d’envoi</b><span>${D.t?(navigator.onLine===false?"Pas de connexion : elles partiront toutes seules dès son retour.":"Envoi en cours… sinon elles repartiront toutes seules."):"Ce lien ne permet pas l’envoi : contactez "+esc(D.m||"TOPAS informatique")+"."}</span>${D.t?'<button type="button" class="btn" data-qgo>Renvoyer maintenant</button>':""}</div>`;
   return any?'<div class="qb qk" role="status"><b>✔ Tout est transmis</b></div>':""};
- function banner(){const e=document.getElementById("qbn");if(e){e.innerHTML=bannerHtml();const b=e.querySelector("[data-qgo]");if(b)b.onclick=flush}}
- window.addEventListener("online",flush);setInterval(()=>{if(Q().length)flush()},20000);
+ function banner(){const e=document.getElementById("qbn");if(e){e.innerHTML=bannerHtml();const b=e.querySelector("[data-qgo]");if(b)b.onclick=flush}const ps=document.getElementById("phst");if(ps&&BS&&BS.step==="done")ps.innerHTML=phStat(BS.ph.map(x=>x.id))}
+ const phCatch=()=>phOrphans().then(n=>{if(n){banner();if(V.v==="list"||V.v==="bid")view()}}).catch(()=>{});
+ window.addEventListener("online",()=>{flush();phCatch()});setInterval(()=>{if(Q().length)flush()},20000);
  // ---- navigation interne (le bouton « retour » du téléphone fonctionne)
  let V={v:"list"};
  const nav=(v,push)=>{V=v;TAB="home";if(push!==false)try{history.pushState({v},"")}catch(e){}view();window.scrollTo(0,0)};
@@ -676,12 +677,22 @@ async function main(){
  const PHMAX=6,PHL=["N° de série","Étiquette","Installation","Avant","Après"],PHU={};
  const PDB=(()=>{let P=null;const op=()=>P||(P=new Promise((ok,ko)=>{try{const r=indexedDB.open("fpiv-ph",1);r.onupgradeneeded=()=>{if(!r.result.objectStoreNames.contains("ph"))r.result.createObjectStore("ph")};r.onsuccess=()=>ok(r.result);r.onerror=()=>ko(r.error)}catch(e){ko(e)}}));
   const tx=(m,f)=>op().then(db=>new Promise((ok,ko)=>{const t=db.transaction("ph",m),q=f(t.objectStore("ph"));t.oncomplete=()=>ok(q&&q.result);t.onerror=()=>ko(t.error);t.onabort=()=>ko(t.error)}));
-  return{get:k=>tx("readonly",s=>s.get(k)),put:(k,v)=>tx("readwrite",s=>s.put(v,k)),rm:k=>tx("readwrite",s=>s["delete"](k))}})();
+  const all=()=>op().then(db=>new Promise((ok,ko)=>{const R=[],c=db.transaction("ph","readonly").objectStore("ph").openCursor();c.onsuccess=()=>{const k=c.result;if(k){R.push([String(k.key),k.value]);k.continue()}else ok(R)};c.onerror=()=>ko(c.error)}));
+  return{get:k=>tx("readonly",s=>s.get(k)),put:(k,v)=>tx("readwrite",s=>s.put(v,k)),rm:k=>tx("readwrite",s=>s["delete"](k)),all}})();
  const phOn=()=>!!EJ&&!!window.indexedDB;
- async function phPrep(f){const u=URL.createObjectURL(f);try{const im=await new Promise((ok,ko)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=ko;i.src=u});const W0=im.naturalWidth||im.width,H0=im.naturalHeight||im.height,k=Math.min(1,1600/Math.max(W0,H0,1)),w=Math.max(1,Math.round(W0*k)),h=Math.max(1,Math.round(H0*k)),c=document.createElement("canvas");c.width=w;c.height=h;c.getContext("2d").drawImage(im,0,0,w,h);const b=await new Promise(ok=>c.toBlob(ok,"image/jpeg",.75));return b?{b,w,h}:null}catch(e){return null}finally{URL.revokeObjectURL(u)}}
+ // préparation (30/10) : lue tout de suite (le fichier choisi peut disparaître ensuite), réduite à 1600 px en JPEG ; si le téléphone ne sait pas
+ // la lire (ex. HEIC), elle est gardée et envoyée TELLE QUELLE (2 Mo au plus) plutôt que perdue
+ const PHRAW=2*1024*1024-1024;
+ async function phPrep(f){let buf=null;try{buf=await f.arrayBuffer()}catch(e){return {ko:"Cette photo n’a pas pu être lue sur le téléphone. Réessayez."}}const bl=new Blob([buf],{type:f.type||""});
+  const toJ=async(src,W0,H0)=>{const k=Math.min(1,1600/Math.max(W0,H0,1)),w=Math.max(1,Math.round(W0*k)),h=Math.max(1,Math.round(H0*k)),c=document.createElement("canvas");c.width=w;c.height=h;c.getContext("2d").drawImage(src,0,0,w,h);const b=await new Promise(ok=>c.toBlob(ok,"image/jpeg",.75));return b&&b.size?{b,w,h}:null};
+  try{if(window.createImageBitmap){const bm=await createImageBitmap(bl,{imageOrientation:"from-image"});try{const r=await toJ(bm,bm.width,bm.height);if(r)return r}finally{if(bm.close)bm.close()}}}catch(e){}
+  const u=URL.createObjectURL(bl);try{const im=await new Promise((ok,ko)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=ko;i.src=u});const r=await toJ(im,im.naturalWidth||im.width,im.naturalHeight||im.height);if(r)return r}catch(e){}finally{URL.revokeObjectURL(u)}
+  const heic=/hei[cf]/i.test(f.type||"")||/\.hei[cf]$/i.test(f.name||"")||/^....ftyp(hei|hev|mif1|msf1)/.test(String.fromCharCode(...new Uint8Array(buf.slice(0,12))));
+  if(buf.byteLength>16&&buf.byteLength<=PHRAW)return {b:new Blob([buf],{type:heic?"image/heic":(f.type||"application/octet-stream")}),w:0,h:0,raw:heic?"HEIC":"photo"};
+  return {ko:heic?"Photo au format HEIC trop lourde pour être envoyée telle quelle : dans l’appareil photo, choisissez le format « Le plus compatible » (JPEG), puis reprenez-la.":"Cette photo n’a pas pu être lue. Réessayez."}}
  const phH=()=>phOn()?`<div class="ip-opt ip-ph on" id="phb"><div class="ip-pht"><b>📷 Photos</b><span id="phn">${BS.ph.length} / ${PHMAX}</span></div><div class="ip-phl" id="phl"></div><p class="ip-phw">Photographiez le matériel (n° de série, étiquette), pas les personnes.</p><input type="file" accept="image/*" capture="environment" id="phin" hidden><input type="file" accept="image/*" multiple id="phig" hidden><div class="pberr" id="phe" role="alert"></div></div>`:"";
- function phDraw(){const l=document.getElementById("phl");if(!l||!BS)return;const n=document.getElementById("phn");if(n)n.textContent=BS.ph.length+" / "+PHMAX;
-  l.innerHTML=BS.ph.map((x,i)=>`<div class="ip-phi"><img alt="Photo ${i+1}${x.lg?" : "+esc(x.lg):""}" data-phim="${esc(x.id)}"${PHU[x.id]?` src="${PHU[x.id]}"`:""}><button type="button" class="ip-phx" data-phx="${i}" aria-label="Retirer la photo ${i+1}">✕</button><button type="button" class="ip-phc" data-phc="${i}" aria-label="Légende de la photo ${i+1}">${x.lg?esc(x.lg):"＋ Légende"}</button></div>`).join("")+(BS.ph.length<PHMAX?`<button type="button" class="ip-pha" data-pha><i aria-hidden="true">＋</i>Ajouter une photo</button><button type="button" class="ip-phg" data-phg>ou choisir dans la galerie</button>`:"");
+ function phDraw(){const l=document.getElementById("phl");if(!l||!BS)return;const n=document.getElementById("phn"),nb=BS.phBusy||0;if(n)n.textContent=BS.ph.length+" / "+PHMAX;
+  l.innerHTML=BS.ph.map((x,i)=>`<div class="ip-phi">${x.raw?`<span class="ip-phr" role="img" aria-label="Photo ${i+1} (${esc(x.raw)})">📷<b>${esc(x.raw)}</b></span>`:`<img alt="Photo ${i+1}${x.lg?" : "+esc(x.lg):""}" data-phim="${esc(x.id)}"${PHU[x.id]?` src="${PHU[x.id]}"`:""}>`}<button type="button" class="ip-phx" data-phx="${i}" aria-label="Retirer la photo ${i+1}">✕</button><button type="button" class="ip-phc" data-phc="${i}" aria-label="Légende de la photo ${i+1}">${x.lg?esc(x.lg):"＋ Légende"}</button></div>`).join("")+`<div class="ip-phi ip-phb" role="status"><i aria-hidden="true">⏳</i>Préparation de la photo…</div>`.repeat(nb)+(BS.ph.length+nb<PHMAX?`<button type="button" class="ip-pha" data-pha><i aria-hidden="true">＋</i>Ajouter une photo</button><button type="button" class="ip-phg" data-phg>ou choisir dans la galerie</button>`:"");
   l.querySelectorAll("[data-phim]").forEach(im=>{const id=im.dataset.phim;if(PHU[id])return;PDB.get(id).then(r=>{if(r&&r.b){PHU[id]=URL.createObjectURL(r.b);im.src=PHU[id]}}).catch(()=>{})});
   l.querySelectorAll("[data-phx]").forEach(b=>b.onclick=()=>{const x=BS.ph.splice(+b.dataset.phx,1)[0];if(x)PDB.rm(x.id).catch(()=>{});phDraw()});
   l.querySelectorAll("[data-phc]").forEach(b=>b.onclick=()=>phLeg(+b.dataset.phc));
@@ -689,21 +700,58 @@ async function main(){
  function phLeg(i){const x=BS.ph[i];if(!x)return;const o=document.createElement("div");o.className="nsov ip-sheet";o.setAttribute("role","dialog");o.setAttribute("aria-modal","true");o.setAttribute("aria-label","Légende de la photo");
   o.innerHTML=`<div class="nsbx"><h3>Légende de la photo ${i+1}</h3><div class="ip-lgs">${PHL.concat([""]).map(l=>`<button type="button" data-lg="${esc(l)}" aria-pressed="${x.lg===l}">${l?esc(l):"Sans légende"}</button>`).join("")}</div><div class="btns"><button type="button" class="btn" data-shx>Fermer</button></div></div>`;
   document.body.appendChild(o);o.querySelectorAll("[data-lg]").forEach(b=>b.onclick=()=>{x.lg=b.dataset.lg;o.remove();phDraw()});o.querySelector("[data-shx]").onclick=()=>o.remove();o.onclick=e=>{if(e.target===o)o.remove()}}
- function phBind(){const add=async inp=>{const e=document.getElementById("phe");e.textContent="";const F=[...(inp.files||[])];inp.value="";for(const f of F){if(BS.ph.length>=PHMAX){e.textContent="6 photos au maximum par bon.";break}
-   const r=await phPrep(f);if(!r){e.textContent="Cette photo n’a pas pu être lue. Réessayez.";continue}const id=Date.now().toString(36)+Math.random().toString(36).slice(2,8);
-   try{await PDB.put(id,{b:r.b,w:r.w,h:r.h,at:nowS().dl})}catch(z){e.textContent="Impossible de garder la photo sur ce téléphone (mémoire pleine ?).";break}BS.ph.push({id,lg:""});phDraw()}};
+ function phBind(){const add=async inp=>{const S0=BS,F=[...(inp.files||[])],msg=t=>{const e=document.getElementById("phe");if(e)e.textContent=t};msg("");if(!S0)return;
+  for(const f of F){if(S0.ph.length+(S0.phBusy||0)>=PHMAX){msg("6 photos au maximum par bon.");break}S0.phBusy=(S0.phBusy||0)+1;if(BS===S0)phDraw();let stop=false;
+   try{const r=await phPrep(f);if(!r||r.ko){msg((r&&r.ko)||"Cette photo n’a pas pu être lue. Réessayez.");continue}const id=Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+    try{await PDB.put(id,{b:r.b,w:r.w,h:r.h,at:nowS().dl,t:Date.now(),bs:S0.sid,raw:r.raw||""})}catch(z){msg("Impossible de garder la photo sur ce téléphone (mémoire pleine ?).");stop=true;continue}
+    S0.ph.push({id,lg:"",raw:r.raw||""})}
+   catch(e){msg("Cette photo n’a pas pu être préparée. Réessayez.")}finally{S0.phBusy--;if(BS===S0)phDraw()}if(stop)break}
+  inp.value=""};
   const a=document.getElementById("phin"),g=document.getElementById("phig");if(a)a.onchange=()=>add(a);if(g)g.onchange=()=>add(g);phDraw()}
+ // « ✔ Valider » / « Envoyer sans signature » / « Terminer » attendent la fin de la préparation des photos (jamais d'envoi sans elles)
+ const phWait=()=>new Promise(ok=>{const t=setInterval(()=>{if(!BS||!BS.phBusy){clearInterval(t);ok()}},120)});
+ function phHold(b){if(!BS||!BS.phBusy)return false;const h=document.getElementById("blhint")||document.getElementById("sge"),t0=h?h.textContent:"";if(h)h.textContent="⏳ Préparation de la photo… un instant, la suite part dès qu’elle est prête.";b.disabled=true;b.setAttribute("aria-busy","true");
+  phWait().then(()=>{b.disabled=false;b.removeAttribute("aria-busy");if(h&&/Préparation de la photo/.test(h.textContent))h.textContent=t0;if(document.body.contains(b))b.click()});return true}
+ // au moment de l'envoi : toutes les photos gardées sur le téléphone POUR CE BON (étiquette sid) sont reprises, même si la liste à l'écran les a perdues
+ async function phSync(S0){if(!S0||!phOn())return;await phWait();let A=[];try{A=await PDB.all()}catch(e){return}const H=new Set(S0.ph.map(x=>x.id));
+  A.forEach(([k,v])=>{if(v&&v.bs&&v.bs===S0.sid&&!H.has(k)&&S0.ph.length<PHMAX){S0.ph.push({id:k,lg:"",raw:v.raw||""});H.add(k)}})}
+ // suivi : photos reçues par TOPAS (PHOK), introuvables sur le téléphone (PHKO), bon envoyé ← étiquette du bon (PHBS)
+ const PHOK="fpiv:phok:"+NS,PHKO="fpiv:phko:"+NS,PHBS="fpiv:phbs:"+NS,PHER="fpiv:pher:"+NS;
+ const phMark=(k,id,v)=>{const L=LS.get(k,[]).filter(x=>(x.id||x)!==id);L.push(v||id);LS.set(k,L.slice(-300))};
+ function phBon(S0,b){const M=LS.get(PHBS,{});M[S0.sid]=b;const K=Object.keys(M);if(K.length>200)delete M[K[0]];LS.set(PHBS,M)}
+ // état des photos d'un bon envoyé : « 📷 n photo(s) envoyée(s) », « ⏳ en cours d'envoi » ou l'échec avec sa raison (nouvel essai automatique)
+ function phStat(ids){ids=(ids||[]).filter(Boolean);if(!ids.length)return "";const ok=new Set(LS.get(PHOK,[])),ko=new Set(LS.get(PHKO,[]).map(x=>x.id||x)),q=new Set(Q().filter(x=>x.k==="ph").map(x=>x.id)),er=LS.get(PHER,{});
+  const n=ids.filter(i=>ok.has(i)).length,w=ids.filter(i=>q.has(i)),l=ids.filter(i=>ko.has(i)).length,e=w.map(i=>er[i]).filter(Boolean)[0];
+  return [n?`<span class="ok">📷 ${n} photo${n>1?"s":""} envoyée${n>1?"s":""}</span>`:"",w.length?(e?`<span class="ko">⚠ ${w.length} photo${w.length>1?"s":""} pas encore envoyée${w.length>1?"s":""} (${esc(e)}) : nouvel essai automatique</span>`:`<span class="wt">⏳ ${w.length} photo${w.length>1?"s":""} en cours d’envoi…</span>`):"",l?`<span class="ko">⚠ ${l} photo${l>1?"s":""} introuvable${l>1?"s":""} sur ce téléphone</span>`:""].filter(Boolean).join("<br>")}
  // file d'envoi : la signature d'abord, puis chaque photo (morceaux de 150 000 caractères) ; la copie gardée sur le téléphone est libérée une fois reçue
  const phPay=()=>(BS.ph||[]).map(x=>[x.id,String(x.lg||"").slice(0,30)]);
  const phQ=num=>(BS.ph||[]).map((x,i)=>({k:"ph",id:x.id,i:"ph",cle:"ph:"+x.id,lg:String(x.lg||"").slice(0,30),nom:String(num||"bon")+" – photo "+(i+1)+(x.lg?" – "+x.lg:"")}));
  const phRpc=o=>fetch(SBU+"/rest/v1/rpc/espace_photo",{method:"POST",headers:{apikey:SBK,"Content-Type":"application/json"},body:JSON.stringify({p_jeton:EJ,p:o})}).then(r=>r.ok?r.json():null);
- async function phUp(p){if(!EJ)throw 0;const r=await PDB.get(p.id).catch(()=>null);if(!r||!r.b)return 1;
+ async function phUp(p){if(!EJ)throw 0;let r;try{r=await PDB.get(p.id)}catch(e){const er=LS.get(PHER,{});er[p.id]="photo illisible sur le téléphone pour le moment";LS.set(PHER,er);throw e}
+  if(!r||!r.b){phMark(PHKO,p.id,{id:p.id,nom:p.nom||""});return 1}
   const b64=await new Promise((ok,ko)=>{const f=new FileReader();f.onload=()=>ok(String(f.result).replace(/^data:[^,]*,/,""));f.onerror=ko;f.readAsDataURL(r.b)}),C=150000,n=Math.ceil(b64.length/C),emp=p.id+"-"+b64.length;
-  for(let i=0;i<n;i++){const j=await phRpc({cle:p.cle,emp,n:i,nb:n,b64:b64.slice(i*C,(i+1)*C),nom:p.nom||"",type:"image/jpeg",taille:r.b.size,lg:p.lg||""});if(!j||!j.ok)throw 0}
-  PDB.rm(p.id).catch(()=>{});return 1}
+  const er=t=>{const E=LS.get(PHER,{});E[p.id]=t;LS.set(PHER,E)};
+  for(let i=0;i<n;i++){let j=null;try{j=await phRpc({cle:p.cle,emp,n:i,nb:n,b64:b64.slice(i*C,(i+1)*C),nom:(p.nom||"")+(r.raw?" ("+r.raw+")":""),type:r.b.type||"image/jpeg",taille:r.b.size,lg:p.lg||""})}catch(e){}if(!j||!j.ok){er(j&&j.erreur?String(j.erreur).slice(0,120):navigator.onLine===false?"pas de connexion":"envoi interrompu");throw 0}}
+  phMark(PHOK,p.id);const E=LS.get(PHER,{});if(E[p.id]){delete E[p.id];LS.set(PHER,E)}PDB.rm(p.id).catch(()=>{});return 1}
+ // RATTRAPAGE : une photo restée sur le téléphone sans être partie (ex. bon envoyé avant qu'elle soit prise en compte) part au passage suivant,
+ // rattachée à son bon : par l'étiquette du bon (sid), sinon (photos d'avant le 30/10 après-midi) au 1er bon envoyé de ce téléphone dans les
+ // 3 heures qui suivent la photo, le même jour. Envoi : dépôt { k:"phadd" } (n° du bon, dépôt d'origine) + la photo, comme d'habitude.
+ const phT=(k,v)=>{const t=+(v&&v.t)||parseInt(String(k).slice(0,8),36)||0;return t>1.7e12&&t<Date.now()+864e5?t:0};
+ function phSent(){const L=biRecs().map(r=>({n:r.n,kb:"bi",it:"",r0:r.id,d:r.d,h:r.h,ns:r.ns}));IT.forEach(x=>{if(x.t.k==="bi")return;["bl","blns"].forEach(kb=>recs(kb+":"+x.t.i).forEach(r=>L.push({n:x.t.b||"",kb,it:x.t.i,r0:r.id,d:r.dl,h:r.hl})))});
+  return L.filter(b=>b.r0&&/^\d{4}-\d\d-\d\d$/.test(b.d||"")).map(b=>Object.assign(b,{at:new Date(b.d+"T"+(/^\d\d:\d\d$/.test(b.h||"")?b.h:"23:59")+":59").getTime()}))}
+ function phGuess(t){if(!t)return null;const d=new Date(t),day=d.getFullYear()+"-"+p2(d.getMonth()+1)+"-"+p2(d.getDate());return phSent().filter(b=>b.d===day&&b.at>=t&&b.at-t<=3*3600e3).sort((a,b)=>a.at-b.at)[0]||null}
+ let PHO=null;
+ function phOrphans(){if(PHO||!phOn()||!D.t)return PHO||Promise.resolve(0);PHO=(async()=>{let A=[];try{A=await PDB.all()}catch(e){return 0}
+  const inQ=new Set(Q().filter(p=>p.k==="ph").map(p=>p.id)),ok=new Set(LS.get(PHOK,[])),M=LS.get(PHBS,{}),G=new Map();
+  for(const [k,v] of A){if(inQ.has(k))continue;if(ok.has(k)){PDB.rm(k).catch(()=>{});continue}if(BS&&BS.step!=="done"&&((v&&v.bs===BS.sid)||BS.ph.some(x=>x.id===k)))continue;
+   const b=v&&v.bs?M[v.bs]||null:phGuess(phT(k,v));if(!b||!b.r0)continue;const g=G.get(b.r0)||{b,L:[]};if(g.L.length<PHMAX)g.L.push([k,v&&v.raw||""]);G.set(b.r0,g)}
+  let n=0;for(const {b,L} of G.values()){const now=nowS(),rid=Date.now().toString(36)+Math.random().toString(36).slice(2,6),p={t:"fp-sign",k:"phadd",id:rid,n:String(b.n||"").slice(0,40),kb:b.kb,it:b.it||"",r0:b.r0,iv:D.i||"",ph:L.map(x=>[x[0],""]),dl:now.dl,hl:now.hl};
+   if(!enqueue([p].concat(L.map((x,i)=>({k:"ph",id:x[0],i:"ph",cle:"ph:"+x[0],lg:"",nom:String(b.n||"bon")+" – photo envoyée après le bon "+(i+1)})))))break;
+   if(b.kb==="bi"){const R=biRecs(),r=R.find(z=>z.id===b.r0);if(r){r.nph=(+r.nph||0)+L.length;r.phx=(r.phx||[]).concat(L.map(x=>x[0]));LS.set(BIK,R)}}n+=L.length}
+  return n})().finally(()=>{PHO=null});return PHO}
  const blWhat=(t,ix,noimg)=>`<div class="pan"><h4>Ce que vous signez</h4><div><b>${esc(t.nm||("Bon de livraison N° "+(t.b||"—")))}</b>${t.c?" · "+esc(t.c):""}</div><div>Intervention du ${t.d?esc(fdl(t.d)):"(date à préciser)"}</div>${noimg?'<div class="qb qw" style="margin:8px 0 0"><b>⚠ Le bon n’a pas pu être affiché</b><span>Le client signe sans le voir : ce sera noté sur le bon signé.</span></div>':imgBox(ix)}</div>`;
  // encart « Signature électronique » DANS la fiche, sous le bon : prénom, nom, fonction, réserves, signature composée ou au doigt
- const blNew=ix=>({ix,step:"form",ns:0,full:"",pr:"",no:"",nm:"",fn:"",ter:"",res:false,resAuto:false,rc:"",rs:"",rsm:"",sg:"",sm:"",noimg:0,mt:matNew(),ph:[]});
+ const blNew=ix=>({ix,sid:Date.now().toString(36)+Math.random().toString(36).slice(2,6),phBusy:0,step:"form",ns:0,full:"",pr:"",no:"",nm:"",fn:"",ter:"",res:false,resAuto:false,rc:"",rs:"",rsm:"",sg:"",sm:"",noimg:0,mt:matNew(),ph:[]});
  // 🛠 « Intervention terminée ? » (30/10) : Oui / Non, aucun choix présélectionné ; « Non » rend la remarque obligatoire (signature et envoi sans signature)
  const TERQ="Indiquez si l’intervention est terminée.",TERN="Intervention non terminée : expliquez ce qui reste à faire.";
  const terH=(id,v)=>`<div class="ip-ter${v?" "+v:""}" id="${id}ter" role="group" aria-labelledby="${id}terq"><div class="ip-terq" id="${id}terq">🛠 Intervention terminée ?</div><div class="ip-terb"><button type="button" class="ip-tb ip-tby" data-ter="oui" aria-pressed="${v==="oui"}">✓ Oui</button><button type="button" class="ip-tb ip-tbn" data-ter="non" aria-pressed="${v==="non"}">✗ Non</button></div></div>`;
@@ -739,9 +787,9 @@ async function main(){
  const NSR=["Client absent","Client a refusé de signer","Oubli","Autre…"];
  // « 📤 Envoyer sans signature » : le même écran que la signature (mêmes règles : Intervention terminée ? obligatoire, remarque obligatoire si « Non »)
  function blNsAsk(ix){BS=blNew(ix);BS.ns=1;nav({v:"bls"})}
- function blNsSend(ix,rs,motif,mat,ter,rc,res){if(BS&&BS.bi)return biSend(1,rs,motif);const t=IT[ix].t,now=nowS(),rid=Date.now().toString(36)+Math.random().toString(36).slice(2,6),p={t:"fp-sign",k:"blns",id:rid,it:t.i,n:t.b||"",c:String(t.c||"").slice(0,120),bv:t.v||1,iv:D.i||"",rs:String(rs).slice(0,60),motif:String(motif||"").slice(0,500),mat:Array.isArray(mat)?mat.slice(0,40):[],ter:ter==="oui"||ter==="non"?ter:"",res:res?1:0,lb:"rem",rc:res?String(rc||"").slice(0,1500):"",ph:phPay(),dl:now.dl,hl:now.hl};
-  const R=recs("blns:"+t.i);R.push({id:rid,dl:now.dl,hl:now.hl,rs:p.rs});if(!LS.set(RK("blns:"+t.i),R)||!enqueue([p].concat(phQ(t.b)))){const el=document.getElementById("blch");if(el)el.insertAdjacentHTML("beforeend",'<p class="ko">Impossible d’enregistrer sur ce téléphone.</p>');return}
-  BS=null;nav({v:"list"});flush().then(()=>view())}
+ async function blNsSend(ix,rs,motif,mat,ter,rc,res){if(BS&&BS.bi)return biSend(1,rs,motif);await phSync(BS);const t=IT[ix].t,now=nowS(),rid=Date.now().toString(36)+Math.random().toString(36).slice(2,6),p={t:"fp-sign",k:"blns",id:rid,it:t.i,n:t.b||"",c:String(t.c||"").slice(0,120),bv:t.v||1,iv:D.i||"",rs:String(rs).slice(0,60),motif:String(motif||"").slice(0,500),mat:Array.isArray(mat)?mat.slice(0,40):[],ter:ter==="oui"||ter==="non"?ter:"",res:res?1:0,lb:"rem",rc:res?String(rc||"").slice(0,1500):"",ph:phPay(),dl:now.dl,hl:now.hl};
+  const R=recs("blns:"+t.i);R.push({id:rid,dl:now.dl,hl:now.hl,rs:p.rs,ph:p.ph.map(x=>x[0])});if(!LS.set(RK("blns:"+t.i),R)||!enqueue([p].concat(phQ(t.b)))){const el=document.getElementById("sge")||document.getElementById("blch");if(el)el.insertAdjacentHTML("beforeend",'<p class="ko">Impossible d’enregistrer sur ce téléphone.</p>');const vb=document.getElementById("blval");if(vb)vb.disabled=false;return}
+  phBon(BS,{n:t.b||"",kb:"blns",it:t.i,r0:rid,d:now.dl,h:now.hl});const np=p.ph.length;BS=null;nav({v:"list"});if(np)flash("📤 Envoyé sans signature · 📷 "+np+" photo"+(np>1?"s":"")+" jointe"+(np>1?"s":""));flush().then(()=>view())}
  function blReport(ix,motif){const t=IT[ix].t,now=nowS(),rid=Date.now().toString(36)+Math.random().toString(36).slice(2,6),p={t:"fp-sign",k:"blrep",id:rid,it:t.i,n:t.b||"",iv:D.i||"",motif:String(motif||"").slice(0,500),dl:now.dl,hl:now.hl};
   const R=recs("blrep:"+t.i);R.push({id:rid,dl:now.dl,hl:now.hl});if(!LS.set(RK("blrep:"+t.i),R)||!enqueue([p])){const el=document.getElementById("blch");if(el)el.insertAdjacentHTML("beforeend",'<p class="ko">Impossible d’enregistrer sur ce téléphone.</p>');return}view();flush().then(()=>view())}
  const matLi=m=>m&&m.length?`<ul class="ip-ml">${m.map(x=>`<li>${x[1]} × ${esc(x[0])}</li>`).join("")}</ul>`:"";
@@ -752,7 +800,7 @@ async function main(){
    <div class="ip-kv"><span>Signé le</span><b>${esc(fds(BS.dl||T))} à ${esc(BS.hl||"")}</b></div>
    <div class="ip-kv"><span>Intervention terminée</span><b>${terTxt(BS.ter)}</b></div>
    <div class="ip-kv"><span>Remarque</span><b>${BS.res?"oui":"aucune"}</b></div>${BS.res?`<div class="ip-rv">${esc(BS.rc)}</div>`:""}
-   <div class="ip-kv"><span>Matériel laissé</span><b>${mat.length?mat.length+" article"+(mat.length>1?"s":""):"aucun"}</b></div>${matLi(mat)}${BS.ph.length?`<div class="ip-kv"><span>Photos</span><b>${BS.ph.length}</b></div>`:""}${BS.bi?`<div class="ip-kv"><span>Temps passé</span><b>${esc(tpTxt(BS.tp))}</b></div>`:""}
+   <div class="ip-kv"><span>Matériel laissé</span><b>${mat.length?mat.length+" article"+(mat.length>1?"s":""):"aucun"}</b></div>${matLi(mat)}${BS.ph.length?`<div class="ip-kv"><span>Photos</span><b>${BS.ph.length}</b></div><p class="ip-phs" id="phst" role="status">${phStat(BS.ph.map(x=>x.id))}</p>`:""}${BS.bi?`<div class="ip-kv"><span>Temps passé</span><b>${esc(tpTxt(BS.tp))}</b></div>`:""}
    <p class="ip-proof">✅ Signé électroniquement par ${esc(BS.nm)}${BS.fn?" ("+esc(BS.fn)+")":""} le ${esc(fds(BS.dl||T))} à ${esc(BS.hl||"")}${BS.rf?" · réf. "+esc(BS.rf):""}${sigKTxt(BS.sk)}</p>
    <p class="mu">${BS.pending?"Pas de connexion pour l’instant : l’envoi se fera tout seul au retour du réseau. Gardez cette page dans votre téléphone.":"TOPAS informatique a reçu le bon signé : il est classé avec l’intervention."}</p></section>
   <button type="button" class="ip-cta" data-blend>🏠 Retour à l’accueil</button><div id="qbn">${bannerHtml()}</div>`;
@@ -785,11 +833,11 @@ async function main(){
   // bon d'intervention : « ✍ Faire signer le client » / « 📤 Envoyer sans signature » (mêmes contrôles), puis la partie choisie s'affiche dessous
   const biChk=e=>{const b=BS.bi&&biBlk();if(!b)return false;e.textContent=b[0];const f=g(b[1]);if(f){f.scrollIntoView({block:"center"});f.focus({preventScroll:true})}return true};
   const toSep=()=>setTimeout(()=>{const x=document.querySelector(".ip-sep");if(x)x.scrollIntoView({block:"start",behavior:"smooth"})},30);
-  document.querySelectorAll("[data-bich]").forEach(b=>b.onclick=()=>{const e=g("sge"),bm=blk();e.textContent="";if(biChk(e))return;if(bm){e.textContent=bm;const f=BS.ter?rc:tb.querySelector("[data-ter]");(BS.ter?rc:tb).scrollIntoView({block:"center"});f.focus({preventScroll:true});return}
+  document.querySelectorAll("[data-bich]").forEach(b=>b.onclick=()=>{if(phHold(b))return;const e=g("sge"),bm=blk();e.textContent="";if(biChk(e))return;if(bm){e.textContent=bm;const f=BS.ter?rc:tb.querySelector("[data-ter]");(BS.ter?rc:tb).scrollIntoView({block:"center"});f.focus({preventScroll:true});return}
    if(BS.mt.flush)BS.mt.flush();BS.rc=rc.value.trim();if(BS.res&&BS.rc.length<3){e.textContent="Écrivez la remarque du client, ou éteignez « Ajouter une remarque ».";rc.focus();return}
    if(BS.mt.on&&!BS.mt.L.length){e.textContent="Ajoutez l’article laissé, ou éteignez « Matériel laissé ».";g("blmn").focus();return}BS.ch=1;BS.ns=+b.dataset.bich;view();toSep()});
   const bsw=document.querySelector("[data-bisw]");if(bsw)bsw.onclick=()=>{if(BS.mt.flush)BS.mt.flush();BS.rc=rc.value;BS.ns=BS.ns?0:1;view();toSep()};
-  if(vb)vb.onclick=()=>{const e=g("sge"),bm=blk();if(biChk(e))return;if(bm){e.textContent=bm;const f=BS.ter?rc:tb.querySelector("[data-ter]");(BS.ter?rc:tb).scrollIntoView({block:"center"});f.focus({preventScroll:true});return}if(BS.mt.flush)BS.mt.flush();BS.rc=rc.value.trim();
+  if(vb)vb.onclick=()=>{if(phHold(vb))return;const e=g("sge"),bm=blk();if(biChk(e))return;if(bm){e.textContent=bm;const f=BS.ter?rc:tb.querySelector("[data-ter]");(BS.ter?rc:tb).scrollIntoView({block:"center"});f.focus({preventScroll:true});return}if(BS.mt.flush)BS.mt.flush();BS.rc=rc.value.trim();
    if(BS.res&&BS.rc.length<3){e.textContent="Écrivez la remarque du client, ou éteignez « Ajouter une remarque ».";rc.focus();return}
    if(BS.mt.on&&!BS.mt.L.length){e.textContent="Ajoutez l’article laissé, ou éteignez « Matériel laissé ».";g("blmn").focus();return}
    if(ns){const m=String(BS.rsm||"").trim();if(!BS.rs){e.textContent="Choisissez la raison.";document.querySelector("[data-nsr]").focus();return}if(BS.rs==="Autre…"&&m.length<3){e.textContent="Précisez la raison en quelques mots.";g("nsat").focus();return}
@@ -804,22 +852,23 @@ async function main(){
   const bx=document.querySelector("[data-bix]");if(bx)bx.onclick=()=>{if(!bx._a){bx._a=1;const t0=bx.textContent;bx.textContent="Annuler ce bon ?";setTimeout(()=>{bx._a=0;bx.textContent=t0},4000);return}(BS.ph||[]).forEach(x=>PDB.rm(x.id).catch(()=>{}));BS=null;nav({v:"list"})}}
  function blBind(){const g=id=>document.getElementById(id);
   document.querySelectorAll("[data-blback]").forEach(b=>b.onclick=()=>{BS.step="form";nav({v:"bls"})});
-  const f=g("blfin");if(f)f.onclick=()=>{f.disabled=true;blFinish()};
+  const f=g("blfin");if(f)f.onclick=()=>{if(phHold(f))return;f.disabled=true;blFinish().catch(e=>{f.disabled=false;const ee=g("sge");if(ee)ee.textContent="⚠ Envoi interrompu : "+((e&&e.message)||e)+". Réessayez."})};
   document.querySelectorAll("[data-blend]").forEach(b=>b.onclick=()=>{BS=null;nav({v:"list"})})}
- function blFinish(){if(BS.bi)return biSend(0);const t=IT[BS.ix].t,now=nowS(),rid=Date.now().toString(36)+Math.random().toString(36).slice(2,6),prev=blRec(t.i),v=(prev?prev.v:0)+1;
+ async function blFinish(){if(BS.bi)return biSend(0);await phSync(BS);const t=IT[BS.ix].t,now=nowS(),rid=Date.now().toString(36)+Math.random().toString(36).slice(2,6),prev=blRec(t.i),v=(prev?prev.v:0)+1;
   const p={t:"fp-sign",k:"bl",id:rid,it:t.i,n:t.b||"",c:String(t.c||"").slice(0,120),bv:t.v||1,v,iv:D.i||"",nm:BS.nm.slice(0,80),pr:BS.pr.slice(0,60),no:BS.no.slice(0,60),fn:BS.fn.slice(0,80),ter:BS.ter==="oui"||BS.ter==="non"?BS.ter:"",res:BS.res?1:0,lb:"rem",rc:BS.res?BS.rc.slice(0,1500):"",noimg:BS.noimg?1:0,sg:BS.sg,sm:BS.sm,sk:BS.sk||"",rf:sigRef(),mat:matOut(BS.mt),ph:phPay(),dl:now.dl,hl:now.hl};BS.rf=p.rf;BS.dl=now.dl;BS.hl=now.hl;BS.hl=now.hl;
-  const R=recs("bl:"+t.i);R.push({id:rid,v,dl:now.dl,hl:now.hl,nm:p.nm,res:p.res,ter:p.ter});
+  const R=recs("bl:"+t.i);R.push({id:rid,v,dl:now.dl,hl:now.hl,nm:p.nm,res:p.res,ter:p.ter,ph:p.ph.map(x=>x[0])});
   if(!LS.set(RK("bl:"+t.i),R)||!enqueue([p].concat(phQ(t.b)))){const ee=document.getElementById("sge");if(ee)ee.textContent="Impossible d’enregistrer sur ce téléphone (mémoire pleine ou navigation privée). Rien n’a été envoyé.";const fb=document.getElementById("blfin");if(fb)fb.disabled=false;return}
-  BS.step="done";BS.pending=true;view();window.scrollTo(0,0);flush().then(()=>{if(BS&&BS.step==="done"){BS.pending=!!pend(rid);view()}})}
+  phBon(BS,{n:t.b||"",kb:"bl",it:t.i,r0:rid,d:now.dl,h:now.hl});BS.step="done";BS.pending=true;view();window.scrollTo(0,0);flush().then(()=>{if(BS&&BS.step==="done"){BS.pending=!!pend(rid);view()}})}
 
  // bon d'intervention : relevé sur le téléphone (liste, détail) puis dépôt { k:"bi" } (signé, ou ns = 1 : envoyé sans signature) et ses photos
- function biSend(ns,rs,motif){const now=nowS(),rid=Date.now().toString(36)+Math.random().toString(36).slice(2,6),N=biNum(),num=N.num;
+ async function biSend(ns,rs,motif){await phSync(BS);const now=nowS(),rid=Date.now().toString(36)+Math.random().toString(36).slice(2,6),N=biNum(),num=N.num;
   const p={t:"fp-sign",k:"bi",id:rid,n:num,cid:BS.cx?"":BS.cid,c:String(BS.cn).trim().slice(0,120),cx:BS.cx?1:0,det:String(BS.det).trim().slice(0,2000),tp:BS.tp,ivk:D.pk||"",iv:D.i||"",ns:ns?1:0,ter:BS.ter==="oui"||BS.ter==="non"?BS.ter:"",res:BS.res?1:0,lb:"rem",rc:BS.res?String(BS.rc).slice(0,1500):"",mat:matOut(BS.mt),ph:phPay(),dl:now.dl,hl:now.hl};
   if(ns)Object.assign(p,{rs:String(rs||"").slice(0,60),motif:String(motif||"").slice(0,500)});else Object.assign(p,{nm:BS.nm.slice(0,80),pr:BS.pr.slice(0,60),no:BS.no.slice(0,60),fn:"",sg:BS.sg,sm:BS.sm,sk:BS.sk||"",rf:sigRef()});
-  const R0=biRecs(),r={id:rid,n:num,c:p.c,cx:p.cx,d:now.dl,h:now.hl,tp:p.tp,det:p.det,ns:p.ns,ter:p.ter,res:p.res,rc:p.rc,mat:p.mat,nph:p.ph.length,nm:p.nm||"",rs:p.rs||"",motif:p.motif||"",rf:p.rf||"",sk:p.sk||""};
+  const R0=biRecs(),r={id:rid,n:num,c:p.c,cx:p.cx,d:now.dl,h:now.hl,tp:p.tp,det:p.det,ns:p.ns,ter:p.ter,res:p.res,rc:p.rc,mat:p.mat,nph:p.ph.length,phx:p.ph.map(x=>x[0]),nm:p.nm||"",rs:p.rs||"",motif:p.motif||"",rf:p.rf||"",sk:p.sk||""};
   const ko=()=>{const ee=document.getElementById("sge")||document.getElementById("blsig");if(ee)ee.insertAdjacentHTML("beforeend",'<p class="ko">Impossible d’enregistrer sur ce téléphone (mémoire pleine ou navigation privée). Rien n’a été envoyé.</p>');const fb=document.getElementById("blfin");if(fb)fb.disabled=false;const vb=document.getElementById("blval");if(vb)vb.disabled=false};
   if(!LS.set(BIK,R0.concat([r]).slice(-400)))return ko();if(!enqueue([p].concat(phQ(num)))){LS.set(BIK,R0);return ko()}LS.set(BINK,{d:N.d,n:N.k});
-  if(ns){BS=null;nav({v:"list"});flash("📤 "+num+" envoyé sans signature.");flush().then(()=>view());return}
+  phBon(BS,{n:num,kb:"bi",it:"",r0:rid,d:now.dl,h:now.hl});const np=p.ph.length;
+  if(ns){BS=null;nav({v:"list"});flash("📤 "+num+" envoyé sans signature."+(np?" 📷 "+np+" photo"+(np>1?"s":"")+" jointe"+(np>1?"s":"")+".":""));flush().then(()=>view());return}
   BS.num=num;BS.rf=p.rf;BS.dl=now.dl;BS.hl=now.hl;BS.step="done";BS.pending=true;view();window.scrollTo(0,0);flush().then(()=>{if(BS&&BS.step==="done"){BS.pending=!!pend(rid);view()}})}
  // détail d'un bon d'intervention (lecture seule) : relevé du téléphone, sinon ce que TOPAS a publié
  function biView(n){const r=biRecs().find(z=>z.n===n),x=IT.find(z=>z.t.k==="bi"&&z.t.b===n),t=x?x.t:{};if(!r&&!x)return listView();const mt=r?r.mat||[]:[],pd=r&&!!pend(r.id);
@@ -827,7 +876,7 @@ async function main(){
   return `<header class="ip-hd ip-hdbi"><button type="button" class="ip-back" data-back>‹ Retour</button><div class="ip-k">Bon d’intervention</div><div class="ip-num">${esc(n)}</div><div class="ip-sub">${esc((r?r.c:t.c)||"")} · ${esc(fds((r?r.d:t.d)||T))}</div></header>
   <section class="ip-sg sgc ip-bid"><div class="ip-kv"><span>Temps passé</span><b>${esc(tpTxt(r?r.tp:t.tp))}</b></div>${r?`<div class="ip-kv"><span>Intervention terminée</span><b>${terTxt(r.ter)}</b></div><div class="ip-bdt">${esc(r.det)}</div>
    <div class="ip-kv"><span>Remarque</span><b>${r.res?"oui":"aucune"}</b></div>${r.res?`<div class="ip-rv">${esc(r.rc)}</div>`:""}<div class="ip-kv"><span>Matériel laissé</span><b>${mt.length?mt.length+" article"+(mt.length>1?"s":""):"aucun"}</b></div>${matLi(mt)}
-   <div class="ip-kv"><span>Photos</span><b>${r.nph||"aucune"}</b></div>`:""}<p class="ip-proof">${st}</p></section><div id="qbn">${bannerHtml()}</div>`}
+   <div class="ip-kv"><span>Photos</span><b>${r.nph||"aucune"}</b></div>${r.phx&&r.phx.length?`<p class="ip-phs" role="status">${phStat(r.phx)}</p>`:""}`:""}<p class="ip-proof">${st}</p></section><div id="qbn">${bannerHtml()}</div>`}
  // ---- 2. une formation
  function formView(ix){const f=D.f[ix];if(!f)return listView();const s=stat(f),sl=SLOTS(f),sd=scToday(f);
   const itemD=(()=>{const r=latest(f.n,"der","","");const x=r?{r,sent:!pend(r.id)}:null;return `<div class="task"><span>📋 Déroulé d’intervention<br><small class="mu">À lire et valider avant la formation</small></span>${x?stTxt(x,"Validé"):""}<button type="button" class="btn ${x?"":"p"}" data-sg="der">${x?"Refaire":"✍ Lire et valider"}</button></div>`})();
@@ -913,7 +962,7 @@ async function main(){
   document.querySelectorAll("[data-ics]").forEach(b=>b.onclick=()=>{const f=D.f.find(x=>x.n===b.dataset.ics);if(!f)return;const bl=new Blob([ics(f)],{type:"text/calendar"}),a=document.createElement("a");a.href=URL.createObjectURL(bl);a.download=f.n+"-planning.ics";document.body.appendChild(a);a.click();setTimeout(()=>a.remove(),500)});
  }
  try{history.replaceState({v:{v:"list"}},"")}catch(e){}
- view();flush();setTimeout(()=>{prefetch().catch(()=>{})},400);window.addEventListener("online",()=>prefetch().catch(()=>{}));
+ view();flush();setTimeout(()=>{prefetch().catch(()=>{})},400);setTimeout(phCatch,1500);setInterval(phCatch,120000);window.addEventListener("online",()=>prefetch().catch(()=>{}));
  if(EJ){window.addEventListener("online",async()=>{if(!hors||V.v!=="list")return;try{const r=await espLoad(EJ);if(!r.hors){D=r.D;location.reload()}}catch(e){}});
   document.addEventListener("click",e=>{if(e.target.closest("[data-insok]")){LS.set("fpiv:inst",1);const i=document.getElementById("inst");if(i)i.remove()}});
   try{if("serviceWorker" in navigator&&location.protocol==="https:")navigator.serviceWorker.register("sw.js").catch(()=>{})}catch(e){}}
