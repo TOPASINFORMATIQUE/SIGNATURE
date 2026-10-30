@@ -663,7 +663,7 @@ async function main(){
   const f=g("blfin");if(f)f.onclick=()=>{f.disabled=true;blFinish()};
   document.querySelectorAll("[data-blend]").forEach(b=>b.onclick=()=>{BS=null;nav({v:"list"})})}
  function blFinish(){const t=IT[BS.ix].t,now=nowS(),rid=Date.now().toString(36)+Math.random().toString(36).slice(2,6),prev=blRec(t.i),v=(prev?prev.v:0)+1;
-  const p={t:"fp-sign",k:"bl",id:rid,it:t.i,n:t.b||"",bv:t.v||1,v,iv:D.i||"",nm:BS.nm.slice(0,80),pr:BS.pr.slice(0,60),no:BS.no.slice(0,60),fn:BS.fn.slice(0,80),res:BS.res?1:0,lb:"rem",rc:BS.res?BS.rc.slice(0,1500):"",noimg:BS.noimg?1:0,sg:BS.sg,sm:BS.sm,sk:BS.sk||"",rf:sigRef(),mat:matOut(BS.mt),dl:now.dl,hl:now.hl};BS.rf=p.rf;BS.dl=now.dl;BS.hl=now.hl;BS.hl=now.hl;
+  const p={t:"fp-sign",k:"bl",id:rid,it:t.i,n:t.b||"",c:String(t.c||"").slice(0,120),bv:t.v||1,v,iv:D.i||"",nm:BS.nm.slice(0,80),pr:BS.pr.slice(0,60),no:BS.no.slice(0,60),fn:BS.fn.slice(0,80),res:BS.res?1:0,lb:"rem",rc:BS.res?BS.rc.slice(0,1500):"",noimg:BS.noimg?1:0,sg:BS.sg,sm:BS.sm,sk:BS.sk||"",rf:sigRef(),mat:matOut(BS.mt),dl:now.dl,hl:now.hl};BS.rf=p.rf;BS.dl=now.dl;BS.hl=now.hl;BS.hl=now.hl;
   const R=recs("bl:"+t.i);R.push({id:rid,v,dl:now.dl,hl:now.hl,nm:p.nm,res:p.res});
   if(!LS.set(RK("bl:"+t.i),R)||!enqueue([p])){const ee=document.getElementById("sge");if(ee)ee.textContent="Impossible d’enregistrer sur ce téléphone (mémoire pleine ou navigation privée). Rien n’a été envoyé.";const fb=document.getElementById("blfin");if(fb)fb.disabled=false;return}
   BS.step="done";BS.pending=true;view();window.scrollTo(0,0);flush().then(()=>{if(BS&&BS.step==="done"){BS.pending=!!pend(rid);view()}})}
