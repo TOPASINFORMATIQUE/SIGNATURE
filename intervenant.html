@@ -21,7 +21,7 @@
  --ds-b-blue:#c7d7fb;--ds-b-green:#bfe8cf;--ds-b-orange:#fed7aa;--ds-b-red:#fecaca;--ds-b-amber:#fde68a;--ds-b-violet:#ddd6fe;--ds-on:#ffffff;
  --ds-tx:#1e293b;--ds-tx2:#334155;--ds-mu:#64748b;--ds-mu2:#94a3b8;--ds-bg:#f5f7fc;--ds-card:#ffffff;--ds-line:#e5e7eb;--ds-line2:#f1f5f9;
  --ds-r-card:16px;--ds-r-tile:12px;--ds-r-btn:10px;--ds-r-pill:999px;--ds-sh:0 1px 3px rgba(15,23,42,.06),0 1px 2px rgba(15,23,42,.04);--ds-sh-h:0 6px 18px rgba(15,23,42,.08);
- --ip-grad:linear-gradient(125deg,var(--ds-topas),var(--ds-violet));
+ --ip-grad:linear-gradient(125deg,var(--ds-topas),var(--ds-violet));--ip-pink-d:var(--ds-pink);--ip-pink-l:var(--ds-b-red);
  --bg:var(--ds-bg);--card:var(--ds-card);--tx:var(--ds-tx);--mu:var(--ds-mu);--br:var(--ds-line);--pr:var(--ds-navy);--bl:var(--ds-sky);--gr:var(--ds-green);--sf:var(--ds-p-blue);--ok:var(--ds-green-d);--ko:var(--ds-red-d);--or:var(--ds-orange);--gy:var(--ds-mu2)}
 @media (prefers-color-scheme:dark){:root{--ds-b-violet:#3b2f63;--ds-card:#1a1f2a;--ds-tx:#e8ebf2;--ds-tx2:#cbd5e1;--ds-mu:#9aa3b5;--ds-line:#2b3240;--ds-line2:#232a36;--ds-bg:#11141b;--ds-p-blue:#1d2740;--ds-p-green:#16291f;--ds-p-orange:#2d2116;--ds-p-violet:#241d3a;--ds-p-pink:#2d1a26;--ds-p-grey:#222a36;--ds-p-red:#2d1a1a;--ds-p-amber:#2b2615;--ds-pri-l:#23264a;--pr:#9db4ff;--bl:#1e4f9a;--gr:#22c55e;--ok:#5fd08a;--ko:#ff8a7a;--or:#fb923c;--gy:#64748b}}
 *{box-sizing:border-box}
@@ -139,6 +139,7 @@ button:focus-visible,a:focus-visible,summary:focus-visible,textarea:focus-visibl
 textarea.rmt{display:block;width:100%;box-sizing:border-box;margin:0;min-height:calc(5.8em + 22px);font:inherit;font-size:16px;line-height:1.45;padding:10px 12px;border:1px solid var(--ds-b-orange);border-radius:var(--ds-r-btn);background:var(--ds-card);color:var(--ds-tx);resize:none;overflow:hidden}
 .urow .m{font-size:15px;margin-top:2px;overflow-wrap:anywhere}
 .nsov{position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:60;display:flex;align-items:flex-end;justify-content:center;padding:12px}.nsbx{background:var(--card);color:var(--tx);border-radius:18px;padding:16px;width:100%;max-width:520px;max-height:92vh;overflow:auto}.nsbx h3{margin:0 0 6px;font-size:19px}.nsr{display:grid;gap:8px;margin-top:10px}.nsrb[aria-checked="true"]{background:var(--pr);color:#fff;border-color:var(--pr)}
+@supports (color:color-mix(in srgb,red,blue)){:root{--ip-pink-d:color-mix(in srgb,var(--ds-pink) 78%,var(--ds-tx));--ip-pink-l:color-mix(in srgb,var(--ds-pink) 30%,var(--ds-card))}}
 /* ===== Présentation « maquette » (29/10) : jetons --ds-* de TOPAS Formation, dégradé de marque à 125°, contenu ≥ 16 px, cibles ≥ 44 px ===== */
 body{background:var(--ds-bg);color:var(--ds-tx)}
 body.ip-nb{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
@@ -175,7 +176,7 @@ body.ip-nb{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
 .ip-row .ip-d small{font-size:11px;font-variant:small-caps;letter-spacing:.03em;color:var(--ds-mu)}
 .ip-row .ip-c{flex:1;min-width:0;display:flex;flex-direction:column}
 .ip-row .ip-c b.uc{font-size:15.5px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
-.ip-row .ip-s.m{font-size:13px;color:var(--ds-mu);margin:1px 0 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;overflow-wrap:normal}
+.ip-row .ip-s.m{font-size:13px;color:var(--ds-mu);margin:1px 0 0;overflow:hidden;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
 .ip-row .ulate{font-size:13px;font-weight:800;color:var(--ds-orange-d);margin:1px 0 0}
 @media (prefers-color-scheme:dark){.ip-row .ulate{color:var(--ds-b-orange)}}
 .ip-r{flex:none;display:flex;align-items:center;gap:6px}
@@ -192,7 +193,7 @@ body.ip-nb{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
 @media (prefers-color-scheme:dark){.ip-nav button.on{color:var(--ds-b-blue);box-shadow:inset 0 3px 0 var(--ds-b-blue)}}
 .ip-flash{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:45;max-width:calc(100% - 32px);padding:10px 16px;border-radius:12px;background:var(--ds-tx);color:var(--ds-card);font-size:15px;font-weight:600;box-shadow:var(--ds-sh-h)}
 .ip-sheet .nsbx{padding:18px}.ip-sheet h3{font-size:19px}.ip-ad{margin:4px 0 10px;font-size:16px}
-.ip-back{min-height:44px;padding:6px 14px 6px 10px;border:0;border-radius:var(--ds-r-pill);background:rgba(255,255,255,.2);color:var(--ds-on);font-size:16px;font-weight:700}
+.ip-back{min-height:44px;margin-left:-4px;padding:6px 8px 6px 4px;border:0;border-radius:var(--ds-r-btn);background:transparent;color:var(--ds-on);font-size:16px;font-weight:600}
 .ip-k{margin-top:12px;font-size:13px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;opacity:.92}
 .ip-num{font-size:23px;font-weight:800;line-height:1.2;overflow-wrap:anywhere}.ip-num.ip-num2{font-size:20px}
 .ip-sub{font-size:15px;margin-top:3px;opacity:.95;overflow-wrap:anywhere}
@@ -200,6 +201,7 @@ body.ip-nb{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
 .ip-sub2{font-size:14px;margin-top:3px;opacity:.95;overflow-wrap:anywhere}
 .ip-card{background:var(--ds-card);border-radius:var(--ds-r-card);box-shadow:var(--ds-sh-h);padding:14px;margin:0 0 14px}
 .ip-h{margin:0 0 10px;font-size:13px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--ds-tx2)}
+.ip-card .ip-h{color:var(--ds-topas)}@media (prefers-color-scheme:dark){.ip-card .ip-h{color:var(--ds-b-blue)}}
 .ip-card .blim{margin:0}.ip-card .blpg,.ip-sg .blpg{position:relative;border-radius:12px;border-color:var(--ds-line)}
 .ip-zp{position:absolute;right:10px;bottom:10px;padding:7px 12px;border-radius:var(--ds-r-pill);background:rgba(15,23,42,.78);color:var(--ds-on);font-size:14px;font-weight:700;pointer-events:none}
 .ip-sum{background:var(--ds-p-blue);border:1.5px solid var(--ds-b-blue);border-radius:var(--ds-r-card);padding:12px 16px 14px;margin:0 0 16px}
@@ -215,12 +217,11 @@ body.ip-nb{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
 .ip-btn2{display:flex;width:100%;min-height:52px;align-items:center;justify-content:center;gap:8px;border:1.5px solid var(--ds-line);border-radius:14px;background:var(--ds-card);color:var(--ds-tx);font-size:16px;font-weight:700;text-decoration:none}
 .ip-map{margin-top:10px;min-height:48px}
 .ip-sg{background:var(--ds-card);border-radius:var(--ds-r-card);box-shadow:var(--ds-sh-h);padding:16px 14px;margin:0 0 14px}
-.ip-lead{margin:0 0 12px;font-size:16px;color:var(--ds-tx2)}
-.ip-fd{margin:0 0 14px}
-.ip-lb{display:block;margin:0 0 6px;font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--ds-mu)}
+.ip-fd{margin:0 0 12px;padding:8px 14px 2px;border:1.5px solid var(--ds-line);border-radius:12px;background:var(--ds-card)}.ip-fd:focus-within{border-color:var(--ds-topas)}
+.ip-lb{display:block;margin:0;font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--ds-mu)}
 .ip-in{display:block;width:100%;min-height:50px;padding:10px 12px;border:1.5px solid var(--ds-line);border-radius:12px;background:var(--ds-card);color:var(--ds-tx);font:inherit;font-size:16px;font-weight:400}
 .ip-in:focus{outline:none;border-color:var(--ds-topas);box-shadow:0 0 0 3px rgba(12,79,160,.16)}
-.ip-2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.ip-fd .ip-in{min-height:44px;padding:4px 0 6px;border:0;border-radius:0;background:transparent}.ip-fd .ip-in:focus{box-shadow:none}
 .ip-sg .sgw-tabs{background:var(--ds-line2);border-radius:16px;padding:4px;gap:4px;margin:4px 0 8px}
 .ip-sg .sgw-tb{min-height:46px;border:0;border-radius:12px;background:transparent;color:var(--ds-mu);font-size:15px}
 .ip-sg .sgw-tb[aria-selected="true"]{border:0;background:var(--ds-card);color:var(--ds-topas);box-shadow:0 1px 3px rgba(15,23,42,.12),0 2px 8px rgba(15,23,42,.06)}
@@ -228,15 +229,14 @@ body.ip-nb{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
 .ip-sg .sgw{position:relative}
 .ip-sg .sgw-pad,.ip-sg .sgw-pad.dr{border:2px dashed var(--ds-b-blue);border-radius:14px;background:var(--ds-on)}
 .ip-sg .sgw-act{position:absolute;right:8px;bottom:8px;margin:0}
-.ip-sg .sgw-act button{min-height:44px;border-radius:var(--ds-r-pill);border:1px solid var(--ds-b-blue);background:var(--ds-on);color:var(--ds-topas);font-size:15px}
+.ip-sg .sgw-act button{min-height:44px;border-radius:var(--ds-r-pill);border:0;background:var(--ds-line2);color:var(--ds-mu);font-size:15px}
 .ip-opt{margin:14px 0 0;padding:2px 14px;border:1.5px solid var(--ds-line);border-radius:16px;background:var(--ds-card);transition:background .15s,border-color .15s}
 .ip-opt.on{background:var(--op);border-color:var(--ob);padding-bottom:14px}
 .ip-rem{--sc:var(--ds-orange);--op:var(--ds-p-orange);--ob:var(--ds-b-orange);--ot:var(--ds-orange-d)}
-.ip-mat{--sc:var(--ds-pink);--op:var(--ds-p-pink);--ob:var(--ds-b-red);--ot:var(--ds-pink)}
-.ip-mat.on{border-color:var(--ds-b-red);border-color:color-mix(in srgb,var(--ds-pink) 30%,var(--ds-card))}
+.ip-mat{--sc:var(--ds-pink);--op:var(--ds-p-pink);--ob:var(--ip-pink-l);--ot:var(--ip-pink-d)}
 @media (prefers-color-scheme:dark){.ip-rem{--ot:var(--ds-b-orange)}}
 .ip-ot{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:52px;margin:0;cursor:pointer}
-.ip-otl{font-size:14px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--ds-tx2)}
+.ip-otl{font-size:17px;font-weight:800;color:var(--ds-tx)}
 .ip-opt.on .ip-otl{color:var(--ot)}
 .ip-ot input{position:absolute;opacity:0;width:1px;height:1px;margin:0}
 .ip-sw{position:relative;flex:none;width:52px;height:30px;border-radius:var(--ds-r-pill);background:var(--ds-mu2);transition:background .15s}
@@ -244,18 +244,18 @@ body.ip-nb{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
 .ip-ot input:checked+.ip-sw{background:var(--sc)}.ip-ot input:checked+.ip-sw>span{left:25px}
 .ip-ot input:focus-visible+.ip-sw{outline:3px solid var(--ot);outline-offset:2px}
 .ip-oh{display:block;margin:2px 0 8px;font-size:13.5px;font-weight:700;color:var(--ot)}
-.ip-mat .ip-oh{color:var(--ds-tx2)}
+.ip-mat .ip-oh,.ip-mat .ip-mk{color:var(--ip-pink-d)}.ip-mat .ip-in{border-color:var(--ip-pink-l)}
 .ip-opt textarea.rmt{border-color:var(--ob)}
 .ip-it{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 8px;padding:6px 6px 6px 12px;border-radius:12px;background:var(--ds-card);box-shadow:var(--ds-sh)}
 .ip-it b{min-width:0;font-size:15px;font-weight:800;overflow-wrap:anywhere}
-.ip-qty{display:flex;align-items:center;gap:4px;flex:none}
-.ip-qty button{width:44px;min-width:44px;height:44px;min-height:44px;padding:0;border:1.5px solid var(--ds-line);border-radius:12px;background:var(--ds-card);color:var(--ds-tx);font-size:20px;font-weight:800}
+.ip-qty{display:flex;align-items:center;gap:0;flex:none;border:1.5px solid var(--ip-pink-l);border-radius:var(--ds-r-pill);padding:0 2px}
+.ip-qty button{width:44px;min-width:44px;height:44px;min-height:44px;padding:0;border:0;border-radius:50%;background:transparent;color:var(--ip-pink-d);font-size:22px;font-weight:800}
 .ip-qty output{min-width:30px;text-align:center;font-size:17px;font-weight:800}
 .ip-mk{display:block;margin:12px 0 6px;font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--ds-mu)}
 .ip-ms{display:flex;flex-wrap:wrap;gap:8px}
-.ip-ms button{min-height:44px;padding:6px 14px;border:1.5px solid var(--ds-line);border-radius:var(--ds-r-pill);background:var(--ds-card);color:var(--ds-tx);font-size:15px;font-weight:700}
+.ip-ms button{min-height:44px;padding:6px 16px;border:1.5px solid var(--ip-pink-l);border-radius:var(--ds-r-pill);background:var(--ds-card);color:var(--ip-pink-d);font-size:15px;font-weight:700}
 .ip-ma{display:flex;gap:8px}.ip-ma .ip-in{flex:1;min-width:0}
-.ip-madd{flex:none;width:54px;min-height:50px;padding:0;border:0;border-radius:12px;background:var(--ds-pink);color:var(--ds-on);font-size:24px;font-weight:800}
+.ip-madd{flex:none;width:56px;min-height:50px;padding:0;border:0;border-radius:14px;background:var(--ds-pink);color:var(--ds-on);font-size:24px;font-weight:800}
 .ip-done{margin:0 0 14px;padding:16px;border:1.5px solid var(--ds-b-green);border-radius:20px;background:var(--ds-p-green)}
 .ip-done h2{margin:0 0 8px;font-size:20px;line-height:1.25;color:var(--ds-green-d)}.ip-done.pend h2{color:var(--ds-orange-d)}
 @media (prefers-color-scheme:dark){.ip-done h2{color:var(--ds-b-green)}.ip-done.pend h2{color:var(--ds-b-orange)}}
@@ -481,6 +481,7 @@ async function main(){
  // rond d'initiales : couleur stable itvPal(nom complet), comme sa carte dans TOPAS Formation
  const avH=()=>{const nm=String(D.i||pr||"").trim(),P=itvPal(nm||"?"),p0=(pr||nm.split(/\s+/)[0]||"").trim(),n0=(D.p&&nm.startsWith(D.p)?nm.slice(D.p.length):nm.split(/\s+/).slice(1).join(" ")).trim();
   return `<span class="ip-av" aria-hidden="true" style="--a:${P[0]};--b:${shade(P[0],.3)}">${esc(((p0[0]||"")+(n0[0]||"")).toUpperCase()||"?")}</span>`};
+ const fH=h=>{const m=/^(\d{1,2}):(\d\d)$/.exec(String(h||""));return m?(+m[1])+"h"+m[2]:String(h||"")},dNear=d=>{const n=dd(T,d);return Math.abs(n)<=1?rel(d):fdm(d)};
  const MOI=d=>{const x=new Date(d+"T12:00:00");return isNaN(x)?"":x.toLocaleDateString("fr-FR",{month:"short"})};
  const dCol=d=>/^\d{4}-\d\d-\d\d$/.test(d||"")?`<span class="ip-d"><b>${new Date(d+"T12:00:00").getDate()}</b><small>${esc(MOI(d))}</small></span>`:`<span class="ip-d"><b>?</b><small>date</small></span>`;
  // barre du bas : 🏠 Accueil · 📄 Signées (fait défiler jusqu'au groupe) · ☎ TOPAS (numéro et adresse de la fiche Gestionnaire)
@@ -504,10 +505,10 @@ async function main(){
  const matOut=st=>st&&st.on?st.L.filter(x=>x[1]>0).slice(0,30).map(x=>[String(x[0]).slice(0,80),Math.min(999,x[1])]):[];
  // bloc à interrupteur (même présentation pour la remarque et le matériel)
  const optH=(cls,id,title,on,body)=>`<div class="ip-opt ${cls}${on?" on":""}"><label class="ip-ot" for="${id}"><span class="ip-otl">${title}</span><input type="checkbox" role="switch" id="${id}" ${on?"checked":""}><span class="ip-sw" aria-hidden="true"><span></span></span></label>${body}</div>`;
- const matH=(st,p)=>optH("ip-mat",p+"mon","📦 Matériel laissé",st.on,`<div class="ip-ob${st.on?"":" hide"}" id="${p}mw"><p class="ip-oh">Ce que vous laissez et qui n’est pas sur le bon</p><div id="${p}ml"></div><div id="${p}msg"></div><label class="ip-mk" for="${p}mn">Autre article</label><div class="ip-ma"><input class="ip-in" id="${p}mn" maxlength="80" autocomplete="off" enterkeyhint="done"><button type="button" class="ip-madd" id="${p}madd" aria-label="Ajouter cet article">＋</button></div></div>`);
+ const matH=(st,p)=>optH("ip-mat",p+"mon","📦 Matériel laissé",st.on,`<div class="ip-ob${st.on?"":" hide"}" id="${p}mw"><p class="ip-oh">Ce que vous laissez et qui n’est pas sur le bon</p><div id="${p}ml"></div><div id="${p}msg"></div><label class="ip-mk" for="${p}mn">Autre article</label><div class="ip-ma"><input class="ip-in" id="${p}mn" maxlength="80" autocomplete="off" enterkeyhint="done" placeholder="Nom de l’article…"><button type="button" class="ip-madd" id="${p}madd" aria-label="Ajouter cet article">＋</button></div></div>`);
  function matBind(root,st,p){const g=s=>root.querySelector("#"+p+s),sw=g("mon"),w=g("mw"),inp=g("mn");if(!sw)return;
   const draw=()=>{g("ml").innerHTML=st.L.map((x,i)=>`<div class="ip-it"><b>${esc(x[0])}</b><span class="ip-qty" role="group" aria-label="Quantité : ${esc(x[0])}"><button type="button" data-mq="${i}:-1" aria-label="Un de moins">−</button><output aria-live="polite">${x[1]}</output><button type="button" data-mq="${i}:1" aria-label="Un de plus">＋</button></span></div>`).join("");
-   const S=matSug(st.L);g("msg").innerHTML=S.length?`<div class="ip-mk">Un toucher pour ajouter</div><div class="ip-ms">${S.map((n,i)=>`<button type="button" data-ms="${i}">${esc(n)}</button>`).join("")}</div>`:"";
+   const S=matSug(st.L);g("msg").innerHTML=S.length?`<div class="ip-mk">Un toucher pour ajouter</div><div class="ip-ms">${S.map((n,i)=>`<button type="button" data-ms="${i}"><span aria-hidden="true">+ </span>${esc(n)}</button>`).join("")}</div>`:"";
    g("ml").querySelectorAll("[data-mq]").forEach(b=>b.onclick=()=>{const[i,d]=b.dataset.mq.split(":").map(Number),x=st.L[i];if(!x)return;x[1]=Math.max(0,Math.min(999,x[1]+d));if(!x[1])st.L.splice(i,1);draw()});
    g("msg").querySelectorAll("[data-ms]").forEach(b=>b.onclick=()=>add(S[+b.dataset.ms]))};
   const add=n=>{n=String(n||"").replace(/\s+/g," ").trim().slice(0,80);if(!n)return false;const x=st.L.find(z=>matK(z[0])===matK(n));if(x)x[1]=Math.min(999,x[1]+1);else if(st.L.length<30)st.L.push([n,1]);matUse(n);draw();return true};
@@ -523,7 +524,7 @@ async function main(){
  // retard : « il y a N jours » (bon ou émargement daté d'avant aujourd'hui, pas signé)
  const uAgo=d=>{const n=Math.round((Date.parse(T)-Date.parse(d))/864e5);return n>0?`<span class="ulate">il y a ${n} jour${n>1?"s":""}</span>`:""};
  const pastDue=f=>SLOTS(f).filter(sl=>sl.day<T&&!emState(f,sl)).map(sl=>sl.day).sort();
- const uB=(x,late,kd)=>{const t=x.t,s=blSt(x),ok=s.k!=="faire",cn=t.c||t.nm||"Intervention",dd=kd?String(kd).slice(0,10):t.d||"",hh=kd?String(kd).slice(11,16):t.h||"";return {k:kd||((t.d||"9999-12-31")+" "+(t.h||"00:00")),h:`<button type="button" class="row urow ip-row" data-it="${x.ix}" data-b="${esc(t.b||"")}">${dCol(dd)}<span class="ip-c ul"><b class="uc" title="${esc(cn)}">${esc(cn)}</b><span class="ip-s m">${t.b?"BL N° "+esc(t.b):esc(t.nm||"Bon de livraison")}${hh?" · "+esc(hh):""}</span>${late&&t.d?uAgo(t.d):""}</span><span class="ip-r"><span class="utag ub ip-tag">BL</span><span class="ip-st" aria-label="${ok?(s.k==="att"?"signé, en attente d’envoi":s.k==="ns"?"envoyé sans signature":"signé"):"à faire signer"}">${ok?"✓":"⏳"}</span></span></button>`}};
+ const uB=(x,late,kd)=>{const t=x.t,s=blSt(x),ok=s.k!=="faire",cn=t.c||t.nm||"Intervention",dd=kd?String(kd).slice(0,10):t.d||"",hh=kd?String(kd).slice(11,16):t.h||"";return {k:kd||((t.d||"9999-12-31")+" "+(t.h||"00:00")),h:`<button type="button" class="row urow ip-row" data-it="${x.ix}" data-b="${esc(t.b||"")}">${dCol(dd)}<span class="ip-c ul"><b class="uc" title="${esc(cn)}">${esc(cn)}</b>${late&&t.d?uAgo(t.d):`<span class="ip-s m">${esc(t.b||t.nm||"Bon de livraison")}${hh?" · "+esc(fH(hh)):""}</span>`}</span><span class="ip-r"><span class="utag ub ip-tag">BL</span><span class="ip-st" aria-label="${ok?(s.k==="att"?"signé, en attente d’envoi":s.k==="ns"?"envoyé sans signature":"signé"):"à faire signer"}">${ok?"✓":"⏳"}</span></span></button>`}};
  // bon signé : classé par sa date de SIGNATURE (pas d'intervention) ; plus de 12 mois → « 🗄 Archives » (jamais invisible)
  const sdOf=x=>{const s=blSt(x);return s.r?String(s.r.dl||"")+" "+String(s.r.hl||""):String(x.t.sd||"")||String(x.t.d||"")};
  // ⏰ À régulariser : tout ce qui est daté d'avant aujourd'hui et pas signé (bons de livraison + émargements), en tête, le plus ancien d'abord
@@ -575,15 +576,15 @@ async function main(){
  const itMaps=t=>"https://www.google.com/maps/search/?api=1&query="+encodeURIComponent((t.c||"")+" "+(t.a||""));
  const itCity=t=>{const a=String(t.a||"").split(",").pop().trim();return a||t.c||""};
  function itView(ix){const x=IT[ix];if(!x)return listView();const t=x.t,s=blSt(x),late=s.k==="faire"&&t.d&&t.d<T,cn=t.c||t.nm||"Intervention",rr=s.k==="faire"?repRec(t.i):null,nl=+t.nl||0;
-  return `<header class="ip-hd"><button type="button" class="ip-back" data-back>‹ Retour</button><div class="ip-k">Bon de livraison</div><div class="ip-num">${t.b?"N° "+esc(t.b):esc(t.nm||"N° —")}</div><div class="ip-sub">${esc(cn)} · ${t.d?esc(fdm(t.d)):"date à préciser"}${t.h?" · "+esc(t.h):""}</div></header>
+  return `<header class="ip-hd"><button type="button" class="ip-back" data-back>‹ Retour</button><div class="ip-k">Bon de livraison</div><div class="ip-num">${esc(t.b||t.nm||"—")}</div><div class="ip-sub">${esc(cn)} · ${t.d?esc(dNear(t.d)):"date à préciser"}${t.h?" "+esc(fH(t.h)):""}</div></header>
   <div id="qbn">${bannerHtml()}</div>
   ${s.k!=="faire"?`<div class="qb ${s.k==="att"?"qw":"qk"}" role="status"><b>${esc(s.txt)}</b>${s.r&&s.r.res?'<span class="ko">avec remarque</span>':""}</div>`:""}
   ${rr?`<div class="qb ${pend(rr.id)?"qw":"qk"}" role="status"><b>⏸ Signature reportée le ${esc(dm(rr.dl))} à ${esc(rr.hl)}</b><span>${pend(rr.id)?"en attente d’envoi":"TOPAS informatique est prévenu"}</span></div>`:""}
   <section class="ip-card" aria-labelledby="ipbon"><h2 class="ip-h" id="ipbon">📄 Le bon</h2>${imgBox(ix)}</section>
   <section class="ip-sum" aria-labelledby="ipsum"><h2 class="ip-h" id="ipsum">🧾 Résumé</h2>
    <div class="ip-kv"><span>Client</span><b>${esc(cn)}</b></div>
-   <div class="ip-kv"><span>Date</span><b>${t.d?esc(fdl(t.d)):"à préciser"}${t.h?" · "+esc(t.h):""}</b></div>
-   <div class="ip-kv"><span>Lignes</span><b>${nl?nl+" ligne"+(nl>1?"s":"")+" sur le bon":"voir le bon ci-dessus"}</b></div>
+   <div class="ip-kv"><span>Date</span><b>${t.d?esc(fds(t.d)):"à préciser"}</b></div>
+   <div class="ip-kv"><span>Lignes</span><b>${nl?nl+" article"+(nl>1?"s":""):"voir le bon ci-dessus"}</b></div>
    ${t.a?`<div class="ip-kv"><span>Adresse</span><b>${esc(t.a)}</b></div><a class="ip-btn2 ip-map" href="${itMaps(t)}" target="_blank" rel="noopener">🧭 Itinéraire</a>`:""}</section>
   ${s.k==="faire"?`<button type="button" class="ip-cta" data-bls="${ix}">✍ Faire signer le client</button><div class="ip-b2"><button type="button" class="ip-btn2" data-blrep2="${ix}">⏸ Reporter la signature</button>${late?`<button type="button" class="ip-btn2" data-blns="${ix}">📤 Envoyer sans signature</button>`:""}</div><div id="blch"></div>`:""}
   ${foot()}`}
@@ -593,14 +594,14 @@ async function main(){
  const svgOf=st=>"data:image/svg+xml;charset=utf-8,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 140"><path d="'+st.map(s=>"M"+s.map(q=>q[0]+" "+q[1]).join(" L")).join(" ")+'" fill="none" stroke="#12308f" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>');
  const blWhat=(t,ix,noimg)=>`<div class="pan"><h4>Ce que vous signez</h4><div><b>${esc(t.nm||("Bon de livraison N° "+(t.b||"—")))}</b>${t.c?" · "+esc(t.c):""}</div><div>Intervention du ${t.d?esc(fdl(t.d)):"(date à préciser)"}</div>${noimg?'<div class="qb qw" style="margin:8px 0 0"><b>⚠ Le bon n’a pas pu être affiché</b><span>Le client signe sans le voir : ce sera noté sur le bon signé.</span></div>':imgBox(ix)}</div>`;
  // encart « Signature électronique » DANS la fiche, sous le bon : prénom, nom, fonction, réserves, signature composée ou au doigt
- const blNew=ix=>({ix,step:"form",pr:"",no:"",nm:"",fn:"",res:false,rc:"",sg:"",sm:"",noimg:0,mt:matNew()});
+ const blNew=ix=>({ix,step:"form",full:"",pr:"",no:"",nm:"",fn:"",res:false,rc:"",sg:"",sm:"",noimg:0,mt:matNew()});
  // écran « Signature du client » : nom et prénom, fonction, deux façons de signer, ✎ remarque et 📦 matériel laissé (interrupteurs), puis vérification
  const blForm=ix=>{if(!BS||BS.ix!==ix)BS=blNew(ix);const t=IT[ix].t,cn=t.c||t.nm||"";
-  return `<header class="ip-hd"><button type="button" class="ip-back" data-blbon>‹ Le bon</button><h1 class="ip-tt">Signature du client</h1><div class="ip-sub2">${t.b?"N° "+esc(t.b):esc(t.nm||"")}${cn?" · "+esc(cn):""}</div></header>
+  return `<header class="ip-hd"><button type="button" class="ip-back" data-blbon>‹ Le bon</button><h1 class="ip-tt">Signature du client</h1><div class="ip-sub2">${esc(t.b||t.nm||"")}${cn?" · "+esc(cn):""}</div></header>
   <div id="qbn">${bannerHtml()}</div>
   <section class="ip-sg sgc" id="blsig">
-  ${BS.noimg?'<div class="qb qw" style="margin:0 0 12px"><b>⚠ Le bon n’a pas pu être affiché</b><span>Le client signe sans le voir : ce sera noté sur le bon signé.</span></div>':'<p class="ip-lead">Le client a vérifié le bon. Il indique son nom et sa fonction, puis signe.</p>'}
-  <div class="ip-fd" role="group" aria-labelledby="blnml"><span class="ip-lb" id="blnml">Nom et prénom du signataire *</span><div class="ip-2"><input class="ip-in" id="blpr" autocomplete="given-name" placeholder="Prénom" aria-label="Prénom du signataire" value="${esc(BS.pr)}"><input class="ip-in" id="blno" autocomplete="family-name" placeholder="Nom" aria-label="Nom du signataire" value="${esc(BS.no)}"></div></div>
+  ${BS.noimg?'<div class="qb qw" style="margin:0 0 12px"><b>⚠ Le bon n’a pas pu être affiché</b><span>Le client signe sans le voir : ce sera noté sur le bon signé.</span></div>':""}
+  <div class="ip-fd"><label class="ip-lb" for="blpr">Nom et prénom du signataire</label><input class="ip-in" id="blpr" autocomplete="name" autocapitalize="words" value="${esc(BS.full||"")}"></div>
   <div class="ip-fd"><label class="ip-lb" for="blfn">Fonction</label><input class="ip-in" id="blfn" value="${esc(BS.fn)}"></div>
   <div id="blsw"></div>
   ${optH("ip-rem","blres","✎ Ajouter une remarque",BS.res,`<div id="blrw" class="ip-ob${BS.res?"":" hide"}"><label class="ip-oh" for="blrc">Ce qui ne va pas, ce qui manque…</label><textarea class="rmt" id="blrc" rows="4">${esc(BS.rc)}</textarea></div>`)}
@@ -629,7 +630,7 @@ async function main(){
  function blReport(ix,motif){const t=IT[ix].t,now=nowS(),rid=Date.now().toString(36)+Math.random().toString(36).slice(2,6),p={t:"fp-sign",k:"blrep",id:rid,it:t.i,n:t.b||"",iv:D.i||"",motif:String(motif||"").slice(0,500),dl:now.dl,hl:now.hl};
   const R=recs("blrep:"+t.i);R.push({id:rid,dl:now.dl,hl:now.hl});if(!LS.set(RK("blrep:"+t.i),R)||!enqueue([p])){const el=document.getElementById("blch");if(el)el.insertAdjacentHTML("beforeend",'<p class="ko">Impossible d’enregistrer sur ce téléphone.</p>');return}view();flush().then(()=>view())}
  const matLi=m=>m&&m.length?`<ul class="ip-ml">${m.map(x=>`<li>${x[1]} × ${esc(x[0])}</li>`).join("")}</ul>`:"";
- function blView(){if(!BS)return listView();const t=IT[BS.ix].t,cn=t.c||t.nm||"",num=t.b?"N° "+esc(t.b):esc(t.nm||""),mat=matOut(BS.mt);
+ function blView(){if(!BS)return listView();const t=IT[BS.ix].t,cn=t.c||t.nm||"",num=esc(t.b||t.nm||""),mat=matOut(BS.mt);
   if(BS.step==="done")return `<header class="ip-hd"><div class="ip-k">Bon de livraison</div><div class="ip-num">${num}</div><div class="ip-sub">${esc(cn)}</div></header>
   <section class="ip-done${BS.pending?" pend":""}" role="status"><h2>${BS.pending?"⏳ Signé, envoi en attente":"✔ Signé et transmis"}</h2>
    <div class="ip-kv"><span>Signataire</span><b>${esc(BS.nm)}${BS.fn?" ("+esc(BS.fn)+")":""}</b></div>
@@ -648,16 +649,16 @@ async function main(){
    <button type="button" class="ip-cta" id="blfin">✔ Terminer l’intervention</button><div class="ip-b2"><button type="button" class="ip-btn2" data-blback>✏ Modifier</button><button type="button" class="ip-btn2" data-sgx>Quitter sans enregistrer</button></div></section><div id="qbn">${bannerHtml()}</div>`;
   return blForm(BS.ix)}
  let BW=null;
- function blFormBind(){const g=id=>document.getElementById(id),pr=g("blpr");if(!pr||!BS)return;const no=g("blno"),fn=g("blfn"),rs=g("blres"),rc=g("blrc");
-  BW=SIGW.mount(g("blsw"),{name:()=>pr.value+" "+no.value,max:2500,label:"Signature du client, composée à partir de son prénom et de son nom.",keep:BS.sw=BS.sw||{}});
-  matBind(document,BS.mt,"bl");pr.oninput=()=>{BS.pr=pr.value;BW.refresh()};no.oninput=()=>{BS.no=no.value;BW.refresh()};fn.oninput=()=>BS.fn=fn.value;const grow=()=>{rc.style.height="auto";rc.style.height=Math.max(rc.scrollHeight,0)+"px"};rc.oninput=()=>{BS.rc=rc.value;grow()};
+ function blFormBind(){const g=id=>document.getElementById(id),pr=g("blpr");if(!pr||!BS)return;const fn=g("blfn"),rs=g("blres"),rc=g("blrc");
+  BW=SIGW.mount(g("blsw"),{name:()=>pr.value,max:2500,label:"Signature du client, composée à partir de son nom et de son prénom.",keep:BS.sw=BS.sw||{}});
+  matBind(document,BS.mt,"bl");pr.oninput=()=>{BS.full=pr.value;BW.refresh()};fn.oninput=()=>BS.fn=fn.value;const grow=()=>{rc.style.height="auto";rc.style.height=Math.max(rc.scrollHeight,0)+"px"};rc.oninput=()=>{BS.rc=rc.value;grow()};
   rs.onchange=()=>{BS.res=rs.checked;rs.closest(".ip-opt").classList.toggle("on",rs.checked);g("blrw").classList.toggle("hide",!rs.checked);if(rs.checked){grow();rc.focus()}};if(rs.checked)setTimeout(grow,0);
-  g("blval").onclick=()=>{const e=g("sge");if(BS.mt.flush)BS.mt.flush();BS.pr=pr.value.trim().replace(/\s+/g," ");BS.no=no.value.trim().replace(/\s+/g," ");BS.fn=fn.value.trim();BS.rc=rc.value.trim();
-   if(!BS.pr){e.textContent="Indiquez le prénom du signataire.";pr.focus();return}if(BS.no.length<2){e.textContent="Indiquez le nom du signataire.";no.focus();return}
+  g("blval").onclick=()=>{const e=g("sge");if(BS.mt.flush)BS.mt.flush();BS.full=pr.value.trim().replace(/\s+/g," ");const W2=BS.full.split(" ");BS.pr=W2[0]||"";BS.no=W2.slice(1).join(" ");BS.fn=fn.value.trim();BS.rc=rc.value.trim();
+   if(!BS.full){e.textContent="Indiquez le nom et le prénom du signataire.";pr.focus();return}if(W2.length<2||BS.full.length<4){e.textContent="Indiquez le prénom et le nom du signataire (les deux).";pr.focus();return}
    if(BS.res&&BS.rc.length<3){e.textContent="Écrivez la remarque du client, ou éteignez « Ajouter une remarque ».";rc.focus();return}
     if(BS.mt.on&&!BS.mt.L.length){e.textContent="Ajoutez l’article laissé, ou éteignez « Matériel laissé ».";g("blmn").focus();return}
-   if(BW.empty()){e.textContent=BW.mode()==="draw"?"Le client doit signer dans le cadre (ou choisir « ✍ Signature simple »).":"Indiquez le prénom et le nom du signataire.";return}
-   BS.nm=BS.pr+" "+BS.no.toLocaleUpperCase("fr-FR");BS.sg=BW.get();BS.sm=BW.how();BS.sk=BW.kind();BS.step="recap";nav({v:"bls"})}}
+   if(BW.empty()){e.textContent=BW.mode()==="draw"?"Le client doit signer dans le cadre (ou choisir « ✍ Signature simple »).":"Indiquez le nom et le prénom du signataire.";return}
+   BS.nm=BS.full;BS.sg=BW.get();BS.sm=BW.how();BS.sk=BW.kind();BS.step="recap";nav({v:"bls"})}}
  function blBind(){const g=id=>document.getElementById(id);
   document.querySelectorAll("[data-blback]").forEach(b=>b.onclick=()=>{BS.step="form";nav({v:"bls"})});
   const f=g("blfin");if(f)f.onclick=()=>{f.disabled=true;blFinish()};
