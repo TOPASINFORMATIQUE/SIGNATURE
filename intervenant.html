@@ -250,6 +250,8 @@ body.ip-nb{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
 .ip-opt.lock .ip-ot{cursor:default}.ip-opt.lock .ip-sw{opacity:.7}
 .ip-cta.off,.btn.off{opacity:.55}
 .ip-hint{margin:8px 0 0;font-size:14px;color:var(--ds-mu);text-align:center}
+.ip-sep{display:flex;align-items:center;gap:10px;margin:24px 0 12px;font-size:13px;font-weight:800;letter-spacing:.08em;color:var(--ds-mu)}.ip-sep::before,.ip-sep::after{content:"";flex:1;height:1.5px;background:var(--ds-line)}
+.ip-nsi{margin:0 0 10px;font-size:15px}.ip-sg .nsr{margin-top:0}.ip-sg .nsaw textarea{display:block;width:100%;margin-top:6px;font:inherit;font-size:16px;padding:10px 12px;min-height:84px;border:1.5px solid var(--ds-line);border-radius:12px;background:var(--ds-card);color:var(--ds-tx);resize:vertical}
 .nsbx .ip-ter{margin:12px 0 0}.nsrw{margin-top:10px}.nsrw textarea{display:block;width:100%;margin-top:6px;font:inherit;font-size:16px;padding:10px 12px;min-height:84px;border:1.5px solid var(--ds-b-orange);border-radius:12px;background:var(--ds-card);color:var(--ds-tx);resize:vertical}
 .nsrw label{display:block;font-size:14px;font-weight:700;color:var(--ds-orange-d)}
 .ip-mat{--sc:var(--ds-pink);--op:var(--ds-p-pink);--ob:var(--ip-pink-l);--ot:var(--ip-pink-d)}
@@ -613,24 +615,27 @@ async function main(){
  const svgOf=st=>"data:image/svg+xml;charset=utf-8,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 140"><path d="'+st.map(s=>"M"+s.map(q=>q[0]+" "+q[1]).join(" L")).join(" ")+'" fill="none" stroke="#12308f" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>');
  const blWhat=(t,ix,noimg)=>`<div class="pan"><h4>Ce que vous signez</h4><div><b>${esc(t.nm||("Bon de livraison N° "+(t.b||"—")))}</b>${t.c?" · "+esc(t.c):""}</div><div>Intervention du ${t.d?esc(fdl(t.d)):"(date à préciser)"}</div>${noimg?'<div class="qb qw" style="margin:8px 0 0"><b>⚠ Le bon n’a pas pu être affiché</b><span>Le client signe sans le voir : ce sera noté sur le bon signé.</span></div>':imgBox(ix)}</div>`;
  // encart « Signature électronique » DANS la fiche, sous le bon : prénom, nom, fonction, réserves, signature composée ou au doigt
- const blNew=ix=>({ix,step:"form",full:"",pr:"",no:"",nm:"",fn:"",ter:"",res:false,resAuto:false,rc:"",sg:"",sm:"",noimg:0,mt:matNew()});
+ const blNew=ix=>({ix,step:"form",ns:0,full:"",pr:"",no:"",nm:"",fn:"",ter:"",res:false,resAuto:false,rc:"",rs:"",rsm:"",sg:"",sm:"",noimg:0,mt:matNew()});
  // 🛠 « Intervention terminée ? » (30/10) : Oui / Non, aucun choix présélectionné ; « Non » rend la remarque obligatoire (signature et envoi sans signature)
  const TERQ="Indiquez si l’intervention est terminée.",TERN="Intervention non terminée : expliquez ce qui reste à faire.";
  const terH=(id,v)=>`<div class="ip-ter${v?" "+v:""}" id="${id}ter" role="group" aria-labelledby="${id}terq"><div class="ip-terq" id="${id}terq">🛠 Intervention terminée ?</div><div class="ip-terb"><button type="button" class="ip-tb ip-tby" data-ter="oui" aria-pressed="${v==="oui"}">✓ Oui</button><button type="button" class="ip-tb ip-tbn" data-ter="non" aria-pressed="${v==="non"}">✗ Non</button></div></div>`;
  const terTxt=v=>v==="oui"?"Oui":v==="non"?"Non":"Non renseigné";
- // écran « Signature du client » : nom et prénom, fonction, deux façons de signer, ✎ remarque et 📦 matériel laissé (interrupteurs), puis vérification
- const blForm=ix=>{if(!BS||BS.ix!==ix)BS=blNew(ix);const t=IT[ix].t,cn=t.c||t.nm||"";
-  return `<header class="ip-hd"><button type="button" class="ip-back" data-blbon>‹ Le bon</button><h1 class="ip-tt">Signature du client</h1><div class="ip-sub2">${esc(t.b||t.nm||"")}${cn?" · "+esc(cn):""}</div></header>
+ // ÉCRAN UNIQUE (30/10) — le client voit tout AVANT de signer : 🛠 Intervention terminée ? → ✎ Remarque → 📦 Matériel laissé, puis
+ // « SIGNATURE DU CLIENT » (nom et prénom, deux façons de signer, Valider) ; « 📤 Envoyer sans signature » (BS.ns) = le même écran, la raison
+ // remplaçant la signature. Plus de champ « Fonction » pour les BL (les signatures déjà reçues gardent la leur).
+ const blForm=ix=>{if(!BS||BS.ix!==ix)BS=blNew(ix);const t=IT[ix].t,cn=t.c||t.nm||"",ns=!!BS.ns;
+  return `<header class="ip-hd"><button type="button" class="ip-back" data-blbon>‹ Le bon</button><h1 class="ip-tt">${ns?"Envoyer sans signature":"Signature du client"}</h1><div class="ip-sub2">${esc(t.b||t.nm||"")}${cn?" · "+esc(cn):""}</div></header>
   <div id="qbn">${bannerHtml()}</div>
   <section class="ip-sg sgc" id="blsig">
-  ${BS.noimg?'<div class="qb qw" style="margin:0 0 12px"><b>⚠ Le bon n’a pas pu être affiché</b><span>Le client signe sans le voir : ce sera noté sur le bon signé.</span></div>':""}
-  <div class="ip-fd"><label class="ip-lb" for="blpr">Nom et prénom du signataire</label><input class="ip-in" id="blpr" autocomplete="name" autocapitalize="words" value="${esc(BS.full||"")}"></div>
-  <div class="ip-fd"><label class="ip-lb" for="blfn">Fonction</label><input class="ip-in" id="blfn" value="${esc(BS.fn)}"></div>
-  <div id="blsw"></div>
+  ${BS.noimg&&!ns?'<div class="qb qw" style="margin:0 0 12px"><b>⚠ Le bon n’a pas pu être affiché</b><span>Le client signe sans le voir : ce sera noté sur le bon signé.</span></div>':""}
   ${terH("bl",BS.ter)}
   ${optH("ip-rem","blres",`✎ Ajouter une remarque<span class="ip-req${BS.ter==="non"?"":" hide"}" id="blreq">OBLIGATOIRE</span>`,BS.res,`<div id="blrw" class="ip-ob${BS.res?"":" hide"}"><label class="ip-oh" for="blrc" id="bloh">${BS.ter==="non"?TERN.replace(/\.$/,""):"Ce qui ne va pas, ce qui manque…"}</label><textarea class="rmt" id="blrc" rows="4">${esc(BS.rc)}</textarea></div>`)}
   ${matH(BS.mt,"bl")}
-  <div style="margin-top:16px"><button type="button" class="ip-cta" id="blval">✔ Valider la signature</button><p class="ip-hint" id="blhint" aria-live="polite"></p></div><div class="pberr" id="sge" role="alert"></div></section>`};
+  <div class="ip-sep" role="separator"><span>${ns?"ENVOI SANS SIGNATURE":"SIGNATURE DU CLIENT"}</span></div>
+  ${ns?`<p class="mu ip-nsi">Le bon quitte votre espace. TOPAS informatique saura qu’il n’a pas été signé.</p><div class="nsr" role="radiogroup" aria-label="Raison">${NSR.map((r,i)=>`<button type="button" class="btn nsrb" role="radio" aria-checked="${BS.rs===r}" data-nsr="${i}">${esc(r)}</button>`).join("")}</div><div class="nsaw${BS.rs==="Autre…"?"":" hide"}"><label class="fl" for="nsat">Précisez la raison *</label><textarea id="nsat" rows="3">${esc(BS.rsm)}</textarea></div>`
+   :`<div class="ip-fd"><label class="ip-lb" for="blpr">Nom et prénom du signataire</label><input class="ip-in" id="blpr" autocomplete="name" autocapitalize="words" value="${esc(BS.full||"")}"></div>
+  <div id="blsw"></div>`}
+  <div style="margin-top:16px"><button type="button" class="ip-cta" id="blval">${ns?"📤 Confirmer l’envoi sans signature":"✔ Valider la signature"}</button><p class="ip-hint" id="blhint" aria-live="polite"></p></div><div class="pberr" id="sge" role="alert"></div></section>`};
  function blStart(ix,noimg){if(!BS||BS.ix!==ix)BS=blNew(ix);if(noimg)BS.noimg=1;BS.step="form";nav({v:"bls"})}
  // bon indisponible : choix explicite, tracé dans l'intervention (signer quand même / reporter)
  function blChoice(ix){const el=document.getElementById("blch");if(!el)return;el.innerHTML=`<div class="blch" role="alert"><b>⚠ Le bon de livraison n’est pas disponible sur ce téléphone.</b><p>Le client ne peut pas voir ce qu’il signe. Choisissez :</p>
@@ -642,20 +647,11 @@ async function main(){
  function blRepAsk(ix){const el=document.getElementById("blch");if(!el)return;el.innerHTML=`<div class="blch ip-rep" role="group" aria-label="Reporter la signature"><label class="fl" for="blrepm">Pourquoi reporter ? <span class="mu">(facultatif)</span></label><textarea class="ip-in" id="blrepm" rows="3"></textarea><div class="btns"><button type="button" class="btn" data-blrepx>Annuler</button><button type="button" class="btn p" data-blrepok="${ix}">Confirmer le report</button></div></div>`;
   el.querySelector("[data-blrepx]").onclick=()=>{el.innerHTML=""};el.querySelector("[data-blrepok]").onclick=()=>blReport(ix,document.getElementById("blrepm").value.trim());document.getElementById("blrepm").focus();el.scrollIntoView({block:"nearest"})}
  const NSR=["Client absent","Client a refusé de signer","Oubli","Autre…"];
- function blNsAsk(ix){const t=IT[ix].t,o=document.createElement("div");o.className="nsov";o.setAttribute("role","dialog");o.setAttribute("aria-modal","true");o.setAttribute("aria-label","Envoyer sans signature");let rs="";const NM=matNew();
-  o.innerHTML=`<div class="nsbx"><h3>📤 Envoyer sans signature</h3><p><b>${esc(t.nm||("BL N° "+(t.b||"—")))}</b>${t.c?" · "+esc(t.c):""}</p><p class="mu">Le bon quitte votre espace. TOPAS informatique saura qu’il n’a pas été signé.</p><div class="nsr" role="radiogroup" aria-label="Raison">${NSR.map((r,i)=>`<button type="button" class="btn nsrb" role="radio" aria-checked="false" data-nsr="${i}">${esc(r)}</button>`).join("")}</div><div class="nsaw hide"><label class="fl" for="nsat">Précisez la raison *</label><textarea id="nsat" rows="3"></textarea></div>${terH("ns","")}<div class="nsrw hide"><label for="nsrc">${TERN.replace(/\.$/,"")} <span class="ip-req">OBLIGATOIRE</span></label><textarea id="nsrc" rows="3"></textarea></div>${matH(NM,"ns")}<div class="pberr" id="nse" role="alert"></div><p class="ip-hint" id="nshint" aria-live="polite"></p><div class="btns"><button type="button" class="btn" data-nsx>Annuler</button><button type="button" class="btn gn" data-nsok>Confirmer l’envoi sans signature</button></div></div>`;
-  document.body.appendChild(o);matBind(o,NM,"ns");const q=s=>o.querySelector(s),aw=q(".nsaw"),ta=q("#nsat"),er=q("#nse");
-  // 🛠 mêmes règles que la signature : confirmation bloquée sans réponse ; « Non » : ce qui reste à faire, obligatoire (texte gardé si on change d'avis)
-  let ter="";const tb=q("#nster"),rw=q(".nsrw"),rc=q("#nsrc"),ok=q("[data-nsok]"),blk=()=>!ter?TERQ:ter==="non"&&rc.value.trim().length<3?TERN:"";
-  const cta=()=>{const m=blk();ok.classList.toggle("off",!!m);ok.setAttribute("aria-disabled",String(!!m));q("#nshint").textContent=m};
-  tb.querySelectorAll("[data-ter]").forEach(b=>b.onclick=()=>{const was=ter;ter=b.dataset.ter;tb.className="ip-ter "+ter;tb.querySelectorAll("[data-ter]").forEach(z=>z.setAttribute("aria-pressed",String(z===b)));rw.classList.toggle("hide",ter!=="non");er.textContent="";cta();if(ter==="non"&&was!=="non")rc.focus()});
-  rc.oninput=cta;cta();
-  o.querySelectorAll("[data-nsr]").forEach(b=>b.onclick=()=>{rs=NSR[+b.dataset.nsr];o.querySelectorAll("[data-nsr]").forEach(z=>z.setAttribute("aria-checked",String(z===b)));aw.classList.toggle("hide",rs!=="Autre…");er.textContent="";if(rs==="Autre…")ta.focus()});
-  q("[data-nsx]").onclick=()=>o.remove();
-  q("[data-nsok]").onclick=()=>{const m=ta.value.trim(),bm=blk();if(bm){er.textContent=bm;(ter?rc:tb.querySelector("[data-ter]")).focus();return}if(NM.flush)NM.flush();if(!rs){er.textContent="Choisissez la raison.";return}if(rs==="Autre…"&&m.length<3){er.textContent="Précisez la raison en quelques mots.";ta.focus();return}if(NM.on&&!NM.L.length){er.textContent="Ajoutez l’article laissé, ou éteignez « Matériel laissé ».";return}o.remove();blNsSend(ix,rs==="Autre…"?"Autre":rs,rs==="Autre…"?m:"",matOut(NM),ter,ter==="non"?rc.value.trim():"")}}
- function blNsSend(ix,rs,motif,mat,ter,rc){const t=IT[ix].t,now=nowS(),rid=Date.now().toString(36)+Math.random().toString(36).slice(2,6),p={t:"fp-sign",k:"blns",id:rid,it:t.i,n:t.b||"",c:String(t.c||"").slice(0,120),bv:t.v||1,iv:D.i||"",rs:String(rs).slice(0,60),motif:String(motif||"").slice(0,500),mat:Array.isArray(mat)?mat.slice(0,40):[],ter:ter==="oui"||ter==="non"?ter:"",rc:String(rc||"").slice(0,1500),dl:now.dl,hl:now.hl};
+ // « 📤 Envoyer sans signature » : le même écran que la signature (mêmes règles : Intervention terminée ? obligatoire, remarque obligatoire si « Non »)
+ function blNsAsk(ix){BS=blNew(ix);BS.ns=1;nav({v:"bls"})}
+ function blNsSend(ix,rs,motif,mat,ter,rc,res){const t=IT[ix].t,now=nowS(),rid=Date.now().toString(36)+Math.random().toString(36).slice(2,6),p={t:"fp-sign",k:"blns",id:rid,it:t.i,n:t.b||"",c:String(t.c||"").slice(0,120),bv:t.v||1,iv:D.i||"",rs:String(rs).slice(0,60),motif:String(motif||"").slice(0,500),mat:Array.isArray(mat)?mat.slice(0,40):[],ter:ter==="oui"||ter==="non"?ter:"",res:res?1:0,lb:"rem",rc:res?String(rc||"").slice(0,1500):"",dl:now.dl,hl:now.hl};
   const R=recs("blns:"+t.i);R.push({id:rid,dl:now.dl,hl:now.hl,rs:p.rs});if(!LS.set(RK("blns:"+t.i),R)||!enqueue([p])){const el=document.getElementById("blch");if(el)el.insertAdjacentHTML("beforeend",'<p class="ko">Impossible d’enregistrer sur ce téléphone.</p>');return}
-  nav({v:"list"});flush().then(()=>view())}
+  BS=null;nav({v:"list"});flush().then(()=>view())}
  function blReport(ix,motif){const t=IT[ix].t,now=nowS(),rid=Date.now().toString(36)+Math.random().toString(36).slice(2,6),p={t:"fp-sign",k:"blrep",id:rid,it:t.i,n:t.b||"",iv:D.i||"",motif:String(motif||"").slice(0,500),dl:now.dl,hl:now.hl};
   const R=recs("blrep:"+t.i);R.push({id:rid,dl:now.dl,hl:now.hl});if(!LS.set(RK("blrep:"+t.i),R)||!enqueue([p])){const el=document.getElementById("blch");if(el)el.insertAdjacentHTML("beforeend",'<p class="ko">Impossible d’enregistrer sur ce téléphone.</p>');return}view();flush().then(()=>view())}
  const matLi=m=>m&&m.length?`<ul class="ip-ml">${m.map(x=>`<li>${x[1]} × ${esc(x[0])}</li>`).join("")}</ul>`:"";
@@ -680,10 +676,10 @@ async function main(){
    <button type="button" class="ip-cta" id="blfin">✔ Terminer l’intervention</button><div class="ip-b2"><button type="button" class="ip-btn2" data-blback>✏ Modifier</button><button type="button" class="ip-btn2" data-sgx>Quitter sans enregistrer</button></div></section><div id="qbn">${bannerHtml()}</div>`;
   return blForm(BS.ix)}
  let BW=null;
- function blFormBind(){const g=id=>document.getElementById(id),pr=g("blpr");if(!pr||!BS)return;const fn=g("blfn"),rs=g("blres"),rc=g("blrc");
-  BW=SIGW.mount(g("blsw"),{name:()=>pr.value,max:2500,label:"Signature du client, composée à partir de son nom et de son prénom.",keep:BS.sw=BS.sw||{}});
-  matBind(document,BS.mt,"bl");pr.oninput=()=>{BS.full=pr.value;BW.refresh()};fn.oninput=()=>BS.fn=fn.value;const grow=()=>{rc.style.height="auto";rc.style.height=Math.max(rc.scrollHeight,0)+"px"};rc.oninput=()=>{BS.rc=rc.value;grow()};
-  // 🛠 Intervention terminée ? : bouton « Valider » bloqué sans réponse ; « Non » allume et verrouille la remarque (obligatoire, 3 caractères au moins) ;
+ function blFormBind(){const g=id=>document.getElementById(id),rs=g("blres"),rc=g("blrc");if(!rs||!BS)return;const ns=!!BS.ns,pr=g("blpr");
+  if(!ns)BW=SIGW.mount(g("blsw"),{name:()=>pr.value,max:2500,label:"Signature du client, composée à partir de son nom et de son prénom.",keep:BS.sw=BS.sw||{}});
+  matBind(document,BS.mt,"bl");if(pr)pr.oninput=()=>{BS.full=pr.value;BW.refresh()};const grow=()=>{rc.style.height="auto";rc.style.height=Math.max(rc.scrollHeight,0)+"px"};rc.oninput=()=>{BS.rc=rc.value;grow()};
+  // 🛠 Intervention terminée ? : bouton bloqué sans réponse ; « Non » allume et verrouille la remarque (obligatoire, 3 caractères au moins) ;
   // changer d'avis à tout moment, le texte saisi est gardé
   const tb=g("blter"),opt=rs.closest(".ip-opt"),vb=g("blval"),blk=()=>!BS.ter?TERQ:BS.ter==="non"&&rc.value.trim().length<3?TERN:"";
   const cta=()=>{const m=blk();vb.classList.toggle("off",!!m);vb.setAttribute("aria-disabled",String(!!m));g("blhint").textContent=m};
@@ -694,10 +690,15 @@ async function main(){
   tb.querySelectorAll("[data-ter]").forEach(b=>b.onclick=()=>{const was=BS.ter;terSet(b.dataset.ter);if(BS.ter==="non"&&was!=="non")rc.focus()});
   rs.onchange=()=>{if(BS.ter==="non"){rs.checked=true;return}BS.res=rs.checked;BS.resAuto=false;opt.classList.toggle("on",rs.checked);g("blrw").classList.toggle("hide",!rs.checked);if(rs.checked){grow();rc.focus()}cta()};if(rs.checked)setTimeout(grow,0);
   rc.addEventListener("input",cta);if(BS.ter)terSet(BS.ter);else cta();
-  vb.onclick=()=>{const e=g("sge"),bm=blk();if(bm){e.textContent=bm;const f=BS.ter?rc:tb.querySelector("[data-ter]");(BS.ter?rc:tb).scrollIntoView({block:"center"});f.focus({preventScroll:true});return}if(BS.mt.flush)BS.mt.flush();BS.full=pr.value.trim().replace(/\s+/g," ");const W2=BS.full.split(" ");BS.pr=W2[0]||"";BS.no=W2.slice(1).join(" ");BS.fn=fn.value.trim();BS.rc=rc.value.trim();
-   if(!BS.full){e.textContent="Indiquez le nom et le prénom du signataire.";pr.focus();return}if(W2.length<2||BS.full.length<4){e.textContent="Indiquez le prénom et le nom du signataire (les deux).";pr.focus();return}
+  // envoi sans signature : raison en un toucher (« Autre… » : précision obligatoire)
+  if(ns){const ta=g("nsat"),aw=document.querySelector(".nsaw");document.querySelectorAll("[data-nsr]").forEach(b=>b.onclick=()=>{BS.rs=NSR[+b.dataset.nsr];document.querySelectorAll("[data-nsr]").forEach(z=>z.setAttribute("aria-checked",String(z===b)));aw.classList.toggle("hide",BS.rs!=="Autre…");g("sge").textContent="";if(BS.rs==="Autre…")ta.focus()});ta.oninput=()=>BS.rsm=ta.value}
+  vb.onclick=()=>{const e=g("sge"),bm=blk();if(bm){e.textContent=bm;const f=BS.ter?rc:tb.querySelector("[data-ter]");(BS.ter?rc:tb).scrollIntoView({block:"center"});f.focus({preventScroll:true});return}if(BS.mt.flush)BS.mt.flush();BS.rc=rc.value.trim();
    if(BS.res&&BS.rc.length<3){e.textContent="Écrivez la remarque du client, ou éteignez « Ajouter une remarque ».";rc.focus();return}
-    if(BS.mt.on&&!BS.mt.L.length){e.textContent="Ajoutez l’article laissé, ou éteignez « Matériel laissé ».";g("blmn").focus();return}
+   if(BS.mt.on&&!BS.mt.L.length){e.textContent="Ajoutez l’article laissé, ou éteignez « Matériel laissé ».";g("blmn").focus();return}
+   if(ns){const m=String(BS.rsm||"").trim();if(!BS.rs){e.textContent="Choisissez la raison.";document.querySelector("[data-nsr]").focus();return}if(BS.rs==="Autre…"&&m.length<3){e.textContent="Précisez la raison en quelques mots.";g("nsat").focus();return}
+    vb.disabled=true;blNsSend(BS.ix,BS.rs==="Autre…"?"Autre":BS.rs,BS.rs==="Autre…"?m:"",matOut(BS.mt),BS.ter,BS.rc,BS.res);return}
+   BS.full=pr.value.trim().replace(/\s+/g," ");const W2=BS.full.split(" ");BS.pr=W2[0]||"";BS.no=W2.slice(1).join(" ");BS.fn="";
+   if(!BS.full){e.textContent="Indiquez le nom et le prénom du signataire.";pr.focus();return}if(W2.length<2||BS.full.length<4){e.textContent="Indiquez le prénom et le nom du signataire (les deux).";pr.focus();return}
    if(BW.empty()){e.textContent=BW.mode()==="draw"?"Le client doit signer dans le cadre (ou choisir « ✍ Signature simple »).":"Indiquez le nom et le prénom du signataire.";return}
    BS.nm=BS.full;BS.sg=BW.get();BS.sm=BW.how();BS.sk=BW.kind();BS.step="recap";nav({v:"bls"})}}
  function blBind(){const g=id=>document.getElementById(id);
