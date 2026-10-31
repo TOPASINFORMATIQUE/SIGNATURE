@@ -162,7 +162,7 @@ form();
 })();
 </script>
 <!-- Mention d'information RGPD (identique sur les 4 pages publiques ; texte modifiable dans TOPAS Formation › Gestionnaire › RGPD) -->
-<style>.rgpdm{max-width:820px;margin:18px auto 24px;padding:0 14px;font:12.5px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;color:#5b6475}.rgpdm details{margin-top:4px}.rgpdm summary{cursor:pointer;color:#12308f;font-weight:600;display:inline-block;min-height:24px}.rgpdm p{margin:4px 0}@media print{.rgpdm{display:none}}.fbx{border:2px solid #dc2626;background:#fef2f2;border-radius:10px;padding:10px 12px;margin:10px 0;color:#1e293b;font-size:15px;line-height:1.45;text-align:left}.fbx p{margin:4px 0}.fbc{width:100%;box-sizing:border-box;font:12px/1.35 ui-monospace,Consolas,monospace;padding:8px;border:1px solid #cbd5e1;border-radius:8px;margin:6px 0;resize:vertical;word-break:break-all}.fbb{display:flex;gap:8px;flex-wrap:wrap}.fbbt{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 14px;border-radius:10px;border:1px solid #12308f;background:#fff;color:#12308f;font:600 15px system-ui,sans-serif;text-decoration:none;cursor:pointer}.fbgo{background:#12308f;color:#fff}</style>
+<style>.rgpdm{max-width:820px;margin:18px auto 24px;padding:0 14px;font:12.5px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;color:#5b6475}.rgpdm details{margin-top:4px}.rgpdm summary{cursor:pointer;color:#12308f;font-weight:600;display:inline-block;min-height:24px}.rgpdm p{margin:4px 0}@media (max-width:700px){.rgpdm{font-size:14px}}@media print{.rgpdm{display:none}}.fbx{border:2px solid #dc2626;background:#fef2f2;border-radius:10px;padding:10px 12px;margin:10px 0;color:#1e293b;font-size:15px;line-height:1.45;text-align:left}.fbx p{margin:4px 0}.fbc{width:100%;box-sizing:border-box;font:12px/1.35 ui-monospace,Consolas,monospace;padding:8px;border:1px solid #cbd5e1;border-radius:8px;margin:6px 0;resize:vertical;word-break:break-all}.fbb{display:flex;gap:8px;flex-wrap:wrap}.fbbt{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 14px;border-radius:10px;border:1px solid #12308f;background:#fff;color:#12308f;font:600 15px system-ui,sans-serif;text-decoration:none;cursor:pointer}.fbgo{background:#12308f;color:#fff}</style>
 <div class="rgpdm" id="rgpdm" role="contentinfo"></div>
 <script>
 (function(){
@@ -174,5 +174,8 @@ draw(DEF);
 try{fetch(SBU+"/rest/v1/rpc/mention_rgpd",{method:"POST",headers:{apikey:SBK,"Content-Type":"application/json"},body:"{}"}).then(r=>r.ok?r.json():null).then(j=>{if(j&&j.c&&j.d)draw(j)}).catch(()=>{})}catch(e){}
 })();
 </script>
+<style>/* lot 9 de l'audit (31/10) : au téléphone, textes ≥ 14 px */
+@media (max-width:700px){.top .ql,.ql{font-size:14px}}
+</style>
 </body>
 </html>
