@@ -18,6 +18,7 @@ body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 system-ui,-appl
 h1{font-size:22px;margin:6px 0 2px;color:var(--pr)}
 h2{font-size:17px;margin:0 0 8px}
 .card{background:var(--card);border:1px solid var(--br);border-radius:12px;padding:16px;margin:12px 0}
+.supr{display:flex;gap:10px;align-items:center;padding:10px 0;border-top:1px solid var(--br)}.supr:first-child{border-top:0}.supi{font-size:24px;flex:none;width:32px;text-align:center}.supt{flex:1;min-width:0;overflow-wrap:anywhere}.supr .btn{flex:none;min-height:44px;padding:10px 14px}.sups:empty{display:none}
 .mu{color:var(--mu);font-size:14px}
 .row{display:grid;grid-template-columns:150px 1fr;gap:6px 12px;margin:4px 0}
 .row b{color:var(--mu);font-weight:600}
@@ -172,9 +173,24 @@ const fdl=d=>{const x=new Date(d+"T12:00:00");return isNaN(x)?d:x.toLocaleDateSt
 const b64u=o=>btoa(unescape(encodeURIComponent(JSON.stringify(o)))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
 function unb64u(t){t=String(t).replace(/-/g,"+").replace(/_/g,"/");while(t.length%4)t+="=";return JSON.parse(decodeURIComponent(escape(atob(t))))}
 async function load(h){if(h.startsWith("z.")){let t=h.slice(2).replace(/-/g,"+").replace(/_/g,"/");while(t.length%4)t+="=";const bin=atob(t),u=Uint8Array.from(bin,c=>c.charCodeAt(0)),ds=new DecompressionStream("deflate-raw"),w=ds.writable.getWriter();w.write(u);w.close();return JSON.parse(await new Response(ds.readable).text())}return unb64u(h)}
+// ===== 📚 SUPPORTS DE COURS pour les stagiaires (31/10) : lien du mail du certificat (type « sup », 90 jours). Un fichier est lu par support_lire
+// (identifiant du lien + clé « sup: », seulement s'il est listé dans ce lien) ; un lien ou une vidéo s'ouvre dans le navigateur. Rien n'est déposé.
+function supPage(D){const app=$("#app"),id=new URLSearchParams(location.search).get("l")||"",L=Array.isArray(D.L)?D.L:[],IC={pdf:"📄",img:"🖼",fiche:"📝",video:"🎬",file:"💾",lien:"🔗"};
+ document.title="Supports de cours – "+(D.f||"");const mb=n=>n>=1048576?(n/1048576).toFixed(1).replace(".",",")+" Mo":n>=1024?Math.round(n/1024)+" Ko":"";
+ const meta=u=>[u.k==="pdf"?"PDF":u.k==="img"?"Image":u.k==="fiche"?"Fiche":u.k==="video"?"Vidéo":u.k==="lien"?"Lien web":"Fichier",u.sz?mb(u.sz):""].filter(Boolean).join(" · ");
+ app.innerHTML=`<div class="card"><div class="mu">${esc(D.g||"")}</div><h1>📚 Supports de cours</h1><p style="margin:4px 0 0"><b>${esc(D.f||"")}</b>${D.n?` <span class="mu">· N° ${esc(D.n)}</span>`:""}${D.c?`<br><span class="mu">${esc(D.c)}</span>`:""}</p></div>
+ <div class="card">${L.length?L.map((u,i)=>{const web=u.k==="lien"||u.k==="video";return `<div class="supr"><span class="supi" aria-hidden="true">${IC[u.k]||"💾"}</span><span class="supt"><b>${esc(u.t||u.n||"Support")}</b><br><small class="mu">${esc(meta(u))}</small><br><small class="mu sups" id="sups${i}" role="status"></small></span>${web?(u.u?`<a class="btn p" href="${esc(u.u)}" target="_blank" rel="noopener">${u.k==="video"?"▶ Regarder":"↗ Ouvrir"}</a>`:'<span class="mu">Adresse manquante</span>'):u.cle&&id?`<button type="button" class="btn p" data-dl="${i}">⬇ Télécharger</button>`:`<span class="mu">À demander à ${esc(D.g||"l’organisme de formation")}${D.m?` : <a href="mailto:${esc(D.m)}">${esc(D.m)}</a>`:""}</span>`}</div>`}).join(""):'<p>Aucun support n’est disponible pour cette formation.</p>'}
+ <p class="mu" style="margin:12px 0 0">Ce lien est personnel et reste valable 90 jours après l’envoi du certificat.${D.m?` Une question ? <a href="mailto:${esc(D.m)}">${esc(D.m)}</a>`:""}</p></div>`;
+ app.querySelectorAll("[data-dl]").forEach(b=>b.onclick=async()=>{const u=L[+b.dataset.dl],st=document.getElementById("sups"+b.dataset.dl),say=t=>{if(st)st.textContent=t};b.disabled=true;say("⏳ Téléchargement…");
+  try{let a=0,P=[],h=null;for(;;){const r=await fetch(SBU+"/rest/v1/rpc/support_lire",{method:"POST",headers:{apikey:SBK,"Content-Type":"application/json"},body:JSON.stringify({p_lien:id,p_cle:u.cle,p_a:a,p_b:a+4})}),j=r.ok?await r.json():null;
+    if(!j||!j.ok){say(j&&j.etat==="expire"?"Ce lien a expiré : demandez le support à l’organisme de formation.":"Support indisponible pour l’instant. Réessayez plus tard.");b.disabled=false;return}h=j;(j.morceaux||[]).forEach(m=>{P[m.n]=m.b64});a+=5;if(a>=(+j.n||0))break}
+   if(P.filter(Boolean).length<(+h.n||0))throw 0;const t=atob(P.join("")),by=new Uint8Array(t.length);for(let i=0;i<t.length;i++)by[i]=t.charCodeAt(i);const bl=new Blob([by],{type:h.type||"application/octet-stream"}),url=URL.createObjectURL(bl);
+   const a2=document.createElement("a");a2.href=url;a2.download=h.nom||u.n||(u.t||"support");document.body.appendChild(a2);a2.click();setTimeout(()=>a2.remove(),2000);say("✔ Téléchargé")}
+  catch(e){say("Support indisponible pour l’instant. Réessayez plus tard.")}b.disabled=false})}
 let D=null;
 try{D=await lnLoad()||await load(location.hash.replace(/^#/,""))}catch(e){if(e&&e.lien){lnDead($("#app"),e.lien);return}D=null}
 if(D&&typeof D==="object"&&D.m)FB_MAIL=String(D.m).trim();
+if(D&&D.k==="sup"){supPage(D);return}
 const app=$("#app");
 if(!D||!D.n||!D.g){app.innerHTML='<div class="card"><h1>Lien incomplet</h1><p>Ce lien de signature est incomplet ou a été modifié. Merci de rouvrir le lien reçu par e-mail, tel quel, ou de contacter l’organisme de formation.</p></div>';return}
 const plan=D.k==="plan",dev=D.k==="dev",ro=!!D.ro,G=D.g,C=D.c||D.cl||["","",""],tr=D.tr||[];
