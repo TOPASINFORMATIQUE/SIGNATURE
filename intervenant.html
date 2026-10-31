@@ -910,7 +910,8 @@ async function main(){
    <div class="ip-kv"><span>Remarque</span><b>${r.res?"oui":"aucune"}</b></div>${r.res?`<div class="ip-rv">${esc(r.rc)}</div>`:""}<div class="ip-kv"><span>Matériel laissé</span><b>${mt.length?mt.length+" article"+(mt.length>1?"s":""):"aucun"}</b></div>${matLi(mt)}
    <div class="ip-kv"><span>Photos</span><b>${r.nph||"aucune"}</b></div>${r.phx&&r.phx.length?`<p class="ip-phs" role="status">${phStat(r.phx)}</p>`:""}`:""}<p class="ip-proof">${st}</p></section><div id="qbn">${bannerHtml()}</div>`}
  // ---- 2. une formation
- // ===== ÉCRAN D'UNE FORMATION (31/10) : À consulter → Supports de cours → À faire signer → Signaler / Remarque / Photos, et UN bouton principal
+ // ===== ÉCRAN D'UNE FORMATION (31/10) : À consulter (déroulé, programme, planification, stagiaires : CONSULTATION SEULE, rien à signer ni valider)
+ // → Supports de cours → À faire signer (émargements, évaluation de fin de stage, bilan du formateur SEULEMENT) → Signaler / Remarque / Photos, et UN bouton principal
  const EVS=(f,ti)=>recs(f.n).filter(r=>r.kd==="ev"&&r.ti===ti).sort((a,b)=>String(b.dl+b.hl).localeCompare(String(a.dl+a.hl)))[0]||null;
  const BIL=f=>recs(f.n).filter(r=>r.kd==="bil").sort((a,b)=>String(b.dl+b.hl).localeCompare(String(a.dl+a.hl)))[0]||null;
  const evOn=f=>{const d=DS(f);return !!d.length&&d[d.length-1]<=T}; // évaluations et bilan possibles dès le dernier jour
@@ -918,12 +919,10 @@ async function main(){
   const late=sl.filter(o=>o.day<T&&!emState(f,o)),tod=sl.filter(o=>o.day===T&&!emState(f,o));
   if(late.length)return `<button type="button" class="btn big2 ip-main" data-sg="em" data-day="${late[0].day}" data-part="${late[0].part}">✍ Faire signer l’émargement du ${esc(fdm(late[0].day))} (${PARTL[late[0].part].toLowerCase()})</button>`;
   if(tod.length){const o=tod.find(x=>x.part===(hr<13?"m":"a"))||tod[0];return `<button type="button" class="btn big2 ip-main" data-sg="em" data-day="${o.day}" data-part="${o.part}">✍ Faire signer l’émargement de ${o.part==="m"?"ce matin":"cet après-midi"}</button>`}
-  if(!latest(f.n,"der","","")&&(s==="venir"||s==="auj"))return `<button type="button" class="btn big2 ip-main" data-sg="der">📋 Lire et valider le déroulé</button>`;
   if(evOn(f)){const k=tr.filter((t,i)=>!(t[2]||EVS(f,i))).length;if(k&&D.qd&&D.qd.post)return `<button type="button" class="btn big2 ip-main" data-ev="${ix}:${tr.findIndex((t,i)=>!(t[2]||EVS(f,i)))}">📝 Évaluation de fin de stage (${k} restante${k>1?"s":""})</button>`;
    const bil=(f.cl||[]).find(z=>z[0]==="bilan");if(!(bil&&bil[1])&&!BIL(f)&&D.qd&&D.qd.bilan)return `<button type="button" class="btn big2 ip-main" data-bil="${ix}">📝 Remplir mon bilan</button>`}
   return ""}
  function formView(ix){const f=D.f[ix];if(!f)return listView();const s=stat(f),sl=SLOTS(f),sd=scToday(f),tr=f.tr||[],evOk=evOn(f),qd=!!(D.qd&&D.qd.post),ma=mainAct(f,ix);
-  const itemD=(()=>{const r=latest(f.n,"der","","");const x=r?{r,sent:!pend(r.id)}:null;return `<div class="task"><span>📋 Déroulé d’intervention<br><small class="mu">À lire et valider avant la formation</small></span>${x?stTxt(x,"Validé"):""}<button type="button" class="btn ${x?"":"p"}" data-sg="der">${x?"Refaire":"✍ Lire et valider"}</button></div>`})();
   const items=sl.map(o=>{const x=emState(f,o),fut=o.day>T;return `<div class="task"><span>✍ Émargement · ${esc(fdm(o.day))}<br><small class="mu">${PARTL[o.part]} · ${PARTH[o.part]}</small></span>${x?stTxt(x):`<span class="mu">${fut?"À partir du "+esc(dm(o.day)):"À faire"}</span>`}<button type="button" class="btn ${x||fut?"":"p"}" data-sg="em" data-day="${o.day}" data-part="${o.part}" ${fut?"disabled":""}>${x?"Refaire":"✍ Signer"}</button></div>`}).join("");
   const evs=tr.length?`<div class="task ip-evh"><span>📝 Évaluation de fin de stage<br><small class="mu">${qd?(evOk?"Chaque stagiaire répond sur ce téléphone, ou plus tard en ligne (mail).":"Dès le dernier jour de la formation, sur ce téléphone ou en ligne."):"Envoyée par mail à chaque stagiaire."}</small></span></div>`+tr.map((t,i)=>{const on=!!t[2],r=EVS(f,i),pd=r&&pend(r.id);
    return `<div class="task ip-ev"><span>${esc(t[0]||"Stagiaire "+(i+1))}</span>${on?'<span class="ok">✔ Répondu en ligne</span>':r?`<span class="${pd?"wt":"ok"}">${pd?"⏳":"✔"} Répondu le ${esc(dm(r.dl))}${pd?" · en attente d’envoi":""}</span>`:evOk&&qd?`<button type="button" class="btn p" data-ev="${ix}:${i}">📝 Répondre</button>`:'<span class="mu">Après la formation</span>'}</div>`}).join(""):"";
@@ -943,7 +942,7 @@ async function main(){
    <details><summary>👥 Stagiaires (${tr.length})</summary><div class="pan">${trList(f)}</div></details>
    ${f.sp&&!(f.sup||[]).length?`<div class="btns"><a class="btn" href="${esc(f.sp)}" target="_blank" rel="noopener">📚 Support de cours</a></div>`:""}</div></section>
   ${supSec(f,ix)}
-  <section class="sec" style="--c:var(--or)"><h2>✍ À faire signer</h2><div class="fc s-clo" style="padding:6px 16px">${itemD}${items}${evs}${itemB}</div></section>
+  <section class="sec" style="--c:var(--or)"><h2>✍ À faire signer</h2><div class="fc s-clo" style="padding:6px 16px">${items}${evs}${itemB}</div></section>
   <div class="fc s-clo">${pbZone(f,ix)}${fphZone(f,ix)}</div>${foot()}`}
  // 📷 photos de la formation (31/10) : mêmes photos que sur les bons (réduites, gardées hors connexion, envoyées par espace_photo), rattachées au dossier
  const FPH={};const fphRec=n=>recs(n).filter(r=>r.kd==="fph");
