@@ -299,7 +299,7 @@ body.ip-nb{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
 .ip-ta{display:block;width:100%;min-height:96px;padding:12px 14px;border:1.5px solid var(--ds-line);border-radius:14px;background:var(--ds-card);color:var(--ds-tx);font:inherit;font-size:16px;line-height:1.45;resize:none;overflow:hidden}
 .ip-ta:focus,.ip-cli:focus-visible,.ip-cx:focus{outline:none;border-color:var(--ds-topas)}
 .ip-cx{display:block;width:100%;min-height:50px;margin-top:8px;padding:10px 14px;border:1.5px solid var(--ds-line);border-radius:14px;background:var(--ds-card);color:var(--ds-tx);font:inherit;font-size:16px}
-.ip-tp{display:flex;align-items:center;gap:12px;padding:8px 10px;border:1.5px solid var(--ds-line);border-radius:14px;background:var(--ds-card)}
+.ip-tp{display:flex;align-items:center;gap:12px;padding:8px 10px;border:1.5px solid var(--ds-line);border-radius:14px;background:var(--ds-card)}.ip-hr{display:grid;grid-template-columns:1fr 1fr;gap:10px}.ip-hl{display:flex;flex-direction:column;gap:4px;font-size:14px;font-weight:700;color:var(--ds-mu)}.ip-hl input{min-height:48px;width:100%;box-sizing:border-box;font:inherit;font-size:16px;padding:8px 10px;border:1.5px solid var(--ds-line);border-radius:12px;background:var(--ds-card);color:var(--ds-tx)}.ip-tpo{display:block;margin-top:8px;font-size:15px}.ip-hw{font-size:14px;color:#b45309;font-weight:700;margin-top:4px}.ip-hw:empty{display:none}
 .ip-tp output{flex:1;text-align:center;font-size:24px;font-weight:800;color:var(--ds-topas)}
 .ip-tpb{flex:none;width:48px;height:48px;border:0;border-radius:12px;background:var(--ds-line2);color:var(--ds-tx);font-size:26px;font-weight:700;line-height:1;cursor:pointer}
 .ip-tpb.p{background:var(--ip-grad);color:var(--ds-on)}.ip-tpb:disabled{opacity:.4;cursor:default}
@@ -685,16 +685,25 @@ async function main(){
  const CL=(Array.isArray(D.cl)?D.cl:[]).filter(c=>Array.isArray(c)&&c[1]).map(c=>[String(c[0]||""),String(c[1]),String(c[2]||"")]);
  const BIK="fpiv:bi:"+NS,BINK="fpiv:bin:"+NS,biRecs=()=>LS.get(BIK,[]),canBI=()=>!!D.t&&shT;
  const tpTxt=m=>{m=+m||0;const h=Math.floor(m/60),r=m%60;return h+"\u00a0h"+(r?"\u00a0"+p2(r):"")};
+ // 31/10 : heures d'arrivée / départ (quart d'heure) à la place du temps passé saisi ; le temps passé est CALCULÉ (passe minuit accepté)
+ const q15=d=>{const m=Math.round((d.getHours()*60+d.getMinutes())/15)*15%1440;return p2(Math.floor(m/60))+":"+p2(m%60)};
+ const hMin=h=>{const m=/^(\d\d):(\d\d)$/.exec(String(h||""));return m?(+m[1])*60+(+m[2]):null};
+ const hFr=h=>{const m=hMin(h);return m==null?"":Math.floor(m/60)+"h"+p2(m%60)};
+ const biDur=(ha,hd)=>{const a=hMin(ha),d=hMin(hd);if(a==null||d==null)return null;return Math.round(((d-a+1440)%1440)/15)*15};
+ const biMidnight=o=>o&&o.ha&&o.hd&&hMin(o.ha)>hMin(o.hd);
+ const biHor=o=>o&&o.ha?"Arrivée "+hFr(o.ha)+" · Départ "+hFr(o.hd)+(biMidnight(o)?" (le lendemain)":"")+" · Temps passé "+tpTxt(o.tp):"Temps passé "+tpTxt(o&&o.tp);
+ const biTpLine=()=>!BS.ha?"Temps passé : indiquez l’heure d’arrivée":!BS.hd?"Temps passé : indiquez l’heure de départ":hMin(BS.ha)===hMin(BS.hd)?"Temps passé : l’heure de départ doit être après l’arrivée":"Temps passé : "+tpTxt(BS.tp)+(biMidnight(BS)?" (passe minuit)":"")+(BS.tp>720?" — plus de 12 h, vérifiez":"");
+ const biHdWarn=()=>BS&&BS.t0&&Date.now()-BS.t0>3600e3?"⏰ Vérifiez l’heure de départ : ce bon est ouvert depuis plus d’une heure.":"";
  // numéro créé sur le téléphone, unique même hors connexion : BI-AAMMJJ-INITIALES+n (compteur du jour gardé sur le téléphone)
  const biIni=()=>{const w=String(D.i||"").trim().split(/\s+/).filter(Boolean),a=((w[0]||"")[0]||"")+((w.length>1?w[w.length-1]:"")[0]||"");return a.normalize("NFD").replace(/[^A-Za-z]/g,"").toUpperCase()||"X"};
  function biNum(){const n=new Date(),d=String(n.getFullYear()).slice(2)+p2(n.getMonth()+1)+p2(n.getDate()),c=LS.get(BINK,{}),used=new Set(biRecs().map(r=>r.n));let k=c.d===d?(+c.n||0):0,num="";do{k++;num="BI-"+d+"-"+biIni()+k}while(used.has(num));return{num,d,k}}
- const biNew=()=>Object.assign(blNew(-1),{bi:1,ch:0,cid:"",cn:"",cv:"",cx:0,det:"",tp:60,num:"",t:{i:"",b:"",c:"",d:T}});
+ const biNew=()=>Object.assign(blNew(-1),{bi:1,ch:0,cid:"",cn:"",cv:"",cx:0,det:"",tp:0,ha:"",hd:q15(new Date()),t0:Date.now(),tpOk:0,num:"",t:{i:"",b:"",c:"",d:T}});
  const bsT=()=>BS&&BS.bi?Object.assign(BS.t,{b:BS.num||"",c:BS.cn}):IT[BS.ix].t;
  function biStart(){if(!canBI())return flash("Ce lien ne permet pas de créer un bon : contactez TOPAS informatique.");BS=biNew();nav({v:"bls"})}
- const biWhat=()=>`<div class="pan"><h4>Ce que vous signez</h4><div><b>Bon d’intervention</b>${BS.cn?" · "+esc(BS.cn):""}</div><div>Intervention du ${esc(fdl(T))} · ${esc(tpTxt(BS.tp))}</div><div class="ip-bdt">${esc(BS.det)}</div></div>`;
+ const biWhat=()=>`<div class="pan"><h4>Ce que vous signez</h4><div><b>Bon d’intervention</b>${BS.cn?" · "+esc(BS.cn):""}</div><div>Intervention du ${esc(fdl(T))} · ${esc(biHor(BS))}</div><div class="ip-bdt">${esc(BS.det)}</div></div>`;
  const biHead=()=>`<div class="ip-bif"><span class="ip-lb2" id="bicll">Client</span><button type="button" class="ip-cli" id="bicl" aria-haspopup="dialog" aria-labelledby="bicll bicl">${BS.cx?'<b>Autre client…</b><span>▾</span>':BS.cn?`<b>${esc(BS.cn)}</b><span>${esc(BS.cv)} ▾</span>`:'<span class="ip-cph mu">Choisir le client</span><span>▾</span>'}</button>${BS.cx?`<input class="ip-cx" id="bicx" maxlength="120" autocomplete="off" autocapitalize="words" placeholder="Nom du client (client à créer)" aria-label="Nom du client" value="${esc(BS.cn)}">`:""}</div>
   <div class="ip-bif"><label class="ip-lb2" for="bidet">Détail de l’intervention</label><textarea class="ip-ta" id="bidet" rows="3" maxlength="2000" placeholder="Ce que vous avez fait…">${esc(BS.det)}</textarea></div>
-  <div class="ip-bif"><span class="ip-lb2" id="bitpl">Temps passé</span><div class="ip-tp" role="group" aria-labelledby="bitpl"><button type="button" class="ip-tpb" data-tp="-30" aria-label="30 minutes de moins"${BS.tp<=60?" disabled":""}>−</button><output id="bitp" aria-live="polite">${tpTxt(BS.tp)}</output><button type="button" class="ip-tpb p" data-tp="30" aria-label="30 minutes de plus"${BS.tp>=720?" disabled":""}>＋</button></div></div>`;
+  <div class="ip-bif ip-bih"><span class="ip-lb2" id="bihl">Horaires</span><div class="ip-hr" role="group" aria-labelledby="bihl"><label class="ip-hl"><span>Heure d’arrivée</span><input type="time" id="biha" step="900" value="${esc(BS.ha)}" required aria-required="true"></label><label class="ip-hl"><span>Heure de départ</span><input type="time" id="bihd" step="900" value="${esc(BS.hd)}" required aria-required="true"></label></div><output id="bitp" class="ip-tpo mu" aria-live="polite">${esc(biTpLine())}</output><div class="ip-hw" id="bihw" role="status">${esc(biHdWarn())}</div></div>`;
  // client : liste de TOPAS Formation (nom + ville), recherche en tapant ; « Autre client… » = champ libre (« client à créer » côté TOPAS)
  function biCliSheet(){const o=document.createElement("div");o.className="nsov ip-sheet ip-csh";o.setAttribute("role","dialog");o.setAttribute("aria-modal","true");o.setAttribute("aria-label","Choisir le client");
   o.innerHTML=`<div class="nsbx"><h3>Choisir le client</h3><input class="ip-cx" id="bicq" type="search" placeholder="🔍 Rechercher un client…" autocomplete="off" aria-label="Rechercher un client"><div class="ip-csl" id="bicsl"></div><div class="btns"><button type="button" class="btn" data-shx>Fermer</button></div></div>`;
@@ -703,7 +712,10 @@ async function main(){
    L.innerHTML=R.map(c=>`<button type="button" data-cid="${esc(c[0])}"><b>${esc(c[1])}</b><span>${esc(c[2])}</span></button>`).join("")+(R.length?"":`<p class="mu" style="padding:8px 12px">Aucun client ne correspond.</p>`)+`<button type="button" class="ip-cso" data-cid="">Autre client…</button>`;
    L.querySelectorAll("[data-cid]").forEach(b=>b.onclick=()=>{const c=b.dataset.cid&&CL.find(z=>z[0]===b.dataset.cid);if(c){BS.cid=c[0];BS.cn=c[1];BS.cv=c[2];BS.cx=0}else{BS.cid="";BS.cn="";BS.cv="";BS.cx=1}o.remove();view();const f=document.getElementById(BS.cx?"bicx":"bidet");if(f)f.focus()})};
   q.oninput=draw;draw();o.querySelector("[data-shx]").onclick=()=>o.remove();o.onclick=e=>{if(e.target===o)o.remove()};setTimeout(()=>q.focus(),30)}
- const biBlk=()=>BS.cx?(String(BS.cn).trim().length<2?["Indiquez le nom du client.","bicx"]:String(BS.det).trim().length<3?["Décrivez l’intervention en quelques mots.","bidet"]:null):!BS.cid?["Choisissez le client.","bicl"]:String(BS.det).trim().length<3?["Décrivez l’intervention en quelques mots.","bidet"]:null;
+ const biBlk=()=>{if(BS.cx){if(String(BS.cn).trim().length<2)return["Indiquez le nom du client.","bicx"]}else if(!BS.cid)return["Choisissez le client.","bicl"];
+ if(String(BS.det).trim().length<3)return["Décrivez l’intervention en quelques mots.","bidet"];
+ if(!BS.ha)return["Indiquez l’heure d’arrivée.","biha"];if(!BS.hd)return["Indiquez l’heure de départ.","bihd"];if(hMin(BS.ha)===hMin(BS.hd))return["L’heure de départ doit être après l’heure d’arrivée.","bihd"];
+ if(BS.tp>720&&!BS.tpOk){BS.tpOk=1;return["Temps passé de "+tpTxt(BS.tp)+" (plus de 12 h) : vérifiez les heures, puis touchez à nouveau le bouton pour confirmer.","bihd"]}return null};
  // ===== 📷 PHOTOS (30/10) — sur tous les bons (BL et bons d'intervention) : 6 au plus, réduites à 1600 px (JPEG ≈ 0,75), gardées sur le
  // téléphone (IndexedDB) jusqu'à l'envoi, envoyées en morceaux dans la base (espace_photo), jamais dans le PDF signé
  const PHMAX=6,PHL=["N° de série","Étiquette","Installation","Avant","Après"],PHU={};
@@ -832,7 +844,7 @@ async function main(){
    <div class="ip-kv"><span>Signé le</span><b>${esc(fds(BS.dl||T))} à ${esc(BS.hl||"")}</b></div>
    <div class="ip-kv"><span>Intervention terminée</span><b>${terTxt(BS.ter)}</b></div>
    <div class="ip-kv"><span>Remarque</span><b>${BS.res?"oui":"aucune"}</b></div>${BS.res?`<div class="ip-rv">${esc(BS.rc)}</div>`:""}
-   <div class="ip-kv"><span>Matériel laissé</span><b>${mat.length?mat.length+" article"+(mat.length>1?"s":""):"aucun"}</b></div>${matLi(mat)}${BS.ph.length?`<div class="ip-kv"><span>Photos</span><b>${BS.ph.length}</b></div><p class="ip-phs" id="phst" role="status">${phStat(BS.ph.map(x=>x.id))}</p>`:""}${BS.bi?`<div class="ip-kv"><span>Temps passé</span><b>${esc(tpTxt(BS.tp))}</b></div>`:""}
+   <div class="ip-kv"><span>Matériel laissé</span><b>${mat.length?mat.length+" article"+(mat.length>1?"s":""):"aucun"}</b></div>${matLi(mat)}${BS.ph.length?`<div class="ip-kv"><span>Photos</span><b>${BS.ph.length}</b></div><p class="ip-phs" id="phst" role="status">${phStat(BS.ph.map(x=>x.id))}</p>`:""}${BS.bi?`<div class="ip-kv"><span>Horaires</span><b>${esc(biHor(BS))}</b></div>`:""}
    <p class="ip-proof">✅ Signé électroniquement par ${esc(BS.nm)}${BS.fn?" ("+esc(BS.fn)+")":""} le ${esc(fds(BS.dl||T))} à ${esc(BS.hl||"")}${BS.rf?" · réf. "+esc(BS.rf):""}${sigKTxt(BS.sk)}</p>
    <p class="mu">${BS.pending?"Pas de connexion pour l’instant : l’envoi se fera tout seul au retour du réseau. Gardez cette page dans votre téléphone.":"TOPAS informatique a reçu le bon signé : il est classé avec l’intervention."}</p></section>
   <button type="button" class="ip-cta" data-blend>🏠 Retour à l’accueil</button><div id="qbn">${bannerHtml()}</div>`;
@@ -880,7 +892,9 @@ async function main(){
    BS.nm=BS.full;BS.sg=BW.get();BS.sm=BW.how();BS.sk=BW.kind();BS.step="recap";nav({v:"bls"})}}
  function biBind(){const g=id=>document.getElementById(id),cl=g("bicl"),cx=g("bicx"),dt=g("bidet"),out=g("bitp");if(!dt)return;
   if(cl)cl.onclick=biCliSheet;if(cx)cx.oninput=()=>{BS.cn=cx.value};const grow=()=>{dt.style.height="auto";dt.style.height=Math.max(dt.scrollHeight,96)+"px"};dt.oninput=()=>{BS.det=dt.value;grow()};setTimeout(grow,0);
-  document.querySelectorAll("[data-tp]").forEach(b=>b.onclick=()=>{BS.tp=Math.max(60,Math.min(720,BS.tp+(+b.dataset.tp)));out.textContent=tpTxt(BS.tp);document.querySelector('[data-tp="-30"]').disabled=BS.tp<=60;document.querySelector('[data-tp="30"]').disabled=BS.tp>=720});
+  const ha=g("biha"),hd=g("bihd"),upd=()=>{BS.ha=ha.value||"";BS.hd=hd.value||"";const d=biDur(BS.ha,BS.hd);BS.tp=d==null?0:d;BS.tpOk=0;if(out)out.textContent=biTpLine()};
+  if(ha&&hd){ha.onfocus=()=>{if(!ha.value){const d=hMin(hd.value);if(d!=null){const m=(d-60+1440)%1440;ha.value=p2(Math.floor(m/60))+":"+p2(m%60);upd()}}};ha.oninput=ha.onchange=upd;hd.oninput=hd.onchange=upd;upd()}
+  clearInterval(window._bihwT);window._bihwT=setInterval(()=>{const w=g("bihw");if(w&&BS&&BS.bi)w.textContent=biHdWarn();else clearInterval(window._bihwT)},30000);
   const bx=document.querySelector("[data-bix]");if(bx)bx.onclick=()=>{if(!bx._a){bx._a=1;const t0=bx.textContent;bx.textContent="Annuler ce bon ?";setTimeout(()=>{bx._a=0;bx.textContent=t0},4000);return}(BS.ph||[]).forEach(x=>PDB.rm(x.id).catch(()=>{}));BS=null;nav({v:"list"})}}
  function blBind(){const g=id=>document.getElementById(id);
   document.querySelectorAll("[data-blback]").forEach(b=>b.onclick=()=>{BS.step="form";nav({v:"bls"})});
@@ -894,9 +908,9 @@ async function main(){
 
  // bon d'intervention : relevé sur le téléphone (liste, détail) puis dépôt { k:"bi" } (signé, ou ns = 1 : envoyé sans signature) et ses photos
  async function biSend(ns,rs,motif){await phSync(BS);const now=nowS(),rid=Date.now().toString(36)+Math.random().toString(36).slice(2,6),N=biNum(),num=N.num;
-  const p={t:"fp-sign",k:"bi",id:rid,n:num,cid:BS.cx?"":BS.cid,c:String(BS.cn).trim().slice(0,120),cx:BS.cx?1:0,det:String(BS.det).trim().slice(0,2000),tp:BS.tp,ivk:D.pk||"",iv:D.i||"",ns:ns?1:0,ter:BS.ter==="oui"||BS.ter==="non"?BS.ter:"",res:BS.res?1:0,lb:"rem",rc:BS.res?String(BS.rc).slice(0,1500):"",mat:matOut(BS.mt),ph:phPay(),dl:now.dl,hl:now.hl};
+  const p={t:"fp-sign",k:"bi",id:rid,n:num,cid:BS.cx?"":BS.cid,c:String(BS.cn).trim().slice(0,120),cx:BS.cx?1:0,det:String(BS.det).trim().slice(0,2000),tp:BS.tp,ha:BS.ha||"",hd:BS.hd||"",ivk:D.pk||"",iv:D.i||"",ns:ns?1:0,ter:BS.ter==="oui"||BS.ter==="non"?BS.ter:"",res:BS.res?1:0,lb:"rem",rc:BS.res?String(BS.rc).slice(0,1500):"",mat:matOut(BS.mt),ph:phPay(),dl:now.dl,hl:now.hl};
   if(ns)Object.assign(p,{rs:String(rs||"").slice(0,60),motif:String(motif||"").slice(0,500)});else Object.assign(p,{nm:BS.nm.slice(0,80),pr:BS.pr.slice(0,60),no:BS.no.slice(0,60),fn:"",sg:BS.sg,sm:BS.sm,sk:BS.sk||"",rf:sigRef()});
-  const R0=biRecs(),r={id:rid,n:num,c:p.c,cx:p.cx,d:now.dl,h:now.hl,tp:p.tp,det:p.det,ns:p.ns,ter:p.ter,res:p.res,rc:p.rc,mat:p.mat,nph:p.ph.length,phx:p.ph.map(x=>x[0]),nm:p.nm||"",rs:p.rs||"",motif:p.motif||"",rf:p.rf||"",sk:p.sk||""};
+  const R0=biRecs(),r={id:rid,n:num,c:p.c,cx:p.cx,d:now.dl,h:now.hl,tp:p.tp,ha:p.ha,hd:p.hd,det:p.det,ns:p.ns,ter:p.ter,res:p.res,rc:p.rc,mat:p.mat,nph:p.ph.length,phx:p.ph.map(x=>x[0]),nm:p.nm||"",rs:p.rs||"",motif:p.motif||"",rf:p.rf||"",sk:p.sk||""};
   const ko=()=>{const ee=document.getElementById("sge")||document.getElementById("blsig");if(ee)ee.insertAdjacentHTML("beforeend",'<p class="ko">Impossible d’enregistrer sur ce téléphone (mémoire pleine ou navigation privée). Rien n’a été envoyé.</p>');const fb=document.getElementById("blfin");if(fb)fb.disabled=false;const vb=document.getElementById("blval");if(vb)vb.disabled=false};
   if(!LS.set(BIK,R0.concat([r]).slice(-400)))return ko();if(!enqueue([p].concat(phQ(num)))){LS.set(BIK,R0);return ko()}LS.set(BINK,{d:N.d,n:N.k});
   phBon(BS,{n:num,kb:"bi",it:"",r0:rid,d:now.dl,h:now.hl});const np=p.ph.length;
@@ -906,7 +920,7 @@ async function main(){
  function biView(n){const r=biRecs().find(z=>z.n===n),x=IT.find(z=>z.t.k==="bi"&&z.t.b===n),t=x?x.t:{};if(!r&&!x)return listView();const mt=r?r.mat||[]:[],pd=r&&!!pend(r.id);
   const st=r?(r.ns?"📤 Envoyé sans signature le "+dm(r.d)+" à "+r.h+(r.rs?" — "+esc(r.rs)+(r.motif?" : « "+esc(r.motif)+" »":""):""):"✔ Signé par "+esc(r.nm)+" le "+dm(r.d)+" à "+r.h+(r.rf?" · réf. "+esc(r.rf):""))+(pd?" · ⏳ en attente d’envoi":" · transmis"):"✔ Signé";
   return `<header class="ip-hd ip-hdbi"><button type="button" class="ip-back" data-back>‹ Retour</button><div class="ip-k">Bon d’intervention</div><div class="ip-num">${esc(n)}</div><div class="ip-sub">${esc((r?r.c:t.c)||"")} · ${esc(fds((r?r.d:t.d)||T))}</div></header>
-  <section class="ip-sg sgc ip-bid"><div class="ip-kv"><span>Temps passé</span><b>${esc(tpTxt(r?r.tp:t.tp))}</b></div>${r?`<div class="ip-kv"><span>Intervention terminée</span><b>${terTxt(r.ter)}</b></div><div class="ip-bdt">${esc(r.det)}</div>
+  <section class="ip-sg sgc ip-bid"><div class="ip-kv"><span>${(r||t).ha?"Horaires":"Temps passé"}</span><b>${esc((r||t).ha?biHor(r||t):tpTxt(r?r.tp:t.tp))}</b></div>${r?`<div class="ip-kv"><span>Intervention terminée</span><b>${terTxt(r.ter)}</b></div><div class="ip-bdt">${esc(r.det)}</div>
    <div class="ip-kv"><span>Remarque</span><b>${r.res?"oui":"aucune"}</b></div>${r.res?`<div class="ip-rv">${esc(r.rc)}</div>`:""}<div class="ip-kv"><span>Matériel laissé</span><b>${mt.length?mt.length+" article"+(mt.length>1?"s":""):"aucun"}</b></div>${matLi(mt)}
    <div class="ip-kv"><span>Photos</span><b>${r.nph||"aucune"}</b></div>${r.phx&&r.phx.length?`<p class="ip-phs" role="status">${phStat(r.phx)}</p>`:""}`:""}<p class="ip-proof">${st}</p></section><div id="qbn">${bannerHtml()}</div>`}
  // ---- 2. une formation
