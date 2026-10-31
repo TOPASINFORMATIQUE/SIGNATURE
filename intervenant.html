@@ -439,10 +439,11 @@ function scDay(day,i,n){const [d,part,sls]=day,h=HRD[part||""]||HRD[""];
  return `<div class="dj"><b>Jour ${i+1}${n>1?"/"+n:""} – ${d?esc(fdl(d)):"date à définir"}${part==="m"?" (matin)":part==="a"?" (après-midi)":""}</b>${(sls||[]).map(([k,G])=>`<div class="sl"><b>${k==="m"?"Matin":"Après-midi"} · ${esc(h[k]||"")}</b>${(G||[]).map(([m,it])=>`${m?`<div><b>${esc(m)}</b></div>`:""}${(it||[]).length?`<ul>${it.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`:""}`).join("")}</div>`).join("")}</div>`}
 function scToday(f){const sc=f.sc||[];if(!sc.length)return"";const d=DS(f);let i=sc.findIndex(x=>x[0]===T);if(i<0)i=d.indexOf(T);if(i<0||!sc[i])return"";return scDay(sc[i],i,sc.length)}
 function scAll(f){const sc=f.sc||[];return sc.map((x,i)=>scDay(x,i,sc.length)).join("")}
-function pbZone(f,ix){return `<div class="pbz"><button type="button" class="btn pbb" data-pbo="${ix}" aria-expanded="false" aria-controls="pbf${ix}">⚠ Signalez un problème</button>
- <div class="pbf hide" id="pbf${ix}"><label for="pbt${ix}">Décrivez le problème (retard, stagiaire absent, matériel, accès aux locaux…)</label><textarea id="pbt${ix}" rows="4"></textarea>
+function pbZone(f,ix){return `<div class="pbz"><div class="btns ip-2b"><button type="button" class="btn pbb" data-pbo="${ix}" data-pbk="pb" aria-expanded="false" aria-controls="pbf${ix}">⚠ Signaler un problème</button><button type="button" class="btn pbb" data-pbo="${ix}" data-pbk="rem" aria-expanded="false" aria-controls="pbf${ix}">✎ Remarque</button></div>
+ <div class="pbf hide" id="pbf${ix}" data-kind="pb"><label for="pbt${ix}" id="pbl${ix}">Décrivez le problème (retard, stagiaire absent, matériel, accès aux locaux…)</label><textarea id="pbt${ix}" rows="4"></textarea>
  <div class="btns"><button type="button" class="btn dg" data-pbs="${ix}">Envoyer à TOPAS informatique</button><button type="button" class="btn" data-pbc="${ix}">Annuler</button></div><div class="pberr" id="pbe${ix}" role="alert"></div></div>
- <div id="pbh${ix}">${pbHist(f.n).map(x=>`<div class="pbok">✔ Problème envoyé le ${esc(x.tsl)} : « ${esc(x.msg.length>90?x.msg.slice(0,87)+"…":x.msg)} »</div>`).join("")}</div></div>`}
+ <div id="pbh${ix}">${pbHist(f.n).map(x=>`<div class="pbok">✔ ${x.rem?"Remarque envoyée":"Problème envoyé"} le ${esc(x.tsl)} : « ${esc(x.msg.length>90?x.msg.slice(0,87)+"…":x.msg)} »</div>`).join("")}</div></div>`}
+const PBLBL={pb:"Décrivez le problème (retard, stagiaire absent, matériel, accès aux locaux…)",rem:"Votre remarque pour TOPAS informatique (déroulement, besoins constatés, suite à donner…)"};
 const ctLine=(f,btn)=>{const ct=f.ct||[];if(!ct[0]&&!ct[2]&&!ct[3])return"";return `<div class="ln"><i>👤</i><div><b>${esc(ct[0]||"Contact client")}</b>${ct[1]?` <span class="mu">– ${esc(ct[1])}</span>`:""}${btn?"":`${ct[2]?`<br><a href="tel:${esc(ct[2].replace(/\s/g,""))}">☎ ${esc(ct[2])}</a>`:""}${ct[3]?`<br><a href="mailto:${esc(ct[3])}">✉ ${esc(ct[3])}</a>`:""}`}${btn&&(ct[2]||ct[3])?`<div class="btns" style="margin-top:6px">${ct[2]?`<a class="btn gn" href="tel:${esc(ct[2].replace(/\s/g,""))}">📞 Appeler</a>`:""}${ct[3]?`<a class="btn" href="mailto:${esc(ct[3])}">✉ Mail</a>`:""}</div>`:""}</div></div>`};
 const lieu=(f,btn)=>`<div class="ln"><i>📍</i><div><b>${esc(f.c)}</b>${f.a?`<br>${esc(f.a)}`:""}${btn?`<div class="btns" style="margin-top:6px"><a class="btn" href="${maps(f)}" target="_blank" rel="noopener">🧭 Itinéraire</a></div>`:""}</div></div>`;
 const trList=f=>{const tr=f.tr||[];return tr.map(x=>esc(x[0])+(x[1]?` <span class="mu">– ${esc(x[1])}</span>`:"")).join("<br>")||"—"};
@@ -606,10 +607,35 @@ async function main(){
 
  // ---- interventions : état (signé dans l'application, ou sur ce téléphone), regroupement, ligne, fiche
  // ---- le bon de livraison EN IMAGES (pages rendues par TOPAS Formation), gardé dans le téléphone pour fonctionner hors connexion
- const IDB={d:null,open(){if(!this.d)this.d=new Promise(res=>{try{const r=indexedDB.open("fpiv",1);r.onupgradeneeded=()=>{try{r.result.createObjectStore("img")}catch(e){}};r.onsuccess=()=>res(r.result);r.onerror=()=>res(null)}catch(e){res(null)}});return this.d},
-  async get(k){const d=await this.open();if(!d)return null;return new Promise(res=>{try{const q=d.transaction("img").objectStore("img").get(k);q.onsuccess=()=>res(q.result||null);q.onerror=()=>res(null)}catch(e){res(null)}})},
-  async put(k,v){const d=await this.open();if(!d)return false;return new Promise(res=>{try{const x=d.transaction("img","readwrite");x.objectStore("img").put(v,k);x.oncomplete=()=>res(true);x.onerror=()=>res(false)}catch(e){res(false)}})}};
+ const IDB={d:null,open(){if(!this.d)this.d=new Promise(res=>{try{const r=indexedDB.open("fpiv",2);r.onupgradeneeded=()=>{try{const db=r.result;if(!db.objectStoreNames.contains("img"))db.createObjectStore("img");if(!db.objectStoreNames.contains("sup"))db.createObjectStore("sup")}catch(e){}};r.onsuccess=()=>res(r.result);r.onerror=()=>res(null);r.onblocked=()=>res(null)}catch(e){res(null)}});return this.d},
+  async get(k,st){st=st||"img";const d=await this.open();if(!d||!d.objectStoreNames.contains(st))return null;return new Promise(res=>{try{const q=d.transaction(st).objectStore(st).get(k);q.onsuccess=()=>res(q.result||null);q.onerror=()=>res(null)}catch(e){res(null)}})},
+  async put(k,v,st){st=st||"img";const d=await this.open();if(!d||!d.objectStoreNames.contains(st))return false;return new Promise(res=>{try{const x=d.transaction(st,"readwrite");x.objectStore(st).put(v,k);x.oncomplete=()=>res(true);x.onerror=()=>res(false)}catch(e){res(false)}})}};
  const IMG={};
+ // ===== 📚 SUPPORTS DE COURS (31/10) : publiés par TOPAS Formation dans les données de l'espace (f.sup). Un fichier est lu par espace_fichier
+ // (jeton + clé « sup: », seulement s'il est publié dans CET espace), puis gardé dans le téléphone (IndexedDB « sup ») pour l'usage hors connexion ;
+ // un lien ou une vidéo s'ouvre dans le navigateur (connexion nécessaire). Préchargement dès qu'il y a du réseau (formations à venir / en cours, ≤ 8 Mo).
+ const SUPI={pdf:"📄",img:"🖼",fiche:"📝",video:"🎬",file:"💾",lien:"🔗"},SUPB={};
+ const supWeb=u=>u.k==="lien"||u.k==="video";
+ const supKo=u=>supWeb(u)?(u.u?"":"Adresse manquante."):!u.cle?"Pas encore disponible : TOPAS informatique n’a pas fini de le publier.":!EJ?"Ouvrez votre espace permanent (lien personnel) pour consulter ce fichier.":"";
+ const supMb=n=>n>=1048576?(n/1048576).toFixed(1).replace(".",",")+" Mo":n>=1024?Math.round(n/1024)+" Ko":n?n+" o":"";
+ const supMeta=u=>[u.k==="pdf"?"PDF":u.k==="img"?"Image":u.k==="fiche"?"Fiche":u.k==="video"?"Vidéo":u.k==="lien"?"Lien web":"Fichier",u.pg?u.pg+" page"+(u.pg>1?"s":""):"",u.du||"",u.sz?supMb(u.sz):""].filter(Boolean).join(" · ");
+ const supDj=(f,dj)=>{if(!dj||dj==="all")return "";const m=/^j(\d+)([ma])$/.exec(dj);if(!m)return "";const d=DS(f)[+m[1]-1];return (d?fdm(d):"Jour "+m[1])+" · "+(m[2]==="m"?"matin":"après-midi")};
+ async function supCached(u){if(!u.cle)return null;if(SUPB[u.cle])return SUPB[u.cle];const c=await IDB.get(u.cle,"sup");if(c&&c.b){SUPB[u.cle]=c.b;return c.b}return null}
+ async function supFetch(u){if(!EJ||!u.cle)return null;let a=0,P=[],h=null;
+  for(;;){const r=await fetch(SBU+"/rest/v1/rpc/espace_fichier",{method:"POST",headers:{apikey:SBK,"Content-Type":"application/json"},body:JSON.stringify({p_jeton:EJ,p_cle:u.cle,p_a:a,p_b:a+4})}),j=r.ok?await r.json():null;if(!j||!j.ok)return null;h=j;(j.morceaux||[]).forEach(m=>{P[m.n]=m.b64});a+=5;if(a>=(+j.n||0))break}
+  if(P.filter(Boolean).length<(+h.n||0))return null;const t=atob(P.join("")),b=new Uint8Array(t.length);for(let i=0;i<t.length;i++)b[i]=t.charCodeAt(i);const bl=new Blob([b],{type:h.type||"application/octet-stream"});
+  SUPB[u.cle]=bl;try{await IDB.put(u.cle,{b:bl,nom:h.nom||u.n||"",at:Date.now()},"sup")}catch(e){}return bl}
+ function supRow(u,f,i,ix){const ko=supKo(u),web=supWeb(u);
+  return `<div class="task sup-r"><span class="sup-i" aria-hidden="true">${SUPI[u.k]||"💾"}</span><span><b>${esc(u.t||u.n||"Support")}</b><br><small class="mu">${esc(supMeta(u))}${supDj(f,u.dj)?" · "+esc(supDj(f,u.dj)):""}${u.vis==="tous"?" · remis aussi aux stagiaires":""}${web?" · connexion nécessaire":""}</small>${ko?`<br><small class="ko">${esc(ko)}</small>`:""}</span>${web?(ko?"":`<a class="btn" href="${esc(u.u)}" target="_blank" rel="noopener">${u.k==="video"?"▶ Regarder":"↗ Ouvrir"}</a>`):`<button type="button" class="btn ${ko?"":"p"}" data-sup="${ix}:${i}" ${ko?"disabled":""}>📂 Ouvrir</button>`}<small class="mu sup-st" id="supst${ix}-${i}" role="status"></small></div>`}
+ const supSec=(f,ix)=>{const L=Array.isArray(f.sup)?f.sup:[];if(!L.length)return"";return `<section class="sec" style="--c:var(--ds-violet,#7c3aed)"><h2>📚 Supports de cours <span class="ip-gn n">${L.length}</span></h2><div class="fc s-venir" style="padding:6px 16px">${L.map((u,i)=>supRow(u,f,i,ix)).join("")}<p class="mu" style="margin:8px 0 6px;font-size:14px">Un fichier ouvert une fois reste disponible sans connexion.</p></div></section>`};
+ async function supOpen(ix,i,btn){const f=D.f[ix],u=f&&(f.sup||[])[i];if(!u)return;const st=document.getElementById("supst"+ix+"-"+i),say=t=>{if(st)st.textContent=t},off="Pas de connexion : ce support n’a pas encore été chargé sur ce téléphone.";
+  if(btn){btn.disabled=true;btn.setAttribute("aria-busy","true")}say("⏳ Ouverture…");let b=null;try{b=await supCached(u);if(!b){if(navigator.onLine===false)say(off);else{say("⏳ Téléchargement…");b=await supFetch(u)}}}catch(e){b=null}
+  if(btn){btn.disabled=false;btn.removeAttribute("aria-busy")}
+  if(!b){say(navigator.onLine===false?off:"Support indisponible pour l’instant. Réessayez plus tard.");return}
+  say("");const url=URL.createObjectURL(b);if(/^image\//.test(b.type)){supZoom(url,u.t||u.n||"");return}
+  const a=document.createElement("a");a.href=url;a.download=u.n||((u.t||"support")+(u.k==="pdf"?".pdf":""));a.target="_blank";a.rel="noopener";document.body.appendChild(a);a.click();setTimeout(()=>{a.remove()},2000)}
+ function supZoom(url,t){const o=document.createElement("div");o.className="zov";o.setAttribute("role","dialog");o.setAttribute("aria-label",t||"Support");o.innerHTML=`<div class="zbar"><span style="flex:1;font-weight:700">${esc(t||"")}</span><button type="button" class="btn p" data-zx>✕ Fermer</button></div><div class="zsc"><img alt="${esc(t||"Support")}" src="${url}" style="width:100%"></div>`;o.querySelector("[data-zx]").onclick=()=>o.remove();document.body.appendChild(o)}
+ async function supPrefetch(){if(!EJ||navigator.onLine===false)return;for(const x of F){if(!["venir","auj","cours"].includes(x.s))continue;for(const u of (x.f.sup||[])){if(!u.cle||(+u.sz||0)>8*1048576)continue;try{if(!(await supCached(u)))await supFetch(u)}catch(e){}}}}
  async function blImg(t){if(!t||!t.pf)return null;if(IMG[t.pf])return IMG[t.pf];const c=await IDB.get(t.pf);if(Array.isArray(c)&&c.length)return IMG[t.pf]=c;
   try{let P=null;if(t.pf.startsWith("e:")){const r=await fetch(SBU+"/rest/v1/rpc/espace_doc",{method:"POST",headers:{apikey:SBK,"Content-Type":"application/json"},body:JSON.stringify({p_jeton:EJ,p_itv:t.i})}),j=r.ok?await r.json():null;let a=null;try{a=j&&j.ok?JSON.parse(j.b64):null}catch(e){}P=Array.isArray(a)?a.filter(x=>typeof x==="string"&&x.length>100):null}
    else{const r=await fetch(SBU+"/rest/v1/rpc/lien_lire",{method:"POST",headers:{apikey:SBK,"Content-Type":"application/json"},body:JSON.stringify({p_id:t.pf})}),j=r.ok?await r.json():null;P=j&&j.ok&&j.data&&Array.isArray(j.data.p)?j.data.p.filter(x=>typeof x==="string"&&x.length>100):null}
@@ -623,7 +649,7 @@ async function main(){
   o.innerHTML=`<div class="zbar"><button type="button" class="btn" data-zm="-1" aria-label="Réduire">－</button><span>100 %</span><button type="button" class="btn" data-zm="1" aria-label="Agrandir">＋</button><button type="button" class="btn p" data-zx>✕ Fermer</button></div><div class="zsc">${P.map(b=>`<img alt="Bon de livraison" src="data:image/jpeg;base64,${b}" style="width:100%">`).join("")}</div>`;
   const set=()=>{o.querySelectorAll(".zsc img").forEach(i=>i.style.width=z+"%");o.querySelector(".zbar span").textContent=z+" %"};o.querySelectorAll("[data-zm]").forEach(b=>b.onclick=()=>{z=Math.max(100,Math.min(400,z+100*+b.dataset.zm));set()});o.querySelector("[data-zx]").onclick=()=>o.remove();document.body.appendChild(o);const im=o.querySelectorAll(".zsc img")[k];if(im)im.scrollIntoView()}
  // préchargement des bons encore à signer dès qu'il y a du réseau
- async function prefetch(){for(const x of IT){if(x.t.pf&&!IMG[x.t.pf]&&blSt(x).k==="faire")try{await blImg(x.t)}catch(e){}}}
+ async function prefetch(){for(const x of IT){if(x.t.pf&&!IMG[x.t.pf]&&blSt(x).k==="faire")try{await blImg(x.t)}catch(e){}}try{await supPrefetch()}catch(e){}}
  const repRec=i=>recs("blrep:"+i).sort((a,b)=>String(b.dl+b.hl).localeCompare(String(a.dl+a.hl)))[0];
  const blRec=i=>recs("bl:"+i).sort((a,b)=>b.v-a.v)[0];
  // « 📤 Envoyé sans signature » : relevé local blns ; si TOPAS a « renvoyé à faire signer » depuis (t.rs plus récent), le bon revient
@@ -879,27 +905,92 @@ async function main(){
    <div class="ip-kv"><span>Remarque</span><b>${r.res?"oui":"aucune"}</b></div>${r.res?`<div class="ip-rv">${esc(r.rc)}</div>`:""}<div class="ip-kv"><span>Matériel laissé</span><b>${mt.length?mt.length+" article"+(mt.length>1?"s":""):"aucun"}</b></div>${matLi(mt)}
    <div class="ip-kv"><span>Photos</span><b>${r.nph||"aucune"}</b></div>${r.phx&&r.phx.length?`<p class="ip-phs" role="status">${phStat(r.phx)}</p>`:""}`:""}<p class="ip-proof">${st}</p></section><div id="qbn">${bannerHtml()}</div>`}
  // ---- 2. une formation
- function formView(ix){const f=D.f[ix];if(!f)return listView();const s=stat(f),sl=SLOTS(f),sd=scToday(f);
+ // ===== ÉCRAN D'UNE FORMATION (31/10) : À consulter → Supports de cours → À faire signer → Signaler / Remarque / Photos, et UN bouton principal
+ const EVS=(f,ti)=>recs(f.n).filter(r=>r.kd==="ev"&&r.ti===ti).sort((a,b)=>String(b.dl+b.hl).localeCompare(String(a.dl+a.hl)))[0]||null;
+ const BIL=f=>recs(f.n).filter(r=>r.kd==="bil").sort((a,b)=>String(b.dl+b.hl).localeCompare(String(a.dl+a.hl)))[0]||null;
+ const evOn=f=>{const d=DS(f);return !!d.length&&d[d.length-1]<=T}; // évaluations et bilan possibles dès le dernier jour
+ function mainAct(f,ix){const s=stat(f),sl=SLOTS(f),hr=new Date().getHours(),tr=f.tr||[];
+  const late=sl.filter(o=>o.day<T&&!emState(f,o)),tod=sl.filter(o=>o.day===T&&!emState(f,o));
+  if(late.length)return `<button type="button" class="btn big2 ip-main" data-sg="em" data-day="${late[0].day}" data-part="${late[0].part}">✍ Faire signer l’émargement du ${esc(fdm(late[0].day))} (${PARTL[late[0].part].toLowerCase()})</button>`;
+  if(tod.length){const o=tod.find(x=>x.part===(hr<13?"m":"a"))||tod[0];return `<button type="button" class="btn big2 ip-main" data-sg="em" data-day="${o.day}" data-part="${o.part}">✍ Faire signer l’émargement de ${o.part==="m"?"ce matin":"cet après-midi"}</button>`}
+  if(!latest(f.n,"der","","")&&(s==="venir"||s==="auj"))return `<button type="button" class="btn big2 ip-main" data-sg="der">📋 Lire et valider le déroulé</button>`;
+  if(evOn(f)){const k=tr.filter((t,i)=>!(t[2]||EVS(f,i))).length;if(k&&D.qd&&D.qd.post)return `<button type="button" class="btn big2 ip-main" data-ev="${ix}:${tr.findIndex((t,i)=>!(t[2]||EVS(f,i)))}">📝 Évaluation de fin de stage (${k} restante${k>1?"s":""})</button>`;
+   const bil=(f.cl||[]).find(z=>z[0]==="bilan");if(!(bil&&bil[1])&&!BIL(f)&&D.qd&&D.qd.bilan)return `<button type="button" class="btn big2 ip-main" data-bil="${ix}">📝 Remplir mon bilan</button>`}
+  return ""}
+ function formView(ix){const f=D.f[ix];if(!f)return listView();const s=stat(f),sl=SLOTS(f),sd=scToday(f),tr=f.tr||[],evOk=evOn(f),qd=!!(D.qd&&D.qd.post),ma=mainAct(f,ix);
   const itemD=(()=>{const r=latest(f.n,"der","","");const x=r?{r,sent:!pend(r.id)}:null;return `<div class="task"><span>📋 Déroulé d’intervention<br><small class="mu">À lire et valider avant la formation</small></span>${x?stTxt(x,"Validé"):""}<button type="button" class="btn ${x?"":"p"}" data-sg="der">${x?"Refaire":"✍ Lire et valider"}</button></div>`})();
-  const items=sl.map((o,k)=>{const x=emState(f,o),fut=o.day>T;return `<div class="task"><span>✍ Émargement · ${esc(fdm(o.day))}<br><small class="mu">${PARTL[o.part]} · ${PARTH[o.part]}</small></span>${x?stTxt(x):`<span class="mu">${fut?"À partir du "+esc(dm(o.day)):"À faire"}</span>`}<button type="button" class="btn ${x||fut?"":"p"}" data-sg="em" data-day="${o.day}" data-part="${o.part}" ${fut?"disabled":""}>${x?"Refaire":"✍ Faire signer"}</button></div>`}).join("");
-  const bil=(f.cl||[]).find(z=>z[0]==="bilan"),ended=s==="clo"||s==="fini";
-  const itemB=`<div class="task"><span>📝 Bilan de la formation<br><small class="mu">Après la fin de la formation</small></span>${bil&&bil[1]?'<span class="ok">✔ Reçu, merci</span>':!ended?'<span class="mu">Après la formation</span>':f.bl?`<a class="btn gn" href="${esc(f.bl)}" target="_blank" rel="noopener">📝 Remplir mon bilan</a>`:'<span class="mu">Le lien vous sera envoyé par mail.</span>'}</div>`;
-  const ct=f.ct||[];
+  const items=sl.map(o=>{const x=emState(f,o),fut=o.day>T;return `<div class="task"><span>✍ Émargement · ${esc(fdm(o.day))}<br><small class="mu">${PARTL[o.part]} · ${PARTH[o.part]}</small></span>${x?stTxt(x):`<span class="mu">${fut?"À partir du "+esc(dm(o.day)):"À faire"}</span>`}<button type="button" class="btn ${x||fut?"":"p"}" data-sg="em" data-day="${o.day}" data-part="${o.part}" ${fut?"disabled":""}>${x?"Refaire":"✍ Signer"}</button></div>`}).join("");
+  const evs=tr.length?`<div class="task ip-evh"><span>📝 Évaluation de fin de stage<br><small class="mu">${qd?(evOk?"Chaque stagiaire répond sur ce téléphone, ou plus tard en ligne (mail).":"Dès le dernier jour de la formation, sur ce téléphone ou en ligne."):"Envoyée par mail à chaque stagiaire."}</small></span></div>`+tr.map((t,i)=>{const on=!!t[2],r=EVS(f,i),pd=r&&pend(r.id);
+   return `<div class="task ip-ev"><span>${esc(t[0]||"Stagiaire "+(i+1))}</span>${on?'<span class="ok">✔ Répondu en ligne</span>':r?`<span class="${pd?"wt":"ok"}">${pd?"⏳":"✔"} Répondu le ${esc(dm(r.dl))}${pd?" · en attente d’envoi":""}</span>`:evOk&&qd?`<button type="button" class="btn p" data-ev="${ix}:${i}">📝 Répondre</button>`:'<span class="mu">Après la formation</span>'}</div>`}).join(""):"";
+  const bil=(f.cl||[]).find(z=>z[0]==="bilan"),br=BIL(f),bpd=br&&pend(br.id);
+  const itemB=`<div class="task"><span>📝 Bilan de la formation<br><small class="mu">Après la fin de la formation</small></span>${bil&&bil[1]?'<span class="ok">✔ Reçu, merci</span>':br?`<span class="${bpd?"wt":"ok"}">${bpd?"⏳":"✔"} Rempli le ${esc(dm(br.dl))}${bpd?" · en attente d’envoi":""}</span>`:!evOk?'<span class="mu">Après la formation</span>':D.qd&&D.qd.bilan?`<button type="button" class="btn gn" data-bil="${ix}">📝 Remplir mon bilan</button>`:f.bl?`<a class="btn gn" href="${esc(f.bl)}" target="_blank" rel="noopener">📝 Remplir mon bilan</a>`:'<span class="mu">Le lien vous sera envoyé par mail.</span>'}</div>`;
   return `<header class="ip-hd"><button type="button" class="ip-back" data-back>‹ Retour</button><div class="ip-k">Formation · ${SL2[s]}</div><div class="ip-num ip-num2">${esc(f.t)}</div><div class="ip-sub">${esc(f.c)} · N° ${esc(f.n)}</div></header>
   <div id="qbn">${bannerHtml()}</div>
   <div class="fc s-${s}"><div class="cli">${esc(f.c)}</div>
    <div class="ln"><i>📅</i><div>${DS(f).map(x=>{const t=slot(f,x);return `<div class="dt${x===T?" now":x<T?" past":""}"><b>${esc(fdl(x))}</b><span>${esc(t[2])}</span></div>`}).join("")||"À définir"}<span class="mu">${esc(f.h)} h au total</span></div></div>
    ${lieu(f,1)}${ctLine(f,1)}
    <div class="ln"><i>☎</i><div><b>TOPAS informatique</b>${D.m?`<br><a href="mailto:${esc(D.m)}">✉ ${esc(D.m)}</a>`:""}${G[1]?`<br><a href="tel:${esc(G[1].replace(/\s/g,""))}">☎ ${esc(G[1])}</a>`:""}</div></div>
-   <div class="btns"><button type="button" class="btn p" data-ics="${esc(f.n)}">📅 Ajouter à mon agenda</button></div></div>
-  <section class="sec" style="--c:var(--or)"><h2>✍ À signer</h2><div class="fc s-clo" style="padding:6px 16px">${itemD}${items}${itemB}</div></section>
+   ${ma?`<div class="btns ip-mainw">${ma}</div>`:""}<div class="btns"><button type="button" class="btn" data-ics="${esc(f.n)}">📅 Ajouter à mon agenda</button></div></div>
   <section class="sec" style="--c:var(--bl)"><h2>📄 À consulter</h2><div class="fc s-venir">
+   <details ${sd?"open":""}><summary>📋 Déroulé d’intervention${sd?" (jour en cours en premier)":""}</summary><div class="pan">${sd||""}${scAll(f)||"<div class='mu'>Aucun déroulé détaillé pour cette formation.</div>"}</div></details>
    ${(f.pg||[]).length?`<details><summary>📘 Programme</summary><div class="pan">${progH(f)}</div></details>`:""}
-   ${(f.sc||[]).length?`<details ${sd?"open":""}><summary>🗂 Scénario${sd?" (jour en cours en premier)":""}</summary><div class="pan">${sd||""}${scAll(f)}</div></details>`:""}
-   ${f.sp?`<div class="btns"><a class="btn" href="${esc(f.sp)}" target="_blank" rel="noopener">📚 Support de cours</a></div>`:""}
-   <details><summary>👥 Liste des stagiaires (${(f.tr||[]).length})</summary><div class="pan">${trList(f)}</div></details></div></section>
-  <div class="fc s-clo">${pbZone(f,ix)}</div>${foot()}`}
-
+   <details><summary>📅 Planification</summary><div class="pan">${DS(f).map(x=>{const t=slot(f,x);return `<div class="tl"><b>${esc(fdm(x))}</b><span>${esc(t[2])}</span></div>`}).join("")||"À définir"}<div class="mu" style="margin-top:6px">${esc(f.h)} h au total${f.j?" · "+esc(f.j)+" jour"+(+f.j>1?"s":""):""}</div></div></details>
+   <details><summary>👥 Stagiaires (${tr.length})</summary><div class="pan">${trList(f)}</div></details>
+   ${f.sp&&!(f.sup||[]).length?`<div class="btns"><a class="btn" href="${esc(f.sp)}" target="_blank" rel="noopener">📚 Support de cours</a></div>`:""}</div></section>
+  ${supSec(f,ix)}
+  <section class="sec" style="--c:var(--or)"><h2>✍ À faire signer</h2><div class="fc s-clo" style="padding:6px 16px">${itemD}${items}${evs}${itemB}</div></section>
+  <div class="fc s-clo">${pbZone(f,ix)}${fphZone(f,ix)}</div>${foot()}`}
+ // 📷 photos de la formation (31/10) : mêmes photos que sur les bons (réduites, gardées hors connexion, envoyées par espace_photo), rattachées au dossier
+ const FPH={};const fphRec=n=>recs(n).filter(r=>r.kd==="fph");
+ function fphZone(f,ix){if(!phOn())return"";const S0=FPH[ix]||(FPH[ix]={ph:[],busy:0}),sent=fphRec(f.n).reduce((a,r)=>a+(+r.n||0),0),pdn=fphRec(f.n).filter(r=>pend(r.id)).length;
+  return `<div class="ip-opt ip-ph on" id="fph${ix}"><div class="ip-pht"><b>📷 Photos de la formation</b><span>${S0.ph.length} / ${PHMAX}</span></div><div class="ip-phl" id="fphl${ix}"></div><p class="ip-phw">Salle, matériel, tableau… pas les personnes.${sent?" · "+sent+" photo"+(sent>1?"s":"")+" déjà envoyée"+(sent>1?"s":"")+(pdn?" (envoi en attente)":""):""}</p><input type="file" accept="image/*" capture="environment" id="fphin${ix}" hidden><input type="file" accept="image/*" multiple id="fphig${ix}" hidden><div class="pberr" id="fphe${ix}" role="alert"></div>${S0.ph.length?`<div class="btns"><button type="button" class="btn gn" data-fphs="${ix}">📤 Envoyer ${S0.ph.length} photo${S0.ph.length>1?"s":""} à TOPAS informatique</button></div>`:""}</div>`}
+ function fphDraw(ix){const S0=FPH[ix],l=document.getElementById("fphl"+ix);if(!S0||!l)return;const box=document.getElementById("fph"+ix);if(box){const c=box.querySelector(".ip-pht span");if(c)c.textContent=S0.ph.length+" / "+PHMAX}
+  l.innerHTML=S0.ph.map((x,i)=>`<div class="ip-phi">${x.raw?`<span class="ip-phr" role="img" aria-label="Photo ${i+1} (${esc(x.raw)})">📷<b>${esc(x.raw)}</b></span>`:`<img alt="Photo ${i+1}" data-fim="${esc(x.id)}"${PHU[x.id]?` src="${PHU[x.id]}"`:""}>`}<button type="button" class="ip-phx" data-fphx="${i}" aria-label="Retirer la photo ${i+1}">✕</button></div>`).join("")+`<div class="ip-phi ip-phb" role="status"><i aria-hidden="true">⏳</i>Préparation…</div>`.repeat(S0.busy||0)+(S0.ph.length+(S0.busy||0)<PHMAX?`<button type="button" class="ip-pha" data-fpha><i aria-hidden="true">＋</i>Ajouter une photo</button><button type="button" class="ip-phg" data-fphg>ou choisir dans la galerie</button>`:"");
+  l.querySelectorAll("[data-fim]").forEach(im=>{const id=im.dataset.fim;if(PHU[id])return;PDB.get(id).then(r=>{if(r&&r.b){PHU[id]=URL.createObjectURL(r.b);im.src=PHU[id]}}).catch(()=>{})});
+  l.querySelectorAll("[data-fphx]").forEach(b=>b.onclick=()=>{const x=S0.ph.splice(+b.dataset.fphx,1)[0];if(x)PDB.rm(x.id).catch(()=>{});view()});
+  const a=l.querySelector("[data-fpha]");if(a)a.onclick=()=>document.getElementById("fphin"+ix).click();const g=l.querySelector("[data-fphg]");if(g)g.onclick=()=>document.getElementById("fphig"+ix).click()}
+ function fphBind(ix){const S0=FPH[ix];if(!S0)return;const f=D.f[ix],msg=t=>{const e=document.getElementById("fphe"+ix);if(e)e.textContent=t};
+  const add=async inp=>{const Fl=[...(inp.files||[])];msg("");for(const fi of Fl){if(S0.ph.length+(S0.busy||0)>=PHMAX){msg(PHMAX+" photos au maximum.");break}S0.busy=(S0.busy||0)+1;fphDraw(ix);
+    try{const r=await phPrep(fi);if(!r||r.ko){msg((r&&r.ko)||"Cette photo n’a pas pu être lue. Réessayez.");continue}const id=Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+     try{await PDB.put(id,{b:r.b,w:r.w,h:r.h,at:nowS().dl,t:Date.now(),bs:"f:"+f.n,raw:r.raw||""})}catch(z){msg("Impossible de garder la photo sur ce téléphone (mémoire pleine ?).");break}S0.ph.push({id,lg:"",raw:r.raw||""})}
+    catch(e){msg("Cette photo n’a pas pu être préparée. Réessayez.")}finally{S0.busy--}}
+   inp.value="";if(V.v==="f"&&V.ix===ix)view()};
+  const a=document.getElementById("fphin"+ix),g=document.getElementById("fphig"+ix);if(a)a.onchange=()=>add(a);if(g)g.onchange=()=>add(g);
+  const sb=document.querySelector(`[data-fphs="${ix}"]`);if(sb)sb.onclick=()=>{if(S0.busy){msg("⏳ Préparation de la photo… un instant.");return}const L=S0.ph.slice();if(!L.length)return;const now=nowS(),rid=Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+   const p={t:"fp-sign",k:"fph",id:rid,n:f.n,iv:D.i||"",ph:L.map(x=>[x.id,x.lg||""]),dl:now.dl,hl:now.hl};
+   if(!enqueue([p].concat(L.map((x,i)=>({k:"ph",id:x.id,i:"ph",cle:"ph:"+x.id,lg:x.lg||"",nom:f.n+" – photo de formation "+(i+1)}))))){msg("Impossible d’enregistrer sur ce téléphone (mémoire pleine ou navigation privée).");return}
+   const R=recs(f.n);R.push({id:rid,kd:"fph",n:L.length,dl:now.dl,hl:now.hl});LS.set(RK(f.n),R);S0.ph=[];view()};
+  fphDraw(ix)}
+ // ===== 📝 ÉVALUATION DE FIN DE STAGE et BILAN sur le téléphone (31/10) : mêmes questions que la page en ligne (publiées par TOPAS Formation dans D.qd),
+ // une réponse par stagiaire (« Passez le téléphone à … »), envoyée comme une réponse en ligne (dépôt fp-q, src « tel »), hors connexion possible.
+ let EV=null;const EVSC={sat:[["😀","Très satisfaisant"],["🙂","Satisfaisant"],["😕","Peu satisfaisant"],["😞","Insatisfaisant"]],qual:[["😀","Très bien"],["🙂","Bien"],["😕","Moyen"],["😞","Insuffisant"]]};
+ function evStart(ix,ti){const f=D.f[ix];if(!f)return;const kd=ti<0?"bilan":"post",q=D.qd&&D.qd[kd];if(!q||!Array.isArray(q.i))return;EV={ix,kd,ti,nm:kd==="bilan"?(D.i||"Formateur"):String(((f.tr||[])[ti]||[])[0]||"Stagiaire "+(ti+1)),q,A:{},done:null};nav({v:"ev"})}
+ const evQ=(q,v)=>{const id="evq_"+q.id;if(q.k==="star")return `<div class="ev-st" role="group" aria-label="${esc(q.t)}">${[1,2,3,4,5].map(n=>`<button type="button" class="ev-s" data-evv="${n}" aria-pressed="${String(v)===String(n)}" aria-label="${n} étoile${n>1?"s":""}">${+v>=n?"★":"☆"}</button>`).join("")}</div>`;
+  if(q.k==="scale"){const SC=EVSC[q.p==="qual"?"qual":"sat"];return `<div class="ev-sc">${SC.map(o=>`<button type="button" class="ev-o" data-evv="${esc(o[1])}" aria-pressed="${v===o[1]}"><span aria-hidden="true">${o[0]}</span>${esc(o[1])}</button>`).join("")}</div>`}
+  if(q.k==="radio")return `<div class="ev-ro">${(q.o||[]).map(o=>`<button type="button" class="ev-o" data-evv="${esc(o)}" aria-pressed="${v===o}">${esc(o)}</button>`).join("")}</div>`;
+  if(q.k==="area")return `<textarea id="${id}" rows="3" data-evt="1" aria-label="${esc(q.t)}">${esc(v||"")}</textarea>`;return `<input id="${id}" type="text" data-evt="1" aria-label="${esc(q.t)}" value="${esc(v||"")}">`};
+ function evView(){if(!EV)return listView();const f=D.f[EV.ix],q=EV.q,bil=EV.kd==="bilan";
+  if(EV.done)return `<div class="fc s-auj sgc"><h3>${EV.done.pending?"⏳ Enregistré, envoi en attente":"✔ Merci, réponse transmise"}</h3><p>${bil?"Votre bilan est enregistré.":"Réponse de <b>"+esc(EV.nm)+"</b> enregistrée."}</p><p class="mu">${EV.done.pending?"Pas de connexion pour l’instant : l’envoi se fera tout seul au retour du réseau.":"TOPAS informatique l’a reçue : elle est classée dans le dossier."}</p><div class="btns"><button type="button" class="btn p" data-evx2>← Retour à la formation</button></div></div><div id="qbn">${bannerHtml()}</div>`;
+  return `<div class="sgh"><button type="button" class="btn" data-evx>← Quitter</button><div class="sgp">${bil?"Bilan du formateur":"Évaluation de fin de stage"}</div></div>
+  <div class="fc s-clo sgc ip-evf"><div class="num">${esc(f.t)} · N° ${esc(f.n)}</div>${bil?"":`<div class="sgw">Passez le téléphone à</div><div class="nm2">${esc(EV.nm)}</div>`}<h3 style="margin:8px 0 2px">${esc(q.ti||"")}</h3><p class="mu" style="margin-top:0">${esc(q.in||"")}</p>
+  ${q.i.map((x,n)=>`<div class="ev-q" data-evq="${esc(x.id)}"><div class="ev-t">${n+1}. ${esc(x.t)}${x.req?' <span class="ko" aria-hidden="true">*</span>':""}</div>${evQ(x,EV.A[x.id]||"")}</div>`).join("")}
+  <div class="pberr" id="eve" role="alert"></div><div class="btns"><button type="button" class="btn gn big2" id="evsend">✔ Envoyer</button></div><p class="mu" style="font-size:14px">* réponse attendue. Rien n’est envoyé avant « Envoyer ».</p></div>`}
+ function evBind(){if(!EV)return;document.querySelectorAll(".ev-q").forEach(w=>{const id=w.dataset.evq;w.querySelectorAll("[data-evv]").forEach(b=>b.onclick=()=>{EV.A[id]=b.dataset.evv;w.querySelectorAll("[data-evv]").forEach(z=>{z.setAttribute("aria-pressed",String(z===b));if(z.classList.contains("ev-s"))z.textContent=+z.dataset.evv<=+b.dataset.evv?"★":"☆"})});w.querySelectorAll("[data-evt]").forEach(i=>i.oninput=()=>{EV.A[id]=i.value})});
+  const x=document.querySelector("[data-evx]");if(x)x.onclick=()=>{if(!x._a){x._a=1;const t0=x.textContent;x.textContent="Quitter sans envoyer ?";setTimeout(()=>{x._a=0;x.textContent=t0},4000);return}const ix=EV.ix;EV=null;nav({v:"f",ix})};
+  const x2=document.querySelector("[data-evx2]");if(x2)x2.onclick=()=>{const ix=EV.ix;EV=null;nav({v:"f",ix})};
+  const sb=document.getElementById("evsend");if(sb)sb.onclick=()=>{const er=document.getElementById("eve"),miss=EV.q.i.find(z=>z.req&&!String(EV.A[z.id]||"").trim());if(miss){er.textContent="Réponse attendue : « "+miss.t+" ».";const w=document.querySelector(`.ev-q[data-evq="${miss.id}"]`);if(w)w.scrollIntoView({block:"center"});return}
+   const f=D.f[EV.ix],now=nowS(),rid=Date.now().toString(36)+Math.random().toString(36).slice(2,6),cut=(t,n)=>String(t).slice(0,n);
+   const ans=EV.q.i.map(z=>[z,String(EV.A[z.id]||"").trim()]).filter(a=>a[1]!=="").map(a=>[cut(a[0].t,90),cut(a[1],300)]);
+   const p={t:"fp-q",q:EV.kd,n:f.n,nm:EV.nm,dl:now.dl,hl:now.hl,tsl:fds(now.dl)+" à "+now.hl,a:ans,src:"tel",iv:D.i||"",id:rid};if(EV.kd!=="bilan")p.ti=EV.ti;
+   const R=recs(f.n);R.push({id:rid,kd:EV.kd==="bilan"?"bil":"ev",ti:EV.ti,nm:EV.nm,dl:now.dl,hl:now.hl});
+   if(!LS.set(RK(f.n),R)||!enqueue([p])){er.textContent="Impossible d’enregistrer sur ce téléphone (mémoire pleine ou navigation privée). Rien n’a été envoyé.";return}
+   EV.done={pending:true};view();window.scrollTo(0,0);flush().then(()=>{if(EV&&EV.done){EV.done.pending=!!pend(rid);view()}})}}
+ // absence : motif pratique seulement (jamais d'information personnelle), inscrit sur la feuille de présence
+ const ABSR=["Absence prévenue","Absence non prévenue","Retard : signera plus tard","Autre raison"],ini2=n=>String(n||"").trim().split(/\s+/).slice(0,2).map(x=>(x[0]||"").toUpperCase()).join("")||"?";
+ function absAsk(st){const o=document.createElement("div");o.className="nsov ip-sheet";o.setAttribute("role","dialog");o.setAttribute("aria-modal","true");o.setAttribute("aria-label","Absence");
+  o.innerHTML=`<div class="nsbx"><h3>🚫 ${esc(st.nm)} : absent(e)</h3><p class="mu" style="margin-top:0">Indiquez seulement le motif pratique.</p><div class="ip-lgs ip-abs">${ABSR.map(l=>`<button type="button" data-ab="${esc(l)}">${esc(l)}</button>`).join("")}</div><div class="btns"><button type="button" class="btn" data-shx>Annuler</button></div></div>`;
+  document.body.appendChild(o);o.querySelectorAll("[data-ab]").forEach(b=>b.onclick=()=>{o.remove();SG.res[SG.i]={nm:st.nm,abs:1,ab:b.dataset.ab,h:nowS().hl};if(SG._next)SG._next()});o.querySelector("[data-shx]").onclick=()=>o.remove();o.onclick=e=>{if(e.target===o)o.remove()}}
+ const sgCnt=()=>{const n=SG.steps.length,sg=SG.res.filter(r=>r&&!r.abs).length,ab=SG.res.filter(r=>r&&r.abs).length,rest=n-sg-ab;return `<div class="sgcnt mu">${n} personne${n>1?"s":""} · ${sg} signature${sg>1?"s":""} · ${ab} absent${ab>1?"s":""} · ${rest} restante${rest>1?"s":""}</div>`};
  // ---- 3. signature sur téléphone
  let SG=null;
  const sigRef=()=>{const a="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";let t="";try{const u=new Uint8Array(6);crypto.getRandomValues(u);u.forEach(x=>t+=a[x%a.length])}catch(e){for(let i=0;i<6;i++)t+=a[Math.floor(Math.random()*a.length)]}return "S-"+t};
@@ -909,15 +1000,15 @@ async function main(){
   const ctx=SG.kd==="der"?`<div class="pan" style="max-height:34vh;overflow:auto"><h4>Déroulé d’intervention – ${esc(f.t)}</h4>${scAll(f)||"<div class='mu'>Aucun scénario détaillé pour cette formation.</div>"}</div>`:"";
   return `<div class="sgh"><button type="button" class="btn" data-sgx>← Quitter</button><div class="sgp">${SG.kd==="em"?`Étape ${SG.i+1} sur ${n}`:"Validation du déroulé"}</div></div>
   <div class="fc s-clo sgc ip-sg"><div class="num">${esc(f.c)} · N° ${esc(f.n)}</div>${SG.kd==="em"?`<div class="num"><b>${esc(fdm(SG.day))}</b> · ${PARTL[SG.part]} · ${PARTH[SG.part]}</div>`:""}
-  <div class="sgw">${st.tr?"Vous signez d’abord":"Passez le téléphone à"}</div><div class="nm2">${esc(st.nm)}</div>${ctx}
+  ${SG.kd==="em"?`<div class="ip-av sgav" style="--a:${itvPal(st.nm)[0]};--b:${itvPal(st.nm)[2]}" aria-hidden="true">${esc(ini2(st.nm))}</div>`:""}<div class="sgw">${st.tr?"Vous signez d’abord":"Passez le téléphone à"}</div><div class="nm2">${esc(st.nm)}</div>${ctx}
   <div id="emw"></div>
-  <div class="sgb sgb2">${SG.kd==="em"&&!st.tr?'<button type="button" class="btn" id="abs">🚫 Absent</button>':"<span></span>"}<button type="button" class="btn gn" id="val">✔ Valider</button></div><div class="pberr" id="sge" role="alert"></div>
+  <div class="sgb sgb2">${SG.kd==="em"&&!st.tr?'<button type="button" class="btn" id="abs">🚫 Absent</button>':"<span></span>"}<button type="button" class="btn gn" id="val">✔ Valider</button></div><div class="pberr" id="sge" role="alert"></div>${SG.kd==="em"?sgCnt():""}
   ${re?`<p class="mu">Déjà renseigné : ${re.abs?"absent":"signé"} à ${esc(re.h)}. Signer à nouveau remplace cette étape (avant l’envoi).</p>`:""}</div>`};
  const recapScreen=()=>{const f=D.f[SG.ix],ab=SG.res.filter(r=>r.abs).length;
   return `<div class="sgh"><button type="button" class="btn" data-sgx>← Quitter</button><div class="sgp">Récapitulatif</div></div>
   <div class="fc s-clo sgc"><h3>${esc(f.t)}</h3><div class="num"><b>${esc(fdm(SG.day))}</b> · ${PARTL[SG.part]} · ${PARTH[SG.part]}</div>
   <p class="mu">Rien n’est envoyé tant que vous n’avez pas touché « Terminer ». Vous pouvez reprendre une signature ou une absence.</p>
-  ${SG.steps.map((s,i)=>{const r=SG.res[i];return `<div class="task"><span><b>${esc(s.nm)}</b>${s.tr?" <small class='mu'>(formateur)</small>":""}</span>${r?(r.abs?`<span class="ko">🚫 Absent · ${esc(r.h)}</span>`:`<span class="ok">✔ Signé · ${esc(r.h)}</span>`):'<span class="ko">Manquant</span>'}<button type="button" class="btn" data-sgr="${i}">Reprendre</button></div>`}).join("")}
+  ${SG.steps.map((s,i)=>{const r=SG.res[i];return `<div class="task"><span><b>${esc(s.nm)}</b>${s.tr?" <small class='mu'>(formateur)</small>":""}</span>${r?(r.abs?`<span class="ko">🚫 Absent${r.ab?" · "+esc(r.ab):""} · ${esc(r.h)}</span>`:`<span class="ok">✔ Signé · ${esc(r.h)}</span>`):'<span class="ko">Manquant</span>'}<button type="button" class="btn" data-sgr="${i}">Reprendre</button></div>`}).join("")}
   <div class="pberr" id="sge" role="alert"></div><div class="btns"><button type="button" class="btn gn big2" id="fin" ${SG.steps.every((s,k)=>SG.res[k])?"":"disabled"}>✔ Terminer la demi-journée${ab?" ("+ab+" absent"+(ab>1?"s":"")+")":""}</button></div></div>`};
  const doneScreen=()=>{const d=SG.done;return `<div class="fc s-auj sgc"><h3>${d.pending?"⏳ Enregistré, envoi en attente":"✔ Enregistré et transmis"}</h3><p>${SG.kd==="em"?`Émargement du <b>${esc(fdm(SG.day))}</b> (${PARTL[SG.part]}) : ${d.sig} signature${d.sig>1?"s":""}${d.abs?`, ${d.abs} absent${d.abs>1?"s":""}`:""}.`:"Déroulé d’intervention validé."}${d.rf?` <span class="mu">Référence ${esc(d.rf)}.</span>`:""}</p><p class="mu">${d.pending?"Pas de connexion pour l’instant : l’envoi se fera tout seul au retour du réseau. Gardez cette page dans votre téléphone.":"TOPAS informatique a reçu la feuille : elle est classée dans le dossier."}</p><div class="btns"><button type="button" class="btn p" data-back2>← Retour à la formation</button></div></div>`};
  function signView(){if(!SG)return listView();return `<div class="sgv">${SG.done?doneScreen():SG.recap?recapScreen():stepScreen()}</div><div id="qbn">${bannerHtml()}</div>`}
@@ -926,20 +1017,23 @@ async function main(){
   const next=()=>{if(SG.kd==="der")return finish();if(SG.steps.every((s,k)=>SG.res[k])||SG.i>=SG.steps.length-1){SG.recap=true;SG.i=SG.steps.length-1}else{SG.i=SG.res.findIndex((r,k)=>k>SG.i&&!r);if(SG.i<0)SG.i=SG.res.length}view();window.scrollTo(0,0)};
   const vb=document.getElementById("val");if(vb)vb.onclick=()=>{if(W.empty()){document.getElementById("sge").textContent=W.mode()==="draw"?"Signez dans le cadre, ou touchez « Absent » si la personne n’est pas là.":"Nom manquant : choisissez « ✏ Signer à la main ».";return}
    SG.res[SG.i]={nm:st.nm,sg:W.get(),sk:W.kind(),sm:W.how(),h:nowS().hl,tr:st.tr?1:0};next()};
-  const ab=document.getElementById("abs");if(ab)ab.onclick=()=>{SG.res[SG.i]={nm:st.nm,abs:1,h:nowS().hl};next()}}
+  SG._next=next;const ab=document.getElementById("abs");if(ab)ab.onclick=()=>absAsk(st)}
  function sigKTxt(k){return k==="manuscrite"?" · signature manuscrite":k==="simple"?" · signature électronique simple":""}
- function finish(){const f=D.f[SG.ix],now=nowS(),rid=Date.now().toString(36)+Math.random().toString(36).slice(2,6),ents=SG.res.map((r,i)=>r.abs?{nm:r.nm,abs:1,h:r.h}:{nm:r.nm,sg:r.sg,sk:r.sk||"",h:r.h,tr:r.tr?1:0}),prev=latest(f.n,SG.kd,SG.day,SG.part),v=(prev?prev.v:0)+1;
+ function finish(){const f=D.f[SG.ix],now=nowS(),rid=Date.now().toString(36)+Math.random().toString(36).slice(2,6),ents=SG.res.map((r,i)=>r.abs?{nm:r.nm,abs:1,h:r.h,ab:r.ab||""}:{nm:r.nm,sg:r.sg,sk:r.sk||"",h:r.h,tr:r.tr?1:0}),prev=latest(f.n,SG.kd,SG.day,SG.part),v=(prev?prev.v:0)+1;
   const rf=sigRef(),pls=ents.map((e,i)=>({t:"fp-sign",k:"emg",kd:SG.kd,n:f.n,id:rid,rf,v,day:SG.day,part:SG.part,iv:D.i||"",tot:ents.length,i,dl:now.dl,hl:now.hl,e}));
   const abs=ents.filter(e=>e.abs).length,R=recs(f.n);R.push({id:rid,kd:SG.kd,day:SG.day,part:SG.part,v,dl:now.dl,hl:now.hl,abs,n:ents.length});
   if(!LS.set(RK(f.n),R)||!enqueue(pls)){const ee=document.getElementById("sge");if(ee)ee.textContent="Impossible d’enregistrer sur ce téléphone (mémoire pleine ou navigation privée). Rien n’a été envoyé.";const fb=document.getElementById("fin");if(fb)fb.disabled=false;return}
   SG.done={pending:true,sig:ents.length-abs,abs,rf};view();window.scrollTo(0,0);flush().then(()=>{if(SG&&SG.done){SG.done.pending=!!pend(rid);view()}})}
 
- function view(){const h=V.v==="f"?formView(V.ix):V.v==="sign"?signView():V.v==="it"?itView(V.ix):V.v==="bls"?blView():V.v==="bid"?biView(V.n):listView(),nb=V.v==="list"||V.v==="it"||V.v==="f"||V.v==="bid";app.innerHTML=h+(nb?navH():"");document.body.classList.toggle("ip-nb",nb);bind()}
+ function view(){const h=V.v==="f"?formView(V.ix):V.v==="sign"?signView():V.v==="ev"?evView():V.v==="it"?itView(V.ix):V.v==="bls"?blView():V.v==="bid"?biView(V.n):listView(),nb=V.v==="list"||V.v==="it"||V.v==="f"||V.v==="bid";app.innerHTML=h+(nb?navH():"");document.body.classList.toggle("ip-nb",nb);bind()}
  function bind(){
   document.querySelectorAll("[data-f]").forEach(b=>b.onclick=()=>nav({v:"f",ix:+b.dataset.f}));
   document.querySelectorAll("[data-back]").forEach(b=>b.onclick=()=>nav({v:"list"}));
   document.querySelectorAll("[data-qgo]").forEach(b=>b.onclick=flush);
   document.querySelectorAll("[data-sg]").forEach(b=>b.onclick=()=>startSign(V.ix,b.dataset.sg,b.dataset.day,b.dataset.part));
+  document.querySelectorAll("[data-ev]").forEach(b=>b.onclick=()=>{const [ix,ti]=b.dataset.ev.split(":").map(Number);evStart(ix,ti)});document.querySelectorAll("[data-bil]").forEach(b=>b.onclick=()=>evStart(+b.dataset.bil,-1));
+  document.querySelectorAll("[data-sup]").forEach(b=>b.onclick=()=>{const [ix,i]=b.dataset.sup.split(":").map(Number);supOpen(ix,i,b)});
+  if(V.v==="ev")evBind();if(V.v==="f")fphBind(V.ix);
   const sx=document.querySelector("[data-sgx]");if(sx)sx.onclick=()=>{if(!sx._a){sx._a=1;const t0=sx.textContent;sx.textContent="Quitter sans enregistrer ?";setTimeout(()=>{sx._a=0;sx.textContent=t0},4000);return}if(V.v==="bls"&&BS){const ix=BS.ix,bi=BS.bi;(BS.ph||[]).forEach(x=>PDB.rm(x.id).catch(()=>{}));BS=null;return nav(bi?{v:"list"}:{v:"it",ix})}const ix=SG?SG.ix:0;SG=null;nav({v:"f",ix})};
   const sx2=document.querySelector("[data-back2]");if(sx2)sx2.onclick=()=>{const ix=SG.ix;SG=null;nav({v:"f",ix})};
   document.querySelectorAll("[data-sgr]").forEach(b=>b.onclick=()=>{SG.i=+b.dataset.sgr;SG.recap=false;SG.res[SG.i]=null;view()});
@@ -951,15 +1045,15 @@ async function main(){
   document.querySelectorAll("[data-blns]").forEach(b=>b.onclick=()=>blNsAsk(+b.dataset.blns));
   document.querySelectorAll("[data-bls]").forEach(b=>b.onclick=async()=>{const ix=+b.dataset.bls;b.disabled=true;const P=await blImg(IT[ix].t);b.disabled=false;if(P)blStart(ix);else if(BS&&BS.ix===ix&&BS.noimg)blStart(ix,1);else blChoice(ix)});
   if(document.querySelector("[data-blim]"))fillImgs();
-  document.querySelectorAll("[data-pbo]").forEach(b=>b.onclick=()=>{const i=b.dataset.pbo,fm=document.getElementById("pbf"+i);fm.classList.toggle("hide");b.setAttribute("aria-expanded",fm.classList.contains("hide")?"false":"true");if(!fm.classList.contains("hide"))document.getElementById("pbt"+i).focus()});
+  document.querySelectorAll("[data-pbo]").forEach(b=>b.onclick=()=>{const i=b.dataset.pbo,fm=document.getElementById("pbf"+i),k=b.dataset.pbk||"pb",same=fm.dataset.kind===k;fm.dataset.kind=k;const lb=document.getElementById("pbl"+i);if(lb)lb.textContent=PBLBL[k]||PBLBL.pb;const sbt=fm.querySelector("[data-pbs]");if(sbt)sbt.className="btn "+(k==="rem"?"p":"dg");if(same)fm.classList.toggle("hide");else fm.classList.remove("hide");document.querySelectorAll(`[data-pbo="${i}"]`).forEach(z=>z.setAttribute("aria-expanded",!fm.classList.contains("hide")&&z.dataset.pbk===k?"true":"false"));if(!fm.classList.contains("hide"))document.getElementById("pbt"+i).focus()});
   document.querySelectorAll("[data-pbc]").forEach(b=>b.onclick=()=>{const i=b.dataset.pbc;document.getElementById("pbf"+i).classList.add("hide");document.querySelector('[data-pbo="'+i+'"]').setAttribute("aria-expanded","false")});
   document.querySelectorAll("[data-pbs]").forEach(b=>b.onclick=async()=>{const i=+b.dataset.pbs,f=D.f[i],ta=document.getElementById("pbt"+i),er=document.getElementById("pbe"+i),msg=ta.value.trim();er.textContent="";if(msg.length<3){er.textContent="Merci de décrire le problème en quelques mots.";ta.focus();return}
    b.disabled=true;b.textContent="Envoi en cours…";const now=new Date(),dl=now.getFullYear()+"-"+p2(now.getMonth()+1)+"-"+p2(now.getDate()),hl=p2(now.getHours())+":"+p2(now.getMinutes()),tsl=fds(dl)+" à "+hl;
-   const pl={t:"fp-pb",id:now.getTime().toString(36)+Math.random().toString(36).slice(2,6),n:f.n,iv:D.i||"",em:D.e||"",msg:msg.slice(0,2000),dl,hl},code="FPPB:"+b64u(pl),S2=[];
+   const rem=document.getElementById("pbf"+i).dataset.kind==="rem"?1:0,pl={t:"fp-pb",id:now.getTime().toString(36)+Math.random().toString(36).slice(2,6),n:f.n,iv:D.i||"",em:D.e||"",msg:msg.slice(0,2000),dl,hl,rem},code="FPPB:"+b64u(pl),S2=[];
    if(D.t)S2.push(sbDep(D.t,pl));
    const R2=await Promise.allSettled(S2),ok=R2.some(r=>r.status==="fulfilled");b.disabled=false;b.textContent="Envoyer à TOPAS informatique";
-   if(ok){const H=pbHist(f.n);H.push({msg,tsl});try{localStorage.setItem(PBK(f.n),JSON.stringify(H))}catch(e){}document.getElementById("pbh"+i).insertAdjacentHTML("beforeend",`<div class="pbok">✔ Problème envoyé le ${esc(tsl)} : TOPAS informatique est prévenu.</div>`);ta.value="";document.getElementById("pbf"+i).classList.add("hide")}
-   else{er.innerHTML=fbHtml(code,"⚠ Problème signalé – "+f.n+" – "+(D.i||""),"Bonjour,\n\n"+msg)}});
+   if(ok){const H=pbHist(f.n);H.push({msg,tsl,rem});try{localStorage.setItem(PBK(f.n),JSON.stringify(H))}catch(e){}document.getElementById("pbh"+i).insertAdjacentHTML("beforeend",`<div class="pbok">✔ ${rem?"Remarque envoyée":"Problème envoyé"} le ${esc(tsl)} : TOPAS informatique est prévenu.</div>`);ta.value="";document.getElementById("pbf"+i).classList.add("hide")}
+   else{er.innerHTML=fbHtml(code,(rem?"✎ Remarque – ":"⚠ Problème signalé – ")+f.n+" – "+(D.i||""),"Bonjour,\n\n"+msg)}});
   document.querySelectorAll("[data-ics]").forEach(b=>b.onclick=()=>{const f=D.f.find(x=>x.n===b.dataset.ics);if(!f)return;const bl=new Blob([ics(f)],{type:"text/calendar"}),a=document.createElement("a");a.href=URL.createObjectURL(bl);a.download=f.n+"-planning.ics";document.body.appendChild(a);a.click();setTimeout(()=>a.remove(),500)});
  }
  try{history.replaceState({v:{v:"list"}},"")}catch(e){}
@@ -973,6 +1067,18 @@ main();
 </script>
 <!-- Mention d'information RGPD (identique sur les 4 pages publiques ; texte modifiable dans TOPAS Formation › Gestionnaire › RGPD) -->
 <style>.rgpdm{max-width:820px;margin:18px auto 24px;padding:0 14px;font:12.5px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;color:#5b6475}.rgpdm details{margin-top:4px}.rgpdm summary{cursor:pointer;color:#12308f;font-weight:600;display:inline-block;min-height:24px}.rgpdm p{margin:4px 0}@media (max-width:700px){.rgpdm{font-size:14px}}@media print{.rgpdm{display:none}}.fbx{border:2px solid #dc2626;background:#fef2f2;border-radius:10px;padding:10px 12px;margin:10px 0;color:#1e293b;font-size:15px;line-height:1.45;text-align:left}.fbx p{margin:4px 0}.fbc{width:100%;box-sizing:border-box;font:12px/1.35 ui-monospace,Consolas,monospace;padding:8px;border:1px solid #cbd5e1;border-radius:8px;margin:6px 0;resize:vertical;word-break:break-all}.fbb{display:flex;gap:8px;flex-wrap:wrap}.fbbt{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 14px;border-radius:10px;border:1px solid #12308f;background:#fff;color:#12308f;font:600 15px system-ui,sans-serif;text-decoration:none;cursor:pointer}.fbgo{background:#12308f;color:#fff}</style>
+<style>/* écran d'une formation (31/10) : supports, évaluation sur le téléphone, bouton principal, compteur d'émargement */
+.ip-main{background:var(--ip-grad);color:#fff;border:0;box-shadow:0 8px 22px rgba(12,79,160,.22)}.ip-mainw{margin-top:10px}
+.ip-k{font-size:14px}.sup-r .sup-i{flex:none;font-size:24px;width:32px;text-align:center}.sup-r small.ko{font-size:14px}.sup-r .sup-st:empty{display:none}.sup-r .sup-st{flex-basis:100%;font-size:14px}
+.ev-q{padding:10px 0;border-top:1px solid var(--br)}.ev-t{font-weight:700;margin-bottom:8px}.ev-st{display:flex;gap:6px}
+.ev-s{flex:1;min-height:48px;font-size:26px;line-height:1;border:1.5px solid var(--ds-line,#d9dce6);border-radius:12px;background:var(--ds-card,#fff);color:#b45309;cursor:pointer}
+.ev-sc{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.ev-ro{display:flex;flex-direction:column;gap:8px}
+.ev-o{min-height:48px;padding:6px 10px;border:1.5px solid var(--ds-line,#d9dce6);border-radius:12px;background:var(--ds-card,#fff);color:var(--ds-tx,#1e293b);font:inherit;font-size:15px;font-weight:700;text-align:left;cursor:pointer;display:flex;align-items:center;gap:8px}.ev-o span{font-size:22px}
+.ev-o[aria-pressed=true],.ev-s[aria-pressed=true]{border-color:var(--ds-topas,#0c4fa0);background:var(--ds-p-topas,#eaf2ff);box-shadow:inset 0 0 0 1px var(--ds-topas,#0c4fa0)}
+.ip-evf input,.ip-evf textarea{width:100%;box-sizing:border-box;font:inherit;font-size:16px;padding:10px;border:1.5px solid var(--ds-line,#d9dce6);border-radius:12px;background:var(--ds-card,#fff);color:var(--ds-tx,#1e293b)}
+.sgcnt{text-align:center;margin-top:8px;font-size:14px}.sgav{margin:4px auto 0}.ip-2b{display:grid;grid-template-columns:1fr 1fr;gap:8px}.ip-2b .btn{margin:0}
+.ip-abs button{min-height:48px;padding:8px 12px;border:1.5px solid var(--ds-line,#d9dce6);border-radius:12px;background:var(--ds-card,#fff);color:var(--ds-tx,#1e293b);font:inherit;font-size:15px;font-weight:700;cursor:pointer}
+.task.ip-ev{padding:8px 0 8px 14px}.task.ip-evh{padding-bottom:4px}.task.ip-evh+.task.ip-ev{border-top:0}</style>
 <div class="rgpdm" id="rgpdm" role="contentinfo"></div>
 <script>
 (function(){
