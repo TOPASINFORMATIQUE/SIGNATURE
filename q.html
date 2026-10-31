@@ -140,7 +140,7 @@ let DEF={
   items:[
    {id:"soc",t:"Société",k:"text",pre:D.c||"",req:1},
    {id:"nom",t:"Nom Prénom / Fonction",k:"text",pre:((D.nm||"")+(D.fn?" / "+D.fn:"")),req:1},
-   {id:"hand",t:"Êtes-vous en situation de handicap ? Si oui nous reviendrons vers vous pour adapter la formation à vos besoins",k:"radio",o:["OUI","NON"],req:1},
+   {id:"amg",t:"Avez-vous besoin d’un aménagement particulier pour suivre cette formation (accessibilité, rythme, supports, matériel) ? Si oui, nous reviendrons vers vous pour l’organiser.",k:"radio",o:["OUI","NON"],req:1},
    {id:"niv",t:"Quel est votre niveau avant la formation ?",k:"radio",o:["Expert","Avancé","Intermédiaire","Débutant"],req:1},
    {id:"obj",t:"Quels sont vos objectifs principaux pour cette formation ?",k:"radio",o:["Approfondir mes connaissances existantes","Acquérir de nouvelles compétences","Améliorer mes performances professionnelles","Autre"],req:1},
    {id:"obj2",t:"Si « Autre », précisez",k:"text"},
@@ -157,7 +157,7 @@ let DEF={
    {id:"mat",t:"Matériel et conditions de la salle ou du poste de travail",k:"scale",o:SAT,req:1},
    {id:"obj",t:"Les objectifs de la formation ont-ils été atteints ?",k:"radio",o:["Oui, totalement","Oui, en grande partie","En partie","Non"],req:1},
    {id:"rec",t:"Recommanderiez-vous cette formation ?",k:"radio",o:["Oui","Non"],req:1},
-   {id:"han",t:"Si vous avez signalé une situation de handicap, la formation a-t-elle été adaptée à vos besoins ?",k:"radio",o:["Sans objet","Oui","Non"]},
+   {id:"han",t:"Si vous aviez demandé un aménagement, a-t-il été mis en place ?",k:"radio",o:["Sans objet","Oui","Non"]},
    {id:"pf",t:"Points forts de la formation",k:"area"},
    {id:"ame",t:"Axes d’amélioration / suggestions",k:"area"},
    {id:"bes",t:"Besoins de formation complémentaires",k:"area"}]},
@@ -265,7 +265,7 @@ async function submit(){if(PREV)return;const btn=$("#send"),err=$("#err");err.te
  const now=new Date(),p2=n=>String(n).padStart(2,"0"),dl=now.getFullYear()+"-"+p2(now.getMonth()+1)+"-"+p2(now.getDate()),hl=p2(now.getHours())+":"+p2(now.getMinutes());
  const cut=(s,n)=>String(s).slice(0,n);let lim=300,payload,body;
  for(;;){payload={t:"fp-q",q:K,n:D.n,ti:D.ti,nm:D.nm||"",dl,hl,tsl:fd(dl)+" à "+hl};
-  if(K==="auto"){payload.v={};ans.forEach(a=>{if(/^(soc|nom|hand|niv|obj|obj2|att|inf)$/.test(a[0].id))payload.v[a[0].id]=cut(a[1],lim)})}
+  if(K==="auto"){payload.v={};ans.forEach(a=>{if(/^(soc|nom|amg|hand|niv|obj|obj2|att|inf)$/.test(a[0].id))payload.v[a[0].id]=cut(a[1],lim)})}
   payload.a=ans.filter(a=>a[1]!=="").map(a=>[cut(a[0].t,90),cut(a[1],lim)]);
   if(PP){payload.v=String(D.v||"");payload.k={};ans.forEach(a=>{if(a[1])payload.k[a[0].id]=cut(a[1],lim)});if(D.em)payload.em=cut(D.em,120)}
   if(K==="veille"){const g=id=>(ans.find(a=>a[0].id===id)||[])[1]||"";payload.v=String(D.v);payload.ch=g("ch");payload.cm=cut(g("cm"),lim);if(!D.nm)payload.nm=cut(g("nm"),80);payload.em=cut(D.em||g("em"),120);delete payload.a}
