@@ -467,18 +467,23 @@ const strokeCompact=(strokes,max)=>{let th=2,out;for(;;){out=strokes.map(s=>{con
 // ===== Espace permanent « TOPAS Intervenants » : adresse …/intervenant.html?e=<jeton> sans aucune donnée ; les données à jour sont lues
 // à chaque ouverture par espace_lire (la base ne connaît que l'empreinte du jeton) ; dernière version gardée sur le téléphone pour l'usage hors connexion.
 // Lien réinitialisé ou inconnu : l'espace et sa copie locale sont effacés de ce téléphone (les signatures en attente d'envoi restent).
-const EK="fpiv:E",EDK="fpiv:E:D";let EJ="";
+const EK="fpiv:E",EDK="fpiv:E:D",DEVK="fpiv:dev";let EJ="";
+// identifiant d'appareil (31/10, onglet Sécurité) : code aléatoire créé une fois sur ce téléphone, jamais une donnée personnelle ; déclaré après chaque ouverture
+function devId(){let d=LS.get(DEVK,"");if(!/^[A-Za-z0-9_-]{8,40}$/.test(String(d||""))){const u=new Uint8Array(12);try{crypto.getRandomValues(u)}catch(e){for(let i=0;i<12;i++)u[i]=Math.floor(Math.random()*256)}d="t"+[...u].map(x=>x.toString(36).padStart(2,"0")).join("").slice(0,20);LS.set(DEVK,d)}return d}
 function espTok(){const q=new URLSearchParams(location.search),e=q.get("e");if(e&&/^[A-Za-z0-9_-]{32,80}$/.test(e)){LS.set(EK,e);return e}
  if(e!=null)return e;if(!q.get("l")&&!location.hash.replace(/^#/,"")){const s=LS.get(EK,"");if(s&&/^[A-Za-z0-9_-]{32,80}$/.test(s))return s}return ""}
 async function espLoad(tok){let j=null,net=false;
  try{const ac=window.AbortController?new AbortController():null,tm=setTimeout(()=>{try{ac&&ac.abort()}catch(e){}},9000);
   const r=await fetch(SBU+"/rest/v1/rpc/espace_lire",{method:"POST",headers:{apikey:SBK,"Content-Type":"application/json"},body:JSON.stringify({p_jeton:tok}),signal:ac?ac.signal:undefined,cache:"no-store"});clearTimeout(tm);j=r.ok?await r.json():null;net=!r.ok&&r.status>=500}
  catch(e){net=true}
- if(j&&j.ok&&j.data&&typeof j.data==="object"){const n=new Date(),at=p2(n.getDate())+"/"+p2(n.getMonth()+1)+" à "+p2(n.getHours())+":"+p2(n.getMinutes());LS.set(EDK,{at,tok,D:j.data});return{D:j.data,hors:""}}
- if(j&&j.ok===false&&j.etat){try{localStorage.removeItem(EDK);localStorage.removeItem(EK)}catch(e){}throw Object.assign(new Error("espace"),{etat:j.etat})}
+ if(j&&j.ok&&j.data&&typeof j.data==="object"){const n=new Date(),at=p2(n.getDate())+"/"+p2(n.getMonth()+1)+" à "+p2(n.getHours())+":"+p2(n.getMinutes());LS.set(EDK,{at,tok,D:j.data});
+  try{fetch(SBU+"/rest/v1/rpc/espace_appareil",{method:"POST",headers:{apikey:SBK,"Content-Type":"application/json"},body:JSON.stringify({p_jeton:tok,p_app:devId()})}).catch(()=>{})}catch(e){}return{D:j.data,hors:""}}
+ if(j&&j.ok===false&&j.etat){try{const c0=LS.get(EDK,null);if(c0&&c0.D&&c0.D.m&&!FB_MAIL)FB_MAIL=String(c0.D.m).trim()}catch(e){}try{localStorage.removeItem(EDK);localStorage.removeItem(EK);localStorage.removeItem("fpiv:D")}catch(e){}
+  if(j.etat==="bloque"){try{indexedDB.deleteDatabase("fpiv")}catch(e){}try{Object.keys(localStorage).filter(k=>/^fpiv:(E|D|inst)/.test(k)).forEach(k=>localStorage.removeItem(k))}catch(e){}}
+  throw Object.assign(new Error("espace"),{etat:j.etat})}
  const c=LS.get(EDK,null);if(c&&c.D&&c.tok===tok)return{D:c.D,hors:c.at||""};
  throw Object.assign(new Error("espace"),{etat:net||!j?"reseau":"erreur"})}
-function espDead(el,etat){const rs=etat==="reseau";document.title="TOPAS Intervenants";el.innerHTML='<div class="fc" id="espko"><h3>'+(rs?"📴 Pas de connexion":"🔒 Ce lien n’est plus actif")+'</h3><p>'+(rs?"Votre espace n’a pas encore été enregistré sur ce téléphone. Connectez-vous à Internet (Wi-Fi ou données mobiles) puis rouvrez-le : il restera ensuite disponible même sans réseau.":"Il a peut-être été réinitialisé (nouveau téléphone, téléphone perdu…) ou n’existe pas. Contactez TOPAS informatique pour recevoir votre nouvelle adresse personnelle"+(FB_MAIL?" : <a href=\"mailto:"+FB_MAIL+"\">"+FB_MAIL+"</a>":"")+".")+'</p>'+(rs?'<button type="button" class="btn" onclick="location.reload()">🔄 Réessayer</button>':"")+'</div>'}
+function espDead(el,etat){const rs=etat==="reseau",bq=etat==="bloque";document.title="TOPAS Intervenants";el.innerHTML='<div class="fc" id="espko"><h3>'+(rs?"📴 Pas de connexion":bq?"⛔ Accès bloqué":"🔒 Ce lien n’est plus actif")+'</h3><p>'+(bq?"Votre accès à cet espace a été désactivé par TOPAS informatique et sa copie a été retirée de ce téléphone. Contactez TOPAS informatique"+(FB_MAIL?" : <a href=\"mailto:"+FB_MAIL+"\">"+FB_MAIL+"</a>":"")+".":rs?"Votre espace n’a pas encore été enregistré sur ce téléphone. Connectez-vous à Internet (Wi-Fi ou données mobiles) puis rouvrez-le : il restera ensuite disponible même sans réseau.":"Il a peut-être été réinitialisé (nouveau téléphone, téléphone perdu…) ou n’existe pas. Contactez TOPAS informatique pour recevoir votre nouvelle adresse personnelle"+(FB_MAIL?" : <a href=\"mailto:"+FB_MAIL+"\">"+FB_MAIL+"</a>":"")+".")+'</p>'+(rs?'<button type="button" class="btn" onclick="location.reload()">🔄 Réessayer</button>':"")+'</div>'}
 async function main(){
  let D=null,hors="";EJ=espTok();
  if(EJ){try{const r=await espLoad(EJ);D=r.D;hors=r.hors}catch(e){espDead(app,e&&e.etat);return}
