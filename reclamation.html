@@ -10,7 +10,7 @@
 /* 30/10 : TOUJOURS en clair, quel que soit le réglage du téléphone (plus de mode sombre automatique) */
 html{color-scheme:light only;background-color:var(--bg)}
 
-:root{--bg:#eef3fa;--card:#fff;--tx:#1f2937;--mu:#5a6275;--br:#d6dfeb;--pr:#1e3a8a;--bl:#1565c0;--gr:#16a34a;--grd:#15803d;--sf:#f1f6fc;--ok:#157347;--ko:#b42318;--sel:#e8f6ed;--sh:0 4px 18px rgba(15,23,42,.08)}
+:root{--bg:#eef3fa;--card:#fff;--tx:#1f2937;--mu:#5a6275;--br:#d6dfeb;--pr:#1e3a8a;--bl:#1565c0;--gr:#15803d;--grd:#15803d;--sf:#f1f6fc;--ok:#157347;--ko:#b42318;--sel:#e8f6ed;--sh:0 4px 18px rgba(15,23,42,.08)}
 
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
@@ -175,6 +175,7 @@ try{fetch(SBU+"/rest/v1/rpc/mention_rgpd",{method:"POST",headers:{apikey:SBK,"Co
 })();
 </script>
 <style>/* lot 9 de l'audit (31/10) : au téléphone, textes ≥ 14 px */
+.top .ql{background:rgba(0,0,0,.22)} /* lot 6 : contraste ≥ 4,5:1 */
 @media (max-width:700px){.top .ql,.ql{font-size:14px}}
 </style>
 </body>
