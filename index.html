@@ -18,7 +18,7 @@ body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 system-ui,-appl
 h1{font-size:22px;margin:6px 0 2px;color:var(--pr)}
 h2{font-size:17px;margin:0 0 8px}
 .card{background:var(--card);border:1px solid var(--br);border-radius:12px;padding:16px;margin:12px 0}
-.supr{display:flex;gap:10px;align-items:center;padding:10px 0;border-top:1px solid var(--br)}.supr:first-child{border-top:0}.supi{font-size:24px;flex:none;width:32px;text-align:center}.supt{flex:1;min-width:0;overflow-wrap:anywhere}.supr .btn{flex:none;min-height:44px;padding:10px 14px}.sups:empty{display:none}
+.phf{margin:0;padding:12px 0;border-top:1px solid var(--br)}.phf:first-child{border-top:0}.phf figcaption{margin-top:6px;font-weight:700}.supr{display:flex;gap:10px;align-items:center;padding:10px 0;border-top:1px solid var(--br)}.supr:first-child{border-top:0}.supi{font-size:24px;flex:none;width:32px;text-align:center}.supt{flex:1;min-width:0;overflow-wrap:anywhere}.supr .btn{flex:none;min-height:44px;padding:10px 14px}.sups:empty{display:none}
 .mu{color:var(--mu);font-size:14px}
 .row{display:grid;grid-template-columns:150px 1fr;gap:6px 12px;margin:4px 0}
 .row b{color:var(--mu);font-weight:600}
@@ -187,10 +187,23 @@ function supPage(D){const app=$("#app"),id=new URLSearchParams(location.search).
    if(P.filter(Boolean).length<(+h.n||0))throw 0;const t=atob(P.join("")),by=new Uint8Array(t.length);for(let i=0;i<t.length;i++)by[i]=t.charCodeAt(i);const bl=new Blob([by],{type:h.type||"application/octet-stream"}),url=URL.createObjectURL(bl);
    const a2=document.createElement("a");a2.href=url;a2.download=h.nom||u.n||(u.t||"support");document.body.appendChild(a2);a2.click();setTimeout(()=>a2.remove(),2000);say("✔ Téléchargé")}
   catch(e){say("Support indisponible pour l’instant. Réessayez plus tard.")}b.disabled=false})}
+// 📷 Photos d'un bon (31/10) : lien court de type « ph » joint au mail « bon transmis au commercial » ; chaque photo est lue par photo_lire
+// (seulement les photos listées dans ce lien, tant qu'il est actif : 90 jours). Aucune donnée personnelle sur la page (numéro du bon, client, date).
+function phPage(D){const app=$("#app"),id=new URLSearchParams(location.search).get("l")||"",L=Array.isArray(D.L)?D.L:[];document.title="Photos du bon "+(D.n||"");
+ app.innerHTML=`<div class="card"><div class="mu">${esc(D.g||"")}</div><h1>📷 Photos du bon ${esc(D.n||"")}</h1><p style="margin:4px 0 0">${D.c?`<b>${esc(D.c)}</b>`:""}${D.d&&/^\d{4}-\d\d-\d\d$/.test(D.d)?` <span class="mu">· intervention du ${esc(D.d.split("-").reverse().join("/"))}</span>`:""}</p></div>
+ <div class="card">${L.length?L.map((u,i)=>`<figure class="phf" id="phf${i}"><div class="mu phs" role="status">⏳ Chargement…</div><figcaption>${esc(u.t||"Photo "+(i+1))}</figcaption></figure>`).join(""):"<p>Aucune photo pour ce bon.</p>"}
+ <p class="mu" style="margin:12px 0 0">Ce lien est réservé au destinataire du mail et reste valable 90 jours.${D.m?` Une question ? <a href="mailto:${esc(D.m)}">${esc(D.m)}</a>`:""}</p></div>`;
+ L.forEach(async(u,i)=>{const f=document.getElementById("phf"+i),st=f&&f.querySelector(".phs");if(!st)return;if(!u.cle||!id){st.textContent="Photo indisponible.";return}
+  try{let a=0,P=[],h=null;for(;;){const r=await fetch(SBU+"/rest/v1/rpc/photo_lire",{method:"POST",headers:{apikey:SBK,"Content-Type":"application/json"},body:JSON.stringify({p_lien:id,p_cle:u.cle,p_a:a,p_b:a+4})}),j=r.ok?await r.json():null;
+    if(!j||!j.ok){st.textContent=j&&j.etat==="expire"?"Ce lien a expiré.":"Photo indisponible pour l’instant. Réessayez plus tard.";return}h=j;(j.morceaux||[]).forEach(m=>{P[m.n]=m.b64});a+=5;if(a>=(+j.n||0))break}
+   if(P.filter(Boolean).length<(+h.n||0))throw 0;const t=atob(P.join("")),by=new Uint8Array(t.length);for(let k=0;k<t.length;k++)by[k]=t.charCodeAt(k);const url=URL.createObjectURL(new Blob([by],{type:h.type||"image/jpeg"}));
+   st.outerHTML=`<a href="${url}" download="${esc(h.nom||"photo-"+(i+1)+".jpg")}"><img src="${url}" alt="${esc(u.t||"Photo "+(i+1))}" style="max-width:100%;border-radius:10px;display:block"></a>`}
+  catch(e){st.textContent="Photo indisponible pour l’instant. Réessayez plus tard."}})}
 let D=null;
 try{D=await lnLoad()||await load(location.hash.replace(/^#/,""))}catch(e){if(e&&e.lien){lnDead($("#app"),e.lien);return}D=null}
 if(D&&typeof D==="object"&&D.m)FB_MAIL=String(D.m).trim();
 if(D&&D.k==="sup"){supPage(D);return}
+if(D&&D.k==="ph"){phPage(D);return}
 const app=$("#app");
 if(!D||!D.n||!D.g){app.innerHTML='<div class="card"><h1>Lien incomplet</h1><p>Ce lien de signature est incomplet ou a été modifié. Merci de rouvrir le lien reçu par e-mail, tel quel, ou de contacter l’organisme de formation.</p></div>';return}
 const plan=D.k==="plan",dev=D.k==="dev",ro=!!D.ro,G=D.g,C=D.c||D.cl||["","",""],tr=D.tr||[];
