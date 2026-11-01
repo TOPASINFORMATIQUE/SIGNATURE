@@ -1,8 +1,8 @@
 // TOPAS Intervenants : l'espace s'ouvre même sans réseau. Seuls l'espace (intervenant.html) et ses images sont gardés sur le téléphone ;
 // la page est toujours redemandée au réseau d'abord (version à jour), la copie ne sert qu'hors connexion. Les données de la personne
 // ne passent jamais par ici (elles sont gardées par la page elle-même) ; les autres pages publiques ne sont pas touchées.
-// Version du cache (C) : à changer à chaque nouvelle présentation de la page ; l’ancienne copie est effacée à l’activation (topas-iv-14 : stagiaires d’abord puis formateur, acquis par onglets, bilan en trois champs, 01/11).
-const C="topas-iv-14",F=["intervenant.html","logo.jpg","icon-192.png","icon-512.png","apple-touch-icon.png","favicon-32.png","manifest.webmanifest"];
+// Version du cache (C) : à changer à chaque nouvelle présentation de la page ; l’ancienne copie est effacée à l’activation (topas-iv-15 : données de l’appareil (effacer, purge 30 j), brouillons acquis / bilan, dossier clôturé en lecture seule, 01/11).
+const C="topas-iv-15",F=["intervenant.html","logo.jpg","icon-192.png","icon-512.png","apple-touch-icon.png","favicon-32.png","manifest.webmanifest"];
 self.addEventListener("install",e=>{e.waitUntil(caches.open(C).then(c=>c.addAll(F)).catch(()=>{}).then(()=>self.skipWaiting()))});
 self.addEventListener("activate",e=>{e.waitUntil(caches.keys().then(K=>Promise.all(K.filter(k=>k.startsWith("topas-iv-")&&k!==C).map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});
 self.addEventListener("fetch",e=>{const r=e.request;if(r.method!=="GET")return;const u=new URL(r.url);if(u.origin!==location.origin)return;
