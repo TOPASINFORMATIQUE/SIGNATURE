@@ -938,19 +938,70 @@ const hMin=h=>{const m=/^(\d\d):(\d\d)$/.exec(String(h||""));return m?(+m[1])*60
  const EVS=(f,ti)=>recs(f.n).filter(r=>r.kd==="ev"&&r.ti===ti).sort((a,b)=>String(b.dl+b.hl).localeCompare(String(a.dl+a.hl)))[0]||null;
  const BIL=f=>recs(f.n).filter(r=>r.kd==="bil").sort((a,b)=>String(b.dl+b.hl).localeCompare(String(a.dl+a.hl)))[0]||null;
  const evOn=f=>{const d=DS(f);return !!d.length&&d[d.length-1]<=T}; // évaluations et bilan possibles dès le dernier jour
- function mainAct(f,ix){const s=stat(f),sl=SLOTS(f),hr=new Date().getHours(),tr=f.tr||[];
+ // ===== ÉCRAN D'UNE FORMATION SIMPLIFIÉ + ✅ ÉVALUATION DES ACQUIS (31/10) =====
+ // Bloc « À faire signer » = 3 lignes : Émargements (ronds par demi-journée, « ✍ Signer » ouvre la demi-journée en cours ou la prochaine),
+ // Évaluation des acquis (grisée tant que le dernier émargement n'est pas validé ; stagiaire par stagiaire, objectifs du dossier sinon du
+ // programme, « Acquis / En partie / Non acquis », commentaire, reprise, hors connexion ; dépôt « fp-sign » k:"acq" par stagiaire),
+ // Bilan du formateur (grisé jusqu'à l'évaluation des acquis, réponse « objectifs atteints » proposée d'après les acquis). Plus d'évaluation
+ // de fin de stage sur le téléphone : la satisfaction est envoyée par mail par TOPAS Formation. Aucune donnée de santé.
+ const ACQL={a:"✓ Acquis",p:"◐ En partie",n:"Non acquis"};
+ const sigSvgP=sg=>{let d="";String(sg||"").split(";").forEach(st=>{const P=st.split(",").map(q=>q.split(".").map(v=>parseInt(v,36))).filter(q=>q.length===2&&!isNaN(q[0])&&!isNaN(q[1]));if(!P.length)return;if(P.length===1)P.push([P[0][0]+1,P[0][1]]);d+="M"+P.map(q=>q[0]+" "+q[1]).join("L")});return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 140" class="emsvg" aria-hidden="true"><path d="${d}" fill="none" stroke="#12308f" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`};
+ const acqRec=(f,ti)=>recs(f.n).filter(r=>r.kd==="acq"&&r.ti===ti).sort((a,b)=>String(b.dl+b.hl).localeCompare(String(a.dl+a.hl)))[0]||null;
+ // état d'un stagiaire : évalué sur ce téléphone (reprise possible, envoi en attente ou fait), sinon résultat déjà connu de TOPAS (f.acq)
+ const acqSt=(f,ti)=>{const r=acqRec(f,ti);if(r)return{src:"tel",r,abs:!!r.abs,pend:!!pend(r.id)};const k=f.acq&&f.acq.tr&&f.acq.tr[ti];return k&&(k.abs||(Array.isArray(k.r)&&k.r.length))?{src:"topas",r:k,abs:!!k.abs,pend:false}:null};
+ // toutes les demi-journées sont signées (dernier jour compris), ici ou déjà reçues par TOPAS
+ const acqReq=f=>(f.cl||[]).some(z=>z[0]==="acq")||!!(f.acq&&f.acq.tr&&Object.keys(f.acq.tr).length)||(f.tr||[]).some((t,i)=>acqRec(f,i));
+ const emgAll=f=>{const sl=SLOTS(f);return (!!sl.length&&sl.every(o=>emState(f,o)))||(f.cl||[]).some(z=>z[0]==="emarg"&&z[1])};
+ // absent à TOUTE la formation (noté absent sur chaque demi-journée signée sur ce téléphone) → « non évalué · absent »
+ const absAll=(f,ti)=>{const nm=String(((f.tr||[])[ti]||[])[0]||"").trim(),sl=SLOTS(f);if(!nm||!sl.length)return false;return sl.every(o=>{const x=emState(f,o);return x&&Array.isArray(x.r.e)&&x.r.e.some(e=>e.nm===nm&&e.abs)})};
+ const acqNext=f=>(f.tr||[]).findIndex((t,i)=>!acqSt(f,i)),acqCnt=f=>(f.tr||[]).filter((t,i)=>acqSt(f,i)).length,acqDone=f=>{const tr=f.tr||[];return !!tr.length&&tr.every((t,i)=>acqSt(f,i))};
+ const acqSum=(r,n)=>{const R=(r&&r.r)||[];let a=0,p=0,x=0;R.forEach(v=>{if(v==="a")a++;else if(v==="p")p++;else if(v==="n")x++});return{a,p,n:x,e:Math.max(0,n-a-p-x)}};
+ const acqSumTxt=u=>`${u.a} acquis · ${u.p} en partie · ${u.n} non acquis${u.e?" · "+u.e+" à évaluer":""}`;
+ // bilan du formateur : réponse « Objectifs pédagogiques atteints par le groupe » proposée d'après les acquis (modifiable)
+ const acqGroup=f=>{const n=(f.ob2||[]).length;let a=0,t=0;(f.tr||[]).forEach((x,i)=>{const s=acqSt(f,i);if(!s||s.abs)return;const u=acqSum(s.r,n);a+=u.a+u.p/2;t+=u.a+u.p+u.n});if(!t)return"";const q=a/t;return q>=0.95?"Totalement":q>=0.7?"En grande partie":q>=0.35?"En partie":"Non atteints"};
+ let AQ=null;
+ function acqStart(ix,ti){const f=D.f[ix];if(!f||!(f.tr||[]).length)return;ti=Math.max(0,Math.min((f.tr||[]).length-1,+ti||0));const st=acqSt(f,ti),ob=f.ob2||[];
+  AQ={ix,ti,r:st&&st.r&&Array.isArray(st.r.r)?ob.map((o,k)=>st.r.r[k]||""):ob.map(()=>""),c:(st&&st.r&&st.r.c)||"",abs:st?!!st.abs:absAll(f,ti),done:null};nav({v:"acq"})}
+ function acqView(){if(!AQ)return listView();const f=D.f[AQ.ix],tr=f.tr||[],t=tr[AQ.ti]||[],ob=f.ob2||[],n=tr.length,au=(f.au||[])[AQ.ti],sum=acqSum({r:AQ.r},ob.length),last=AQ.ti>=n-1;
+  if(AQ.done)return `<div class="fc s-auj sgc"><h3>${AQ.done.pending?"⏳ Enregistré, envoi en attente":"✔ Évaluation terminée"}</h3><p>${n} stagiaire${n>1?"s":""}${AQ.done.abs?" dont "+AQ.done.abs+" absent"+(AQ.done.abs>1?"s":""):""}. TOPAS informatique reçoit les résultats : document rempli, certificats, bilan.</p><p class="mu">${AQ.done.pending?"Pas de connexion pour l’instant : l’envoi se fera tout seul au retour du réseau.":"Vous pouvez revoir ou corriger une évaluation depuis la formation."}</p><div class="btns"><button type="button" class="btn p" data-aqx2>← Retour à la formation</button></div></div><div id="qbn">${bannerHtml()}</div>`;
+  return `<div class="sgh"><button type="button" class="btn" data-aqx>← Quitter</button><div class="sgp">Évaluation des acquis · ${AQ.ti+1} / ${n}</div></div>
+  <div class="fc s-clo sgc ip-aq"><div class="num">${esc(f.t)} · N° ${esc(f.n)}</div><div class="sgw">Stagiaire</div><div class="nm2">${esc(t[0]||"Stagiaire "+(AQ.ti+1))}</div>${t[1]?`<div class="mu" style="text-align:center">${esc(t[1])}</div>`:""}
+  ${au&&(au[0]||au[1])?`<div class="aqau">📝 Avant la formation : ${au[0]?"niveau <b>"+esc(au[0])+"</b>":""}${au[0]&&au[1]?" · ":""}${au[1]?"objectif « "+esc(au[1])+" »":""}</div>`:""}
+  ${AQ.abs?`<div class="aqabs"><b>🚫 Absent(e) à toute la formation</b><br>Résultat : <b>non évalué · absent</b>. ${last?"Touchez « Terminer » pour enregistrer.":"Passez au stagiaire suivant."}<div class="btns" style="margin-top:8px"><button type="button" class="btn" data-aqpres>Finalement présent(e) : évaluer</button></div></div>`:
+  `${ob.length?ob.map((o,k)=>`<div class="aq" data-aqk="${k}"><div class="aqt">${k+1}. ${esc(o)}</div><div class="aqb" role="group" aria-label="Objectif ${k+1}">${["a","p","n"].map(v=>`<button type="button" class="aqo ${v}" data-aqv="${v}" aria-pressed="${AQ.r[k]===v}">${ACQL[v]}</button>`).join("")}</div></div>`).join(""):'<p class="mu">Aucun objectif n’est défini pour cette formation : indiquez simplement un commentaire.</p>'}
+  <label class="aqc">Commentaire <small class="mu">(facultatif)</small><textarea id="aqc" rows="2" maxlength="400">${esc(AQ.c)}</textarea></label>
+  <div class="aqsum" id="aqsum">${acqSumTxt(sum)}</div>`}
+  <div class="pberr" id="aqe" role="alert"></div><div class="btns"><button type="button" class="btn gn big2" id="aqgo">${last?"✔ Terminer":"Stagiaire suivant ›"}</button></div><p class="mu" style="font-size:14px">Un objectif non évalué reste « à évaluer » : rien n’est bloquant. Enregistré sur ce téléphone, envoyé dès que possible.</p></div>`}
+ function acqSave(){const f=D.f[AQ.ix],t=(f.tr||[])[AQ.ti]||[],now=nowS(),rid=Date.now().toString(36)+Math.random().toString(36).slice(2,6),ob=(f.ob2||[]).map(o=>String(o).slice(0,120)),rf=sigRef();
+  const r=AQ.abs?[]:AQ.r.map(v=>["a","p","n"].includes(v)?v:""),c=AQ.abs?"":String(AQ.c||"").trim().slice(0,400);
+  const p={t:"fp-sign",k:"acq",n:f.n,id:rid,rf,ti:AQ.ti,nm:String(t[0]||"").slice(0,80),r,c,abs:AQ.abs?1:0,ob,tot:(f.tr||[]).length,dl:now.dl,hl:now.hl,iv:D.i||""};
+  const R=recs(f.n);R.push({id:rid,kd:"acq",ti:AQ.ti,nm:p.nm,r,c,abs:p.abs,dl:now.dl,hl:now.hl});
+  if(!LS.set(RK(f.n),R)||!enqueue([p])){const e=document.getElementById("aqe");if(e)e.textContent="Impossible d’enregistrer sur ce téléphone (mémoire pleine ou navigation privée). Rien n’a été envoyé.";return false}return true}
+ function acqBind(){if(!AQ)return;const f=D.f[AQ.ix];
+  document.querySelectorAll(".aq").forEach(w=>{const k=+w.dataset.aqk;w.querySelectorAll("[data-aqv]").forEach(b=>b.onclick=()=>{AQ.r[k]=AQ.r[k]===b.dataset.aqv?"":b.dataset.aqv;w.querySelectorAll("[data-aqv]").forEach(z=>z.setAttribute("aria-pressed",String(z.dataset.aqv===AQ.r[k])));const s=document.getElementById("aqsum");if(s)s.textContent=acqSumTxt(acqSum({r:AQ.r},(f.ob2||[]).length))})});
+  const c=document.getElementById("aqc");if(c)c.oninput=()=>{AQ.c=c.value};
+  const pr=document.querySelector("[data-aqpres]");if(pr)pr.onclick=()=>{AQ.abs=false;view()};
+  const x=document.querySelector("[data-aqx]");if(x)x.onclick=()=>{const ix=AQ.ix;AQ=null;nav({v:"f",ix})};
+  const x2=document.querySelector("[data-aqx2]");if(x2)x2.onclick=()=>{const ix=AQ.ix;AQ=null;nav({v:"f",ix})};
+  const go=document.getElementById("aqgo");if(go)go.onclick=()=>{go.disabled=true;if(!acqSave()){go.disabled=false;return}const tr=f.tr||[],k=tr.findIndex((t,i)=>i>AQ.ti&&!acqSt(f,i));
+   if(k>=0){acqStart(AQ.ix,k);return}const k2=tr.findIndex((t,i)=>!acqSt(f,i));if(k2>=0&&k2!==AQ.ti){acqStart(AQ.ix,k2);return}
+   const ab=tr.filter((t,i)=>{const s=acqSt(f,i);return s&&s.abs}).length;AQ.done={pending:true,abs:ab};view();window.scrollTo(0,0);flush().then(()=>{if(AQ&&AQ.done){AQ.done.pending=tr.some((t,i)=>{const s=acqSt(f,i);return s&&s.pend});view()}})}}
+ function mainAct(f,ix){const sl=SLOTS(f),hr=new Date().getHours(),tr=f.tr||[];
   const late=sl.filter(o=>o.day<T&&!emState(f,o)),tod=sl.filter(o=>o.day===T&&!emState(f,o));
   if(late.length)return `<button type="button" class="btn big2 ip-main" data-sg="em" data-day="${late[0].day}" data-part="${late[0].part}">✍ Faire signer l’émargement du ${esc(fdm(late[0].day))} (${PARTL[late[0].part].toLowerCase()})</button>`;
   if(tod.length){const o=tod.find(x=>x.part===(hr<13?"m":"a"))||tod[0];return `<button type="button" class="btn big2 ip-main" data-sg="em" data-day="${o.day}" data-part="${o.part}">✍ Faire signer l’émargement de ${o.part==="m"?"ce matin":"cet après-midi"}</button>`}
-  if(evOn(f)){const k=tr.filter((t,i)=>!(t[2]||EVS(f,i))).length;if(k&&D.qd&&D.qd.post)return `<button type="button" class="btn big2 ip-main" data-ev="${ix}:${tr.findIndex((t,i)=>!(t[2]||EVS(f,i)))}">📝 Évaluation de fin de stage (${k} restante${k>1?"s":""})</button>`;
-   const bil=(f.cl||[]).find(z=>z[0]==="bilan");if(!(bil&&bil[1])&&!BIL(f)&&D.qd&&D.qd.bilan)return `<button type="button" class="btn big2 ip-main" data-bil="${ix}">📝 Remplir mon bilan</button>`}
+  if(emgAll(f)&&tr.length&&acqReq(f)&&!acqDone(f)){const k=tr.filter((t,i)=>!acqSt(f,i)).length,an=acqNext(f);return `<button type="button" class="btn big2 ip-main" data-acq="${ix}:${an<0?0:an}">✅ Évaluation des acquis (${k} stagiaire${k>1?"s":""} restant${k>1?"s":""})</button>`}
+  if(acqDone(f)||(emgAll(f)&&(!tr.length||!acqReq(f)))){const bil=(f.cl||[]).find(z=>z[0]==="bilan");if(!(bil&&bil[1])&&!BIL(f)&&D.qd&&D.qd.bilan)return `<button type="button" class="btn big2 ip-main" data-bil="${ix}">📝 Remplir mon bilan</button>`}
   return ""}
- function formView(ix){const f=D.f[ix];if(!f)return listView();const s=stat(f),sl=SLOTS(f),sd=scToday(f),tr=f.tr||[],evOk=evOn(f),qd=!!(D.qd&&D.qd.post),ma=mainAct(f,ix);
-  const items=sl.map(o=>{const x=emState(f,o),fut=o.day>T;return `<div class="task"><span>✍ Émargement · ${esc(fdm(o.day))}<br><small class="mu">${PARTL[o.part]} · ${PARTH[o.part]}</small></span>${x?stTxt(x):`<span class="mu">${fut?"À partir du "+esc(dm(o.day)):"À faire"}</span>`}<button type="button" class="btn ${x||fut?"":"p"}" data-sg="em" data-day="${o.day}" data-part="${o.part}" ${fut?"disabled":""}>${x?"Refaire":"✍ Signer"}</button></div>`}).join("");
-  const evs=tr.length?`<div class="task ip-evh"><span>📝 Évaluation de fin de stage<br><small class="mu">${qd?(evOk?"Chaque stagiaire répond sur ce téléphone, ou plus tard en ligne (mail).":"Dès le dernier jour de la formation, sur ce téléphone ou en ligne."):"Envoyée par mail à chaque stagiaire."}</small></span></div>`+tr.map((t,i)=>{const on=!!t[2],r=EVS(f,i),pd=r&&pend(r.id);
-   return `<div class="task ip-ev"><span>${esc(t[0]||"Stagiaire "+(i+1))}</span>${on?'<span class="ok">✔ Répondu en ligne</span>':r?`<span class="${pd?"wt":"ok"}">${pd?"⏳":"✔"} Répondu le ${esc(dm(r.dl))}${pd?" · en attente d’envoi":""}</span>`:evOk&&qd?`<button type="button" class="btn p" data-ev="${ix}:${i}">📝 Répondre</button>`:'<span class="mu">Après la formation</span>'}</div>`}).join(""):"";
-  const bil=(f.cl||[]).find(z=>z[0]==="bilan"),br=BIL(f),bpd=br&&pend(br.id);
-  const itemB=`<div class="task"><span>📝 Bilan de la formation<br><small class="mu">Après la fin de la formation</small></span>${bil&&bil[1]?'<span class="ok">✔ Reçu, merci</span>':br?`<span class="${bpd?"wt":"ok"}">${bpd?"⏳":"✔"} Rempli le ${esc(dm(br.dl))}${bpd?" · en attente d’envoi":""}</span>`:!evOk?'<span class="mu">Après la formation</span>':D.qd&&D.qd.bilan?`<button type="button" class="btn gn" data-bil="${ix}">📝 Remplir mon bilan</button>`:f.bl?`<a class="btn gn" href="${esc(f.bl)}" target="_blank" rel="noopener">📝 Remplir mon bilan</a>`:'<span class="mu">Le lien vous sera envoyé par mail.</span>'}</div>`;
+ function formView(ix){const f=D.f[ix];if(!f)return listView();const s=stat(f),sl=SLOTS(f),sd=scToday(f),tr=f.tr||[],ma=mainAct(f,ix),sup=Array.isArray(f.sup)?f.sup:[];
+  const sg=sl.filter(o=>emState(f,o)).length,cur=sl.find(o=>o.day===T&&!emState(f,o))||sl.find(o=>o.day<T&&!emState(f,o))||sl.find(o=>!emState(f,o))||null;
+  const dots=sl.map(o=>{const x=emState(f,o),k=x?"ok":cur&&o.day===cur.day&&o.part===cur.part?"cur":"";return `<span class="emd${k?" "+k:""}" title="${esc(fdm(o.day))} · ${PARTL[o.part]}"></span>`}).join("");
+  const pd=sl.filter(o=>{const x=emState(f,o);return x&&!x.sent}).length,emSub=!sl.length?"Aucune date":`${sg} demi-journée${sg>1?"s":""} signée${sg>1?"s":""} sur ${sl.length}`+(pd?" · "+pd+" en attente d’envoi":"")+(cur?cur.day===T?" · "+(cur.part==="m"?"ce matin":"cet après-midi")+" : à signer":cur.day<T?" · "+esc(fdm(cur.day))+" : en retard":" · prochaine : "+esc(fdm(cur.day)):" · tout est signé");
+  const emB=cur?`<button type="button" class="btn${cur.day<=T?" p":""}" data-sg="em" data-day="${cur.day}" data-part="${cur.part}" ${cur.day>T?"disabled":""}>✍ Signer</button>`:sl.length?'<span class="ok">✔ Tout signé</span>':"";
+  const emOk=emgAll(f),an=acqNext(f),ac=acqCnt(f),aDone=acqDone(f),aPend=tr.some((t,i)=>{const x=acqSt(f,i);return x&&x.pend}),nO=(f.ob2||[]).length;
+  const acqB=!tr.length?'<span class="mu">Aucun stagiaire</span>':!acqReq(f)?'<span class="mu">Non demandée pour cette formation</span>':aDone?`<span class="${aPend?"wt":"ok"}">${aPend?"⏳ Terminée · en attente d’envoi":"✔ Terminée"}</span><button type="button" class="btn" data-acq="${ix}:0">Revoir</button>`:emOk?`<button type="button" class="btn p" data-acq="${ix}:${an<0?0:an}">▶ ${ac?"Continuer · "+ac+" / "+tr.length:"Commencer"}</button>`:'<span class="mu">Après le dernier émargement</span>';
+  const bil=(f.cl||[]).find(z=>z[0]==="bilan"),br=BIL(f),bpd=br&&pend(br.id),bilOk=!!(bil&&bil[1])||!!br,bilOpen=aDone||(emOk&&(!tr.length||!acqReq(f)));
+  const bilB=bil&&bil[1]?'<span class="ok">✔ Reçu, merci</span>':br?`<span class="${bpd?"wt":"ok"}">${bpd?"⏳":"✔"} Rempli le ${esc(dm(br.dl))}${bpd?" · en attente d’envoi":""}</span>`:!bilOpen?'<span class="mu">Après l’évaluation des acquis</span>':D.qd&&D.qd.bilan?`<button type="button" class="btn gn" data-bil="${ix}">📝 Remplir mon bilan</button>`:f.bl?`<a class="btn gn" href="${esc(f.bl)}" target="_blank" rel="noopener">📝 Remplir mon bilan</a>`:'<span class="mu">Le lien vous sera envoyé par mail.</span>';
   return `<header class="ip-hd"><button type="button" class="ip-back" data-back>‹ Retour</button><div class="ip-k">Formation · ${SL2[s]}</div><div class="ip-num ip-num2">${esc(f.t)}</div><div class="ip-sub">${esc(f.c)} · N° ${esc(f.n)}</div></header>
   <div id="qbn">${bannerHtml()}</div>
   <div class="fc s-${s}"><div class="cli">${esc(f.c)}</div>
@@ -958,14 +1009,20 @@ const hMin=h=>{const m=/^(\d\d):(\d\d)$/.exec(String(h||""));return m?(+m[1])*60
    ${lieu(f,1)}${ctLine(f,1)}
    <div class="ln"><i>☎</i><div><b>TOPAS informatique</b>${D.m?`<br><a href="mailto:${esc(D.m)}">✉ ${esc(D.m)}</a>`:""}${G[1]?`<br><a href="tel:${esc(G[1].replace(/\s/g,""))}">☎ ${esc(G[1])}</a>`:""}</div></div>
    ${ma?`<div class="btns ip-mainw">${ma}</div>`:""}<div class="btns"><button type="button" class="btn" data-ics="${esc(f.n)}">📅 Ajouter à mon agenda</button></div></div>
-  <section class="sec" style="--c:var(--bl)"><h2>📄 À consulter</h2><div class="fc s-venir">
-   <details ${sd?"open":""}><summary>📋 Déroulé d’intervention${sd?" (jour en cours en premier)":""}</summary><div class="pan">${sd||""}${scAll(f)||"<div class='mu'>Aucun déroulé détaillé pour cette formation.</div>"}</div></details>
-   ${(f.pg||[]).length?`<details><summary>📘 Programme</summary><div class="pan">${progH(f)}</div></details>`:""}
-   <details><summary>📅 Planification</summary><div class="pan">${DS(f).map(x=>{const t=slot(f,x);return `<div class="tl"><b>${esc(fdm(x))}</b><span>${esc(t[2])}</span></div>`}).join("")||"À définir"}<div class="mu" style="margin-top:6px">${esc(f.h)} h au total${f.j?" · "+esc(f.j)+" jour"+(+f.j>1?"s":""):""}</div></div></details>
-   <details><summary>👥 Stagiaires (${tr.length})</summary><div class="pan">${trList(f)}</div></details>
-   ${f.sp&&!(f.sup||[]).length?`<div class="btns"><a class="btn" href="${esc(f.sp)}" target="_blank" rel="noopener">📚 Support de cours</a></div>`:""}</div></section>
-  ${supSec(f,ix)}
-  <section class="sec" style="--c:var(--or)"><h2>✍ À faire signer</h2><div class="fc s-clo" style="padding:6px 16px">${items}${evs}${itemB}</div></section>
+  <section class="sec ip-cons" style="--c:var(--bl)"><div class="fc s-venir ip-cl">
+   <details class="ip-cd" id="cons${ix}"><summary class="ip-cs"><span>📋 À consulter</span><small class="mu">déroulé, programme, planification, stagiaires · consultation seule</small></summary><div class="pan">
+    <details ${sd?"open":""}><summary>📋 Déroulé d’intervention${sd?" (jour en cours en premier)":""}</summary><div class="pan">${sd||""}${scAll(f)||"<div class='mu'>Aucun déroulé détaillé pour cette formation.</div>"}</div></details>
+    ${(f.pg||[]).length?`<details><summary>📘 Programme</summary><div class="pan">${progH(f)}</div></details>`:""}
+    <details><summary>📅 Planification</summary><div class="pan">${DS(f).map(x=>{const t=slot(f,x);return `<div class="tl"><b>${esc(fdm(x))}</b><span>${esc(t[2])}</span></div>`}).join("")||"À définir"}<div class="mu" style="margin-top:6px">${esc(f.h)} h au total${f.j?" · "+esc(f.j)+" jour"+(+f.j>1?"s":""):""}</div></div></details>
+    <details><summary>👥 Stagiaires (${tr.length})</summary><div class="pan">${trList(f)}</div></details>
+    ${f.sp&&!sup.length?`<div class="btns"><a class="btn" href="${esc(f.sp)}" target="_blank" rel="noopener">📚 Support de cours</a></div>`:""}</div></details>
+   ${sup.length?`<details class="ip-cd" id="sups${ix}"><summary class="ip-cs"><span>📚 Supports de cours <span class="ip-gn n">${sup.length}</span></span><small class="mu">disponibles sans connexion une fois ouverts</small></summary><div class="pan ip-supl">${sup.map((u,i)=>supRow(u,f,i,ix)).join("")}</div></details>`:""}
+  </div></section>
+  <section class="sec" style="--c:var(--or)"><h2>✍ À faire signer</h2><div class="fc s-clo ip-l3w">
+   <div class="task ip-l3" id="l3em"><span class="ip-l3t">✍ Émargements<br><small class="mu">${emSub}</small><span class="emds" aria-hidden="true">${dots}</span></span>${emB}</div>
+   <div class="task ip-l3${emOk&&tr.length&&acqReq(f)?"":" dim"}" id="l3aq"><span class="ip-l3t">✅ Évaluation des acquis<br><small class="mu">par stagiaire · après le dernier émargement${nO?" · "+nO+" objectif"+(nO>1?"s":""):""}</small></span>${acqB}</div>
+   <div class="task ip-l3${bilOpen||bilOk?"":" dim"}" id="l3bil"><span class="ip-l3t">📝 Bilan du formateur<br><small class="mu">votre questionnaire · après l’évaluation des acquis</small></span>${bilB}</div>
+  </div></section>
   <div class="fc s-clo">${pbZone(f,ix)}${fphZone(f,ix)}</div>${foot()}`}
  // 📷 photos de la formation (31/10) : mêmes photos que sur les bons (réduites, gardées hors connexion, envoyées par espace_photo), rattachées au dossier
  const FPH={};const fphRec=n=>recs(n).filter(r=>r.kd==="fph");
@@ -991,7 +1048,7 @@ const hMin=h=>{const m=/^(\d\d):(\d\d)$/.exec(String(h||""));return m?(+m[1])*60
  // ===== 📝 ÉVALUATION DE FIN DE STAGE et BILAN sur le téléphone (31/10) : mêmes questions que la page en ligne (publiées par TOPAS Formation dans D.qd),
  // une réponse par stagiaire (« Passez le téléphone à … »), envoyée comme une réponse en ligne (dépôt fp-q, src « tel »), hors connexion possible.
  let EV=null;const EVSC={sat:[["😀","Très satisfaisant"],["🙂","Satisfaisant"],["😕","Peu satisfaisant"],["😞","Insatisfaisant"]],qual:[["😀","Très bien"],["🙂","Bien"],["😕","Moyen"],["😞","Insuffisant"]]};
- function evStart(ix,ti){const f=D.f[ix];if(!f)return;const kd=ti<0?"bilan":"post",q=D.qd&&D.qd[kd];if(!q||!Array.isArray(q.i))return;EV={ix,kd,ti,nm:kd==="bilan"?(D.i||"Formateur"):String(((f.tr||[])[ti]||[])[0]||"Stagiaire "+(ti+1)),q,A:{},done:null};nav({v:"ev"})}
+ function evStart(ix,ti){const f=D.f[ix];if(!f)return;const kd=ti<0?"bilan":"post",q=D.qd&&D.qd[kd];if(!q||!Array.isArray(q.i))return;EV={ix,kd,ti,nm:kd==="bilan"?(D.i||"Formateur"):String(((f.tr||[])[ti]||[])[0]||"Stagiaire "+(ti+1)),q,A:{},done:null};if(kd==="bilan"){const g=acqGroup(f);if(g)EV.A.obj=g}nav({v:"ev"})}
  const evQ=(q,v)=>{const id="evq_"+q.id;if(q.k==="star")return `<div class="ev-st" role="group" aria-label="${esc(q.t)}">${[1,2,3,4,5].map(n=>`<button type="button" class="ev-s" data-evv="${n}" aria-pressed="${String(v)===String(n)}" aria-label="${n} étoile${n>1?"s":""}">${+v>=n?"★":"☆"}</button>`).join("")}</div>`;
   if(q.k==="scale"){const SC=EVSC[q.p==="qual"?"qual":"sat"];return `<div class="ev-sc">${SC.map(o=>`<button type="button" class="ev-o" data-evv="${esc(o[1])}" aria-pressed="${v===o[1]}"><span aria-hidden="true">${o[0]}</span>${esc(o[1])}</button>`).join("")}</div>`}
   if(q.k==="radio")return `<div class="ev-ro">${(q.o||[]).map(o=>`<button type="button" class="ev-o" data-evv="${esc(o)}" aria-pressed="${v===o}">${esc(o)}</button>`).join("")}</div>`;
@@ -1038,7 +1095,28 @@ const hMin=h=>{const m=/^(\d\d):(\d\d)$/.exec(String(h||""));return m?(+m[1])*60
   ${SG.steps.map((s,i)=>{const r=SG.res[i];return `<div class="task"><span><b>${esc(s.nm)}</b>${s.tr?" <small class='mu'>(formateur)</small>":""}</span>${r?(r.abs?`<span class="ko">🚫 Absent${r.ab?" · "+esc(r.ab):""} · ${esc(r.h)}</span>`:`<span class="ok">✔ Signé · ${esc(r.h)}</span>`):'<span class="ko">Manquant</span>'}<button type="button" class="btn" data-sgr="${i}">Reprendre</button></div>`}).join("")}
   <div class="pberr" id="sge" role="alert"></div><div class="btns"><button type="button" class="btn gn big2" id="fin" ${SG.steps.every((s,k)=>SG.res[k])?"":"disabled"}>✔ Terminer la demi-journée${ab?" ("+ab+" absent"+(ab>1?"s":"")+")":""}</button></div></div>`};
  const doneScreen=()=>{const d=SG.done;return `<div class="fc s-auj sgc"><h3>${d.pending?"⏳ Enregistré, envoi en attente":"✔ Enregistré et transmis"}</h3><p>${SG.kd==="em"?`Émargement du <b>${esc(fdm(SG.day))}</b> (${PARTL[SG.part]}) : ${d.sig} signature${d.sig>1?"s":""}${d.abs?`, ${d.abs} absent${d.abs>1?"s":""}`:""}.`:"Déroulé d’intervention validé."}${d.rf?` <span class="mu">Référence ${esc(d.rf)}.</span>`:""}</p><p class="mu">${d.pending?"Pas de connexion pour l’instant : l’envoi se fera tout seul au retour du réseau. Gardez cette page dans votre téléphone.":"TOPAS informatique a reçu la feuille : elle est classée dans le dossier."}</p><div class="btns"><button type="button" class="btn p" data-back2>← Retour à la formation</button></div></div>`};
- function signView(){if(!SG)return listView();return `<div class="sgv">${SG.done?doneScreen():SG.recap?recapScreen():stepScreen()}</div><div id="qbn">${bannerHtml()}</div>`}
+ // ---- écran des émargements (31/10) : bandeau, pastilles des demi-journées (toucher = changer ; future non signable avant son jour),
+ // un cadre par personne (signé : « ✓ Signé à 14h02 » + tracé sur fond vert ; en cours : cadre bleu « Passez-lui le téléphone », bloc de
+ // signature à deux choix, « ↺ Effacer » du bloc, « Absent » ; sinon « À signer »), pied « n / N signé · fonctionne sans réseau » et
+ // « ✔ Valider cette demi-journée » (actif quand tous ont signé ou sont notés absents). Les dépôts restent les mêmes (un par personne).
+ const emScreen=()=>{const f=D.f[SG.ix],sl=SLOTS(f),n=SG.steps.length,sgn=SG.res.filter(r=>r&&!r.abs).length,ab=SG.res.filter(r=>r&&r.abs).length,all=SG.steps.every((s,k)=>SG.res[k]),prev=latest(f.n,"em",SG.day,SG.part);
+  const pills=sl.map(o=>{const x=emState(f,o),on=o.day===SG.day&&o.part===SG.part,fut=o.day>T;return `<button type="button" class="emp${x?" ok":""}${on?" on":""}" data-emgo="${o.day}:${o.part}" ${fut?"disabled":""} aria-pressed="${on}" ${fut?`title="Signable à partir du ${esc(dm(o.day))}"`:""}>${x?"✓ ":""}${esc(dm(o.day))}<small>${o.part==="m"?"matin":"a.-midi"}</small></button>`}).join("");
+  const frames=SG.steps.map((st,i)=>{const r=SG.res[i],cur=i===SG.i&&!r,who=`<b>${esc(st.nm)}</b>${st.tr?' <small class="mu">(formateur)</small>':""}`;
+   if(r&&!r.abs)return `<div class="emf ok" data-emf="${i}"><div class="emfh">${who}<span class="ok">✓ Signé à ${esc(String(r.h||"").replace(":","h"))}</span></div><div class="emsg">${sigSvgP(r.sg)}</div><div class="emfa"><button type="button" class="btn" data-sgr="${i}">↺ Reprendre</button></div></div>`;
+   if(r&&r.abs)return `<div class="emf ab" data-emf="${i}"><div class="emfh">${who}<span class="ko">🚫 Absent${r.ab?" · "+esc(r.ab):""}</span></div><div class="emfa"><button type="button" class="btn" data-sgr="${i}">↺ Reprendre</button></div></div>`;
+   if(cur)return `<div class="emf cur" data-emf="${i}"><div class="emfh">${who}<span class="wt">${st.tr?"Vous signez d’abord":"Passez-lui le téléphone"}</span></div><div id="emw"></div><div class="sgb sgb2">${st.tr?"<span></span>":'<button type="button" class="btn" id="abs">🚫 Absent</button>'}<button type="button" class="btn gn" id="val">✔ Valider</button></div><div class="pberr" id="sge" role="alert"></div></div>`;
+   return `<div class="emf" data-emf="${i}"><div class="emfh">${who}<span class="mu">À signer</span></div><div class="emfa"><button type="button" class="btn" data-sgr="${i}">✍ Signer</button></div></div>`}).join("");
+  return `<div class="sgh"><button type="button" class="btn" data-sgx>← Quitter</button><div class="sgp">Émargement · ${esc(dm(SG.day))} ${PARTL[SG.part].toLowerCase()}</div></div>
+  <div class="fc s-clo sgc ip-em"><div class="num"><b>${esc(f.t)}</b> · ${esc(f.c)}</div><div class="mu">${PARTH[SG.part]}${prev?" · déjà signée (version "+prev.v+") : valider à nouveau remplace la version précédente":""}</div>
+  <div class="emps" role="group" aria-label="Demi-journées">${pills}</div>
+  ${frames}
+  <div class="emft"><span class="sgcnt mu">${sgn} / ${n} signé${sgn>1?"s":""}${ab?" · "+ab+" absent"+(ab>1?"s":""):""} · fonctionne sans réseau</span><button type="button" class="btn gn big2" id="fin" ${all?"":"disabled"}>✔ Valider cette demi-journée</button></div></div>`};
+ function emBind(){if(!SG||SG.kd!=="em")return;document.querySelectorAll("[data-emgo]").forEach(b=>b.onclick=()=>{const [day,part]=b.dataset.emgo.split(":");if(day===SG.day&&part===SG.part)return;if(SG.res.some(Boolean)&&!b._a){b._a=1;const t0=b.innerHTML;b.textContent="Changer ? (signatures non validées perdues)";setTimeout(()=>{b._a=0;b.innerHTML=t0},4000);return}startSign(SG.ix,"em",day,part)});
+  const host=document.getElementById("emw");if(!host)return;const st=SG.steps[SG.i],W=SIGW.mount(host,{name:()=>st.nm,max:1300,label:"Signature de "+st.nm+", composée à partir de son prénom et de son nom."});
+  const next=()=>{const k=SG.steps.findIndex((z,i)=>!SG.res[i]);SG.i=k<0?SG.steps.length-1:k;view();const el=document.querySelector(".emf.cur")||document.getElementById("fin");if(el)el.scrollIntoView({block:"center"})};
+  const vb=document.getElementById("val");if(vb)vb.onclick=()=>{if(W.empty()){document.getElementById("sge").textContent=W.mode()==="draw"?"Signez dans le cadre, ou touchez « Absent » si la personne n’est pas là.":"Nom manquant : choisissez « ✏ Signer à la main ».";return}SG.res[SG.i]={nm:st.nm,sg:W.get(),sk:W.kind(),sm:W.how(),h:nowS().hl,tr:st.tr?1:0};next()};
+  SG._next=next;const ab=document.getElementById("abs");if(ab)ab.onclick=()=>absAsk(st)}
+ function signView(){if(!SG)return listView();return `<div class="sgv">${SG.done?doneScreen():SG.kd==="em"?emScreen():SG.recap?recapScreen():stepScreen()}</div><div id="qbn">${bannerHtml()}</div>`}
  function padInit(){const host=document.getElementById("emw");if(!host||!SG)return;const st=SG.steps[SG.i];
   const W=SIGW.mount(host,{name:()=>st.nm,max:1300,label:"Signature de "+st.nm+", composée à partir de son prénom et de son nom."});
   const next=()=>{if(SG.kd==="der")return finish();if(SG.steps.every((s,k)=>SG.res[k])||SG.i>=SG.steps.length-1){SG.recap=true;SG.i=SG.steps.length-1}else{SG.i=SG.res.findIndex((r,k)=>k>SG.i&&!r);if(SG.i<0)SG.i=SG.res.length}view();window.scrollTo(0,0)};
@@ -1048,24 +1126,26 @@ const hMin=h=>{const m=/^(\d\d):(\d\d)$/.exec(String(h||""));return m?(+m[1])*60
  function sigKTxt(k){return k==="manuscrite"?" · signature manuscrite":k==="simple"?" · signature électronique simple":""}
  function finish(){const f=D.f[SG.ix],now=nowS(),rid=Date.now().toString(36)+Math.random().toString(36).slice(2,6),ents=SG.res.map((r,i)=>r.abs?{nm:r.nm,abs:1,h:r.h,ab:r.ab||""}:{nm:r.nm,sg:r.sg,sk:r.sk||"",h:r.h,tr:r.tr?1:0}),prev=latest(f.n,SG.kd,SG.day,SG.part),v=(prev?prev.v:0)+1;
   const rf=sigRef(),pls=ents.map((e,i)=>({t:"fp-sign",k:"emg",kd:SG.kd,n:f.n,id:rid,rf,v,day:SG.day,part:SG.part,iv:D.i||"",tot:ents.length,i,dl:now.dl,hl:now.hl,e}));
-  const abs=ents.filter(e=>e.abs).length,R=recs(f.n);R.push({id:rid,kd:SG.kd,day:SG.day,part:SG.part,v,dl:now.dl,hl:now.hl,abs,n:ents.length});
+  const abs=ents.filter(e=>e.abs).length,R=recs(f.n);R.push({id:rid,kd:SG.kd,day:SG.day,part:SG.part,v,dl:now.dl,hl:now.hl,abs,n:ents.length,e:ents.map(e=>({nm:e.nm,abs:e.abs?1:0}))});
   if(!LS.set(RK(f.n),R)||!enqueue(pls)){const ee=document.getElementById("sge");if(ee)ee.textContent="Impossible d’enregistrer sur ce téléphone (mémoire pleine ou navigation privée). Rien n’a été envoyé.";const fb=document.getElementById("fin");if(fb)fb.disabled=false;return}
   SG.done={pending:true,sig:ents.length-abs,abs,rf};view();window.scrollTo(0,0);flush().then(()=>{if(SG&&SG.done){SG.done.pending=!!pend(rid);view()}})}
 
- function view(){const h=V.v==="f"?formView(V.ix):V.v==="sign"?signView():V.v==="ev"?evView():V.v==="it"?itView(V.ix):V.v==="bls"?blView():V.v==="bid"?biView(V.n):listView(),nb=V.v==="list"||V.v==="it"||V.v==="f"||V.v==="bid";app.innerHTML=h+(nb?navH():"");document.body.classList.toggle("ip-nb",nb);bind()}
+ function view(){const h=V.v==="f"?formView(V.ix):V.v==="sign"?signView():V.v==="ev"?evView():V.v==="acq"?acqView():V.v==="it"?itView(V.ix):V.v==="bls"?blView():V.v==="bid"?biView(V.n):listView(),nb=V.v==="list"||V.v==="it"||V.v==="f"||V.v==="bid";app.innerHTML=h+(nb?navH():"");document.body.classList.toggle("ip-nb",nb);bind()}
+ const CDO={};
  function bind(){
+  document.querySelectorAll("details.ip-cd").forEach(d=>{if(CDO[d.id])d.open=true;d.ontoggle=()=>{CDO[d.id]=d.open}});
   document.querySelectorAll("[data-f]").forEach(b=>b.onclick=()=>nav({v:"f",ix:+b.dataset.f}));
   document.querySelectorAll("[data-back]").forEach(b=>b.onclick=()=>nav({v:"list"}));
   document.querySelectorAll("[data-qgo]").forEach(b=>b.onclick=flush);
   document.querySelectorAll("[data-sg]").forEach(b=>b.onclick=()=>startSign(V.ix,b.dataset.sg,b.dataset.day,b.dataset.part));
-  document.querySelectorAll("[data-ev]").forEach(b=>b.onclick=()=>{const [ix,ti]=b.dataset.ev.split(":").map(Number);evStart(ix,ti)});document.querySelectorAll("[data-bil]").forEach(b=>b.onclick=()=>evStart(+b.dataset.bil,-1));
+  document.querySelectorAll("[data-ev]").forEach(b=>b.onclick=()=>{const [ix,ti]=b.dataset.ev.split(":").map(Number);evStart(ix,ti)});document.querySelectorAll("[data-bil]").forEach(b=>b.onclick=()=>evStart(+b.dataset.bil,-1));document.querySelectorAll("[data-acq]").forEach(b=>b.onclick=()=>{const [ix,ti]=b.dataset.acq.split(":").map(Number);acqStart(ix,ti)});
   document.querySelectorAll("[data-sup]").forEach(b=>b.onclick=()=>{const [ix,i]=b.dataset.sup.split(":").map(Number);supOpen(ix,i,b)});
-  if(V.v==="ev")evBind();if(V.v==="f")fphBind(V.ix);
+  if(V.v==="ev")evBind();if(V.v==="acq")acqBind();if(V.v==="f")fphBind(V.ix);
   const sx=document.querySelector("[data-sgx]");if(sx)sx.onclick=()=>{if(!sx._a){sx._a=1;const t0=sx.textContent;sx.textContent="Quitter sans enregistrer ?";setTimeout(()=>{sx._a=0;sx.textContent=t0},4000);return}if(V.v==="bls"&&BS){const ix=BS.ix,bi=BS.bi;(BS.ph||[]).forEach(x=>PDB.rm(x.id).catch(()=>{}));BS=null;return nav(bi?{v:"list"}:{v:"it",ix})}const ix=SG?SG.ix:0;SG=null;nav({v:"f",ix})};
   const sx2=document.querySelector("[data-back2]");if(sx2)sx2.onclick=()=>{const ix=SG.ix;SG=null;nav({v:"f",ix})};
   document.querySelectorAll("[data-sgr]").forEach(b=>b.onclick=()=>{SG.i=+b.dataset.sgr;SG.recap=false;SG.res[SG.i]=null;view()});
   const fin=document.getElementById("fin");if(fin)fin.onclick=()=>{fin.disabled=true;finish()};
-  if(V.v==="sign"&&SG&&!SG.recap&&!SG.done)padInit();
+  if(V.v==="sign"&&SG&&!SG.done){if(SG.kd==="em")emBind();else if(!SG.recap)padInit()}
   if(V.v==="bls"&&BS){if(BS.step==="form")blFormBind();else blBind()}
   document.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>tabGo(b.dataset.tab));document.querySelectorAll("[data-blbon]").forEach(b=>b.onclick=()=>nav({v:"it",ix:BS.ix}));document.querySelectorAll("[data-blrep2]").forEach(b=>b.onclick=()=>blRepAsk(+b.dataset.blrep2));
   document.querySelectorAll("[data-it]").forEach(b=>b.onclick=()=>nav({v:"it",ix:+b.dataset.it}));document.querySelectorAll("[data-bid]").forEach(b=>b.onclick=()=>nav({v:"bid",n:b.dataset.bid}));
@@ -1120,6 +1200,15 @@ try{fetch(SBU+"/rest/v1/rpc/mention_rgpd",{method:"POST",headers:{apikey:SBK,"Co
 <style>/* lot 9 de l'audit (31/10) : au téléphone, textes ≥ 14 px hors document, cibles ≥ 44 px */
 @media (max-width:700px){.ip-gt,.ip-g .ip-gn.n,.ip-row .ip-s.m,.ip-h,.ip-sep,.ip-lb{font-size:14px}.ip-row .ip-d small{font-size:14px}.utag.ip-tag{font-size:14px}.ip-row .ip-c .ulate,.ip-row .ulate,.ulate{font-size:14px}
 .ip-nav .ip-nplus{font-size:14px;line-height:1.1;padding-bottom:7px}.ip-nav .ip-nplus i{top:-33px}}
+
+/* 31/10 : écran d'une formation simplifié, émargements en cadres, évaluation des acquis */
+.ip-cl{padding:0 16px}.ip-cd{border-top:1px solid var(--br)}.ip-cd:first-child{border-top:0}.ip-cs{display:flex;flex-direction:column;gap:2px;min-height:48px;justify-content:center;cursor:pointer;font-weight:700;font-size:16px;list-style:none;padding:6px 0}.ip-cs small{font-weight:500;font-size:14px}.ip-cs::-webkit-details-marker{display:none}.ip-cs>span::after{content:" ›";color:var(--mu)}.ip-cd[open]>.ip-cs>span::after{content:" ⌄"}.ip-cd>.pan{margin:0 0 10px}
+.ip-l3w{padding:4px 16px}.ip-l3{align-items:center}.ip-l3t{flex:1;min-width:160px}.ip-l3.dim .ip-l3t,.ip-l3.dim .ip-l3t .mu{color:var(--mu)}.ip-l3.dim{opacity:.8}
+.emds{display:flex;gap:5px;margin-top:5px}.emd{width:12px;height:12px;border-radius:50%;background:#cbd5e1;display:inline-block}.emd.ok{background:var(--ds-green-d,#15803d)}.emd.cur{background:var(--bl,#1565c0);box-shadow:0 0 0 2px #bfdbfe}
+.emps{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}.emp{min-height:44px;padding:4px 10px;border:1.5px solid var(--br);border-radius:999px;background:var(--sf);font:inherit;font-size:14px;font-weight:700;display:inline-flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.15;color:var(--tx)}.emp small{font-weight:500;font-size:12px}.emp.ok{border-color:var(--ds-green-d,#15803d);color:var(--ds-green-d,#15803d)}.emp.on{background:var(--bl,#1565c0);border-color:var(--bl,#1565c0);color:#fff}.emp:disabled{opacity:.5}
+.emf{border:1.5px solid var(--br);border-radius:12px;padding:10px 12px;margin:8px 0;background:var(--ds-card,#fff)}.emf.ok{background:#f0fdf4;border-color:#86efac}.emf.ab{background:#fff7ed;border-color:#fdba74}.emf.cur{border:2px solid var(--bl,#1565c0);background:#eff6ff}.emfh{display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap;font-size:16px}.emsg{background:#f0fdf4;border-radius:8px;margin-top:6px}.emsvg{width:100%;max-width:260px;height:auto;display:block}.emfa{display:flex;justify-content:flex-end;margin-top:6px}.emft{margin-top:10px;display:flex;flex-direction:column;gap:8px}.ip-em .sgw{margin-top:6px}
+.aq{padding:10px 0;border-top:1px solid var(--br)}.aqt{font-weight:700;font-size:16px;margin-bottom:6px}.aqb{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}.aqo{min-height:46px;border:1.5px solid var(--br);border-radius:12px;background:var(--ds-card,#fff);font:inherit;font-size:15px;font-weight:700;color:var(--tx);padding:4px 6px}.aqo.a[aria-pressed="true"]{background:#15803d;border-color:#15803d;color:#fff}.aqo.p[aria-pressed="true"]{background:#b45309;border-color:#b45309;color:#fff}.aqo.n[aria-pressed="true"]{background:#b91c1c;border-color:#b91c1c;color:#fff}
+.aqc{display:block;margin-top:10px;font-weight:700}.aqc textarea{width:100%;box-sizing:border-box;margin-top:4px;font:inherit;font-size:16px;min-height:48px;padding:8px;border:1.5px solid var(--br);border-radius:12px}.aqsum{margin-top:8px;font-weight:700;color:var(--ds-green-d,#15803d)}.aqau{background:var(--sf);border-radius:10px;padding:8px 10px;margin:6px 0;font-size:15px}.aqabs{background:#fff7ed;border:1.5px solid #fdba74;border-radius:12px;padding:10px 12px;margin:8px 0;font-size:16px}
 </style>
 </body>
 </html>
