@@ -199,11 +199,49 @@ function phPage(D){const app=$("#app"),id=new URLSearchParams(location.search).g
    if(P.filter(Boolean).length<(+h.n||0))throw 0;const t=atob(P.join("")),by=new Uint8Array(t.length);for(let k=0;k<t.length;k++)by[k]=t.charCodeAt(k);const url=URL.createObjectURL(new Blob([by],{type:h.type||"image/jpeg"}));
    st.outerHTML=`<a href="${url}" download="${esc(h.nom||"photo-"+(i+1)+".jpg")}"><img src="${url}" alt="${esc(u.t||"Photo "+(i+1))}" style="max-width:100%;border-radius:10px;display:block"></a>`}
   catch(e){st.textContent="Photo indisponible pour l’instant. Réessayez plus tard."}})}
+// ===== ✍ ÉMARGEMENT D'UNE DEMI-JOURNÉE signé en ligne par UN stagiaire (01/11, partie 3) : lien du mail « ✉ Réclamer au stagiaire » (type « emgs », 90 jours).
+// Le stagiaire voit la formation, la demi-journée et son nom, signe (signature simple ou à la main), atteste sa participation ; le dépôt (k:"emgs") s'inscrit
+// sur l'émargement de cette demi-journée dans TOPAS Formation, pour lui seul. Même secours que les autres signatures si le dépôt échoue (code + e-mail préparé).
+function emgsPage(D){const app=$("#app"),G=Array.isArray(D.g)?D.g:[],org=G[0]||"",tel=G[2]||"",mail=G[3]||"",part=D.p==="a"?"après-midi":"matin",day=String(D.d||""),KEY="fpsig:emgs:"+(D.n||"")+":"+day+":"+(D.p==="a"?"a":"m")+":"+(D.ti==null?"":D.ti);
+ document.title="Feuille d’émargement – "+(D.n||"");let done=null;try{done=JSON.parse(localStorage.getItem(KEY)||"null")}catch(e){}
+ {const n=new Date(),p2=v=>String(v).padStart(2,"0"),T=n.getFullYear()+"-"+p2(n.getMonth()+1)+"-"+p2(n.getDate()),cm=D.m||mail||FB_MAIL;
+  if(!done&&/^\d{4}-\d\d-\d\d$/.test(D.x||"")&&T>D.x){document.title="Lien expiré";app.innerHTML='<div class="card" id="expire"><h1>Ce lien a expiré</h1><p>Ce lien a expiré, contactez-nous : '+esc(org||"TOPAS informatique")+(cm?' – <a href="mailto:'+esc(cm)+'">'+esc(cm)+'</a>':'')+(tel?' – '+esc(tel):'')+'.</p><p style="color:#5b6475">Lien valable jusqu’au '+esc(fd(D.x))+'. Nous vous enverrons un nouveau lien.</p></div>';return}}
+ const nm0=String(D.nm||"").trim(),pr0=nm0.split(/\s+/)[0]||"",no0=nm0.split(/\s+/).slice(1).join(" "),kt=k=>k==="manuscrite"?" · signature manuscrite":k==="simple"?" · signature électronique simple":"";
+ const info=`<div class="card emgs-c"><div class="emgs-h"><img src="logo.jpg" alt="" style="height:48px"><div><div class="emgs-o">${esc(org)}</div><h1 class="emgs-t">Feuille d’émargement – signature en ligne</h1></div></div>
+  <table class="emgs-i"><tr><th>Formation</th><td>${esc(D.f||"")}</td></tr><tr><th>Client</th><td>${esc(D.c||"")}</td></tr><tr><th>Demi-journée</th><td><b>${esc(fdl(day))} – ${part}</b>${D.hh?" ("+esc(D.hh)+")":""}</td></tr>${D.iv?`<tr><th>Formateur</th><td>${esc(D.iv)}</td></tr>`:""}<tr><th>Stagiaire</th><td><b>${esc(nm0)}</b></td></tr>${D.n?`<tr><th>Dossier</th><td>${esc(D.n)}</td></tr>`:""}</table></div>`;
+ const form=()=>`<div class="sgf noprint" id="sgform"><div class="sgf-h">✍ SIGNATURE ÉLECTRONIQUE — feuille d’émargement</div>
+  <p class="sgf-mu">Vérifiez votre prénom et votre nom : votre signature se compose toute seule, ou signez à la main.</p>
+  <div class="sgf-g"><div><label for="spr">Prénom</label><input type="text" id="spr" autocomplete="given-name" value="${esc(pr0)}"></div><div><label for="sno">Nom</label><input type="text" id="sno" autocomplete="family-name" value="${esc(no0)}"></div></div>
+  <div id="sgw"></div>
+  <label class="chk"><input type="checkbox" id="ok"><span>J’atteste avoir participé à cette demi-journée de formation (${esc(fd(day))} – ${part}).</span></label>
+  <div class="err" id="err" role="alert"></div>
+  <button class="go" id="go" type="button">✍ Signer la feuille d’émargement</button>
+  <p class="sgf-mu">Les informations saisies sont transmises uniquement à ${esc(org)}. Cette signature électronique simple vaut émargement pour cette demi-journée.</p></div>`;
+ const okHtml=()=>`<div class="card okb noprint" id="emgs-ok"><div class="okt">✔ Merci, c’est signé !</div><p>${esc(org)} a bien reçu votre signature pour la demi-journée du ${esc(fd(day))} (${part}).</p><div class="sgfm">✅ Signé électroniquement par ${esc(done.nm)} le ${esc(done.tsl)}${done.rf?" · réf. "+esc(done.rf):""}${kt(done.sk)}</div>${done.sg?sigSvg(done.sg):""}<p>Vous pouvez fermer cette page.</p></div>`;
+ app.innerHTML=info+(done?okHtml():form())+'<div id="res"></div>';
+ if(done)return;
+ const SW=window.SGW_CUR=SIGW.mount($("#sgw"),{name:()=>(($("#spr")||{}).value||"")+" "+(($("#sno")||{}).value||""),max:2200});["#spr","#sno"].forEach(k=>{const i=$(k);if(i)i.addEventListener("input",()=>SW.refresh())});try{SW.refresh()}catch(e){}
+ const ref=()=>{const a="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";let t="";try{const u=new Uint8Array(6);crypto.getRandomValues(u);u.forEach(x=>t+=a[x%a.length])}catch(e){for(let i=0;i<6;i++)t+=a[Math.floor(Math.random()*a.length)]}return "S-"+t};
+ $("#go").onclick=async()=>{const err=$("#err"),pr=$("#spr").value.trim().replace(/\s+/g," "),no=$("#sno").value.trim().replace(/\s+/g," ");err.textContent="";
+  if(!pr)return(err.textContent="Merci d’indiquer votre prénom.",$("#spr").focus());
+  if(no.length<2)return(err.textContent="Merci d’indiquer votre nom.",$("#sno").focus());
+  const nm=pr+" "+no.toLocaleUpperCase("fr-FR");
+  if(!SW||SW.empty())return err.textContent=SW&&SW.mode()==="draw"?"Merci de signer dans le cadre (ou choisissez « ✍ Signature simple »).":"Merci d’indiquer votre prénom et votre nom.";
+  if(!$("#ok").checked)return err.textContent="Merci de cocher la case pour attester votre participation.";
+  const go=$("#go");go.disabled=true;go.textContent="Envoi en cours…";
+  const now=new Date(),p2=n=>String(n).padStart(2,"0"),dl=now.getFullYear()+"-"+p2(now.getMonth()+1)+"-"+p2(now.getDate()),hl=p2(now.getHours())+":"+p2(now.getMinutes());
+  const payload={t:"fp-sign",k:"emgs",n:D.n||"",day,part:D.p==="a"?"a":"m",ti:D.ti==null?-1:+D.ti,nm,nm0,pr,no,dl,hl,tsl:fd(dl)+" à "+hl,sg:SW.get(),sm:SW.how(),sk:SW.kind(),rf:ref()},code="FPSIG:"+b64u(payload);
+  let ok=false;if(D.t){try{ok=!!(await sbDep(D.t,payload))}catch(e){ok=false}}
+  done={nm,tsl:payload.tsl,sg:payload.sg,rf:payload.rf,sk:payload.sk};if(ok){try{localStorage.setItem(KEY,JSON.stringify(done))}catch(e){}}
+  const f=$("#sgform");if(f)f.remove();
+  $("#res").innerHTML=ok?okHtml():`<div class="card noprint" style="border-color:var(--ko)">${fbHtml(code,"Émargement signé – "+(D.n||"")+" – "+nm,"Bonjour,\n\n"+nm+" a signé en ligne la feuille d’émargement de la demi-journée du "+fd(day)+" ("+part+") du dossier "+(D.n||"")+" (référence "+payload.rf+").")}</div>`;
+  window.scrollTo(0,0)}}
 let D=null;
 try{D=await lnLoad()||await load(location.hash.replace(/^#/,""))}catch(e){if(e&&e.lien){lnDead($("#app"),e.lien);return}D=null}
 if(D&&typeof D==="object"&&D.m)FB_MAIL=String(D.m).trim();
 if(D&&D.k==="sup"){supPage(D);return}
 if(D&&D.k==="ph"){phPage(D);return}
+if(D&&D.k==="emgs"){emgsPage(D);return}
 const app=$("#app");
 if(!D||!D.n||!D.g){app.innerHTML='<div class="card"><h1>Lien incomplet</h1><p>Ce lien de signature est incomplet ou a été modifié. Merci de rouvrir le lien reçu par e-mail, tel quel, ou de contacter l’organisme de formation.</p></div>';return}
 const plan=D.k==="plan",dev=D.k==="dev",ro=!!D.ro,G=D.g,C=D.c||D.cl||["","",""],tr=D.tr||[];
@@ -379,6 +417,8 @@ try{fetch(SBU+"/rest/v1/rpc/mention_rgpd",{method:"POST",headers:{apikey:SBK,"Co
 </script>
 <style>/* lot 9 de l'audit (31/10) : au téléphone, case « Lu et approuvé » ≥ 44 px, textes ≥ 14 px hors document */
 @media (max-width:700px){.chk{min-height:44px;align-items:center;padding:4px 0}.chk input{width:28px;height:28px;margin-top:0}.top .ql,.ql{font-size:14px}}
+/* émargement d'une demi-journée signé en ligne par un stagiaire (01/11) */
+.emgs-h{display:flex;gap:12px;align-items:center;margin-bottom:10px}.emgs-o{font-weight:700;color:#12308f}.emgs-t{font-size:20px;font-weight:800;margin:0}.emgs-i{width:100%;border-collapse:collapse;margin:8px 0 4px}.emgs-i th{text-align:left;padding:6px 8px;width:130px;color:#5b6475;font-weight:600;vertical-align:top}.emgs-i td{padding:6px 8px}.emgs-i tr+tr th,.emgs-i tr+tr td{border-top:1px solid #e5e7eb}@media (max-width:700px){.emgs-i th{width:105px;font-size:14px}.emgs-i td{font-size:15px}}
 </style>
 </body>
 </html>
