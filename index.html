@@ -132,7 +132,7 @@ const SIGW=(()=>{
  function mount(el,o){o=o||{};const st=DEF;let cur=null,comp=[];const T=touch(),K=o.keep&&typeof o.keep==="object"?o.keep:null;let mode=K&&(K.mode==="draw"||K.mode==="txt")?K.mode:T?"draw":"txt",drw=K&&Array.isArray(K.drw)?K.drw:[];const id=el.id||"sgw";
   const keep=()=>{if(K){K.mode=mode;K.drw=drw}};// o.keep : mémoire (mode + tracé) conservée si l'encart est reconstruit (retour en arrière)
   el.innerHTML=CSS+`<div class="sgw"><div class="sgw-tabs" role="tablist" aria-label="Façon de signer"><button type="button" role="tab" class="sgw-tb" data-m="txt" id="${id}-tt">✍ Signature simple</button><button type="button" role="tab" class="sgw-tb" data-m="draw" id="${id}-td">✏ Signer à la main</button></div>
-   <div class="sgw-txt"><div class="sgw-l" id="${id}-l">${o.label||"Votre signature est composée à partir de votre prénom et de votre nom."}</div></div>
+   <div class="sgw-txt"><div class="sgw-l" id="${id}-l">${String(o.label||"Votre signature est composée à partir de votre prénom et de votre nom.").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}</div></div>
    <div class="sgw-pad" role="tabpanel"><canvas class="sgw-cv" role="img" aria-label="Votre signature"></canvas><div class="sgw-ph"></div></div>
    <div class="sgw-act"><button type="button" class="sgw-cl" hidden>↺ Effacer</button></div></div>`;
   const q=s=>el.querySelector(s),cv=q(".sgw-cv"),pad=q(".sgw-pad"),ph=q(".sgw-ph"),nm=()=>clean(o.name?o.name():"");
@@ -206,14 +206,16 @@ function phPage(D){const app=$("#app"),id=new URLSearchParams(location.search).g
 // sur l'émargement de cette demi-journée dans TOPAS Formation, pour lui seul. Même secours que les autres signatures si le dépôt échoue (code + e-mail préparé).
 function emgsPage(D){const app=$("#app"),G=Array.isArray(D.g)?D.g:[],org=G[0]||"",tel=G[2]||"",mail=G[3]||"",part=D.p==="a"?"après-midi":"matin",day=String(D.d||""),KEY="fpsig:emgs:"+(D.n||"")+":"+day+":"+(D.p==="a"?"a":"m")+":"+(D.ti==null?"":D.ti);
  document.title="Feuille d’émargement – "+(D.n||"");let done=null;try{done=JSON.parse(localStorage.getItem(KEY)||"null")}catch(e){}
- {const n=new Date(),p2=v=>String(v).padStart(2,"0"),T=n.getFullYear()+"-"+p2(n.getMonth()+1)+"-"+p2(n.getDate()),cm=D.m||mail||FB_MAIL;
+ const cm=D.m||mail||FB_MAIL;
+ {const n=new Date(),p2=v=>String(v).padStart(2,"0"),T=n.getFullYear()+"-"+p2(n.getMonth()+1)+"-"+p2(n.getDate());
   if(!done&&/^\d{4}-\d\d-\d\d$/.test(D.x||"")&&T>D.x){document.title="Lien expiré";app.innerHTML='<div class="card" id="expire"><h1>Ce lien a expiré</h1><p>Ce lien a expiré, contactez-nous : '+esc(org||"TOPAS informatique")+(cm?' – <a href="mailto:'+esc(cm)+'">'+esc(cm)+'</a>':'')+(tel?' – '+esc(tel):'')+'.</p><p style="color:#5b6475">Lien valable jusqu’au '+esc(fd(D.x))+'. Nous vous enverrons un nouveau lien.</p></div>';return}}
  const nm0=String(D.nm||"").trim(),pr0=nm0.split(/\s+/)[0]||"",no0=nm0.split(/\s+/).slice(1).join(" "),kt=k=>k==="manuscrite"?" · signature manuscrite":k==="simple"?" · signature électronique simple":"";
  const info=`<div class="card emgs-c"><div class="emgs-h"><img src="logo.jpg" alt="" style="height:48px"><div><div class="emgs-o">${esc(org)}</div><h1 class="emgs-t">Feuille d’émargement – signature en ligne</h1></div></div>
   <table class="emgs-i"><tr><th>Formation</th><td>${esc(D.f||"")}</td></tr><tr><th>Client</th><td>${esc(D.c||"")}</td></tr><tr><th>Demi-journée</th><td><b>${esc(fdl(day))} – ${part}</b>${D.hh?" ("+esc(D.hh)+")":""}</td></tr>${D.iv?`<tr><th>Formateur</th><td>${esc(D.iv)}</td></tr>`:""}<tr><th>Stagiaire</th><td><b>${esc(nm0)}</b></td></tr>${D.n?`<tr><th>Dossier</th><td>${esc(D.n)}</td></tr>`:""}</table></div>`;
  const form=()=>`<div class="sgf noprint" id="sgform"><div class="sgf-h">✍ SIGNATURE ÉLECTRONIQUE — feuille d’émargement</div>
-  <p class="sgf-mu">Vérifiez votre prénom et votre nom : votre signature se compose toute seule, ou signez à la main.</p>
-  <div class="sgf-g"><div><label for="spr">Prénom</label><input type="text" id="spr" autocomplete="given-name" value="${esc(pr0)}"></div><div><label for="sno">Nom</label><input type="text" id="sno" autocomplete="family-name" value="${esc(no0)}"></div></div>
+  <p class="sgf-mu">${nm0?"Votre prénom et votre nom sont ceux de la liste des stagiaires (non modifiables) : votre signature se compose toute seule, ou signez à la main.":"Vérifiez votre prénom et votre nom : votre signature se compose toute seule, ou signez à la main."}</p>
+  <div class="sgf-g"><div><label for="spr">Prénom</label><input type="text" id="spr" autocomplete="given-name" value="${esc(pr0)}" ${nm0?'readonly aria-readonly="true"':""}></div><div><label for="sno">Nom</label><input type="text" id="sno" autocomplete="family-name" value="${esc(no0)}" ${nm0?'readonly aria-readonly="true"':""}></div></div>
+  ${nm0?`<p class="sgf-mu" id="emgs-notyou">Ce n’est pas vous ? ${cm?"Écrivez à <a href=\"mailto:"+esc(cm)+"\">"+esc(cm)+"</a>":"Contactez "+esc(org||"TOPAS informatique")} (ne signez pas à la place d’une autre personne).</p>`:""}
   <div id="sgw"></div>
   <label class="chk"><input type="checkbox" id="ok"><span>J’atteste avoir participé à cette demi-journée de formation (${esc(fd(day))} – ${part}).</span></label>
   <div class="err" id="err" role="alert"></div>
