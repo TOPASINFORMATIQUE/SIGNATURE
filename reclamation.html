@@ -105,6 +105,7 @@ input[type=email],input[type=tel],select{width:100%;font:inherit;font-size:17px;
 @media (max-width:480px){.cards.two{grid-template-columns:1fr}}
 .fz{display:flex;align-items:center;justify-content:center;border:2px dashed var(--br);border-radius:12px;min-height:56px;padding:10px;cursor:pointer;text-align:center;color:var(--mu)}
 .fz input{position:absolute;opacity:0;width:1px;height:1px}
+.fz:focus-within{outline:3px solid #12308f;outline-offset:2px}
 .code{font-family:monospace;font-size:13px;word-break:break-all;background:var(--sf);border-radius:10px;padding:10px;margin:8px 0}
 </style>
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
@@ -127,13 +128,14 @@ function fbCopy(b){const t=b.closest(".fbx").querySelector("textarea");t.focus()
 const $=s=>document.querySelector(s);
 const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const b64u=o=>btoa(unescape(encodeURIComponent(JSON.stringify(o)))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
-const P=new URLSearchParams(location.search),C=(P.get("c")||"").replace(/[^A-Za-z0-9_-]/g,""),M=(P.get("m")||"").trim(),ORG=P.get("o")||"TOPAS informatique";FB_MAIL=M;
+// Paramètres du lien contrôlés : m = une adresse e-mail seulement (sinon ignorée), o = nom affiché sans balise (80 caractères), a / j = délais annoncés (heures ouvrées / jours) tels que réglés dans TOPAS Formation
+const P=new URLSearchParams(location.search),C=(P.get("c")||"").replace(/[^A-Za-z0-9_-]/g,""),M=(m=>/^[^\s@,;<>"'()]+@[^\s@,;<>"'()]+\.[A-Za-z]{2,}$/.test(m)&&m.length<=120?m:"")((P.get("m")||"").trim().replace(/^mailto:/i,"")),ORG=(String(P.get("o")||"").replace(/[<>"'&]/g,"").trim().slice(0,80))||"TOPAS informatique",A=Math.min(Math.max(0,Math.floor(+P.get("a")||0)),999),J=Math.min(Math.max(0,Math.floor(+P.get("j")||0)),365);FB_MAIL=M;
 const QUI=[["client","🏢 Entreprise cliente"],["stagiaire","🎓 Stagiaire"],["formateur","🧑‍🏫 Formateur"],["financeur","💼 Financeur"],["autre","✉ Autre"]];
-const app=$("#app");$("#ft").textContent=ORG+" – organisme de formation certifié Qualiopi · vos informations servent uniquement au traitement de votre demande";
+const app=$("#app");$("#ft").textContent=ORG+" – organisme de formation certifié Qualiopi · vos informations servent uniquement au traitement de votre demande"+(M?" · Contact : "+M:"");
 const shell=inner=>`<div class="sh"><div class="top"><img src="logo.jpg" alt="${esc(ORG)}"><div class="tt">Réclamation ou difficulté</div><span class="ql">Qualiopi ✓</span></div><div class="bd">${inner}</div></div>`;
-let pj="";
-function form(){app.innerHTML=shell(`<div class="kk">📮 Nous sommes à votre écoute</div><h1>Signaler une difficulté ou faire une réclamation</h1>
- <div class="intro">Décrivez-nous la situation : nous vous envoyons un accusé de réception, puis notre réponse avec la suite donnée.</div>
+let pj="",RID="";
+function form(){RID=RID||Date.now().toString(36)+Math.random().toString(36).slice(2,7);app.innerHTML=shell(`<div class="kk">📮 Nous sommes à votre écoute</div><h1>Signaler une difficulté ou faire une réclamation</h1>
+ <div class="intro">Décrivez-nous la situation : nous vous envoyons un accusé de réception${A?" sous "+A+" heures ouvrées":""}, puis notre réponse avec la suite donnée${J?" sous "+J+" jours":""}.</div>
  <form id="f" novalidate>
  <div class="qb" id="b_qui"><span class="ql2" id="l_qui">Vous êtes<span class="req" aria-hidden="true">*</span></span><div class="cards two" role="radiogroup" aria-labelledby="l_qui">${QUI.map(([k,l])=>`<label class="cd"><input type="radio" name="qui" value="${k}"><span class="ck"></span><span>${l}</span></label>`).join("")}</div><div class="qerr" id="e_qui"></div></div>
  <label class="fl" for="nm">Vos nom et prénom<span class="req" aria-hidden="true">*</span></label><input type="text" id="nm" autocomplete="name"><div class="qerr" id="e_nm"></div>
@@ -152,12 +154,12 @@ async function submit(){const v=id=>($("#"+id).value||"").trim(),qui=(document.q
  let first=null;Object.entries(E).forEach(([k,m])=>{$("#e_"+k).textContent=m||"";if(m&&!first)first=k});if(first){const el=$("#"+(first==="qui"?"b_qui":first));el.scrollIntoView({behavior:"smooth",block:"center"});const i=first==="qui"?document.querySelector('input[name="qui"]'):$("#"+first);if(i)i.focus({preventScroll:true});return}
  const btn=$("#send");btn.disabled=true;btn.textContent="Envoi en cours…";
  const now=new Date(),p2=n=>String(n).padStart(2,"0"),dl=now.getFullYear()+"-"+p2(now.getMonth()+1)+"-"+p2(now.getDate()),hl=p2(now.getHours())+":"+p2(now.getMinutes()),cut=(s,n)=>String(s).slice(0,n);
- const p={t:"fp-rec",id:Date.now().toString(36)+Math.random().toString(36).slice(2,7),qui,nm:cut(v("nm"),80),em:cut(v("em"),120),tel:cut(v("tel"),30),f:cut(v("fo"),120),obj:cut(v("ob"),160),desc:cut(v("de"),2600),pj,dl,hl};
+ const p={t:"fp-rec",id:RID,qui,nm:cut(v("nm"),80),em:cut(v("em"),120),tel:cut(v("tel"),30),f:cut(v("fo"),120),obj:cut(v("ob"),160),desc:cut(v("de"),2600),pj,dl,hl};
  const code="FPREC:"+b64u(p),sends=[];if(C)sends.push(sbDep(C,p));
  const R=await Promise.allSettled(sends);if(R.some(r=>r.status==="fulfilled"))return thanks(p);
  btn.disabled=false;btn.textContent="✔ Envoyer";const mt="mailto:"+encodeURIComponent(M)+"?subject="+encodeURIComponent("Réclamation – "+p.obj)+"&body="+encodeURIComponent("Bonjour,\n\n"+p.desc+"\n\n"+p.nm+" – "+p.em+"\n\n"+code+"\n");
- $("#err").innerHTML=fbHtml(code,"Réclamation – "+p.obj,"Bonjour,\n\n"+p.desc+"\n\n"+p.nm+" – "+p.em)}
-function thanks(p){app.innerHTML=shell(`<div class="thx"><div class="ckb" aria-hidden="true">✓</div><h1>Merci, c’est envoyé !</h1><p>Votre demande « ${esc(p.obj)} » a bien été transmise à ${esc(ORG)} le ${esc(p.dl.split("-").reverse().join("/"))} à ${esc(p.hl)}.</p><p>Vous allez recevoir un accusé de réception à <b>${esc(p.em)}</b>, puis notre réponse.</p><p style="color:var(--mu);font-size:15px;margin-top:18px">Vous pouvez fermer cette page.</p></div>`);window.scrollTo(0,0)}
+ $("#err").innerHTML='<p style="margin:0 0 8px">Si votre envoi était tout de même arrivé, un nouvel essai porte le même identifiant : il ne créera pas de doublon.</p>'+fbHtml(code,"Réclamation – "+p.obj,"Bonjour,\n\n"+p.desc+"\n\n"+p.nm+" – "+p.em)}
+function thanks(p){app.innerHTML=shell(`<div class="thx"><div class="ckb" aria-hidden="true">✓</div><h1>Merci, c’est envoyé !</h1><p>Votre demande « ${esc(p.obj)} » a bien été transmise à ${esc(ORG)} le ${esc(p.dl.split("-").reverse().join("/"))} à ${esc(p.hl)}.</p><p>Vous recevrez un accusé de réception à <b>${esc(p.em)}</b>${A?" sous "+A+" heures ouvrées":""}, puis notre réponse${J?" sous "+J+" jours":""}.</p><p style="color:var(--mu);font-size:15px;margin-top:18px">Vous pouvez fermer cette page.</p></div>`);window.scrollTo(0,0)}
 form();
 })();
 </script>
@@ -167,7 +169,7 @@ form();
 <script>
 (function(){
 const DEF={c:"Les informations saisies sur cette page sont utilisées par TOPAS informatique uniquement pour la gestion de votre formation et de sa qualité.",
- d:"Responsable du traitement : TOPAS informatique, organisme de formation.\nFinalité : gestion de la formation (inscription, convention, planification, signature, évaluation) et suivi de sa qualité, y compris les obligations de la certification Qualiopi.\nBase légale : exécution du contrat de formation et respect des obligations légales des organismes de formation.\nDestinataires : TOPAS informatique et son hébergeur Supabase (données hébergées en France). Aucune donnée n’est vendue ni transmise à des fins commerciales.\nDurée de conservation : le temps de la formation, puis 5 ans pour le dossier de formation, 3 ans pour les réponses aux questionnaires, 5 ans pour les réclamations et 10 ans pour les pièces comptables.\nLiens envoyés par e-mail : ils ne contiennent aucune donnée ; le document est conservé dans la base (hébergée à Paris) pendant la validité du lien (90 jours par défaut), puis son contenu est effacé.\nVos droits : vous pouvez demander l’accès à vos données, leur rectification, leur effacement ou vous opposer à leur traitement en écrivant à l’adresse de contact indiquée sur cette page. Vous pouvez aussi adresser une réclamation à la CNIL (www.cnil.fr)."};
+ d:"Responsable du traitement : TOPAS informatique, organisme de formation.\nFinalité : gestion de la formation (inscription, convention, planification, signature, émargement, évaluation, réclamations) et suivi de sa qualité, y compris les preuves demandées par la certification Qualiopi.\nBase légale : exécution du contrat de formation et respect des obligations légales des organismes de formation.\nDestinataires : TOPAS informatique ; son hébergeur Supabase (données hébergées en France) ; les prestataires d’envoi des e-mails (Brevo, Microsoft 365) pour les messages qui vous sont adressés. Aucune donnée n’est vendue ni transmise à des fins commerciales.\nDurée de conservation : le temps de la formation, puis 5 ans pour le dossier de formation, 3 ans pour les réponses aux questionnaires, 5 ans pour les réclamations et 10 ans pour les pièces comptables.\nLiens envoyés par e-mail : les liens courts ne contiennent qu’un identifiant, aucune donnée ; le document est conservé dans la base (hébergée à Paris) pendant la validité du lien (90 jours par défaut), puis son contenu est effacé. Les anciens liens (document dans l’adresse, envoyés avant le 26/10/2026) restent acceptés jusqu’au 24/01/2027.\nVos droits : accès, rectification, effacement, limitation, opposition et portabilité de vos données, en écrivant à l’adresse de contact indiquée sur cette page. Vous pouvez aussi adresser une réclamation à la CNIL (www.cnil.fr)."};
 const E=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const draw=M=>{const b=document.getElementById("rgpdm");if(!b)return;const o=b.querySelector("details"),op=!!(o&&o.open);b.innerHTML="<p>🔒 "+E(M.c)+"</p><details"+(op?" open":"")+"><summary>En savoir plus</summary>"+String(M.d).split(/\n+/).filter(Boolean).map(l=>"<p>"+E(l)+"</p>").join("")+"</details>"};
 draw(DEF);

@@ -59,7 +59,7 @@ h1{font-size:25px;line-height:1.25;margin:6px 0 4px;color:var(--pr)}
 .st{display:flex;gap:6px;justify-content:space-between;max-width:420px}
 .st label{flex:1;display:flex;flex-direction:column;align-items:center;min-height:64px;justify-content:center;border-radius:14px;font-size:13px;color:var(--mu)}
 .st .s{font-size:40px;line-height:1;color:#cbd5e1;transition:transform .18s ease,color .15s}
-.st label.on .s{color:#f59e0b}
+.st label.on .s{color:#b45309}
 .st label:has(input:checked) .s{transform:scale(1.18)}
 .lg{display:flex;justify-content:space-between;font-size:14px;color:var(--mu);margin-top:6px;max-width:420px}
 input[type=text],textarea{width:100%;font:inherit;font-size:17px;padding:13px 14px;border:2px solid var(--br);border-radius:12px;background:var(--card);color:var(--tx)}
@@ -117,7 +117,16 @@ function fbCopy(b){const t=b.closest(".fbx").querySelector("textarea");t.focus()
 async function lnLoad(){const id=new URLSearchParams(location.search).get("l");if(!id)return null;let j=null;
  try{const r=await fetch(SBU+"/rest/v1/rpc/lien_lire",{method:"POST",headers:{apikey:SBK,"Content-Type":"application/json"},body:JSON.stringify({p_id:id})});j=r.ok?await r.json():null}catch(e){}
  if(j&&j.ok&&j.data&&typeof j.data==="object")return j.data;throw Object.assign(new Error("lien"),{lien:j&&j.etat?j.etat:"erreur"})}
-function lnDead(el,etat){const er=etat==="erreur";if(!el)return;el.innerHTML='<div id="lnko" style="max-width:640px;margin:24px auto;padding:20px;border:1px solid #d9dce6;border-radius:12px;background:#fff;font:16px/1.5 system-ui,-apple-system,Segoe UI,sans-serif;color:#1e293b"><h1 style="font-size:22px;margin:0 0 10px;color:#12308f">'+(er?"Lien momentanément indisponible":"Ce lien a expiré ou n’est plus valide")+'</h1><p style="margin:0">'+(er?"Le serveur ne répond pas pour l’instant. Réessayez dans un moment, ou contactez-nous : ":"Ce lien a expiré ou n’est plus valide, contactez-nous : ")+(FB_MAIL?'<a href="mailto:'+FB_MAIL+'">'+FB_MAIL+'</a>':'TOPAS informatique')+'.</p></div>';document.title=er?"Lien indisponible":"Lien expiré"}
+const OLD_LINKS_UNTIL="2027-01-24"; // anciens liens « # » (document dans l’adresse, envoyés avant le 26/10/2026) acceptés jusqu’à cette date, refusés ensuite (audit lot C, 01/11)
+function oldHash(){const h=location.hash.replace(/^#/,"");if(!h)return h;const n=new Date(),p2=v=>String(v).padStart(2,"0"),T=n.getFullYear()+"-"+p2(n.getMonth()+1)+"-"+p2(n.getDate());if(T>OLD_LINKS_UNTIL)throw Object.assign(new Error("lien"),{lien:"ancien"});return h}
+// Lien mort : « expiré » / « pas valide » (inconnu) / « trop ancien » / « erreur technique » distingués ; coordonnées de l’organisme affichées (lnCoord), jamais écrites en dur
+function lnDead(el,etat){if(!el)return;const E=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])),er=etat==="erreur",old=etat==="ancien",exp=etat==="expire";
+ const h1=er?"Lien momentanément indisponible":old?"Ce lien est trop ancien":exp?"Ce lien a expiré":"Ce lien n’est pas valide",p=er?"Le serveur ne répond pas pour l’instant (ce n’est pas un problème de votre lien). Réessayez dans un moment ; si cela persiste, contactez-nous.":old?"Les liens envoyés avant le 26/10/2026 (document dans l’adresse) ne sont plus acceptés depuis le 25/01/2027. Écrivez-nous pour recevoir un nouveau lien.":exp?"Sa durée de validité est dépassée. Écrivez-nous pour recevoir un nouveau lien.":"L’adresse est incomplète ou erronée : copiez le lien en entier depuis le mail reçu, ou écrivez-nous pour recevoir un nouveau lien.";
+ el.innerHTML='<div id="lnko" data-etat="'+E(etat||"")+'" style="max-width:640px;margin:24px auto;padding:20px;border:1px solid #d9dce6;border-radius:12px;background:#fff;font:16px/1.5 system-ui,-apple-system,Segoe UI,sans-serif;color:#1e293b"><h1 style="font-size:22px;margin:0 0 10px;color:#12308f">'+h1+'</h1><p style="margin:0">'+p+'</p><p id="lnkk" style="margin:12px 0 0;font-size:15px">'+(FB_MAIL?'Contact : <a href="mailto:'+E(FB_MAIL)+'">'+E(FB_MAIL)+'</a>':'')+'</p></div>';
+ lnCoord(el.querySelector("#lnkk"))}
+// Coordonnées de l’organisme (fiche Gestionnaire publiée par l’application : mention_rgpd → k) : nom, adresse, téléphone, e-mail
+async function lnCoord(el){if(!el)return;try{const r=await fetch(SBU+"/rest/v1/rpc/mention_rgpd",{method:"POST",headers:{apikey:SBK,"Content-Type":"application/json"},body:"{}"}),j=r.ok?await r.json():null,k=j&&j.k;if(!k||!k.n)return;const E=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+ el.innerHTML='<b>'+E(k.n)+'</b>'+(k.adr?'<br>'+E(k.adr):'')+(k.tel?'<br>Téléphone : <a href="tel:'+E(String(k.tel).replace(/[^\d+]/g,""))+'">'+E(k.tel)+'</a>':'')+(k.em?'<br>E-mail : <a href="mailto:'+E(k.em)+'">'+E(k.em)+'</a>':'')}catch(e){}}
 
 (async function(){
 "use strict";
@@ -127,11 +136,13 @@ const fd=d=>{if(!d)return"";const x=new Date(d+"T12:00:00");return isNaN(x)?d:x.
 const b64u=o=>btoa(unescape(encodeURIComponent(JSON.stringify(o)))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
 function unb64u(t){t=String(t).replace(/-/g,"+").replace(/_/g,"/");while(t.length%4)t+="=";return JSON.parse(decodeURIComponent(escape(atob(t))))}
 const ls={get:k=>{try{return localStorage.getItem(k)}catch(e){return null}},set:(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}},del:k=>{try{localStorage.removeItem(k)}catch(e){}}};
-let D=null;try{D=await lnLoad()||unb64u(location.hash.replace(/^#/,""))}catch(e){if(e&&e.lien){lnDead($("#app"),e.lien);return}D=null}
+let D=null;try{D=await lnLoad()||unb64u(oldHash())}catch(e){if(e&&e.lien){lnDead($("#app"),e.lien);return}D=null}
 if(D&&typeof D==="object"&&D.m)FB_MAIL=String(D.m).trim();
 const app=$("#app");
 if(!D||!D.n||!/^(auto|post|bilan|veille|entreprise|financeur)$/.test(D.q||"")||(D.q==="veille"&&!D.v)){app.innerHTML='<div class="sh"><div class="bd"><h1>Lien incomplet</h1><p>Ce lien est incomplet ou a été modifié. Merci de rouvrir le lien reçu par e-mail, tel quel.</p></div></div>';return}
 const K=D.q,PP=K==="entreprise"||K==="financeur",org=D.g||"",KEY="fpq:"+K+":"+D.n+":"+(K==="veille"?D.v+":"+(D.em||""):PP?(D.v||"")+":":"")+(D.nm||""),DK=KEY+":brouillon";
+// identifiant d’envoi stable (gardé sur l’appareil) : un nouvel essai après un échec porte le même identifiant, jamais un doublon
+const QID=(()=>{const kk=KEY+":id";let v=ls.get(kk)||"";if(!/^[a-z0-9]{8,24}$/.test(v)){v=Date.now().toString(36)+Math.random().toString(36).slice(2,8);ls.set(kk,v)}return v})();
 let done=null;try{done=localStorage.getItem(KEY)}catch(e){}
 const SAT=[["😀","Très satisfaisant"],["🙂","Satisfaisant"],["😕","Peu satisfaisant"],["😞","Insatisfaisant"]];
 const QUAL=[["😀","Très bien"],["🙂","Bien"],["😕","Moyen"],["😞","Insuffisant"]];
@@ -203,7 +214,7 @@ let DEF={
 if(D.x&&Array.isArray(D.x.i)&&D.x.i.length){const KM={t:"text",a:"area",r:"radio",s:"scale",g:"star"};DEF={title:D.x.ti||DEF.title,intro:D.x.in||"",items:D.x.i.map(a=>({id:String(a[0]),k:KM[a[1]]||"text",t:String(a[2]||""),req:a[3]?1:0,o:a[1]==="s"?(a[4]==="qual"?QUAL:SAT):(Array.isArray(a[4])?a[4]:[]),pre:a[0]==="soc"?(D.c||""):a[0]==="nom"?((D.nm||"")+(D.fn?" / "+D.fn:"")):""}))}}
 const PREV=D.n==="APERCU",IT=DEF.items;
 document.title=DEF.title;
-$("#ft").textContent="Vos réponses servent uniquement à améliorer nos formations – "+(org||"TOPAS informatique")+", organisme certifié Qualiopi";const lnk=t=>esc(t).replace(/(https?:\/\/[^\s<]+)/g,u=>`<a href="${u}" target="_blank" rel="noopener">formulaire en ligne</a>`).replace(/([\w.+-]+@[\w-]+\.[\w.-]+)/g,m=>`<a href="mailto:${m}">${m}</a>`);if(D.rc)$("#ft").insertAdjacentHTML("beforeend",`<div style="margin-top:6px">${lnk(D.rc)}</div>`);if(D.rh)$("#ft").insertAdjacentHTML("beforeend",`<div class="rh" style="margin-top:6px">♿ ${lnk(D.rh)}</div>`);
+$("#ft").textContent="Vos réponses servent à améliorer nos formations et à justifier de leur qualité (certification Qualiopi) ; elles sont conservées 3 ans – "+(org||"TOPAS informatique")+", organisme certifié Qualiopi"+(D.m?" · Contact : "+D.m:"");const lnk=t=>esc(t).replace(/(https?:\/\/[^\s<]+)/g,u=>`<a href="${u}" target="_blank" rel="noopener">formulaire en ligne</a>`).replace(/([\w.+-]+@[\w-]+\.[\w.-]+)/g,m=>`<a href="mailto:${m}">${m}</a>`);if(D.rc)$("#ft").insertAdjacentHTML("beforeend",`<div style="margin-top:6px">${lnk(D.rc)}</div>`);if(D.rh)$("#ft").insertAdjacentHTML("beforeend",`<div class="rh" style="margin-top:6px">♿ ${lnk(D.rh)}</div>`);
 // ---- écrans de 1 à 3 questions : un choix seul (passage automatique), jusqu'à 3 échelles identiques, jusqu'à 3 champs texte ; « Si … précisez » reste avec son choix
 const CH=q=>q.k==="radio"||q.k==="scale"||q.k==="star",YN=q=>q.k==="radio"&&(q.o||[]).length===2&&q.o.every(o=>String(o).length<=14);
 const SCR=[];{let cur=[];const flush=()=>{if(cur.length){SCR.push(cur);cur=[]}};
@@ -265,7 +276,7 @@ async function submit(){if(PREV)return;const btn=$("#send"),err=$("#err");err.te
  btn.disabled=true;btn.textContent="Envoi en cours…";
  const now=new Date(),p2=n=>String(n).padStart(2,"0"),dl=now.getFullYear()+"-"+p2(now.getMonth()+1)+"-"+p2(now.getDate()),hl=p2(now.getHours())+":"+p2(now.getMinutes());
  const cut=(s,n)=>String(s).slice(0,n);let lim=300,payload,body;
- for(;;){payload={t:"fp-q",q:K,n:D.n,ti:D.ti,nm:D.nm||"",dl,hl,tsl:fd(dl)+" à "+hl};
+ for(;;){payload={t:"fp-q",id:QID,q:K,n:D.n,ti:D.ti,nm:D.nm||"",dl,hl,tsl:fd(dl)+" à "+hl};
   if(K==="auto"){payload.v={};ans.forEach(a=>{if(/^(soc|nom|amg|hand|niv|obj|obj2|att|inf)$/.test(a[0].id))payload.v[a[0].id]=cut(a[1],lim)})}
   payload.a=ans.filter(a=>a[1]!=="").map(a=>[cut(a[0].t,90),cut(a[1],lim)]);
   if(PP){payload.v=String(D.v||"");payload.k={};ans.forEach(a=>{if(a[1])payload.k[a[0].id]=cut(a[1],lim)});if(D.em)payload.em=cut(D.em,120)}
@@ -275,10 +286,10 @@ async function submit(){if(PREV)return;const btn=$("#send"),err=$("#err");err.te
  const code="FPQ:"+b64u(payload),subj=DEF.title+" – "+D.n+" – "+(D.nm||""),sends=[];
  if(D.t)sends.push(sbDep(D.t,payload));
  const R=await Promise.allSettled(sends),ok=R.some(r=>r.status==="fulfilled");
- if(ok){ls.set(KEY,"1");ls.del(DK);return thanks(false)}
+ if(ok){ls.set(KEY,"1");ls.del(DK);ls.del(KEY+":id");return thanks(false)}
  btn.disabled=false;btn.textContent="✔ Envoyer";
  const mailto="mailto:"+encodeURIComponent(D.m||"")+"?subject="+encodeURIComponent(subj)+"&body="+encodeURIComponent("Bonjour,\n\nVoici mes réponses au questionnaire.\n\n"+code+"\n");
- err.innerHTML=`Vos réponses sont gardées sur cet appareil.`+fbHtml(code,subj,"Bonjour,\n\nVoici mes réponses au questionnaire.")}
+ err.innerHTML=`Vos réponses sont gardées sur cet appareil. Si votre envoi était tout de même arrivé, un nouvel essai porte le même identifiant et remplace simplement le premier.`+fbHtml(code,subj,"Bonjour,\n\nVoici mes réponses au questionnaire.")}
 if(done)thanks(true);else welcome();
 })();
 </script>
@@ -288,7 +299,7 @@ if(done)thanks(true);else welcome();
 <script>
 (function(){
 const DEF={c:"Les informations saisies sur cette page sont utilisées par TOPAS informatique uniquement pour la gestion de votre formation et de sa qualité.",
- d:"Responsable du traitement : TOPAS informatique, organisme de formation.\nFinalité : gestion de la formation (inscription, convention, planification, signature, évaluation) et suivi de sa qualité, y compris les obligations de la certification Qualiopi.\nBase légale : exécution du contrat de formation et respect des obligations légales des organismes de formation.\nDestinataires : TOPAS informatique et son hébergeur Supabase (données hébergées en France). Aucune donnée n’est vendue ni transmise à des fins commerciales.\nDurée de conservation : le temps de la formation, puis 5 ans pour le dossier de formation, 3 ans pour les réponses aux questionnaires, 5 ans pour les réclamations et 10 ans pour les pièces comptables.\nLiens envoyés par e-mail : ils ne contiennent aucune donnée ; le document est conservé dans la base (hébergée à Paris) pendant la validité du lien (90 jours par défaut), puis son contenu est effacé.\nVos droits : vous pouvez demander l’accès à vos données, leur rectification, leur effacement ou vous opposer à leur traitement en écrivant à l’adresse de contact indiquée sur cette page. Vous pouvez aussi adresser une réclamation à la CNIL (www.cnil.fr)."};
+ d:"Responsable du traitement : TOPAS informatique, organisme de formation.\nFinalité : gestion de la formation (inscription, convention, planification, signature, émargement, évaluation, réclamations) et suivi de sa qualité, y compris les preuves demandées par la certification Qualiopi.\nBase légale : exécution du contrat de formation et respect des obligations légales des organismes de formation.\nDestinataires : TOPAS informatique ; son hébergeur Supabase (données hébergées en France) ; les prestataires d’envoi des e-mails (Brevo, Microsoft 365) pour les messages qui vous sont adressés. Aucune donnée n’est vendue ni transmise à des fins commerciales.\nDurée de conservation : le temps de la formation, puis 5 ans pour le dossier de formation, 3 ans pour les réponses aux questionnaires, 5 ans pour les réclamations et 10 ans pour les pièces comptables.\nLiens envoyés par e-mail : les liens courts ne contiennent qu’un identifiant, aucune donnée ; le document est conservé dans la base (hébergée à Paris) pendant la validité du lien (90 jours par défaut), puis son contenu est effacé. Les anciens liens (document dans l’adresse, envoyés avant le 26/10/2026) restent acceptés jusqu’au 24/01/2027.\nVos droits : accès, rectification, effacement, limitation, opposition et portabilité de vos données, en écrivant à l’adresse de contact indiquée sur cette page. Vous pouvez aussi adresser une réclamation à la CNIL (www.cnil.fr)."};
 const E=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const draw=M=>{const b=document.getElementById("rgpdm");if(!b)return;const o=b.querySelector("details"),op=!!(o&&o.open);b.innerHTML="<p>🔒 "+E(M.c)+"</p><details"+(op?" open":"")+"><summary>En savoir plus</summary>"+String(M.d).split(/\n+/).filter(Boolean).map(l=>"<p>"+E(l)+"</p>").join("")+"</details>"};
 draw(DEF);
