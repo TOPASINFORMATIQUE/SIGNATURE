@@ -534,8 +534,8 @@ async function main(){
  let FP=null;
  function flush(){if(FP||!D.t)return FP||Promise.resolve();FP=(async()=>{await 0;try{for(const p of Q()){try{await(p.k==="ph"?phUp(p):sbDep(D.t,p))}catch(e){break}LS.set(QK,Q().filter(x=>!(x.id===p.id&&x.i===p.i)));banner()}}finally{FP=null;banner();try{if(V&&V.v==="f"&&!document.activeElement.matches("input,textarea"))view()}catch(e){}}})();return FP}
  function enqueue(pls){const q=Q().concat(pls);if(!LS.set(QK,q))return false;flush();return true}
- const bannerHtml=()=>{const q=Q(),n=q.length,nb=q.filter(x=>x.k==="bl"||x.k==="blrep"||x.k==="blns").length,nbi=q.filter(x=>x.k==="bi").length,np=q.filter(x=>x.k==="ph").length,ns=n-nb-nbi-np,any=F.some(x=>recs(x.f.n).length)||IT.some(x=>recs("bl:"+x.t.i).length);
-  if(n)return `<div class="qb qw" role="status"><b>📤 ${[nb?nb+" bon"+(nb>1?"s":"")+" de livraison":"",nbi?nbi+" bon"+(nbi>1?"s":"")+" d’intervention":"",ns?ns+" signature"+(ns>1?"s":""):"",np?np+" photo"+(np>1?"s":""):""].filter(Boolean).join(" et ")} en attente d’envoi</b><span>${D.t?(navigator.onLine===false?"Pas de connexion : elles partiront toutes seules dès son retour.":"Envoi en cours… sinon elles repartiront toutes seules."):"Ce lien ne permet pas l’envoi : contactez "+esc(D.m||"TOPAS informatique")+"."}</span>${D.t?'<button type="button" class="btn" data-qgo>Renvoyer maintenant</button>':""}</div>`;
+ const bannerHtml=()=>{const q=Q(),n=q.length,nb=q.filter(x=>x.k==="bl"||x.k==="blrep"||x.k==="blns").length,nbi=q.filter(x=>x.k==="bi").length,ntp=q.filter(x=>x.k==="itp").length,np=q.filter(x=>x.k==="ph").length,ns=n-nb-nbi-np-ntp,any=F.some(x=>recs(x.f.n).length)||IT.some(x=>recs("bl:"+x.t.i).length)||LS.get("fpiv:tp:"+NS,[]).length>0;
+  if(n)return `<div class="qb qw" role="status"><b>📤 ${[nb?nb+" bon"+(nb>1?"s":"")+" de livraison":"",nbi?nbi+" bon"+(nbi>1?"s":"")+" d’intervention":"",ntp?ntp+" intervention"+(ntp>1?"s":"")+" créée"+(ntp>1?"s":"")+" ou modifiée"+(ntp>1?"s":""):"",ns?ns+" signature"+(ns>1?"s":""):"",np?np+" photo"+(np>1?"s":""):""].filter(Boolean).join(" et ")} en attente d’envoi</b><span>${D.t?(navigator.onLine===false?"Pas de connexion : elles partiront toutes seules dès son retour.":"Envoi en cours… sinon elles repartiront toutes seules."):"Ce lien ne permet pas l’envoi : contactez "+esc(D.m||"TOPAS informatique")+"."}</span>${D.t?'<button type="button" class="btn" data-qgo>Renvoyer maintenant</button>':""}</div>`;
   return any?'<div class="qb qk" role="status"><b>✔ Tout est transmis</b></div>':""};
  function banner(){const e=document.getElementById("qbn");if(e){e.innerHTML=bannerHtml();const b=e.querySelector("[data-qgo]");if(b)b.onclick=flush}document.querySelectorAll(".ip-wait[data-pid]").forEach(w=>{if(!pend(w.dataset.pid))w.remove()});const ps=document.getElementById("phst");if(ps&&BS&&BS.step==="done")ps.innerHTML=phStat(BS.ph.map(x=>x.id))}
  const phCatch=()=>phOrphans().then(n=>{if(n){banner();if(V.v==="list"||V.v==="bid")view()}}).catch(()=>{});
@@ -572,7 +572,7 @@ async function main(){
   const I=canBI()?[["home","🏠","Accueil"],["new","＋",""],["topas","☎","TOPAS"]]:[["home","🏠","Accueil"],["sig","📄","Signées"],["topas","☎","TOPAS"]];
   return `<nav class="ip-nav" aria-label="Navigation">${I.map(([k,i,t])=>k==="new"?`<button type="button" data-tab="new" class="ip-nplus" aria-label="Créer un bon d’intervention"><i aria-hidden="true">＋</i><span aria-hidden="true">Créer un bon<br>d’intervention</span></button>`:`<button type="button" data-tab="${k}" class="${on(k)?"on":""}"${on(k)?' aria-current="page"':""}><i aria-hidden="true">${i}</i>${t}</button>`).join("")}</nav>`};
  function markTabs(sheet){document.querySelectorAll(".ip-nav [data-tab]").forEach(b=>{const k=b.dataset.tab,on=sheet?k==="topas":(k==="home"&&V.v==="list"&&TAB!=="sig")||(k==="sig"&&V.v==="list"&&TAB==="sig");b.classList.toggle("on",on);if(on)b.setAttribute("aria-current","page");else b.removeAttribute("aria-current")})}
- function flash(t){const o=document.createElement("div");o.className="ip-flash";o.setAttribute("role","status");o.textContent=t;document.body.appendChild(o);setTimeout(()=>o.remove(),2600)}
+ function flash(t,ok){const o=document.createElement("div");o.className="ip-flash"+(ok?" ip-flash-ok":"");o.setAttribute("role","status");o.textContent=t;document.body.appendChild(o);setTimeout(()=>o.remove(),2600)}
  function goSig(){const s=document.getElementById("s-usig")||document.getElementById("s-uarc");if(!s){flash("Rien de signé pour l’instant.");return}const d=s.querySelector("details");if(d)d.open=true;s.scrollIntoView({behavior:"smooth",block:"start"})}
  function tabGo(k){if(k==="topas")return topasSheet();if(k==="new")return biStart();if(k==="sig"){if(V.v!=="list")nav({v:"list"});TAB="sig";markTabs();setTimeout(goSig,30);return}
   TAB="home";if(V.v!=="list")nav({v:"list"});else{markTabs();window.scrollTo({top:0,behavior:"smooth"})}}
@@ -631,7 +631,8 @@ async function main(){
  // bon signé : classé par sa date de SIGNATURE (pas d'intervention) ; plus de 12 mois → « 🗄 Archives » (jamais invisible)
  const sdOf=x=>{const s=blSt(x);return s.r?String(s.r.dl||"")+" "+String(s.r.hl||""):String(x.t.sd||"")||String(x.t.d||"")};
  // ⏰ À régulariser : tout ce qui est daté d'avant aujourd'hui et pas signé (bons de livraison + émargements), en tête, le plus ancien d'abord
- function uGroups(){const G3=itGroups(),inF=x=>shF?x:[],last=x=>DS(x.f).slice(-1)[0]||"",nxt=x=>DS(x.f).find(d=>d>=T)||DS(x.f)[0]||"",up=(a,b)=>a.k.localeCompare(b.k),dn=(a,b)=>b.k.localeCompare(a.k);
+ function uGroups(){return tpGroups(uGroups0())}
+ function uGroups0(){const G3=itGroups(),inF=x=>shF?x:[],last=x=>DS(x.f).slice(-1)[0]||"",nxt=x=>DS(x.f).find(d=>d>=T)||DS(x.f)[0]||"",up=(a,b)=>a.k.localeCompare(b.k),dn=(a,b)=>b.k.localeCompare(a.k);
   const lateF=x=>pastDue(x.f).length>0&&!(x.f.cl||[]).some(z=>z[0]==="emarg"&&z[1]),regF=inF(F.filter(lateF)),regB=G3.auj.filter(x=>x.t.d&&x.t.d<T);
   return {reg:regF.map(x=>uF(x,pastDue(x.f)[0],1)).concat(regB.map(x=>uB(x,1))).sort(up),
    auj:inF(encours).filter(x=>!lateF(x)||DS(x.f).includes(T)).map(x=>uF(x,DS(x.f).includes(T)?T:x.s==="clo"?last(x):nxt(x))).concat(G3.auj.filter(x=>!regB.includes(x)).map(x=>uB(x))).sort(up),
@@ -642,14 +643,14 @@ async function main(){
  const biLoc=()=>biRecs().filter(r=>!IT.some(x=>x.t.k==="bi"&&x.t.b===r.n));
  const uBI=r=>{const pd=!!pend(r.id);return {k:(r.d||"")+" "+(r.h||""),h:rowW("sig",`<button type="button" class="row urow ip-row" data-bid="${esc(r.n)}" data-b="${esc(r.n)}">${dCol(r.d)}<span class="ip-c ul"><b class="uc" title="${esc(r.c)}">${esc(r.c||"Client")}</b><span class="ip-s m">${esc(r.n)} · ${esc(tpTxt(r.tp))}</span><span class="ip-s m ip-sl ${r.ns?"ip-sl-ns":"ip-sl-ok"}">${r.ns?"📤 Sans signature":"✓ Signé"+(r.h?" à "+esc(fH(r.h)):"")+(r.nm?" par "+esc(r.nm):"")}${r.res?" · remarque notée":""}</span>${pd?`<span class="ip-s m ip-wait" data-pid="${esc(r.id)}">transmis à TOPAS dès le réseau</span>`:""}</span><span class="ip-r"><span class="ip-rt"><span class="utag ui ip-tag">Intervention</span>${stW(r.ns?"ns":"sig",r.ns?"Sans signature":"Signé")}</span></span></button>`,"",(r.c||"")+" "+(r.n||""))}};
  // groupes, dans l'ordre ; un groupe vide n'est pas affiché ; « Signées » et « Archives » repliés
- const GRP=[["reg","⏰ À régulariser",1],["auj","📅 Aujourd’hui",1],["ven","🔜 À venir",1],["sig","✓ Signées",0],["arc","🗄 Archives",0]];
+ const GRP=[["reg","⏰ À régulariser",1],["auj","📅 Aujourd’hui",1],["ven","🔜 À venir",1],["tpx","📅 Interventions passées ou annulées",0],["sig","✓ Signées",0],["arc","🗄 Archives",0]];
  function uList(U){U=U||uGroups();const H=GRP.filter(g=>U[g[0]].length).map(([k,t,op])=>`<section class="sec ip-g ip-g-${k}${k==="reg"?" ureg":""}" id="s-u${k}"><details ${op?"open":""}><summary class="lh"><span class="ip-gt">${t}</span><span class="ip-gn n">${U[k].length}</span></summary>${k==="sig"?'<p class="ip-gx">Les 12 derniers mois.</p><div class="ip-srw"><input type="search" class="ip-in ip-srch" id="usrch" placeholder="Rechercher : n° de BL, client" aria-label="Rechercher dans les bons signés (n° de BL, client)" autocomplete="off" enterkeyhint="search"></div><p class="ip-gx hide" id="usrch0">Aucun bon signé ne correspond.</p>':k==="arc"?'<p class="ip-gx">Signés il y a plus d’un an.</p>':""}${U[k].map(o=>o.h).join("")}</details></section>`).join("");
   return H?`<div class="ip-gs">${H}</div>`:`<div class="empty ip-empty">Rien de prévu pour le moment.</div>`}
  function listView(){const V2=D.v,U=uGroups(),nT=U.reg.length+U.auj.length;
   return `<header class="ip-hero"><div class="ip-top"><span class="ip-logo"><img src="logo.jpg" alt="TOPAS informatique"></span>${netH()}</div>
   <div class="ip-me">${avH()}<div class="ip-mt"><h1 class="ip-hi hi">Bonjour${pr?" "+esc(pr):""}</h1><div class="ip-n">${nT?nT+" chose"+(nT>1?"s":"")+" à faire aujourd’hui":"Rien à faire aujourd’hui"}</div></div></div></header>
   <div id="qbn">${bannerHtml()}</div>${horsH()}${EJ?instH():""}
-  ${uList(U)}
+  ${uList(U)}${tpFab()}
   ${V2&&V2.t?`<div class="vei"><div class="kk">📢 Info réglementaire</div><h3>${esc(V2.t)}</h3>${V2.r?`<div class="mu" style="color:var(--tx)">${esc(V2.r)}</div>`:""}<div class="mu" style="margin-top:4px">Transmise le ${esc(fds(V2.dd||V2.d||T))}${V2.u?` · <a href="${esc(V2.u)}" target="_blank" rel="noopener">Voir la source</a>`:""}</div><div class="btns">${V2.lu?'<span class="pbok" style="margin:0">✔ Vous l’avez lue, merci</span>':V2.a?`<a class="btn gn" href="${esc(V2.a)}" target="_blank" rel="noopener">✅ J’ai lu – donner mon avis</a>`:""}</div></div>`:""}
   ${foot()}`}
 
@@ -1229,7 +1230,71 @@ const hMin=h=>{const m=/^(\d\d):(\d\d)$/.exec(String(h||""));return m?(+m[1])*60
   if(!LS.set(RK(f.n),R)||!enqueue(pls)){const ee=document.getElementById("sge");if(ee)ee.textContent="Impossible d’enregistrer sur ce téléphone (mémoire pleine ou navigation privée). Rien n’a été envoyé.";const fb=document.getElementById("fin");if(fb)fb.disabled=false;return}
   SG.done={pending:true,sig:ents.length-abs,abs,rf};view();window.scrollTo(0,0);flush().then(()=>{if(SG&&SG.done){SG.done.pending=!!pend(rid);view()}})}
 
- function view(){const faire=V.v==="it"&&!!IT[V.ix]&&(blSt(IT[V.ix]).k==="faire"||(!!BS&&!BS.bi&&BS.ix===V.ix&&BS.step!=="form"));const h=V.v==="f"?formView(V.ix):V.v==="sign"?signView():V.v==="ev"?evView():V.v==="acq"?acqView():V.v==="bil"?bilView():V.v==="it"?itView(V.ix):V.v==="bls"?blView():V.v==="bid"?biView(V.n):listView(),nb=(V.v==="list"||V.v==="it"||V.v==="f"||V.v==="bid")&&!faire;app.innerHTML=h+(nb?navH():"");document.body.classList.toggle("ip-nb",nb);document.body.classList.toggle("ip-fx",!!document.querySelector(".ip-fix"));bind()}
+ // ===== 📅 NOUVELLE INTERVENTION créée par le technicien (02/11) — TOPAS la met dans SON agenda Outlook (obligatoire : ni case, ni réglage, ni retrait).
+ // Enregistrée tout de suite sur ce téléphone (TPK), visible aussitôt dans la liste (Aujourd'hui / À venir), envoyée par le même canal que les bons
+ // (dépôt « itp » avec le jeton) ; hors connexion : « en attente d'envoi », puis envoyée au retour du réseau. Il peut modifier date / heure / durée / objet
+ // de SES interventions (nouvelle version) ; il ne peut ni les supprimer ni les retirer du planning : « Annuler l'intervention » = demande au bureau.
+ // Rien d'autre que client, adresse, date, heure, durée, objet (jamais de donnée de santé). Suggestions de clients : SES interventions déjà publiées seulement.
+ const TPK="fpiv:tp:"+NS,tpRecs=()=>{const r=LS.get(TPK,[]);return Array.isArray(r)?r:[]},canTP=()=>!!D.t&&shT;
+ const TPS=(Array.isArray(D.tp)?D.tp:[]).filter(t=>t&&t.tid);
+ const TPDU=[30,45,60,90,120,150,180,240,300,360,420,480];
+ const tpDuT=m=>{m=+m||0;const h=Math.floor(m/60),r=m%60;return h?h+" h"+(r?" "+p2(r):""):r+" min"};
+ // une intervention = la version la plus récente (téléphone ou TOPAS) ; « annulée » et « annulation refusée » viennent seulement de TOPAS
+ function tpAll(){const M={};TPS.forEach(t=>{M[t.tid]={s:t,r:null}});tpRecs().forEach(r=>{if(r&&r.tid)(M[r.tid]=M[r.tid]||{s:null,r:null}).r=r});
+  return Object.values(M).map(({s,r})=>{const b=r&&(!s||(+r.v||1)>=(+s.v||1))?r:s;return {tid:b.tid,c:String(b.c||""),a:String(b.a||""),d:String(b.d||""),h:String(b.h||""),du:+b.du||90,o:String(b.o||""),v:Math.max(+(s&&s.v)||1,+(r&&r.v)||1),et:s&&s.et==="a"?"a":"",an:s&&s.an&&!s.ad?1:0,ad:s?(s.et||s.an&&!s.ad?0:(s.ad||(r&&r.ann)?1:0)):(r&&r.ann?1:0),id:r&&r.id||"",loc:!!r,srv:!!s}}).filter(t=>t.tid&&/^\d{4}-\d\d-\d\d$/.test(t.d))}
+ const tpDateOk=d=>{if(!/^\d{4}-\d\d-\d\d$/.test(d||"")||isNaN(Date.parse(d+"T12:00:00")))return false;const n=dd(T,d);return n>=-31&&n<=366};
+ const uTP=t=>{const pd=!!(t.id&&pend(t.id)),an=t.et==="a",g=an?"sig":t.d===T?"auj":"ven",sub=[t.h?fH(t.h):"",tpDuT(t.du),t.o].filter(Boolean).join(" · ");
+  const lab=an?'<span class="ip-tpl ip-tpl-x">Annulée</span>':'<span class="ip-tpl ip-tpl-me">＋ Créée par vous</span><span class="ip-tpl ip-tpl-pl">📅 Au planning</span>'+(t.ad?'<span class="ip-tpl ip-tpl-ad">Annulation demandée</span>':"");
+  return {k:t.d+" "+(t.h||""),h:rowW(g,`<button type="button" class="row urow ip-row ip-tprow" data-tpe="${esc(t.tid)}">${dCol(t.d)}<span class="ip-c ul"><b class="uc" title="${esc(t.c)}">${esc(t.c)}</b><span class="ip-s m">${esc(sub)}</span><span class="ip-tpls">${lab}</span>${pd?`<span class="ip-s m ip-wait" data-pid="${esc(t.id)}">en attente d’envoi</span>`:""}</span><span class="ip-r"><span class="ip-rt"><span class="utag ui ip-tag">Intervention</span></span></span></button>`,an||!t.a?"":mapA(t.c,t.a),t.c+" "+t.o)}};
+ // liste : Aujourd'hui / À venir à leur date ; passées ou annulées : groupe replié (60 derniers jours)
+ function tpGroups(U){const up=(a,b)=>a.k.localeCompare(b.k),dn=(a,b)=>b.k.localeCompare(a.k),L=tpAll(),lim=(()=>{const x=new Date(Date.now()-60*864e5);return x.getFullYear()+"-"+p2(x.getMonth()+1)+"-"+p2(x.getDate())})();
+  U.auj=U.auj.concat(L.filter(t=>t.et!=="a"&&t.d===T).map(uTP)).sort(up);U.ven=U.ven.concat(L.filter(t=>t.et!=="a"&&t.d>T).map(uTP)).sort(up);
+  U.tpx=L.filter(t=>(t.et==="a"||t.d<T)&&t.d>=lim).map(uTP).sort(dn);return U}
+ let TS=null;
+ function tpStart(tid){if(!canTP())return flash("Ce lien ne permet pas de créer une intervention : contactez TOPAS informatique.");const t=tid?tpAll().find(z=>z.tid===tid):null;if(tid&&!t)return flash("Intervention introuvable sur ce téléphone.");
+  TS=t?{ed:1,tid:t.tid,c:t.c,a:t.a,d:t.d,h:t.h,du:t.du,o:t.o,v:t.v,et:t.et,ad:t.ad,an:t.an}:{ed:0,c:"",a:"",d:T,h:q15(new Date(Date.now()+30*60e3)),du:90,o:""};nav({v:"tp"})}
+ function tpView(){const s=TS;if(!s)return listView();const ro=s.et==="a",mn=(()=>{const x=new Date(Date.now()-31*864e5);return x.getFullYear()+"-"+p2(x.getMonth()+1)+"-"+p2(x.getDate())})(),mx=(()=>{const x=new Date(Date.now()+366*864e5);return x.getFullYear()+"-"+p2(x.getMonth()+1)+"-"+p2(x.getDate())})();
+  const du=TPDU.includes(+s.du)?TPDU:TPDU.concat([+s.du]).sort((a,b)=>a-b);
+  return `<header class="ip-hd ip-hdtp"><button type="button" class="ip-back" data-tpx>‹ ${s.ed?"Retour":"Annuler"}</button><h1 class="ip-tt">${s.ed?"Mon intervention":"Nouvelle intervention"}</h1><div class="ip-sub2">${esc(D.i||"")}${s.ed?" · créée par vous":""}</div></header>
+  <div id="qbn">${bannerHtml()}</div>
+  ${ro?'<div class="qb qw" role="status"><b>🚫 Intervention annulée par TOPAS informatique</b><span>Elle a été retirée de votre agenda.</span></div>':s.ad?'<div class="qb qw" role="status"><b>🚫 Annulation demandée</b><span>TOPAS informatique va la valider ; en attendant, l’intervention reste à votre planning.</span></div>':s.an?'<div class="qb qv" role="status"><b>Annulation refusée par TOPAS informatique</b><span>L’intervention est maintenue.</span></div>':""}
+  <form id="tpf" class="ip-tpf" novalidate autocomplete="off"><fieldset class="ip-tpfs"${ro?" disabled":""}>
+   <div class="ip-bif ip-tpcw"><label class="ip-lb2" for="tpc">Client</label>${s.ed?`<div class="ip-tpro" id="tpc">${esc(s.c)}</div>`:`<input class="ip-cx" id="tpc" maxlength="120" autocapitalize="words" placeholder="Nom du client" value="${esc(s.c)}" aria-describedby="tpch" aria-controls="tpsg"><div class="ip-tpsg" id="tpsg"></div><p class="ip-gx" id="tpch">Suggestions : vos interventions déjà publiées.</p>`}</div>
+   <div class="ip-bif"><label class="ip-lb2" for="tpa">Adresse</label>${s.ed?`<div class="ip-tpro" id="tpa">${esc(s.a||"—")}</div>`:`<input class="ip-cx" id="tpa" maxlength="200" placeholder="Adresse de l’intervention" value="${esc(s.a)}">`}</div>
+   <div class="ip-tp2"><div class="ip-bif"><label class="ip-lb2" for="tpd">Date</label><input class="ip-cx" type="date" id="tpd" min="${mn}" max="${mx}" value="${esc(s.d)}" required></div><div class="ip-bif ip-tph">${hField("tph","Heure",s.h)}</div></div>
+   <div class="ip-bif"><label class="ip-lb2" for="tpdu">Durée</label><select class="ip-cx" id="tpdu">${du.map(m=>`<option value="${m}" ${+s.du===m?"selected":""}>${tpDuT(m)}</option>`).join("")}</select></div>
+   <div class="ip-bif"><label class="ip-lb2" for="tpo">Objet</label><input class="ip-cx" id="tpo" maxlength="200" placeholder="Ex. : installation d’un poste, dépannage imprimante" value="${esc(s.o)}" aria-describedby="tpoh"><p class="ip-gx" id="tpoh">Le travail prévu — jamais d’information de santé ni de donnée personnelle.</p></div>
+   <div class="ip-tplk" role="note"><span class="ip-tplki" aria-hidden="true">📅</span><span class="ip-tplkt"><b>Ajoutée à votre planning</b><span>Un rendez-vous sera mis dans votre agenda Outlook.</span></span><span class="ip-tplkb">🔒 Obligatoire</span></div>
+   <p class="ko" id="tperr" role="alert"></p>
+   ${s.ed&&!ro&&!s.ad?`<button type="button" class="ip-btn2 ip-tpann" id="tpann">Annuler l’intervention</button><p class="ip-gx">La demande part chez TOPAS informatique, qui la valide.</p>`:""}
+  </fieldset>${ro?"":`<div class="ip-fix"><button type="submit" class="ip-cta" id="tpok">${s.ed?"✓ Enregistrer la modification":"✓ Créer l’intervention"}</button></div>`}</form>`}
+ // clients déjà vus : ses interventions publiées (bons et interventions créées), jamais la liste de TOPAS ni d'autres personnes
+ const tpSugs=()=>{const M=new Map();IT.forEach(x=>{const c=String(x.t.c||"").trim();if(c&&!M.has(nrm(c)))M.set(nrm(c),[c,String(x.t.a||"")])});tpAll().forEach(t=>{if(t.c&&!M.has(nrm(t.c)))M.set(nrm(t.c),[t.c,t.a])});return [...M.values()]};
+ function tpBind(){const g=id=>document.getElementById(id),f=g("tpf");if(!f||!TS)return;const s=TS,c=g("tpc"),a=g("tpa"),sg=g("tpsg");
+  if(c&&c.tagName==="INPUT"&&sg){const draw=()=>{const k=nrm(c.value).trim(),L=tpSugs().filter(x=>!k||nrm(x[0]+" "+x[1]).includes(k)).filter(x=>nrm(x[0])!==k||!k).slice(0,5);sg.innerHTML=k&&L.length?L.map((x,i)=>`<button type="button" class="ip-tpsb" data-tps="${i}"><b>${esc(x[0])}</b>${x[1]?`<span>${esc(x[1])}</span>`:""}</button>`).join(""):"";sg.querySelectorAll("[data-tps]").forEach(b=>b.onclick=()=>{const x=L[+b.dataset.tps];c.value=x[0];s.c=x[0];if(x[1]){a.value=x[1];s.a=x[1]}sg.innerHTML="";g("tpo").focus()})};
+   c.oninput=()=>{s.c=c.value;draw()};c.onfocus=draw;a.oninput=()=>{s.a=a.value}}
+  const d=g("tpd"),h=g("tph"),du=g("tpdu"),o=g("tpo");if(d)d.onchange=d.oninput=()=>{s.d=d.value};if(h)h.onchange=h.oninput=()=>{s.h=h.value};if(du)du.onchange=()=>{s.du=+du.value};if(o)o.oninput=()=>{s.o=o.value};
+  document.querySelectorAll(".ip-ws").forEach(sl=>{const id=sl.dataset.for,inp=g(id),sel=w=>document.querySelector(`.ip-ws[data-w="${w}"][data-for="${id}"]`);sl.onchange=()=>{if(sel("h").value&&!sel("m").value)sel("m").value="00";inp.value=sel("h").value&&sel("m").value?sel("h").value+":"+sel("m").value:"";s.h=inp.value}});
+  f.onsubmit=e=>{e.preventDefault();tpSave()};
+  const x=document.querySelector("[data-tpx]");if(x)x.onclick=()=>{if(!s.ed&&(String(s.c).trim()||String(s.o).trim())&&!x._a){x._a=1;const t0=x.textContent;x.textContent="Quitter sans créer ?";setTimeout(()=>{x._a=0;x.textContent=t0},4000);return}TS=null;nav({v:"list"})};
+  const an=g("tpann");if(an)an.onclick=()=>{if(!an._a){an._a=1;an.textContent="Confirmer la demande d’annulation ?";an.classList.add("on");setTimeout(()=>{if(an.isConnected){an._a=0;an.textContent="Annuler l’intervention";an.classList.remove("on")}},5000);return}tpSend(1)}}
+ function tpErr(t){const e=document.getElementById("tperr");if(e){e.textContent=t;e.scrollIntoView({block:"center"})}return false}
+ function tpSave(){const g=id=>document.getElementById(id),s=TS,sp=v=>String(v||"").replace(/\s+/g," ").trim();if(!s||s.et==="a")return;
+  s.c=s.ed?s.c:sp(g("tpc").value);s.a=s.ed?s.a:sp(g("tpa").value);s.d=g("tpd").value;s.h=g("tph").value;s.du=+g("tpdu").value;s.o=sp(g("tpo").value);
+  const er=s.c.length<2?"Indiquez le client.":s.c.length>120?"Nom du client trop long (120 caractères au plus).":s.a.length>200?"Adresse trop longue (200 caractères au plus).":!tpDateOk(s.d)?"Indiquez une date valide (au plus un mois en arrière, un an en avant).":!/^([01]\d|2[0-3]):[0-5]\d$/.test(s.h)?"Indiquez l’heure.":!(s.du>=15&&s.du<=720)?"Choisissez la durée.":s.o.length<2?"Indiquez l’objet de l’intervention.":s.o.length>200?"Objet trop long (200 caractères au plus).":"";
+  if(er)return tpErr(er);if(s.ed){const t=tpAll().find(z=>z.tid===s.tid);if(t&&t.d===s.d&&t.h===s.h&&+t.du===+s.du&&t.o===s.o)return tpErr("Rien n’a changé.")}
+  return tpSend(0)}
+ function tpSend(ann){const s=TS;if(!s)return;const now=nowS(),rid=Date.now().toString(36)+Math.random().toString(36).slice(2,6),tid=s.ed?s.tid:"T"+Date.now().toString(36)+Math.random().toString(36).slice(2,6),v=s.ed?(ann?(+s.v||1):(+s.v||1)+1):1;
+  const p={t:"fp-sign",k:"itp",id:rid,tid,v,c:String(s.c).slice(0,120),a:String(s.a||"").slice(0,200),d:s.d,h:s.h,du:+s.du,o:String(s.o).slice(0,200),ivk:D.pk||"",iv:D.i||"",dl:now.dl,hl:now.hl};if(ann)p.ann=1;
+  const R0=tpRecs(),old=R0.find(r=>r.tid===tid)||{},r=Object.assign({},old,{tid,v,c:p.c,a:p.a,d:p.d,h:p.h,du:p.du,o:p.o,id:rid,dl:now.dl,hl:now.hl,cr:old.cr||now.dl},ann?{ann:1,annDl:now.dl,annHl:now.hl}:{});
+  if(!LS.set(TPK,R0.filter(x=>x.tid!==tid).concat([r]).slice(-300)))return tpErr("Impossible d’enregistrer sur ce téléphone (mémoire pleine ou navigation privée). Rien n’a été envoyé.");
+  if(!enqueue([p])){LS.set(TPK,R0);return tpErr("Impossible d’enregistrer sur ce téléphone (mémoire pleine ou navigation privée). Rien n’a été envoyé.")}
+  const ed=s.ed;TS=null;nav({v:"list"});flash(ann?"Demande d’annulation envoyée à TOPAS informatique":ed?"Intervention modifiée · planning mis à jour":"Intervention créée · ajoutée à votre planning",1)}
+ // ouverture depuis le rendez-vous Outlook : intervenant.html?tp=identifiant
+ function tpDeep(){try{const id=new URLSearchParams(location.search).get("tp");if(id&&/^[A-Za-z0-9-]{2,40}$/.test(id)&&tpAll().some(t=>t.tid===id))tpStart(id)}catch(e){}}
+ function tpBindAll(){document.querySelectorAll("[data-tpe]").forEach(b=>b.onclick=()=>tpStart(b.dataset.tpe));document.querySelectorAll("[data-tpn]").forEach(b=>b.onclick=()=>tpStart());if(V.v==="tp")tpBind()}
+ const tpFab=()=>canTP()?'<button type="button" class="ip-fab" data-tpn aria-label="Nouvelle intervention (ajoutée à votre planning)"><i aria-hidden="true">＋</i><span class="ip-fabt">Nouvelle intervention</span></button><div class="ip-fabsp" aria-hidden="true"></div>':"";
+ function view(){const faire=V.v==="it"&&!!IT[V.ix]&&(blSt(IT[V.ix]).k==="faire"||(!!BS&&!BS.bi&&BS.ix===V.ix&&BS.step!=="form"));const h=V.v==="f"?formView(V.ix):V.v==="sign"?signView():V.v==="ev"?evView():V.v==="acq"?acqView():V.v==="bil"?bilView():V.v==="it"?itView(V.ix):V.v==="bls"?blView():V.v==="bid"?biView(V.n):V.v==="tp"?tpView():listView(),nb=(V.v==="list"||V.v==="it"||V.v==="f"||V.v==="bid")&&!faire;app.innerHTML=h+(nb?navH():"");document.body.classList.toggle("ip-nb",nb);document.body.classList.toggle("ip-fx",!!document.querySelector(".ip-fix"));bind();tpBindAll()}
  const CDO={};
  function bind(){
   document.querySelectorAll("details.ip-cd").forEach(d=>{if(CDO[d.id])d.open=true;d.ontoggle=()=>{CDO[d.id]=d.open}});
@@ -1270,7 +1335,7 @@ const hMin=h=>{const m=/^(\d\d):(\d\d)$/.exec(String(h||""));return m?(+m[1])*60
  }
  try{history.replaceState({v:{v:"list"}},"")}catch(e){}
  window.addEventListener("beforeunload",e=>{const dirty=(AQ&&Object.values(AQ.all||{}).some(z=>z&&z.dirty))||(BI&&BI.dirty);if(dirty){e.preventDefault();e.returnValue=""}});
- view();flush();setTimeout(()=>{prefetch().catch(()=>{})},400);setTimeout(phCatch,1500);setInterval(phCatch,120000);window.addEventListener("online",()=>prefetch().catch(()=>{}));
+ view();tpDeep();flush();setTimeout(()=>{prefetch().catch(()=>{})},400);setTimeout(phCatch,1500);setInterval(phCatch,120000);window.addEventListener("online",()=>prefetch().catch(()=>{}));
  if(EJ){window.addEventListener("online",async()=>{if(!hors||V.v!=="list")return;try{await flush()}catch(e){}if(FP||Q().length)return;try{const r=await espLoad(EJ);if(!r.hors){D=r.D;location.reload()}}catch(e){}});
   document.addEventListener("click",e=>{if(e.target.closest("[data-insok]")){LS.set("fpiv:inst",1);const i=document.getElementById("inst");if(i)i.remove()}});
   try{if("serviceWorker" in navigator&&location.protocol==="https:")navigator.serviceWorker.register("sw.js").catch(()=>{})}catch(e){}}
@@ -1349,6 +1414,30 @@ body.ip-fx{padding-bottom:calc(100px + env(safe-area-inset-bottom,0px))}
 .ip-ro{opacity:.55;pointer-events:none}
 .blch small{font-size:14px}
 .qb.qv{background:var(--ds-p-blue);border:1.5px solid var(--ds-b-blue);color:var(--ds-tx)}.qb.qv .btn{width:100%;justify-content:center;min-height:48px;margin:4px 0 0}
+</style>
+<style>/* 02/11 : nouvelle intervention créée par le technicien — bouton flottant, formulaire court, encart « Ajoutée à votre planning » verrouillé, étiquettes de la liste.
+   Dégradé #14b8a6 → #0e7490 ; le texte blanc est toujours sur la partie foncée (≥ 4,5:1), le ＋ dans un rond blanc. */
+.ip-fab{position:fixed;right:16px;bottom:calc(96px + env(safe-area-inset-bottom,0px));z-index:41;display:inline-flex;align-items:stretch;gap:0;min-height:54px;padding:0 0 0 11px;border:0;border-radius:27px;background:linear-gradient(90deg,#14b8a6 0,#0e7490 50px,#0e7490 100%);color:#fff;font:inherit;font-size:17px;font-weight:800;box-shadow:0 10px 24px rgba(14,116,144,.38);cursor:pointer}
+.ip-fab .ip-fabt{display:flex;align-items:center;padding:0 20px 0 10px;border-radius:0 27px 27px 0;background:#0e7490}.ip-fab i{align-self:center;display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;background:#fff;color:#0e7490;font-style:normal;font-size:24px;font-weight:700;line-height:1}
+.ip-fab:focus-visible{outline:3px solid #0e7490;outline-offset:3px}
+.ip-fabsp{height:80px}
+.ip-hdtp{background:linear-gradient(135deg,#0f766e,#0e7490)}
+.ip-tpfs{border:0;margin:0;padding:0;min-width:0}
+.ip-tp2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ip-tph .ip-hl>span{display:block;margin:0 0 2px;font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--ds-mu)}
+.ip-tpro{min-height:50px;padding:12px 14px;border:1.5px dashed var(--ds-line);border-radius:14px;background:#f8fafc;color:var(--ds-tx);font-size:16px}
+.ip-tpsg{display:flex;flex-direction:column;gap:6px;margin-top:6px}.ip-tpsg:empty{display:none}
+.ip-tpsb{display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-height:48px;padding:8px 12px;border:1.5px solid #5eead4;border-radius:12px;background:#f0fdfa;color:var(--ds-tx);font:inherit;text-align:left;cursor:pointer}
+.ip-tpsb b{font-size:16px}.ip-tpsb span{font-size:14px;color:var(--ds-mu)}
+.ip-tplk{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin:4px 0 14px;padding:14px;border:1.5px solid #5eead4;border-radius:16px;background:#f0fdfa;color:#134e4a}
+.ip-tplki{font-size:26px;line-height:1}.ip-tplkt{flex:1 1 200px;display:flex;flex-direction:column;gap:2px;font-size:15px}.ip-tplkt b{font-size:16px;color:#115e59}
+.ip-tplkb{flex:none;margin-left:38px;padding:6px 10px;border-radius:999px;background:#0e7490;color:#fff;font-size:14px;font-weight:800;white-space:nowrap}
+.ip-tpls{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.ip-tpl{display:inline-flex;align-items:center;min-height:26px;padding:2px 10px;border-radius:999px;font-size:14px;font-weight:700;white-space:nowrap}
+.ip-tpl-me{background:#e0f2fe;color:#075985}.ip-tpl-pl{background:#ccfbf1;color:#115e59}.ip-tpl-ad{background:#fff7ed;color:#9a3412}.ip-tpl-x{background:#eef1f5;color:#475569}
+.ip-tpann{margin-top:6px;border-color:#fca5a5;color:#991b1b}.ip-tpann.on{background:#fef2f2}
+#tperr:empty{display:none}
+.ip-flash-ok{background:#166534;color:#fff}
 </style>
 </body>
 </html>
