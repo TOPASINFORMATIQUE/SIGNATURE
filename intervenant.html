@@ -427,8 +427,12 @@ async function load(h){
  if(h.startsWith("z.")){const bin=atob(unb64u(h.slice(2))),u=Uint8Array.from(bin,c=>c.charCodeAt(0)),ds=new DecompressionStream("deflate-raw"),w=ds.writable.getWriter();w.write(u);w.close();return JSON.parse(await new Response(ds.readable).text())}
  return JSON.parse(decodeURIComponent(escape(atob(unb64u(h)))));
 }
-const HRS={m:["09:00","12:30","Matin · 9h00 – 12h30"],a:["14:00","17:30","Après-midi · 14h00 – 17h30"]},FULL=["09:00","17:30","Journée · 9h00 – 12h30 / 14h00 – 17h30"];
-const slot=(f,d)=>HRS[(f.hf||{})[d]]||FULL;
+// décisions du 02/11 : horaires réglés jour par jour dans TOPAS Formation (f.hr = {"AAAA-MM-JJ":{m:[..],a:[..]}}, absent = horaires habituels)
+const HR0={m:["09:00","12:30"],a:["14:00","17:30"]};
+const hrOf=(f,d,k)=>{const o=(((f&&f.hr)||{})[d]||{})[k];return Array.isArray(o)&&o.length===2&&o.every(x=>/^\d{2}:\d{2}$/.test(x))&&o[0]<o[1]?o:HR0[k]};
+const hrH=x=>(+String(x).slice(0,2))+"h"+String(x).slice(3,5);
+const partH=(f,d,k)=>{const v=hrOf(f,d,k==="a"?"a":"m");return hrH(v[0])+" – "+hrH(v[1])};
+const slot=(f,d)=>{const p=((f&&f.hf)||{})[d],m=hrOf(f,d,"m"),a=hrOf(f,d,"a");return p==="m"?[m[0],m[1],"Matin · "+partH(f,d,"m")]:p==="a"?[a[0],a[1],"Après-midi · "+partH(f,d,"a")]:[m[0],a[1],"Journée · "+partH(f,d,"m")+" / "+partH(f,d,"a")]};
 const hOf=(f,d)=>(f.hf||{})[d]?3.5:7;
 const today=()=>{const n=new Date(),p=x=>String(x).padStart(2,"0");return n.getFullYear()+"-"+p(n.getMonth()+1)+"-"+p(n.getDate())};
 const T=today(),dd=(a,b)=>Math.round((Date.parse(b+"T12:00:00")-Date.parse(a+"T12:00:00"))/864e5);
@@ -444,11 +448,13 @@ function ics(f){
  DS(f).forEach(d=>{const dd2=d.replace(/-/g,""),t=slot(f,d);o.push("BEGIN:VEVENT","UID:"+f.n+"-"+dd2+"@topas-iv","DTSTAMP:"+now,"DTSTART;TZID=Europe/Paris:"+dd2+"T"+t[0].replace(":","")+"00","DTEND;TZID=Europe/Paris:"+dd2+"T"+t[1].replace(":","")+"00","SUMMARY:"+z(f.t+" – "+f.c),"LOCATION:"+z(f.a||f.c),"DESCRIPTION:"+z("N° "+f.n+"\nClient : "+f.c+"\nStagiaires : "+(f.tr||[]).map(x=>x[0]).join(", ")),"END:VEVENT")});
  o.push("END:VCALENDAR");return o.join("\r\n");
 }
-const HRD={m:{acc:"9h00 → 9h15",m:"9h15 → 12h15",clo:"12h15 → 12h30"},a:{acc:"14h00 → 14h15",a:"14h15 → 17h15",clo:"17h15 → 17h30"},"":{acc:"9h00 → 9h15",m:"9h15 → 12h30",a:"14h00 → 17h15",clo:"17h15 → 17h30"}};
-function scDay(day,i,n){const [d,part,sls]=day,h=HRD[part||""]||HRD[""];
+// créneaux du déroulé calculés sur les horaires du jour (identiques à l'application : deroHr)
+function hrd(f,d,part){const m=hrOf(f,d,"m"),a=hrOf(f,d,"a"),mn=t=>(+t.slice(0,2))*60+(+t.slice(3,5)),q=(t,n)=>{const x=mn(t)+n;return Math.floor(x/60)+"h"+String(x%60).padStart(2,"0")},A=(x,y)=>x+" → "+y;
+ return part==="m"?{acc:A(hrH(m[0]),q(m[0],15)),m:A(q(m[0],15),q(m[1],-15)),clo:A(q(m[1],-15),hrH(m[1]))}:part==="a"?{acc:A(hrH(a[0]),q(a[0],15)),a:A(q(a[0],15),q(a[1],-15)),clo:A(q(a[1],-15),hrH(a[1]))}:{acc:A(hrH(m[0]),q(m[0],15)),m:A(q(m[0],15),hrH(m[1])),a:A(hrH(a[0]),q(a[1],-15)),clo:A(q(a[1],-15),hrH(a[1]))}}
+function scDay(day,i,n,f){const [d,part,sls]=day,h=hrd(f,d,part||"");
  return `<div class="dj"><b>Jour ${i+1}${n>1?"/"+n:""} – ${d?esc(fdl(d)):"date à définir"}${part==="m"?" (matin)":part==="a"?" (après-midi)":""}</b>${(sls||[]).map(([k,G])=>`<div class="sl"><b>${k==="m"?"Matin":"Après-midi"} · ${esc(h[k]||"")}</b>${(G||[]).map(([m,it])=>`${m?`<div><b>${esc(m)}</b></div>`:""}${(it||[]).length?`<ul>${it.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`:""}`).join("")}</div>`).join("")}</div>`}
-function scToday(f){const sc=f.sc||[];if(!sc.length)return"";const d=DS(f);let i=sc.findIndex(x=>x[0]===T);if(i<0)i=d.indexOf(T);if(i<0||!sc[i])return"";return scDay(sc[i],i,sc.length)}
-function scAll(f){const sc=f.sc||[];return sc.map((x,i)=>scDay(x,i,sc.length)).join("")}
+function scToday(f){const sc=f.sc||[];if(!sc.length)return"";const d=DS(f);let i=sc.findIndex(x=>x[0]===T);if(i<0)i=d.indexOf(T);if(i<0||!sc[i])return"";return scDay(sc[i],i,sc.length,f)}
+function scAll(f){const sc=f.sc||[];return sc.map((x,i)=>scDay(x,i,sc.length,f)).join("")}
 function pbZone(f,ix){return `<div class="pbz"><div class="btns ip-2b"><button type="button" class="btn pbb" data-pbo="${ix}" data-pbk="pb" aria-expanded="false" aria-controls="pbf${ix}">⚠ Signaler un problème</button><button type="button" class="btn pbb" data-pbo="${ix}" data-pbk="rem" aria-expanded="false" aria-controls="pbf${ix}">✎ Remarque</button></div>
  <div class="pbf hide" id="pbf${ix}" data-kind="pb"><label for="pbt${ix}" id="pbl${ix}">Décrivez le problème (retard, stagiaire absent, matériel, accès aux locaux…)</label><textarea id="pbt${ix}" rows="4"></textarea>
  <div class="btns"><button type="button" class="btn dg" data-pbs="${ix}">Envoyer à TOPAS informatique</button><button type="button" class="btn" data-pbc="${ix}">Annuler</button></div><div class="pberr" id="pbe${ix}" role="alert"></div></div>
@@ -471,7 +477,7 @@ const nrm=x=>String(x||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036
 const ITVPAL=[["#3b82f6","#eaf2ff","#d6e6ff"],["#14b8a6","#e6f8f5","#c9efe9"],["#f97316","#fff1e6","#ffdfc6"],["#8b5cf6","#f1ecff","#e1d6ff"],["#f43f5e","#ffeaee","#ffd3dc"]];
 function itvPal(nom){let h=0;for(const c of nrm(nom))h=(h*31+c.charCodeAt(0))>>>0;return ITVPAL[h%ITVPAL.length]}
 const shade=(hx,k)=>{const n=parseInt(String(hx).slice(1),16);return "#"+[16,8,0].map(b=>Math.round(((n>>b)&255)*(1-k)).toString(16).padStart(2,"0")).join("")};
-const PARTL={m:"Matin",a:"Après-midi"},PARTH={m:"9h00 – 12h30",a:"14h00 – 17h30"};
+const PARTL={m:"Matin",a:"Après-midi"};
 // demi-journées d'une formation (une journée entière = matin + après-midi)
 const SLOTS=f=>DS(f).flatMap(d=>{const h=(f.hf||{})[d];return(h==="m"?["m"]:h==="a"?["a"]:["m","a"]).map(p=>({day:d,part:p}))});
 const strokeCompact=(strokes,max)=>{let th=2,out;for(;;){out=strokes.map(s=>{const r=[];let l=null;s.forEach((q,i)=>{if(!l||Math.hypot(q[0]-l[0],q[1]-l[1])>=th||i===s.length-1){if(!l||q[0]!==l[0]||q[1]!==l[1])r.push(q);l=q}});return r});const str=out.map(s=>s.map(q=>Math.max(0,q[0]).toString(36)+"."+Math.max(0,q[1]).toString(36)).join(",")).join(";");if(str.length<=max||th>40)return str;th+=1.5}};
@@ -604,12 +610,12 @@ async function main(){
  const uHr=t=>String(t||"").replace(/^[^·]*·\s*/,"");
  const stW=(k,t)=>`<span class="ip-stw st-${k}">${t}</span>`;
  const nLate=d=>d&&d<T?dd(d,T):0;
- // signées : « ✓ Signé à HHhMM par <signataire> » (+ « 1 réserve notée » : res vaut 1 ou un nombre ; libellé de la spécification du 02/11)
+ // signées : « ✓ Signé à HHhMM par <signataire> » (+ « remarque notée » : décisions du 02/11, « Remarque » partout, plus « réserve » ; res vaut 1 ou un nombre, données inchangées ; spécification du 02/11)
  const rsvN=r=>Math.max(1,parseInt(r,10)||1);
  const bonSt=x=>{const s=blSt(x),t=x.t;if(s.k==="ns")return{k:"ns",w:"Sans signature",s};if(s.k==="sig"||s.k==="att")return{k:"sig",w:"Signé",s};const n=nLate(t.d);if(n>=2)return{k:"late",w:"+ 48 h",s,n};if(t.d&&t.d<=T)return{k:"auj",w:"À signer",s,n};return{k:"ven",w:"À venir",s}};
  const mapA=(c,a)=>a?`<a class="ip-ab ip-ab-map" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(String(c||"")+" "+a)}" target="_blank" rel="noopener">🧭 Itinéraire</a>`:"";
  const rowW=(g,inner,acts,q)=>`<div class="ip-rw ip-rw-${g}" data-q="${esc(String(q||"").replace(/\s+/g," ").trim())}">${inner}${acts?`<div class="ip-ra">${acts}</div>`:""}</div>`;
- const uF=(x,d,late)=>{const f=x.f,dd=DS(f),dt=d||dd[0]||"",j=dd.indexOf(dt),dn=x.s==="fini",pd=late?pastDue(f).length:0,n=late&&dt?nLate(dt):0,hr=(HRS[(f.hf||{})[dt]]||FULL)[0];
+ const uF=(x,d,late)=>{const f=x.f,dd=DS(f),dt=d||dd[0]||"",j=dd.indexOf(dt),dn=x.s==="fini",pd=late?pastDue(f).length:0,n=late&&dt?nLate(dt):0,hr=slot(f,dt)[0];
   const emTodo=!dn&&(late||SLOTS(f).some(o=>o.day===T&&!emState(f,o))),todo=emTodo||(!dn&&x.s==="clo");
   const st=dn?stW("sig","Terminée"):n>=2?stW("late","+ 48 h"):emTodo?stW("auj","À émarger"):x.s==="clo"?stW("auj","À clôturer"):x.s==="cours"||x.s==="auj"?stW("ven","En cours"):stW("ven","À venir");
   const acts=dn?"":(todo?`<button type="button" class="ip-ab ip-ab-go" data-fgo="${x.ix}">${emTodo?"✎ Faire émarger":"📝 À compléter"}</button>`:"")+mapA(f.c,f.a)+`<button type="button" class="ip-ab ip-ab-eye" data-fder="${x.ix}">Déroulé</button>`;
@@ -618,7 +624,7 @@ async function main(){
  const uAgo=d=>{const n=Math.round((Date.parse(T)-Date.parse(d))/864e5);return n>0?`<span class="ulate">il y a ${n} jour${n>1?"s":""}</span>`:""};
  const pastDue=f=>SLOTS(f).filter(sl=>sl.day<T&&!emState(f,sl)).map(sl=>sl.day).sort();
  const uB=(x,late,kd)=>{const t=x.t,B=bonSt(x),s=B.s,ok=B.k==="sig"||B.k==="ns",cn=t.c||t.nm||"Intervention",dd=kd?String(kd).slice(0,10):t.d||"",hh=kd?String(kd).slice(11,16):t.h||"",pd=!!(s.r&&pend(s.r.id)),city=itCity(t),bi=t.k==="bi";
-  const sub=ok?(B.k==="ns"?`<span class="ip-s m ip-sl ip-sl-ns">📤 Sans signature${s.r?" le "+esc(dm(s.r.dl)):""}</span>`:`<span class="ip-s m ip-sl ip-sl-ok">✓ Signé${s.r?(s.r.hl?" à "+esc(fH(s.r.hl)):"")+(s.r.nm?" par "+esc(s.r.nm):""):t.sd&&t.sd.length>10?" à "+esc(fH(t.sd.slice(11,16)))+(t.sn?" par "+esc(t.sn):""):t.sn?" par "+esc(t.sn):""}${s.r?(s.r.res?" · "+rsvN(s.r.res)+" réserve notée":""):t.sr?" · "+rsvN(t.sr)+" réserve notée":""}</span>`)+(pd?`<span class="ip-s m ip-wait" data-pid="${esc(s.r.id)}">transmis à TOPAS dès le réseau</span>`:"")
+  const sub=ok?(B.k==="ns"?`<span class="ip-s m ip-sl ip-sl-ns">📤 Sans signature${s.r?" le "+esc(dm(s.r.dl)):""}</span>`:`<span class="ip-s m ip-sl ip-sl-ok">✓ Signé${s.r?(s.r.hl?" à "+esc(fH(s.r.hl)):"")+(s.r.nm?" par "+esc(s.r.nm):""):t.sd&&t.sd.length>10?" à "+esc(fH(t.sd.slice(11,16)))+(t.sn?" par "+esc(t.sn):""):t.sn?" par "+esc(t.sn):""}${s.r?(s.r.res?" · remarque notée":""):t.sr?" · remarque notée":""}</span>`)+(pd?`<span class="ip-s m ip-wait" data-pid="${esc(s.r.id)}">transmis à TOPAS dès le réseau</span>`:"")
    :`<span class="ip-s m">${esc(t.b||t.nm||"Bon de livraison")}${bi?" · "+esc(tpTxt(t.tp)):city?" · "+esc(city):""}</span>${late&&t.d?uAgo(t.d):""}`;
   const acts=ok?"":B.k==="ven"?mapA(cn,t.a)+`<button type="button" class="ip-ab ip-ab-eye" data-it="${x.ix}">Voir le bon</button>`:`<button type="button" class="ip-ab ip-ab-go" data-bls2="${x.ix}">✎ Faire signer</button>${mapA(cn,t.a)}<button type="button" class="ip-ab ip-ab-eye ip-ab-ic" data-it="${x.ix}" aria-label="Voir le bon" title="Voir le bon">👁</button>`;
   return {k:kd||((t.d||"9999-12-31")+" "+(t.h||"00:00")),h:rowW(ok?"sig":B.k==="ven"?"ven":"auj",`<button type="button" class="row urow ip-row" ${bi?`data-bid="${esc(t.b||"")}"`:`data-it="${x.ix}"`} data-b="${esc(t.b||"")}">${dCol(dd)}<span class="ip-c ul"><b class="uc" title="${esc(cn)}">${esc(cn)}</b>${sub}</span><span class="ip-r">${ok?`<span class="ip-hrn">${esc(t.b||"")}</span>`:hh?`<span class="ip-hr">${esc(fH(hh))}</span>`:""}<span class="ip-rt">${bi?'<span class="utag ui ip-tag">Intervention</span>':'<span class="utag ub ip-tag">BL</span>'}${stW(B.k,B.w)}</span></span></button>`,acts,cn+" "+(t.b||""))}};
@@ -634,7 +640,7 @@ async function main(){
    arc:G3.sig.filter(x=>{const d=sdOf(x).slice(0,10);return d&&d<lim12}).map(x=>uB(x,0,sdOf(x))).concat(biLoc().filter(r=>r.d&&r.d<lim12).map(uBI)).sort(dn)}}
  // bons d'intervention créés sur ce téléphone et pas encore revenus de TOPAS (même numéro) : dans « Signées » (ou « Archives » après 12 mois)
  const biLoc=()=>biRecs().filter(r=>!IT.some(x=>x.t.k==="bi"&&x.t.b===r.n));
- const uBI=r=>{const pd=!!pend(r.id);return {k:(r.d||"")+" "+(r.h||""),h:rowW("sig",`<button type="button" class="row urow ip-row" data-bid="${esc(r.n)}" data-b="${esc(r.n)}">${dCol(r.d)}<span class="ip-c ul"><b class="uc" title="${esc(r.c)}">${esc(r.c||"Client")}</b><span class="ip-s m">${esc(r.n)} · ${esc(tpTxt(r.tp))}</span><span class="ip-s m ip-sl ${r.ns?"ip-sl-ns":"ip-sl-ok"}">${r.ns?"📤 Sans signature":"✓ Signé"+(r.h?" à "+esc(fH(r.h)):"")+(r.nm?" par "+esc(r.nm):"")}${r.res?" · "+rsvN(r.res)+" réserve notée":""}</span>${pd?`<span class="ip-s m ip-wait" data-pid="${esc(r.id)}">transmis à TOPAS dès le réseau</span>`:""}</span><span class="ip-r"><span class="ip-rt"><span class="utag ui ip-tag">Intervention</span>${stW(r.ns?"ns":"sig",r.ns?"Sans signature":"Signé")}</span></span></button>`,"",(r.c||"")+" "+(r.n||""))}};
+ const uBI=r=>{const pd=!!pend(r.id);return {k:(r.d||"")+" "+(r.h||""),h:rowW("sig",`<button type="button" class="row urow ip-row" data-bid="${esc(r.n)}" data-b="${esc(r.n)}">${dCol(r.d)}<span class="ip-c ul"><b class="uc" title="${esc(r.c)}">${esc(r.c||"Client")}</b><span class="ip-s m">${esc(r.n)} · ${esc(tpTxt(r.tp))}</span><span class="ip-s m ip-sl ${r.ns?"ip-sl-ns":"ip-sl-ok"}">${r.ns?"📤 Sans signature":"✓ Signé"+(r.h?" à "+esc(fH(r.h)):"")+(r.nm?" par "+esc(r.nm):"")}${r.res?" · remarque notée":""}</span>${pd?`<span class="ip-s m ip-wait" data-pid="${esc(r.id)}">transmis à TOPAS dès le réseau</span>`:""}</span><span class="ip-r"><span class="ip-rt"><span class="utag ui ip-tag">Intervention</span>${stW(r.ns?"ns":"sig",r.ns?"Sans signature":"Signé")}</span></span></button>`,"",(r.c||"")+" "+(r.n||""))}};
  // groupes, dans l'ordre ; un groupe vide n'est pas affiché ; « Signées » et « Archives » repliés
  const GRP=[["reg","⏰ À régulariser",1],["auj","📅 Aujourd’hui",1],["ven","🔜 À venir",1],["sig","✓ Signées",0],["arc","🗄 Archives",0]];
  function uList(U){U=U||uGroups();const H=GRP.filter(g=>U[g[0]].length).map(([k,t,op])=>`<section class="sec ip-g ip-g-${k}${k==="reg"?" ureg":""}" id="s-u${k}"><details ${op?"open":""}><summary class="lh"><span class="ip-gt">${t}</span><span class="ip-gn n">${U[k].length}</span></summary>${k==="sig"?'<p class="ip-gx">Les 12 derniers mois.</p><div class="ip-srw"><input type="search" class="ip-in ip-srch" id="usrch" placeholder="Rechercher : n° de BL, client" aria-label="Rechercher dans les bons signés (n° de BL, client)" autocomplete="off" enterkeyhint="search"></div><p class="ip-gx hide" id="usrch0">Aucun bon signé ne correspond.</p>':k==="arc"?'<p class="ip-gx">Signés il y a plus d’un an.</p>':""}${U[k].map(o=>o.h).join("")}</details></section>`).join("");
@@ -714,7 +720,7 @@ async function main(){
    <div class="ip-kv"><span>Lignes</span><b>${nl?nl+" article"+(nl>1?"s":""):"voir le bon ci-dessus"}</b></div>
    ${t.a?`<div class="ip-kv"><span>Adresse</span><b>${esc(t.a)}</b></div><a class="ip-btn2 ip-map" href="${itMaps(t)}" target="_blank" rel="noopener">🧭 Itinéraire</a>`:""}</section>
   ${foot()}`}
- // ---- signature du BL : ce que le client signe (au-dessus), nom, fonction, réserves, tracé ; vérification ; rien n'est envoyé avant « Terminer »
+ // ---- signature du BL : ce que le client signe (au-dessus), nom, fonction, remarque, tracé ; vérification ; rien n'est envoyé avant « Terminer »
  let BS=null;
  const sgPts=sg=>String(sg||"").split(";").map(st=>st.split(",").map(q=>q.split(".").map(v=>parseInt(v,36))).filter(q=>q.length===2&&!isNaN(q[0])&&!isNaN(q[1]))).filter(x=>x.length);
  const svgOf=st=>"data:image/svg+xml;charset=utf-8,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 140"><path d="'+st.map(s=>"M"+s.map(q=>q[0]+" "+q[1]).join(" L")).join(" ")+'" fill="none" stroke="#12308f" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>');
@@ -837,7 +843,7 @@ const hMin=h=>{const m=/^(\d\d):(\d\d)$/.exec(String(h||""));return m?(+m[1])*60
    if(b.kb==="bi"){const R=biRecs(),r=R.find(z=>z.id===b.r0);if(r){r.nph=(+r.nph||0)+L.length;r.phx=(r.phx||[]).concat(L.map(x=>x[0]));LS.set(BIK,R)}}n+=L.length}
   return n})().finally(()=>{PHO=null});return PHO}
  const blWhat=(t,ix,noimg)=>`<div class="pan"><h4>Ce que vous signez</h4><div><b>${esc(t.nm||("Bon de livraison N° "+(t.b||"—")))}</b>${t.c?" · "+esc(t.c):""}</div><div>Intervention du ${t.d?esc(fdl(t.d)):"(date à préciser)"}</div>${noimg?'<div class="qb qw" style="margin:8px 0 0"><b>⚠ Le bon n’a pas pu être affiché</b><span>Le client signe sans le voir : ce sera noté sur le bon signé.</span></div>':imgBox(ix)}</div>`;
- // encart « Signature électronique » DANS la fiche, sous le bon : prénom, nom, fonction, réserves, signature composée ou au doigt
+ // encart « Signature électronique » DANS la fiche, sous le bon : prénom, nom, fonction, remarque, signature composée ou au doigt
  const blNew=ix=>({ix,sid:Date.now().toString(36)+Math.random().toString(36).slice(2,6),phBusy:0,step:"form",ns:0,liv:[],livn:0,unl:0,full:"",pr:"",no:"",nm:"",fn:"",ter:"",res:false,resAuto:false,rc:"",rs:"",rsm:"",sg:"",sm:"",noimg:0,mt:matNew(),ph:[]});
  // 🛠 « Intervention terminée ? » (30/10) : Oui / Non, aucun choix présélectionné ; « Non » rend la remarque obligatoire (signature et envoi sans signature)
  const TERQ="Indiquez si l’intervention est terminée.",TERN="Intervention non terminée : expliquez ce qui reste à faire.";
@@ -1176,14 +1182,14 @@ const hMin=h=>{const m=/^(\d\d):(\d\d)$/.exec(String(h||""));return m?(+m[1])*60
  const stepScreen=()=>{const f=D.f[SG.ix],st=SG.steps[SG.i],n=SG.steps.length,re=SG.res[SG.i];
   const ctx=SG.kd==="der"?`<div class="pan" style="max-height:34vh;overflow:auto"><h4>Déroulé d’intervention – ${esc(f.t)}</h4>${scAll(f)||"<div class='mu'>Aucun scénario détaillé pour cette formation.</div>"}</div>`:"";
   return `<div class="sgh"><button type="button" class="btn" data-sgx>← Quitter</button><div class="sgp">${SG.kd==="em"?`Étape ${SG.i+1} sur ${n}`:"Validation du déroulé"}</div></div>
-  <div class="fc s-clo sgc ip-sg"><div class="num">${esc(f.c)} · N° ${esc(f.n)}</div>${SG.kd==="em"?`<div class="num"><b>${esc(fdm(SG.day))}</b> · ${PARTL[SG.part]} · ${PARTH[SG.part]}</div>`:""}
+  <div class="fc s-clo sgc ip-sg"><div class="num">${esc(f.c)} · N° ${esc(f.n)}</div>${SG.kd==="em"?`<div class="num"><b>${esc(fdm(SG.day))}</b> · ${PARTL[SG.part]} · ${partH(f,SG.day,SG.part)}</div>`:""}
   ${SG.kd==="em"?`<div class="ip-av sgav" style="--a:${shade(itvPal(st.nm)[0],.3)};--b:${shade(itvPal(st.nm)[0],.5)}" aria-hidden="true">${esc(ini2(st.nm))}</div>`:""}<div class="sgw">${st.tr?"Vous signez d’abord":"Passez le téléphone à"}</div><div class="nm2">${esc(st.nm)}</div>${ctx}
   <div id="emw"></div>
   <div class="sgb sgb2">${SG.kd==="em"&&!st.tr?'<button type="button" class="btn" id="abs">🚫 Absent</button>':"<span></span>"}<button type="button" class="btn gn" id="val">✔ Valider</button></div><div class="pberr" id="sge" role="alert"></div>${SG.kd==="em"?sgCnt():""}
   ${re?`<p class="mu">Déjà renseigné : ${re.abs?"absent":"signé"} à ${esc(re.h)}. Signer à nouveau remplace cette étape (avant l’envoi).</p>`:""}</div>`};
  const recapScreen=()=>{const f=D.f[SG.ix],ab=SG.res.filter(r=>r.abs).length;
   return `<div class="sgh"><button type="button" class="btn" data-sgx>← Quitter</button><div class="sgp">Récapitulatif</div></div>
-  <div class="fc s-clo sgc"><h3>${esc(f.t)}</h3><div class="num"><b>${esc(fdm(SG.day))}</b> · ${PARTL[SG.part]} · ${PARTH[SG.part]}</div>
+  <div class="fc s-clo sgc"><h3>${esc(f.t)}</h3><div class="num"><b>${esc(fdm(SG.day))}</b> · ${PARTL[SG.part]} · ${partH(f,SG.day,SG.part)}</div>
   <p class="mu">Rien n’est envoyé tant que vous n’avez pas touché « Terminer ». Vous pouvez reprendre une signature ou une absence.</p>
   ${SG.steps.map((s,i)=>{const r=SG.res[i];return `<div class="task"><span><b>${esc(s.nm)}</b>${s.tr?" <small class='mu'>(formateur)</small>":""}</span>${r?(r.abs?`<span class="ko">🚫 Absent${r.ab?" · "+esc(r.ab):""} · ${esc(r.h)}</span>`:`<span class="ok">✔ Signé · ${esc(r.h)}</span>`):'<span class="ko">Manquant</span>'}<button type="button" class="btn" data-sgr="${i}">Reprendre</button></div>`}).join("")}
   <div class="pberr" id="sge" role="alert"></div><div class="btns"><button type="button" class="btn gn big2" id="fin" ${SG.steps.every((s,k)=>SG.res[k])?"":"disabled"}>✔ Terminer la demi-journée${ab?" ("+ab+" absent"+(ab>1?"s":"")+")":""}</button></div></div>`};
@@ -1200,7 +1206,7 @@ const hMin=h=>{const m=/^(\d\d):(\d\d)$/.exec(String(h||""));return m?(+m[1])*60
    if(cur)return `<div class="emf cur" data-emf="${i}"><div class="emfh">${who}<span class="wt">${st.tr?"À vous de signer, en dernier":"Passez-lui le téléphone"}</span></div><div id="emw"></div><div class="sgb sgb2">${st.tr?"<span></span>":'<button type="button" class="btn" id="abs">🚫 Absent</button>'}<button type="button" class="btn gn" id="val">✔ Valider</button></div><div class="pberr" id="sge" role="alert"></div></div>`;
    return `<div class="emf" data-emf="${i}"><div class="emfh">${who}<span class="mu">À signer</span></div><div class="emfa"><button type="button" class="btn" data-sgr="${i}">✍ Signer</button></div></div>`}).join("");
   return `<div class="sgh"><button type="button" class="btn" data-sgx>← Quitter</button><div class="sgp">Émargement · ${esc(fdw(SG.day))} ${PARTL[SG.part].toLowerCase()}</div></div>
-  <div class="fc s-clo sgc ip-em"><div class="num"><b>${esc(f.t)}</b> · ${esc(f.c)}</div><div class="mu">${PARTH[SG.part]}${prev?" · déjà signée (version "+prev.v+") : valider à nouveau remplace la version précédente":""}</div>
+  <div class="fc s-clo sgc ip-em"><div class="num"><b>${esc(f.t)}</b> · ${esc(f.c)}</div><div class="mu">${partH(f,SG.day,SG.part)}${prev?" · déjà signée (version "+prev.v+") : valider à nouveau remplace la version précédente":""}</div>
   <div class="emps" role="group" aria-label="Demi-journées">${pills}</div>
   ${frames}
   <div class="emft"><span class="sgcnt mu">${sgn} / ${n} signé${sgn>1?"s":""}${ab?" · "+ab+" absent"+(ab>1?"s":""):""} · fonctionne sans réseau</span><button type="button" class="btn gn big2" id="fin" ${all?"":"disabled"}>✔ Valider cette demi-journée</button></div></div>`};
