@@ -322,7 +322,9 @@ ${D.ac?`<div class="ac">♿ ${E(D.ac)}</div>`:""}
 <div class="fin"><div class="sg"><b style="color:#12308f">✍ SIGNATURE ÉLECTRONIQUE</b><br>${D.rp?"Représentée par "+E(D.rp)+"<br>":""}${sgn||`<div style="margin-top:6px;color:#12308f;font-weight:700">⬇ À signer juste en dessous</div>`}</div><table class="tot"><tr><td>Total H.T.</td><td class="r">${eur(D.ht)} €</td></tr><tr><td>${tvaLbl()}</td><td class="r">${eur(D.tva)} €</td></tr><tr class="ttc"><td>Total TTC</td><td class="r">${eur(D.ttc)} €</td></tr></table></div>${D.rg?`<div class="rg" style="margin-top:6px">${E(/^BON POUR ACCORD/.test(D.rg)?"SIGNATURE ÉLECTRONIQUE – Ce devis, qui comprend l’étude des besoins, s’accepte par signature électronique en ligne (bouton « Signer le devis en ligne »). La signature, horodatée et enregistrée avec le nom et la fonction du signataire, vaut acceptation du devis et commande ferme. Elle est suivie de l’envoi de la convention de formation.":D.rg)}</div>`:""}
 ${tvaNote()}${annulHtml()}${sigForm()}
 <div class="ft">${E(org)}${g[11]?" · "+formeTxt()+" au capital de "+E(g[11]):""}${rcsTxt()}${g[9]?" · APE "+E(g[9]):""}${g[10]?" · TVA intracommunautaire "+E(g[10]):""} · N° SIRET ${E(siret)}</div></div>`}
-function hrsT(d){const p=(D.hf||{})[d];return p==="m"?"½ journée : 9h00 – 12h30":p==="a"?"½ journée : 14h00 – 17h30":"9h00 – 12h30 / 14h00 – 17h30"}
+// décisions du 02/11 : horaires réglés jour par jour (D.hr, absent = horaires habituels)
+function hrsSp(d,k){const o=((D.hr||{})[d]||{})[k],ok=Array.isArray(o)&&o.length===2&&o.every(x=>/^\d{2}:\d{2}$/.test(x)),v=ok?o:(k==="m"?["09:00","12:30"]:["14:00","17:30"]),h=x=>(+x.slice(0,2))+"h"+x.slice(3);return h(v[0])+" – "+h(v[1])}
+function hrsT(d){const p=(D.hf||{})[d];return p==="m"?"½ journée : "+hrsSp(d,"m"):p==="a"?"½ journée : "+hrsSp(d,"a"):hrsSp(d,"m")+" / "+hrsSp(d,"a")}
 function docPlan(){
  const ds=D.ds||[],pe=D.pe||"",ad=D.ad||mail;
  return `<div class="cv pln"><div class="hg2">
