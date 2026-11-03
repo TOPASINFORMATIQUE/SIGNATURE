@@ -160,6 +160,8 @@ function fbHtml(code,subj,intro){const E=s=>String(s==null?"":s).replace(/[&<>"'
  return `<div class="fbx" role="alert"><p><b>La transmission automatique n’a pas fonctionné.</b> Rien n’a été envoyé à un autre service.</p><p>${FB_MAIL?`Appuyez sur « ✉ Envoyer par e-mail » : un message prêt à partir s’ouvre, adressé à ${E(FB_MAIL)}. Ou copiez le code ci-dessous et envoyez-le à ${E(FB_MAIL)}.`:`Copiez le code ci-dessous et transmettez-le à votre interlocuteur TOPAS informatique.`}</p><textarea readonly class="fbc" rows="3" aria-label="Code à transmettre" onclick="this.select()">${E(code)}</textarea><div class="fbb"><button type="button" class="fbbt" onclick="fbCopy(this)">📋 Copier le code</button>${FB_MAIL?`<a class="fbbt fbgo" href="${E(mt)}">✉ Envoyer par e-mail</a>`:""}</div></div>`}
 function fbCopy(b){const t=b.closest(".fbx").querySelector("textarea");t.focus();t.select();let c=false;try{c=document.execCommand("copy")}catch(e){}try{if(navigator.clipboard)navigator.clipboard.writeText(t.value).then(()=>{b.textContent="✔ Code copié"},()=>{})}catch(e){}b.textContent=c?"✔ Code copié":"Code sélectionné : faites Ctrl+C (ou « Copier »)"}
 // Lien court « ?l=identifiant » : le contenu est lu dans Supabase (table liens) ; les anciens liens « # » restent acceptés
+// (03/11) Dossier de test : bandeau « TEST » (données du lien : tst = 1)
+function tstBanPub(){try{if(document.getElementById("tstpub"))return;const b=document.createElement("div");b.id="tstpub";b.setAttribute("role","status");b.textContent="🧪 TEST — page d’un dossier de test : tout fonctionne, les mails partent vers l’adresse de test de l’organisme";b.style.cssText="position:sticky;top:0;z-index:50;padding:10px 14px;text-align:center;font:700 15px/1.35 Arial,sans-serif;color:#422006;background:repeating-linear-gradient(135deg,#fef08a 0 14px,#fde047 14px 28px);border-bottom:2px solid #a16207";document.body.prepend(b)}catch(e){}}
 async function lnLoad(){const id=new URLSearchParams(location.search).get("l");if(!id)return null;let j=null;
  try{const r=await fetch(SBU+"/rest/v1/rpc/lien_lire",{method:"POST",headers:{apikey:SBK,"Content-Type":"application/json"},body:JSON.stringify({p_id:id})});j=r.ok?await r.json():null}catch(e){}
  if(j&&j.ok&&j.data&&typeof j.data==="object")return j.data;throw Object.assign(new Error("lien"),{lien:j&&j.etat?j.etat:"erreur"})}
@@ -252,7 +254,7 @@ function emgsPage(D){const app=$("#app"),G=Array.isArray(D.g)?D.g:[],org=G[0]||"
   window.scrollTo(0,0)}}
 let D=null;
 try{D=await lnLoad()||await load(oldHash())}catch(e){if(e&&e.lien){lnDead($("#app"),e.lien);return}D=null}
-if(D&&typeof D==="object"&&D.m)FB_MAIL=String(D.m).trim();
+if(D&&typeof D==="object"&&D.m)FB_MAIL=String(D.m).trim();if(D&&typeof D==="object"&&D.tst)tstBanPub();/* 03/11 : dossier de test */
 if(D&&D.k==="sup"){supPage(D);return}
 if(D&&D.k==="ph"){phPage(D);return}
 if(D&&D.k==="emgs"){emgsPage(D);return}
