@@ -361,28 +361,28 @@ const SIGW=(()=>{
  const MARK=5;
  function toSg(S,max){max=max||2200;let th=0,out="";const keep=S.map(s=>s.length<=MARK);for(;;){const R=S.map((s,j)=>{const r=[];let l=null;s.forEach((q,i)=>{if(!l||keep[j]||Math.hypot(q[0]-l[0],q[1]-l[1])>=th||i===s.length-1){if(!l||q[0]!==l[0]||q[1]!==l[1])r.push(q);l=q}});return r});
   out=R.map(s=>s.map(q=>Math.max(0,q[0]).toString(36)+"."+Math.max(0,q[1]).toString(36)).join(",")).join(";");if(out.length<=max||th>40)return out;th+=th?1.5:1.2}}
- function paint(cv,S,lw){const r=cv.getBoundingClientRect(),dp=window.devicePixelRatio||1;if(r.width){const w=Math.round(r.width*dp),h=Math.round(r.height*dp);if(cv.width!==w||cv.height!==h){cv.width=w;cv.height=h}}
-  const ctx=cv.getContext("2d"),k=cv.width/320;ctx.clearRect(0,0,cv.width,cv.height);ctx.strokeStyle=INK;ctx.lineWidth=(lw||2.4)*k;ctx.lineCap="round";ctx.lineJoin="round";
-  S.forEach(s=>{if(!s.length)return;ctx.beginPath();ctx.moveTo(s[0][0]*k,s[0][1]*k);if(s.length===1)ctx.lineTo(s[0][0]*k+.1,s[0][1]*k);s.forEach(q=>ctx.lineTo(q[0]*k,q[1]*k));ctx.stroke()})}
- const CSS=`<style>.sgw{margin-top:6px}.sgw [hidden]{display:none!important}.sgw-l{font-size:15px;color:#475569;margin:10px 0 0}.sgw-pad{position:relative;margin-top:10px;border:2px dashed #9fb3d9;border-radius:12px;background:#fff;aspect-ratio:320/140;max-height:240px;width:100%}.sgw-cv{position:absolute;inset:0;width:100%;height:100%}.sgw-pad.dr{border-style:solid;border-color:${INK}}.sgw-pad.dr .sgw-cv{touch-action:none;cursor:crosshair}.sgw-ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#5b6475;font:15px system-ui,sans-serif;pointer-events:none;text-align:center;padding:0 10px}.sgw-act{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}.sgw-act button{min-height:44px;font:600 15px system-ui,sans-serif;border-radius:10px;border:1px solid #cbd5e1;background:#f8fafc;color:#1e293b;padding:8px 12px;cursor:pointer}.sgw-tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:4px 0 6px}.sgw-tb{min-height:48px;font:700 15px system-ui,-apple-system,"Segoe UI",sans-serif;border-radius:12px;border:2px solid #cbd5e1;background:#f8fafc;color:#334155;padding:8px 10px;cursor:pointer}.sgw-tb[aria-selected="true"]{border-color:${INK};background:${INK};color:#fff}.sgw-tb:focus-visible{outline:3px solid rgba(18,48,143,.35);outline-offset:2px}</style>`;
+ function paint(cv,S,lw,tf){const r=cv.getBoundingClientRect(),dp=window.devicePixelRatio||1;if(r.width){const w=Math.round(r.width*dp),h=Math.round(r.height*dp);if(cv.width!==w||cv.height!==h){cv.width=w;cv.height=h}}
+  const ctx=cv.getContext("2d"),k=cv.width/320,dp2=r.width?cv.width/r.width:1,T2=tf?tf(r.width,r.height):null,X=T2?(x=>(x-T2.dx)*T2.s*dp2):(x=>x*k),Y=T2?(y=>(y-T2.dy)*T2.s*dp2):(y=>y*k);ctx.clearRect(0,0,cv.width,cv.height);ctx.strokeStyle=INK;ctx.lineWidth=(lw||2.4)*(T2?Math.min(T2.s*dp2,k*1.6):k);ctx.lineCap="round";ctx.lineJoin="round";
+  S.forEach(s=>{if(!s.length)return;ctx.beginPath();ctx.moveTo(X(s[0][0]),Y(s[0][1]));if(s.length===1)ctx.lineTo(X(s[0][0])+.1,Y(s[0][1]));s.forEach(q=>ctx.lineTo(X(q[0]),Y(q[1])));ctx.stroke()})}
+ const CSS=`<style>.sgw{margin-top:6px}.sgw [hidden]{display:none!important}.sgw-l{font-size:15px;color:#475569;margin:10px 0 0}.sgw-pad{position:relative;margin-top:10px;border:2px dashed #9fb3d9;border-radius:12px;background:#fff;aspect-ratio:320/140;max-height:240px;width:100%}.sgw-cv{position:absolute;inset:0;width:100%;height:100%}.sgw-pad.sgw-tall{aspect-ratio:auto;height:250px;max-height:none}.sgw-pad.dr{border-style:solid;border-color:${INK}}.sgw-pad.dr .sgw-cv{touch-action:none;cursor:crosshair}.sgw-ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#5b6475;font:15px system-ui,sans-serif;pointer-events:none;text-align:center;padding:0 10px}.sgw-act{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}.sgw-act button{min-height:44px;font:600 15px system-ui,sans-serif;border-radius:10px;border:1px solid #cbd5e1;background:#f8fafc;color:#1e293b;padding:8px 12px;cursor:pointer}.sgw-tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:4px 0 6px}.sgw-tb{min-height:48px;font:700 15px system-ui,-apple-system,"Segoe UI",sans-serif;border-radius:12px;border:2px solid #cbd5e1;background:#f8fafc;color:#334155;padding:8px 10px;cursor:pointer}.sgw-tb[aria-selected="true"]{border-color:${INK};background:${INK};color:#fff}.sgw-tb:focus-visible{outline:3px solid rgba(18,48,143,.35);outline-offset:2px}</style>`;
  // o = {name: () => « Prénom Nom », max: longueur maximale du tracé, label}
  // tracé à la main : renforcé (traits doublés d'un point) pour rester lisible une fois réduit dans le document — même format de données
  const thick=S=>S.concat(S.map(s=>s.map(([x,y])=>[x+1,y])),S.map(s=>s.map(([x,y])=>[x,y+1])));
- function mount(el,o){o=o||{};const st=DEF;let cur=null,comp=[];const T=touch(),K=o.keep&&typeof o.keep==="object"?o.keep:null;let mode=K&&(K.mode==="draw"||K.mode==="txt")?K.mode:T?"draw":"txt",drw=K&&Array.isArray(K.drw)?K.drw:[];const id=el.id||"sgw";
+ function mount(el,o){o=o||{};const TL=!!o.tall,tfD=(W,H)=>{const f=Math.min(320/W,140/H);return {s:1/f,dx:(320-W*f)/2,dy:(140-H*f)/2}},tfT=(W,H)=>{const s=W/320;return {s,dx:0,dy:-(H-140*s)/2/s}};const st=DEF;let cur=null,comp=[];const T=touch(),K=o.keep&&typeof o.keep==="object"?o.keep:null;let mode=K&&(K.mode==="draw"||K.mode==="txt")?K.mode:T?"draw":"txt",drw=K&&Array.isArray(K.drw)?K.drw:[];const id=el.id||"sgw";
   const keep=()=>{if(K){K.mode=mode;K.drw=drw}};// o.keep : mémoire (mode + tracé) conservée si l'encart est reconstruit (retour en arrière)
   el.innerHTML=CSS+`<div class="sgw"><div class="sgw-tabs" role="tablist" aria-label="Façon de signer"><button type="button" role="tab" class="sgw-tb" data-m="txt" id="${id}-tt">✍ Signature simple</button><button type="button" role="tab" class="sgw-tb" data-m="draw" id="${id}-td">✏ Signer à la main</button></div>
    <div class="sgw-txt"><div class="sgw-l" id="${id}-l">${String(o.label||"Votre signature est composée à partir de votre prénom et de votre nom.").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}</div></div>
-   <div class="sgw-pad" role="tabpanel"><canvas class="sgw-cv" role="img" aria-label="Votre signature"></canvas><div class="sgw-ph"></div></div>
+   <div class="sgw-pad${TL?" sgw-tall":""}" role="tabpanel"><canvas class="sgw-cv" role="img" aria-label="Votre signature"></canvas><div class="sgw-ph"></div></div>
    <div class="sgw-act"><button type="button" class="sgw-cl" hidden>↺ Effacer</button></div></div>`;
   const q=s=>el.querySelector(s),cv=q(".sgw-cv"),pad=q(".sgw-pad"),ph=q(".sgw-ph"),nm=()=>clean(o.name?o.name():"");
-  function draw(){if(mode==="draw"){paint(cv,drw.concat(cur?[cur]:[]),3.4);ph.style.display=drw.length||cur?"none":"flex";ph.textContent=T?"Signez ici avec le doigt":"Signez ici avec la souris ou le pavé tactile"}
-   else{comp=compose(nm(),st);paint(cv,comp);ph.style.display=comp.length?"none":"flex";ph.textContent="Indiquez votre prénom et votre nom : votre signature s’affiche ici"}}
+  function draw(){if(mode==="draw"){paint(cv,drw.concat(cur?[cur]:[]),3.4,TL?tfD:null);ph.style.display=drw.length||cur?"none":"flex";ph.textContent=TL?(T?"Signez avec le doigt":"Signez avec la souris"):T?"Signez ici avec le doigt":"Signez ici avec la souris ou le pavé tactile"}
+   else{comp=compose(nm(),st);paint(cv,comp,0,TL?tfT:null);ph.style.display=comp.length?"none":"flex";ph.textContent="Indiquez votre prénom et votre nom : votre signature s’affiche ici"}}
   function setMode(m){mode=m;keep();pad.classList.toggle("dr",m==="draw");q(".sgw-txt").hidden=m==="draw";q(".sgw-cl").hidden=m!=="draw";
    el.querySelectorAll(".sgw-tb").forEach(b=>{const on=b.dataset.m===m;b.setAttribute("aria-selected",String(on));b.tabIndex=on?0:-1});pad.setAttribute("aria-labelledby",id+(m==="draw"?"-td":"-tt"));draw()}
   el.querySelectorAll(".sgw-tb").forEach(b=>b.onclick=()=>{if(b.dataset.m!==mode)setMode(b.dataset.m)});
   q(".sgw-tabs").addEventListener("keydown",e=>{if(e.key==="ArrowLeft"||e.key==="ArrowRight"){e.preventDefault();setMode(mode==="txt"?"draw":"txt");q('.sgw-tb[aria-selected="true"]').focus()}});
   q(".sgw-cl").onclick=()=>{drw=[];cur=null;keep();draw()};
-  const pt=e=>{const r=cv.getBoundingClientRect();return[Math.round((e.clientX-r.left)/r.width*320),Math.round((e.clientY-r.top)/r.height*140)]};
+  const pt=e=>{const r=cv.getBoundingClientRect();if(TL){const t=tfD(r.width,r.height),f=1/t.s;return[Math.round((e.clientX-r.left)*f+t.dx),Math.round((e.clientY-r.top)*f+t.dy)]}return[Math.round((e.clientX-r.left)/r.width*320),Math.round((e.clientY-r.top)/r.height*140)]};
   cv.addEventListener("pointerdown",e=>{if(mode!=="draw")return;e.preventDefault();try{cv.setPointerCapture(e.pointerId)}catch(x){}cur=[pt(e)];draw()});
   cv.addEventListener("pointermove",e=>{if(mode!=="draw"||!cur)return;e.preventDefault();cur.push(pt(e));draw()});
   const end=()=>{if(!cur)return;drw.push(cur);cur=null;keep();draw()};cv.addEventListener("pointerup",end);cv.addEventListener("pointercancel",end);cv.addEventListener("pointerleave",end);
@@ -525,10 +525,10 @@ async function main(){
  const DK=(n,k)=>"fpiv:d:"+NS+":"+n+":"+k,draft=(n,k)=>LS.get(DK(n,k),null),draftSet=(n,k,v)=>LS.set(DK(n,k),v),draftDel=(n,k)=>{try{localStorage.removeItem(DK(n,k))}catch(e){}};
  try{const lim=(()=>{const d=new Date(Date.now()-30*864e5);return d.getFullYear()+"-"+p2(d.getMonth()+1)+"-"+p2(d.getDate())})(),QI=new Set(Q().map(x=>x.id)),FN={};(D.f||[]).forEach(f=>{FN[f.n]=f});
   Object.keys(localStorage).filter(k=>k.startsWith("fpiv:r:"+NS+":")).forEach(k=>{const n=k.slice(("fpiv:r:"+NS+":").length),f=FN[n],R=LS.get(k,[]);if(!Array.isArray(R))return;
-   const K=R.filter(r=>{if(!r||!r.dl||r.dl>=lim||QI.has(r.id))return true;if(!f)return false;if(r.kd==="acq")return !(f.acq&&f.acq.tr&&f.acq.tr[r.ti]);if(r.kd==="bil")return !f.bilr;return true});if(!K.length)localStorage.removeItem(k);else if(K.length!==R.length)LS.set(k,K)})}catch(e){}
+   const K=R.filter(r=>{if(!r||!r.dl||r.dl>=lim||QI.has(r.id))return true;if(!f)return false;if(r.kd==="acq"){const A=r.ty==="av"?f.acqAv:f.acq;return !(A&&A.tr&&A.tr[r.ti])}if(r.kd==="bil")return !f.bilr;return true});if(!K.length)localStorage.removeItem(k);else if(K.length!==R.length)LS.set(k,K)})}catch(e){}
  function wipeDevice(){try{Object.keys(localStorage).filter(k=>/^fpiv:(r:|d:|E:D$|D$)/.test(k)).forEach(k=>localStorage.removeItem(k))}catch(e){}}
  const latest=(n,kd,day,part)=>recs(n).filter(r=>r.kd===kd&&r.day===(day||"")&&r.part===(part||"")).sort((a,b)=>b.v-a.v)[0];
- const emState=(f,sl)=>{const r=latest(f.n,"em",sl.day,sl.part);return r?{r,sent:!pend(r.id)}:null};
+ const emState=(f,sl)=>{const r=latest(f.n,"em",sl.day,sl.part);return r&&!(r.e||[]).some(z=>z&&z.lt)?{r,sent:!pend(r.id)}:null};
  const dueEm=f=>SLOTS(f).filter(sl=>sl.day<=T&&!emState(f,sl)).length;
  const stTxt=(x,what)=>x?(x.sent?`<span class="ok">✔ ${what||"Signé"} le ${esc(dm(x.r.dl))} à ${esc(x.r.hl)}${x.r.abs?` · ${x.r.abs} absent${x.r.abs>1?"s":""}`:""}</span>`:`<span class="wt">⏳ ${what||"Signé"} le ${esc(dm(x.r.dl))} à ${esc(x.r.hl)} · en attente d’envoi</span>`):"";
  let FP=null;
@@ -615,10 +615,22 @@ async function main(){
  const bonSt=x=>{const s=blSt(x),t=x.t;if(s.k==="ns")return{k:"ns",w:"Sans signature",s};if(s.k==="sig"||s.k==="att")return{k:"sig",w:"Signé",s};const n=nLate(t.d);if(n>=2)return{k:"late",w:"+ 48 h",s,n};if(t.d&&t.d<=T)return{k:"auj",w:"À signer",s,n};return{k:"ven",w:"À venir",s}};
  const mapA=(c,a)=>a?`<a class="ip-ab ip-ab-map" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(String(c||"")+" "+a)}" target="_blank" rel="noopener">🧭 Itinéraire</a>`:"";
  const rowW=(g,inner,acts,q)=>`<div class="ip-rw ip-rw-${g}" data-q="${esc(String(q||"").replace(/\s+/g," ").trim())}">${inner}${acts?`<div class="ip-ra">${acts}</div>`:""}</div>`;
+ // ---- 03/11 : sous chaque formation, 4 boutons pleine largeur — ✍ Faire émarger (orange) · 🎯 Évaluation avant (violet) · 🏁 Évaluation après
+ // (violet → rose) · 📄 Déroulé (blanc) — chacun avec son état ; les deux évaluations s'ouvrent à tout moment (plus de blocage par l'émargement) ;
+ // en bas « ⚠ Signaler un problème » (rouge) et « ✏ Remarque » (blanc bordé bleu), mêmes fonctions que sur l'écran de la formation.
+ const evSt=(f,ty)=>{const tr=f.tr||[],n=tr.length,k=tr.filter((t,i)=>acqSt(f,i,ty)).length,pd=tr.some((t,i)=>{const z=acqSt(f,i,ty);return z&&z.pend}),d=acqDate(f,ty),last=DS(f).slice(-1)[0]||"";
+  if(!n)return{t:"aucun stagiaire",k:"no"};if(pd)return{t:"en attente d’envoi",k:"pd"};if(k===n)return{t:"✓ faite le "+dm(d)+" · "+k+"/"+n,k:"ok"};if(k)return{t:k+"/"+n,k:"part"};
+  if(ty==="ap"){if(last===T)return{t:"à faire aujourd’hui",k:"now"};if(last>T)return{t:"le "+dm(last),k:"later"}}return{t:"à faire",k:"todo"}};
+ const emBtnSt=f=>{const o=emDue(f);if(o)return o.part==="m"?"matin":"après-midi";const sl=SLOTS(f);if(sl.length&&sl.every(z=>emState(f,z)))return"✓ fait";const nx=sl.find(z=>!emState(f,z));return nx?"le "+dm(nx.day):"—"};
+ const acqLine=(f,ix,ty)=>{const tr=f.tr||[],st=evSt(f,ty),an=Math.max(0,tr.findIndex((t,i)=>!acqSt(f,i,ty)));
+  return `<div class="task ip-l3" id="l3${ty}"><span class="ip-l3t">${ty==="av"?"🎯 Évaluation avant":"🏁 Évaluation après"}<br><small class="mu">${ty==="av"?"positionnement":"acquis"} · par stagiaire · ${esc(st.t)}</small></span>${!tr.length?'<span class="mu">Aucun stagiaire</span>':f.clo?'<span class="mu">🔒 clôturé</span>':`<button type="button" class="btn${st.k==="ok"?"":" p"}" data-acq="${ix}:${an}:${ty}">${st.k==="ok"?"Modifier":st.k==="part"?"▶ Continuer":"▶ Commencer"}</button>`}</div>`};
+ const f4Btns=(f,ix)=>{const tr=f.tr||[],ev=ty=>{const st=evSt(f,ty),an=Math.max(0,tr.findIndex((t,i)=>!acqSt(f,i,ty)));return `<button type="button" class="ip-f4b ip-f4-${ty}${st.k==="ok"?" done":""}" data-acq="${ix}:${an}:${ty}"><span>${ty==="av"?"🎯 Évaluation avant":"🏁 Évaluation après"}</span><span class="ip-f4s ip-f4s-${st.k}">${esc(st.t)}</span></button>`};
+  return `<div class="ip-f4"><button type="button" class="ip-f4b ip-f4-em" data-fgo="${ix}"><span>✍ Faire émarger</span><span class="ip-f4s">${esc(emBtnSt(f))}</span></button>${tr.length&&!f.clo?ev("av")+ev("ap"):""}<button type="button" class="ip-f4b ip-f4-de" data-fder="${ix}">📄 Déroulé</button>
+  <div class="ip-f4x"><button type="button" class="ip-f4pb" data-fpb="${ix}:pb">⚠ Signaler un problème</button><button type="button" class="ip-f4rm" data-fpb="${ix}:rem">✏ Remarque</button></div></div>`};
  const uF=(x,d,late)=>{const f=x.f,dd=DS(f),dt=d||dd[0]||"",j=dd.indexOf(dt),dn=x.s==="fini",pd=late?pastDue(f).length:0,n=late&&dt?nLate(dt):0,hr=slot(f,dt)[0];
   const emTodo=!dn&&(late||SLOTS(f).some(o=>o.day===T&&!emState(f,o))),todo=emTodo||(!dn&&x.s==="clo");
   const st=dn?stW("sig","Terminée"):n>=2?stW("late","+ 48 h"):emTodo?stW("auj","À émarger"):x.s==="clo"?stW("auj","À clôturer"):x.s==="cours"||x.s==="auj"?stW("ven","En cours"):stW("ven","À venir");
-  const acts=dn?"":(todo?`<button type="button" class="ip-ab ip-ab-go" data-fgo="${x.ix}">${emTodo?"✎ Faire émarger":"📝 À compléter"}</button>`:"")+mapA(f.c,f.a)+`<button type="button" class="ip-ab ip-ab-eye" data-fder="${x.ix}">Déroulé</button>`;
+  const acts=dn?"":f4Btns(f,x.ix);
   return {k:dt+" "+hr,h:rowW(dn?"sig":todo?"auj":"ven",`<button type="button" class="row urow ip-row" data-f="${x.ix}">${dCol(dt)}<span class="ip-c ul"><b class="uc" title="${esc(f.c||"")}">${esc(f.c||"")}</b><span class="ip-s m">${esc(f.t||"Formation")}${dd.length>1?(dn||j<0?" · "+dd.length+" jours":" · jour "+(j+1)+"/"+dd.length):""}</span>${late&&dt?uAgo(dt)+(pd?`<span class="ip-s m">✍ ${pd} émargement${pd>1?"s":""} à faire signer</span>`:""):""}</span><span class="ip-r">${dn?"":`<span class="ip-hr">${esc(fH(hr))}</span>`}<span class="ip-rt"><span class="utag uf ip-tag">Formation</span>${st}</span></span></button>`,acts,(f.c||"")+" "+(f.n||"")+" "+(f.t||""))}};
  // retard : « il y a N jours » (bon ou émargement daté d'avant aujourd'hui, pas signé)
  const uAgo=d=>{const n=Math.round((Date.parse(T)-Date.parse(d))/864e5);return n>0?`<span class="ulate">il y a ${n} jour${n>1?"s":""}</span>`:""};
@@ -1027,31 +1039,32 @@ const hMin=h=>{const m=/^(\d\d):(\d\d)$/.exec(String(h||""));return m?(+m[1])*60
  // de fin de stage sur le téléphone : la satisfaction est envoyée par mail par TOPAS Formation. Aucune donnée de santé.
  const ACQL={a:"✓ Acquis",p:"◐ En partie",n:"Non acquis"};
  const sigSvgP=sg=>{let d="";String(sg||"").split(";").forEach(st=>{const P=st.split(",").map(q=>q.split(".").map(v=>parseInt(v,36))).filter(q=>q.length===2&&!isNaN(q[0])&&!isNaN(q[1]));if(!P.length)return;if(P.length===1)P.push([P[0][0]+1,P[0][1]]);d+="M"+P.map(q=>q[0]+" "+q[1]).join("L")});return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 140" class="emsvg" aria-hidden="true"><path d="${d}" fill="none" stroke="#12308f" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`};
- const acqRec=(f,ti)=>recs(f.n).filter(r=>r.kd==="acq"&&r.ti===ti).reverse().sort((a,b)=>String(b.dl+b.hl).localeCompare(String(a.dl+a.hl)))[0]||null;
+ const acqRec=(f,ti,ty)=>recs(f.n).filter(r=>r.kd==="acq"&&r.ti===ti&&(r.ty||"ap")===(ty||"ap")).reverse().sort((a,b)=>String(b.dl+b.hl).localeCompare(String(a.dl+a.hl)))[0]||null;
  // état d'un stagiaire : évalué sur ce téléphone (reprise possible, envoi en attente ou fait), sinon résultat déjà connu de TOPAS (f.acq)
- const acqSt=(f,ti)=>{const r=acqRec(f,ti);if(r)return{src:"tel",r,abs:!!r.abs,pend:!!pend(r.id)};const k=f.acq&&f.acq.tr&&f.acq.tr[ti];return k&&(k.abs||(Array.isArray(k.r)&&k.r.length))?{src:"topas",r:k,abs:!!k.abs,pend:false}:null};
+ const acqSt=(f,ti,ty)=>{const r=acqRec(f,ti,ty);if(r)return{src:"tel",r,abs:!!r.abs,pend:!!pend(r.id)};const A=ty==="av"?f.acqAv:f.acq,k=A&&A.tr&&A.tr[ti];return k&&(k.abs||(Array.isArray(k.r)&&k.r.length))?{src:"topas",r:k,abs:!!k.abs,pend:false}:null};
  // toutes les demi-journées sont signées (dernier jour compris), ici ou déjà reçues par TOPAS
  const acqReq=f=>(f.cl||[]).some(z=>z[0]==="acq")||!!(f.acq&&f.acq.tr&&Object.keys(f.acq.tr).length)||(f.tr||[]).some((t,i)=>acqRec(f,i));
  const emgAll=f=>{const sl=SLOTS(f);return (!!sl.length&&sl.every(o=>emState(f,o)))||(f.cl||[]).some(z=>z[0]==="emarg"&&z[1])};
  // absent à TOUTE la formation (noté absent sur chaque demi-journée signée sur ce téléphone) → « non évalué · absent »
  const absAll=(f,ti)=>{const nm=String(((f.tr||[])[ti]||[])[0]||"").trim(),sl=SLOTS(f);if(!nm||!sl.length)return false;return sl.every(o=>{const x=emState(f,o);return x&&Array.isArray(x.r.e)&&x.r.e.some(e=>e.nm===nm&&e.abs)})};
- const acqNext=f=>(f.tr||[]).findIndex((t,i)=>!acqSt(f,i)),acqCnt=f=>(f.tr||[]).filter((t,i)=>acqSt(f,i)).length,acqDone=f=>{const tr=f.tr||[];return !!tr.length&&tr.every((t,i)=>acqSt(f,i))};
+ const acqNext=(f,ty)=>(f.tr||[]).findIndex((t,i)=>!acqSt(f,i,ty)),acqCnt=(f,ty)=>(f.tr||[]).filter((t,i)=>acqSt(f,i,ty)).length,acqDone=(f,ty)=>{const tr=f.tr||[];return !!tr.length&&tr.every((t,i)=>acqSt(f,i,ty))};
  const acqSum=(r,n)=>{const R=(r&&r.r)||[];let a=0,p=0,x=0;R.forEach(v=>{if(v==="a")a++;else if(v==="p")p++;else if(v==="n")x++});return{a,p,n:x,e:Math.max(0,n-a-p-x)}};
  const acqSumTxt=u=>`${u.a} acquis · ${u.p} en partie · ${u.n} non acquis${u.e?" · "+u.e+" à évaluer":""}`;
  // bilan du formateur : réponse « Objectifs pédagogiques atteints par le groupe » proposée d'après les acquis (modifiable)
  const acqGroup=f=>{const n=(f.ob2||[]).length;let a=0,t=0;(f.tr||[]).forEach((x,i)=>{const s=acqSt(f,i);if(!s||s.abs)return;const u=acqSum(s.r,n);a+=u.a+u.p/2;t+=u.a+u.p+u.n});if(!t)return"";const q=a/t;return q>=0.95?"Totalement":q>=0.7?"En grande partie":q>=0.35?"En partie":"Non atteints"};
  let AQ=null;
- const acqDate=f=>{let d="";(f.tr||[]).forEach((t,i)=>{const z=acqSt(f,i);if(z&&z.r&&z.r.dl&&String(z.r.dl)>d)d=String(z.r.dl)});return d||(f.acq&&f.acq.d)||""};
+ const acqDate=(f,ty)=>{let d="";(f.tr||[]).forEach((t,i)=>{const z=acqSt(f,i,ty);if(z&&z.r&&z.r.dl&&String(z.r.dl)>d)d=String(z.r.dl)});const A=ty==="av"?f.acqAv:f.acq;return d||(A&&A.d)||""};
+ const acqDK=ti=>(AQ&&AQ.ty==="av"?"acqav:":"acq:")+ti;
  const shortNm=n=>{const p=String(n||"").trim().split(/\s+/).filter(Boolean);return p.length>1?p[0]+" "+p[p.length-1][0].toUpperCase()+".":p[0]||"?"};
  // 01/11 : un onglet par stagiaire (prénom + initiale), « Enregistrer » par stagiaire (nouveau dépôt à chaque enregistrement : chaque version est conservée, côté téléphone et côté TOPAS Formation)
- function acqStart(ix,ti){const f=D.f[ix];if(!f||!(f.tr||[]).length)return;ti=Math.max(0,Math.min((f.tr||[]).length-1,+ti||0));AQ={ix,ti,all:{},done:null};acqLoad(ti);nav({v:"acq"})}
- function acqLoad(ti){const f=D.f[AQ.ix],ob=f.ob2||[];if(AQ.all[ti])return AQ.all[ti];const st=acqSt(f,ti),cur=AQ.all[ti]={r:st&&st.r&&Array.isArray(st.r.r)?ob.map((o,k)=>st.r.r[k]||""):ob.map(()=>""),c:(st&&st.r&&st.r.c)||"",abs:st?!!st.abs:absAll(f,ti),saved:!!st,dirty:false};
-  const dr=draft(f.n,"acq:"+ti);if(dr&&typeof dr==="object"){cur.r=ob.map((o,k)=>(Array.isArray(dr.r)?dr.r[k]:"")||"");cur.c=typeof dr.c==="string"?dr.c:"";cur.abs=!!dr.abs;cur.dirty=true}return cur}
- const acqDraft=()=>{if(!AQ)return;const f=D.f[AQ.ix],cur=AQ.all[AQ.ti];if(cur)draftSet(f.n,"acq:"+AQ.ti,{r:cur.r,c:cur.c,abs:cur.abs})};
+ function acqStart(ix,ti,ty){const f=D.f[ix];if(!f||!(f.tr||[]).length)return;ti=Math.max(0,Math.min((f.tr||[]).length-1,+ti||0));AQ={ix,ti,ty:ty==="av"?"av":"ap",all:{},done:null};acqLoad(ti);nav({v:"acq"})}
+ function acqLoad(ti){const f=D.f[AQ.ix],ob=f.ob2||[];if(AQ.all[ti])return AQ.all[ti];const st=acqSt(f,ti,AQ.ty),cur=AQ.all[ti]={r:st&&st.r&&Array.isArray(st.r.r)?ob.map((o,k)=>st.r.r[k]||""):ob.map(()=>""),c:(st&&st.r&&st.r.c)||"",abs:st?!!st.abs:absAll(f,ti),saved:!!st,dirty:false};
+  const dr=draft(f.n,acqDK(ti));if(dr&&typeof dr==="object"){cur.r=ob.map((o,k)=>(Array.isArray(dr.r)?dr.r[k]:"")||"");cur.c=typeof dr.c==="string"?dr.c:"";cur.abs=!!dr.abs;cur.dirty=true}return cur}
+ const acqDraft=()=>{if(!AQ)return;const f=D.f[AQ.ix],cur=AQ.all[AQ.ti];if(cur)draftSet(f.n,acqDK(AQ.ti),{r:cur.r,c:cur.c,abs:cur.abs})};
  function acqView(){if(!AQ)return listView();const f=D.f[AQ.ix],tr=f.tr||[],t=tr[AQ.ti]||[],ob=f.ob2||[],n=tr.length,au=(f.au||[])[AQ.ti],cur=acqLoad(AQ.ti),sum=acqSum({r:cur.r},ob.length);
-  if(AQ.done)return `<div class="fc s-auj sgc"><h3>${AQ.done.pending?"⏳ Enregistré, envoi en attente":"✔ Évaluation enregistrée"}</h3><p>${n} stagiaire${n>1?"s":""} évalué${n>1?"s":""}${AQ.done.abs?" dont "+AQ.done.abs+" absent"+(AQ.done.abs>1?"s":""):""}. TOPAS informatique reçoit les résultats : document rempli, certificats, bilan.</p><p class="mu">${AQ.done.pending?"Pas de connexion pour l’instant : l’envoi se fera tout seul au retour du réseau.":"Vous pouvez revoir ou corriger une évaluation depuis la formation tant que le dossier n’est pas clôturé."}</p><div class="btns"><button type="button" class="btn p" data-aqx2>← Retour à la formation</button></div></div><div id="qbn">${bannerHtml()}</div>`;
-  const tabs=tr.map((x,i)=>{const z=acqSt(f,i),on=i===AQ.ti,m=AQ.all[i];return `<button type="button" class="aqtab${on?" on":""}${z?" ok":""}" data-aqt="${i}" role="tab" aria-selected="${on}">${esc(shortNm(x[0]||"Stagiaire "+(i+1)))}${z?" ✓":m&&m.dirty?" ●":""}</button>`}).join("");
-  return `<div class="sgh"><button type="button" class="btn" data-aqx>← Quitter</button><div class="sgp">Évaluation des acquis · ${AQ.ti+1} / ${n}</div></div>
+  if(AQ.done)return `<div class="fc s-auj sgc"><h3>${AQ.done.pending?"⏳ Enregistré, envoi en attente":AQ.ty==="av"?"✔ Évaluation avant enregistrée":"✔ Évaluation après enregistrée"}</h3><p>${n} stagiaire${n>1?"s":""} évalué${n>1?"s":""}${AQ.done.abs?" dont "+AQ.done.abs+" absent"+(AQ.done.abs>1?"s":""):""}. TOPAS informatique reçoit les résultats : document rempli, certificats, bilan.</p><p class="mu">${AQ.done.pending?"Pas de connexion pour l’instant : l’envoi se fera tout seul au retour du réseau.":"Vous pouvez revoir ou corriger une évaluation depuis la formation tant que le dossier n’est pas clôturé."}</p><div class="btns"><button type="button" class="btn p" data-aqx2>← Retour à la formation</button></div></div><div id="qbn">${bannerHtml()}</div>`;
+  const tabs=tr.map((x,i)=>{const z=acqSt(f,i,AQ.ty),on=i===AQ.ti,m=AQ.all[i];return `<button type="button" class="aqtab${on?" on":""}${z?" ok":""}" data-aqt="${i}" role="tab" aria-selected="${on}">${esc(shortNm(x[0]||"Stagiaire "+(i+1)))}${z?" ✓":m&&m.dirty?" ●":""}</button>`}).join("");
+  return `<div class="sgh"><button type="button" class="btn" data-aqx>← Quitter</button><div class="sgp">${AQ.ty==="av"?"🎯 Évaluation avant · positionnement":"🏁 Évaluation après · acquis"} · ${AQ.ti+1} / ${n}</div></div>
   <div class="fc s-clo sgc ip-aq"><div class="num">${esc(f.t)} · N° ${esc(f.n)}</div><div class="aqtabs" role="tablist" aria-label="Stagiaires">${tabs}</div><div class="nm2">${esc(t[0]||"Stagiaire "+(AQ.ti+1))}</div>${t[1]?`<div class="mu" style="text-align:center">${esc(t[1])}</div>`:""}
   ${au&&(au[0]||au[1])?`<div class="aqau">📝 Avant la formation : ${au[0]?"niveau <b>"+esc(au[0])+"</b>":""}${au[0]&&au[1]?" · ":""}${au[1]?"objectif « "+esc(au[1])+" »":""}</div>`:""}
   ${cur.abs?`<div class="aqabs"><b>🚫 Absent(e) à toute la formation</b><br>Résultat : <b>non évalué · absent</b>. Touchez « Enregistrer » pour le noter.<div class="btns" style="margin-top:8px"><button type="button" class="btn" data-aqpres>Finalement présent(e) : évaluer</button></div></div>`:
@@ -1062,9 +1075,9 @@ const hMin=h=>{const m=/^(\d\d):(\d\d)$/.exec(String(h||""));return m?(+m[1])*60
  function acqSave(){const f=D.f[AQ.ix],t=(f.tr||[])[AQ.ti]||[],cur=acqLoad(AQ.ti),now=nowS(),rid=Date.now().toString(36)+Math.random().toString(36).slice(2,6),ob=(f.ob2||[]).map(o=>String(o).slice(0,120)),rf=sigRef();
   const r=cur.abs?[]:cur.r.map(v=>["a","p","n"].includes(v)?v:""),c=cur.abs?"":String(cur.c||"").trim().slice(0,400);
   if(!cur.abs&&!r.some(Boolean)&&!c){const e=document.getElementById("aqe");if(e)e.textContent="Évaluation vide : cochez au moins un objectif ou indiquez un commentaire (ou notez le stagiaire absent). Rien n’a été enregistré.";return false}
-  const p={t:"fp-sign",k:"acq",n:f.n,id:rid,rf,ti:AQ.ti,nm:String(t[0]||"").slice(0,80),r,c,abs:cur.abs?1:0,ob,tot:(f.tr||[]).length,dl:now.dl,hl:now.hl,iv:D.i||""};
-  const R=recs(f.n);R.push({id:rid,kd:"acq",ti:AQ.ti,nm:p.nm,r,c,abs:p.abs,dl:now.dl,hl:now.hl});
-  if(!LS.set(RK(f.n),R)||!enqueue([p])){const e=document.getElementById("aqe");if(e)e.textContent="Impossible d’enregistrer sur ce téléphone (mémoire pleine ou navigation privée). Rien n’a été envoyé.";return false}cur.saved=true;cur.dirty=false;draftDel(f.n,"acq:"+AQ.ti);return true}
+  const p={t:"fp-sign",k:"acq",ty:AQ.ty,n:f.n,id:rid,rf,ti:AQ.ti,nm:String(t[0]||"").slice(0,80),r,c,abs:cur.abs?1:0,ob,tot:(f.tr||[]).length,dl:now.dl,hl:now.hl,iv:D.i||""};
+  const R=recs(f.n);R.push({id:rid,kd:"acq",ty:AQ.ty,ti:AQ.ti,nm:p.nm,r,c,abs:p.abs,dl:now.dl,hl:now.hl});
+  if(!LS.set(RK(f.n),R)||!enqueue([p])){const e=document.getElementById("aqe");if(e)e.textContent="Impossible d’enregistrer sur ce téléphone (mémoire pleine ou navigation privée). Rien n’a été envoyé.";return false}cur.saved=true;cur.dirty=false;draftDel(f.n,acqDK(AQ.ti));return true}
  function acqBind(){if(!AQ)return;const f=D.f[AQ.ix],cur=acqLoad(AQ.ti);
   document.querySelectorAll("[data-aqt]").forEach(b=>b.onclick=()=>{AQ.ti=+b.dataset.aqt;acqLoad(AQ.ti);view()});
   document.querySelectorAll(".aq").forEach(w=>{const k=+w.dataset.aqk;w.querySelectorAll("[data-aqv]").forEach(b=>b.onclick=()=>{cur.r[k]=cur.r[k]===b.dataset.aqv?"":b.dataset.aqv;cur.dirty=true;acqDraft();w.querySelectorAll("[data-aqv]").forEach(z=>z.setAttribute("aria-pressed",String(z.dataset.aqv===cur.r[k])));const s=document.getElementById("aqsum");if(s)s.textContent=acqSumTxt(acqSum({r:cur.r},(f.ob2||[]).length))})});
@@ -1072,9 +1085,9 @@ const hMin=h=>{const m=/^(\d\d):(\d\d)$/.exec(String(h||""));return m?(+m[1])*60
   const pr=document.querySelector("[data-aqpres]");if(pr)pr.onclick=()=>{cur.abs=false;cur.dirty=true;acqDraft();view()};
   const x=document.querySelector("[data-aqx]");if(x)x.onclick=()=>{if(Object.values(AQ.all).some(z=>z.dirty)&&!x._a){x._a=1;const t0=x.textContent;x.textContent="Quitter sans enregistrer ?";setTimeout(()=>{x._a=0;x.textContent=t0},4000);return}const ix=AQ.ix;AQ=null;nav({v:"f",ix})};
   const x2=document.querySelector("[data-aqx2]");if(x2)x2.onclick=()=>{const ix=AQ.ix;AQ=null;nav({v:"f",ix})};
-  const go=document.getElementById("aqgo");if(go)go.onclick=()=>{go.disabled=true;if(!acqSave()){go.disabled=false;return}const tr=f.tr||[],k=tr.findIndex((t,i)=>i>AQ.ti&&!acqSt(f,i)),k2=k>=0?k:tr.findIndex((t,i)=>!acqSt(f,i));
+  const go=document.getElementById("aqgo");if(go)go.onclick=()=>{go.disabled=true;if(!acqSave()){go.disabled=false;return}const tr=f.tr||[],k=tr.findIndex((t,i)=>i>AQ.ti&&!acqSt(f,i,AQ.ty)),k2=k>=0?k:tr.findIndex((t,i)=>!acqSt(f,i,AQ.ty));
    if(k2>=0&&k2!==AQ.ti){AQ.ti=k2;acqLoad(k2);view();window.scrollTo(0,0);return}
-   const ab=tr.filter((t,i)=>{const z=acqSt(f,i);return z&&z.abs}).length;AQ.done={pending:true,abs:ab};view();window.scrollTo(0,0);flush().then(()=>{if(AQ&&AQ.done){AQ.done.pending=tr.some((t,i)=>{const z=acqSt(f,i);return z&&z.pend});view()}})}}
+   const ab=tr.filter((t,i)=>{const z=acqSt(f,i,AQ.ty);return z&&z.abs}).length;AQ.done={pending:true,abs:ab};view();window.scrollTo(0,0);flush().then(()=>{if(AQ&&AQ.done){AQ.done.pending=tr.some((t,i)=>{const z=acqSt(f,i,AQ.ty);return z&&z.pend});view()}})}}
  // 📝 Bilan du formateur (01/11) : trois champs libres (déroulement, difficultés, suites à donner), dépôt k:"bil", modifiable (nouvelle version à chaque envoi), hors connexion
  let BI=null;
  function bilStart(ix){const f=D.f[ix];if(!f)return;const r=BIL(f)||{};BI={ix,der:r.der||"",dif:r.dif||"",sui:r.sui||"",again:!!r.der,done:null,dirty:false};const dr=draft(f.n,"bil");if(dr&&typeof dr==="object"){["der","dif","sui"].forEach(k=>{if(typeof dr[k]==="string")BI[k]=dr[k]});BI.dirty=true}nav({v:"bil"})}
@@ -1095,7 +1108,7 @@ const hMin=h=>{const m=/^(\d\d):(\d\d)$/.exec(String(h||""));return m?(+m[1])*60
   const late=sl.filter(o=>o.day<T&&!emState(f,o)),tod=sl.filter(o=>o.day===T&&!emState(f,o));
   if(late.length)return `<button type="button" class="btn big2 ip-main" data-sg="em" data-day="${late[0].day}" data-part="${late[0].part}">✍ Faire signer l’émargement du ${esc(fdm(late[0].day))} (${PARTL[late[0].part].toLowerCase()})</button>`;
   if(tod.length){const o=tod.find(x=>x.part===(hr<13?"m":"a"))||tod[0];return `<button type="button" class="btn big2 ip-main" data-sg="em" data-day="${o.day}" data-part="${o.part}">✍ Faire signer l’émargement de ${o.part==="m"?"ce matin":"cet après-midi"}</button>`}
-  if(emgAll(f)&&tr.length&&acqReq(f)&&!acqDone(f)){const k=tr.filter((t,i)=>!acqSt(f,i)).length,an=acqNext(f);return `<button type="button" class="btn big2 ip-main" data-acq="${ix}:${an<0?0:an}">✅ Évaluation des acquis (${k} stagiaire${k>1?"s":""} restant${k>1?"s":""})</button>`}
+  if(emgAll(f)&&tr.length&&acqReq(f)&&!acqDone(f)){const k=tr.filter((t,i)=>!acqSt(f,i)).length,an=acqNext(f);return `<button type="button" class="btn big2 ip-main" data-acq="${ix}:${an<0?0:an}">🏁 Évaluation après (${k} stagiaire${k>1?"s":""} restant${k>1?"s":""})</button>`}
   if(acqDone(f)||(emgAll(f)&&(!tr.length||!acqReq(f)))){const bil=(f.cl||[]).find(z=>z[0]==="bilan");if(!(bil&&bil[1])&&!BIL(f))return `<button type="button" class="btn big2 ip-main" data-bil="${ix}">📝 Remplir mon bilan</button>`}
   return ""}
  function formView(ix){const f=D.f[ix];if(!f)return listView();const s=stat(f),sl=SLOTS(f),sd=scToday(f),tr=f.tr||[],ma=mainAct(f,ix),sup=Array.isArray(f.sup)?f.sup:[];
@@ -1127,7 +1140,7 @@ const hMin=h=>{const m=/^(\d\d):(\d\d)$/.exec(String(h||""));return m?(+m[1])*60
   </div></section>
   <section class="sec" style="--c:var(--or)"><h2>✍ À faire signer</h2><div class="fc s-clo ip-l3w">
    <div class="task ip-l3" id="l3em"><span class="ip-l3t">✍ Émargements<br><small class="mu">${emSub}</small><span class="emds" aria-hidden="true">${dots}</span></span>${emB}</div>
-   <div class="task ip-l3${emOk&&tr.length&&acqReq(f)?"":" dim"}" id="l3aq"><span class="ip-l3t">✅ Évaluation des acquis<br><small class="mu">par stagiaire · ${aDone?"faite le "+esc(dm(aDate)):ac?"en cours · "+ac+" / "+tr.length:"à faire"}${emOk||aDone?"":" · après le dernier émargement"}${nO?" · "+nO+" objectif"+(nO>1?"s":""):""}</small></span>${acqB}</div>
+   ${acqLine(f,ix,"av")}${acqLine(f,ix,"ap")}<div hidden class="task ip-l3${emOk&&tr.length&&acqReq(f)?"":" dim"}" id="l3aq"><span class="ip-l3t">✅ Évaluation des acquis<br><small class="mu">par stagiaire · ${aDone?"faite le "+esc(dm(aDate)):ac?"en cours · "+ac+" / "+tr.length:"à faire"}${emOk||aDone?"":" · après le dernier émargement"}${nO?" · "+nO+" objectif"+(nO>1?"s":""):""}</small></span>${acqB}</div>
    <div class="task ip-l3${bilOpen||bilOk?"":" dim"}" id="l3bil"><span class="ip-l3t">📝 Bilan du formateur<br><small class="mu">${br?"envoyé le "+esc(dm(br.dl)):bil&&bil[1]?"envoyé"+(f.bilr?" le "+esc(dm(f.bilr)):""):"à faire"} · déroulement, difficultés, suites à donner${bilOpen||bilOk?"":" · après l’évaluation des acquis"}</small></span>${bilB}</div>
   </div></section>
   <div class="fc s-clo">${pbZone(f,ix)}${fphZone(f,ix)}</div>${foot()}`}
@@ -1186,7 +1199,8 @@ const hMin=h=>{const m=/^(\d\d):(\d\d)$/.exec(String(h||""));return m?(+m[1])*60
  let SG=null;
  const sigRef=()=>{const a="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";let t="";try{const u=new Uint8Array(6);crypto.getRandomValues(u);u.forEach(x=>t+=a[x%a.length])}catch(e){for(let i=0;i<6;i++)t+=a[Math.floor(Math.random()*a.length)]}return "S-"+t};
  function startSign(ix,kd,day,part){const f=D.f[ix];const names=(f.tr||[]).map(x=>String(x[0]||"").trim()).filter(Boolean);
-  SG={ix,kd,day:day||"",part:part||"",steps:kd==="em"?names.map(n=>({nm:n})).concat([{nm:D.i||"Formateur",tr:1}]):[{nm:D.i||"Formateur",tr:1}],i:0,res:[],recap:false,done:null};nav({v:"sign"})}
+  SG={ix,kd,day:day||"",part:part||"",steps:kd==="em"?names.map(n=>({nm:n})).concat([{nm:D.i||"Formateur",tr:1}]):[{nm:D.i||"Formateur",tr:1}],i:0,res:[],recap:false,done:null,pass:[],phase:"sign",re:0};
+  if(kd==="em"){const prev=latest(f.n,"em",SG.day,SG.part);if(prev&&Array.isArray(prev.ef)&&(prev.e||[]).some(z=>z&&z.lt)){SG.steps.forEach((st,k)=>{if(st.tr)return;const o=prev.ef.find(z=>z&&z.nm===st.nm);if(o&&!(o.abs&&o.ab===EM_LT))SG.res[k]=Object.assign({},o,{old:1})});SG.re=prev.v||1}SG.i=emFirst();if(SG.i<0)SG.i=SG.steps.length-1}nav({v:"sign"})}
  const stepScreen=()=>{const f=D.f[SG.ix],st=SG.steps[SG.i],n=SG.steps.length,re=SG.res[SG.i];
   const ctx=SG.kd==="der"?`<div class="pan" style="max-height:34vh;overflow:auto"><h4>Déroulé d’intervention – ${esc(f.t)}</h4>${scAll(f)||"<div class='mu'>Aucun scénario détaillé pour cette formation.</div>"}</div>`:"";
   return `<div class="sgh"><button type="button" class="btn" data-sgx>← Quitter</button><div class="sgp">${SG.kd==="em"?`Étape ${SG.i+1} sur ${n}`:"Validation du déroulé"}</div></div>
@@ -1206,24 +1220,61 @@ const hMin=h=>{const m=/^(\d\d):(\d\d)$/.exec(String(h||""));return m?(+m[1])*60
  // un cadre par personne (signé : « ✓ Signé à 14h02 » + tracé sur fond vert ; en cours : cadre bleu « Passez-lui le téléphone », bloc de
  // signature à deux choix, « ↺ Effacer » du bloc, « Absent » ; sinon « À signer »), pied « n / N signé · fonctionne sans réseau » et
  // « ✔ Valider cette demi-journée » (actif quand tous ont signé ou sont notés absents). Les dépôts restent les mêmes (un par personne).
- const emScreen=()=>{const f=D.f[SG.ix],sl=SLOTS(f),n=SG.steps.length,sgn=SG.res.filter(r=>r&&!r.abs).length,ab=SG.res.filter(r=>r&&r.abs).length,all=SG.steps.every((s,k)=>SG.res[k]),prev=latest(f.n,"em",SG.day,SG.part);
-  const pills=sl.map(o=>{const x=emState(f,o),on=o.day===SG.day&&o.part===SG.part,fut=o.day>T;return `<button type="button" class="emp${x?" ok":fut?"":" due"}${on?" on":""}" data-emgo="${o.day}:${o.part}" ${fut?"disabled":""} aria-pressed="${on}" ${fut?`title="Signable à partir du ${esc(dm(o.day))}"`:""}>${x?"✓ ":""}${esc(fdw(o.day))}<small>${o.part==="m"?"matin":"après-midi"}</small></button>`}).join("");
-  const frames=SG.steps.map((st,i)=>{const r=SG.res[i],cur=i===SG.i&&!r,who=`<b>${esc(st.nm)}</b>${st.tr?' <small class="mu">(formateur)</small>':""}`;
-   if(r&&!r.abs)return `<div class="emf ok" data-emf="${i}"><div class="emfh">${who}<span class="ok">✓ Signé à ${esc(String(r.h||"").replace(":","h"))}</span></div><div class="emsg">${sigSvgP(r.sg)}</div><div class="emfa"><button type="button" class="btn" data-sgr="${i}">↺ Reprendre</button></div></div>`;
-   if(r&&r.abs)return `<div class="emf ab" data-emf="${i}"><div class="emfh">${who}<span class="ko">🚫 Absent${r.ab?" · "+esc(r.ab):""}</span></div><div class="emfa"><button type="button" class="btn" data-sgr="${i}">↺ Reprendre</button></div></div>`;
-   if(cur)return `<div class="emf cur" data-emf="${i}"><div class="emfh">${who}<span class="wt">${st.tr?"À vous de signer, en dernier":"Passez-lui le téléphone"}</span></div><div id="emw"></div><div class="sgb sgb2">${st.tr?"<span></span>":'<button type="button" class="btn" id="abs">🚫 Absent</button>'}<button type="button" class="btn gn" id="val">✔ Valider</button></div><div class="pberr" id="sge" role="alert"></div></div>`;
-   return `<div class="emf" data-emf="${i}"><div class="emfh">${who}<span class="mu">À signer</span></div><div class="emfa"><button type="button" class="btn" data-sgr="${i}">✍ Signer</button></div></div>`}).join("");
-  return `<div class="sgh"><button type="button" class="btn" data-sgx>← Quitter</button><div class="sgp">Émargement · ${esc(fdw(SG.day))} ${PARTL[SG.part].toLowerCase()}</div></div>
-  <div class="fc s-clo sgc ip-em"><div class="num"><b>${esc(f.t)}</b> · ${esc(f.c)}</div><div class="mu">${partH(f,SG.day,SG.part)}${prev?" · déjà signée (version "+prev.v+") : valider à nouveau remplace la version précédente":""}</div>
-  <div class="emps" role="group" aria-label="Demi-journées">${pills}</div>
-  ${frames}
-  <div class="emft"><span class="sgcnt mu">${sgn} / ${n} signé${sgn>1?"s":""}${ab?" · "+ab+" absent"+(ab>1?"s":""):""} · fonctionne sans réseau</span><button type="button" class="btn gn big2" id="fin" ${all?"":"disabled"}>✔ Valider cette demi-journée</button></div></div>`};
- function emBind(){if(!SG||SG.kd!=="em")return;document.querySelectorAll("[data-emgo]").forEach(b=>b.onclick=()=>{const [day,part]=b.dataset.emgo.split(":");if(day===SG.day&&part===SG.part)return;if(SG.res.some(Boolean)&&!b._a){b._a=1;const t0=b.innerHTML;b.textContent="Changer ? (signatures non validées perdues)";setTimeout(()=>{b._a=0;b.innerHTML=t0},4000);return}startSign(SG.ix,"em",day,part)});
-  const host=document.getElementById("emw");if(!host)return;const st=SG.steps[SG.i],W=SIGW.mount(host,{name:()=>st.nm,max:1300,label:"Signature de "+st.nm+", composée à partir de son prénom et de son nom."});
-  const next=()=>{const k=SG.steps.findIndex((z,i)=>!SG.res[i]);SG.i=k<0?SG.steps.length-1:k;view();const el=document.querySelector(".emf.cur")||document.getElementById("fin");if(el)el.scrollIntoView({block:"center"})};
-  const vb=document.getElementById("val");if(vb)vb.onclick=()=>{if(W.empty()){document.getElementById("sge").textContent=W.mode()==="draw"?"Signez dans le cadre, ou touchez « Absent » si la personne n’est pas là.":"Nom manquant : choisissez « ✏ Signer à la main ».";return}SG.res[SG.i]={nm:st.nm,sg:W.get(),sk:W.kind(),sm:W.how(),h:nowS().hl,tr:st.tr?1:0};next()};
-  SG._next=next;const ab=document.getElementById("abs");if(ab)ab.onclick=()=>absAsk(st)}
- function signView(){if(!SG)return listView();return `<div class="sgv">${SG.done?doneScreen():SG.kd==="em"?emScreen():SG.recap?recapScreen():stepScreen()}</div><div id="qbn">${bannerHtml()}</div>`}
+ // ---- ÉMARGEMENT SIMPLE (03/11, maquette « Émargement : je choisis le stagiaire, je peux passer une signature ») :
+ // en haut une pastille par personne (signé = vert « ✓ », en cours = bord orange, passé = pointillé « ⏭ passée », absent = gris barré,
+ // « Vous · en dernier ») — un appui choisit qui signe (déjà signé : « Refaire la signature ? ») ; au milieu « Au tour de » + nom en 24 px
+ // et une grande zone de signature (SIGW option tall : 250 px, tracé gardé dans l'espace 320 × 140 sans déformation) ; en bas « ✓ Valider · suivant »
+ // (grisé tant que la zone est vide), « ⏭ Passer » (reste à faire), « 🚫 Absent » (motif, tracé), « ↺ Effacer ». Plus de stagiaire à faire : le formateur
+ // signe en dernier (« ✓ Valider et envoyer ») ; personnes passées : écran « n personne(s) n'a/ont pas signé » (Faire signer / Absent / Plus tard).
+ // « Plus tard » = la personne part « pas encore signé » (même format que les feuilles en ligne : abs + ab « pas encore signé ») et « Faire émarger »
+ // la propose de nouveau : la nouvelle version reprend les signatures déjà faites (gardées sur le téléphone, ef) — rien n'est écrasé.
+ const EM_LT="pas encore signé",emFirst=()=>{const N=SG.steps.length,k=SG.steps.findIndex((st,i)=>!st.tr&&!SG.res[i]&&!SG.pass.includes(i));return k>=0?k:(SG.res[N-1]?-1:N-1)};
+ const emSt=k=>{const r=SG.res[k];return r&&!r.abs?"ok":r&&r.lt?"lt":r&&r.abs?"ab":SG.pass.includes(k)?"pass":k===SG.i?"cur":"todo"};
+ const emFirstNm=n=>String(n||"").trim().split(/\s+/)[0]||n,emShort=n=>{const w=String(n||"").trim().split(/\s+/);return w.length>1?w[0]+" "+(w[w.length-1][0]||"")+".":w[0]||n};
+ const emAv=(nm,cls)=>`<span class="${cls}" style="background:${shade(itvPal(nm)[0],.45)}" aria-hidden="true">${esc(ini2(nm))}</span>`;
+ const emPills=()=>SG.steps.map((st,k)=>{const s=st.tr&&k!==SG.i&&!SG.res[k]?"tr":emSt(k),nm=st.nm,lb=st.tr?(SG.res[k]?"✓ Vous":"Vous · en dernier"):s==="ok"?"✓ "+emFirstNm(nm):s==="pass"?"⏭ "+emShort(nm)+" · passée":s==="lt"?"⏳ "+emShort(nm)+" · plus tard":nm;
+  return `<button type="button" class="em2p em2p-${s}${k===SG.i?" on":""}" data-emp="${k}" aria-pressed="${k===SG.i}" aria-label="${esc(nm)}${s==="ok"?" : signé":s==="ab"?" : absent":s==="pass"?" : passée":s==="lt"?" : plus tard":k===SG.i?" : en cours":""}">${emAv(nm,"em2pa")}<span class="em2pn">${esc(lb)}</span></button>`}).join("");
+ const emHead=()=>`<div class="em2h"><span class="em2ht">Émargement · ${esc(fdw(SG.day))} ${esc(PARTL[SG.part].toLowerCase())}</span><button type="button" class="em2x" data-sgx aria-label="Quitter l’émargement">✕</button></div>`;
+ const emScreen=()=>{const f=D.f[SG.ix],N=SG.steps.length;if(SG.phase==="rest")return emRest();const st=SG.steps[SG.i]||SG.steps[N-1],tr=!!st.tr,sg=SG.res.filter(r=>r&&!r.abs).length;
+  return `${emHead()}<div class="em2 ip-em2"><div class="em2ps" role="group" aria-label="Personnes à faire signer">${emPills()}</div>
+  ${SG.re?`<p class="em2re">Personnes manquantes seulement · les signatures déjà faites sont reprises (version ${SG.re+1}).</p>`:""}
+  <div class="em2c">${emAv(st.nm,"em2av")}<div class="em2k">${tr?"À vous de signer, en dernier":"Au tour de"}</div><div class="em2n" id="em2n">${esc(st.nm)}</div></div>
+  <div id="emw"></div><div class="pberr" id="sge" role="alert"></div>
+  <button type="button" class="em2go" id="val" disabled>${tr?"✓ Valider et envoyer":"✓ Valider · suivant"}</button>
+  ${tr?"":`<div class="em2b2"><button type="button" class="em2pass" id="empp">⏭ Passer</button><button type="button" class="em2abs" id="abs">🚫 Absent</button></div>`}
+  <div class="em2ft"><button type="button" class="em2clr" id="emclr">↺ Effacer</button><span class="em2cnt">${sg} / ${N} signé${sg>1?"s":""} · ${esc(f.t)}</span></div></div>`};
+ const emRest=()=>{const L=SG.pass.filter(k=>!SG.res[k]),n=L.length;
+  return `${emHead()}<div class="em2 ip-em2"><h2 class="em2rt">${n} personne${n>1?"s n’ont":" n’a"} pas signé</h2><p class="em2rx">Avant l’envoi : pour chacune, faites-la signer, notez-la absente ou gardez-la pour plus tard (elle partira « non signée » et « Faire émarger » vous la proposera de nouveau).</p>
+  ${L.map(k=>{const nm=SG.steps[k].nm;return `<div class="em2r">${emAv(nm,"em2pa")}<b>${esc(nm)}</b><div class="em2rb"><button type="button" class="em2go em2sm" data-rsg="${k}">✍ Faire signer</button><button type="button" class="em2abs" data-rab="${k}">🚫 Absent</button><button type="button" class="em2pass" data-rlt="${k}">⏳ Plus tard</button></div></div>`}).join("")}
+  <div class="pberr" id="sge" role="alert"></div></div>`};
+ // petite fenêtre de confirmation intégrée (jamais confirm() natif)
+ function emAsk(msg,ok){return new Promise(res=>{const o=document.createElement("div");o.className="nsov ip-sheet";o.setAttribute("role","dialog");o.setAttribute("aria-modal","true");o.setAttribute("aria-label",msg);
+  o.innerHTML=`<div class="nsbx"><h3>${esc(msg)}</h3><div class="btns"><button type="button" class="btn p" data-ok>${esc(ok)}</button><button type="button" class="btn" data-no>Annuler</button></div></div>`;document.body.appendChild(o);
+  const end=v=>{o.remove();res(v)};o.querySelector("[data-ok]").onclick=()=>end(true);o.querySelector("[data-no]").onclick=()=>end(false);o.onclick=e=>{if(e.target===o)end(false)}})}
+ const emNext=()=>{SG.i=emFirst();if(SG.i<0){if(SG.pass.some(k=>!SG.res[k])){SG.phase="rest";view();window.scrollTo(0,0);return}return finish()}SG.phase="sign";view();window.scrollTo(0,0)};
+ function emBind(){if(!SG||SG.kd!=="em")return;clearInterval(window._emT);
+  document.querySelectorAll("[data-emp]").forEach(b=>b.onclick=async()=>{const k=+b.dataset.emp,st=SG.steps[k],s=emSt(k);if(k===SG.i&&SG.phase!=="rest")return;
+   if(st.tr&&SG.steps.some((z,i)=>!z.tr&&!SG.res[i]&&!SG.pass.includes(i))){flash("Le formateur signe en dernier.");return}
+   if(s==="ok"){if(!await emAsk("Refaire la signature de "+st.nm+" ?","Refaire la signature"))return;SG.res[k]=null}
+   else if(s==="ab"||s==="lt")SG.res[k]=null;SG.pass=SG.pass.filter(z=>z!==k);SG.i=k;SG.phase="sign";view();window.scrollTo(0,0)});
+  document.querySelectorAll("[data-rsg]").forEach(b=>b.onclick=()=>{const k=+b.dataset.rsg;SG.pass=SG.pass.filter(z=>z!==k);SG.i=k;SG.phase="sign";view();window.scrollTo(0,0)});
+  document.querySelectorAll("[data-rab]").forEach(b=>b.onclick=()=>{const k=+b.dataset.rab;SG.i=k;absAsk(SG.steps[k])});
+  document.querySelectorAll("[data-rlt]").forEach(b=>b.onclick=()=>{const k=+b.dataset.rlt;SG.res[k]={nm:SG.steps[k].nm,abs:1,ab:EM_LT,h:nowS().hl,lt:1};SG.pass=SG.pass.filter(z=>z!==k);emNext()});
+  SG._next=()=>{SG.pass=SG.pass.filter(z=>z!==SG.i);emNext()};
+  const host=document.getElementById("emw");if(!host||SG.phase==="rest")return;const st=SG.steps[SG.i],W=SIGW.mount(host,{tall:1,name:()=>st.nm,max:1300,label:"Signature de "+st.nm+", composée à partir de son prénom et de son nom."});
+  const vb=document.getElementById("val"),upd=()=>{if(!document.body.contains(vb)){clearInterval(window._emT);return}vb.disabled=W.empty()};upd();window._emT=setInterval(upd,200);host.addEventListener("pointerup",()=>setTimeout(upd,0));host.addEventListener("click",()=>setTimeout(upd,0));
+  vb.onclick=()=>{if(W.empty()){document.getElementById("sge").textContent=W.mode()==="draw"?"Signez dans le cadre, ou touchez « Passer » ou « Absent ».":"Nom manquant : choisissez « ✏ Signer à la main ».";return}
+   SG.res[SG.i]={nm:st.nm,sg:W.get(),sk:W.kind(),sm:W.how(),h:nowS().hl,tr:st.tr?1:0};SG.pass=SG.pass.filter(z=>z!==SG.i);emNext()};
+  const pp=document.getElementById("empp");if(pp)pp.onclick=()=>{if(!SG.pass.includes(SG.i))SG.pass.push(SG.i);emNext()};
+  const ab=document.getElementById("abs");if(ab)ab.onclick=()=>absAsk(st);
+  const cl=document.getElementById("emclr");if(cl)cl.onclick=()=>{const c=host.querySelector(".sgw-cl");if(c&&!c.hidden)c.click();else W.setMode("draw");setTimeout(upd,0)}}
+ // demi-journée proposée par « Faire émarger » : la plus ancienne en retard, sinon celle du moment (matin / après-midi)
+ function emDue(f){const sl=SLOTS(f),late=sl.filter(o=>o.day<T&&!emState(f,o));if(late.length)return late[0];const tod=sl.filter(o=>o.day===T&&!emState(f,o));return tod.find(x=>x.part===(new Date().getHours()<13?"m":"a"))||tod[0]||null}
+ // écran final : grand ✓ vert (envoyé) ou orange (enregistré, partira au retour du réseau), résumé par personne
+ const emDone=()=>{const d=SG.done,p=d.pending,L=d.list||[];return `${emHead()}<div class="em2 em2d${p?" pend":""}" role="status"><div class="em2ok" aria-hidden="true">${p?"⏳":"✓"}</div><h2>${p?"Émargement enregistré":"Émargement envoyé"}</h2><p>${p?"Il partira dès que le réseau revient.":"Le bureau l’a reçu."}</p>
+  <div class="em2sum">${L.map(e=>`<div class="em2sr"><span>${esc(e.nm)}${e.tr?' <small>(vous)</small>':""}</span>${e.lt?'<b class="em2s-lt">à faire</b>':e.abs?'<b class="em2s-ab">absent'+(e.ab?" · "+esc(e.ab):"")+'</b>':'<b class="em2s-ok">✓ signé</b>'}</div>`).join("")}</div>
+  ${d.rf?`<p class="em2ref">Référence ${esc(d.rf)}</p>`:""}<button type="button" class="em2home" data-home>Retour à l’accueil</button></div>`};
+ function signView(){if(!SG)return listView();return `<div class="sgv">${SG.done?(SG.kd==="em"?emDone():doneScreen()):SG.kd==="em"?emScreen():SG.recap?recapScreen():stepScreen()}</div><div id="qbn">${bannerHtml()}</div>`}
  function padInit(){const host=document.getElementById("emw");if(!host||!SG)return;const st=SG.steps[SG.i];
   const W=SIGW.mount(host,{name:()=>st.nm,max:1300,label:"Signature de "+st.nm+", composée à partir de son prénom et de son nom."});
   const next=()=>{if(SG.kd==="der")return finish();if(SG.steps.every((s,k)=>SG.res[k])||SG.i>=SG.steps.length-1){SG.recap=true;SG.i=SG.steps.length-1}else{SG.i=SG.res.findIndex((r,k)=>k>SG.i&&!r);if(SG.i<0)SG.i=SG.res.length}view();window.scrollTo(0,0)};
@@ -1233,9 +1284,9 @@ const hMin=h=>{const m=/^(\d\d):(\d\d)$/.exec(String(h||""));return m?(+m[1])*60
  function sigKTxt(k){return k==="manuscrite"?" · signature manuscrite":k==="simple"?" · signature électronique simple":""}
  function finish(){const f=D.f[SG.ix],now=nowS(),rid=Date.now().toString(36)+Math.random().toString(36).slice(2,6),ents=SG.res.map((r,i)=>r.abs?{nm:r.nm,abs:1,h:r.h,ab:r.ab||""}:{nm:r.nm,sg:r.sg,sk:r.sk||"",h:r.h,tr:r.tr?1:0}),prev=latest(f.n,SG.kd,SG.day,SG.part),v=(prev?prev.v:0)+1;
   const rf=sigRef(),pls=ents.map((e,i)=>({t:"fp-sign",k:"emg",kd:SG.kd,n:f.n,id:rid,rf,v,day:SG.day,part:SG.part,iv:D.i||"",tot:ents.length,i,dl:now.dl,hl:now.hl,e}));
-  const abs=ents.filter(e=>e.abs).length,R=recs(f.n);R.push({id:rid,kd:SG.kd,day:SG.day,part:SG.part,v,dl:now.dl,hl:now.hl,abs,n:ents.length,e:ents.map(e=>({nm:e.nm,abs:e.abs?1:0}))});
+  const abs=ents.filter(e=>e.abs).length,R=recs(f.n);R.push({id:rid,kd:SG.kd,day:SG.day,part:SG.part,v,dl:now.dl,hl:now.hl,abs,n:ents.length,e:ents.map(e=>({nm:e.nm,abs:e.abs?1:0,lt:e.abs&&e.ab===EM_LT?1:0})),ef:SG.kd==="em"?ents:undefined});
   if(!LS.set(RK(f.n),R)||!enqueue(pls)){const ee=document.getElementById("sge");if(ee)ee.textContent="Impossible d’enregistrer sur ce téléphone (mémoire pleine ou navigation privée). Rien n’a été envoyé.";const fb=document.getElementById("fin");if(fb)fb.disabled=false;return}
-  SG.done={pending:true,sig:ents.length-abs,abs,rf};view();window.scrollTo(0,0);flush().then(()=>{if(SG&&SG.done){SG.done.pending=!!pend(rid);view()}})}
+  SG.done={pending:true,sig:ents.length-abs,abs,rf,list:ents.map(e=>({nm:e.nm,tr:e.tr?1:0,abs:e.abs?1:0,ab:e.ab===EM_LT?"":e.ab||"",lt:e.abs&&e.ab===EM_LT?1:0}))};view();window.scrollTo(0,0);flush().then(()=>{if(SG&&SG.done){SG.done.pending=!!pend(rid);view()}})}
 
  // ===== 📅 NOUVELLE INTERVENTION créée par le technicien (02/11) — TOPAS la met dans SON agenda Outlook (obligatoire : ni case, ni réglage, ni retrait).
  // Enregistrée tout de suite sur ce téléphone (TPK), visible aussitôt dans la liste (Aujourd'hui / À venir), envoyée par le même canal que les bons
@@ -1309,7 +1360,7 @@ const hMin=h=>{const m=/^(\d\d):(\d\d)$/.exec(String(h||""));return m?(+m[1])*60
   document.querySelectorAll("[data-back]").forEach(b=>b.onclick=()=>nav({v:"list"}));
   document.querySelectorAll("[data-qgo]").forEach(b=>b.onclick=flush);
   document.querySelectorAll("[data-sg]").forEach(b=>b.onclick=()=>{const f0=D.f[V.ix];if(f0&&f0.clo)return flash("Dossier clôturé par TOPAS : lecture seule.");startSign(V.ix,b.dataset.sg,b.dataset.day,b.dataset.part)});
-  document.querySelectorAll("[data-ev]").forEach(b=>b.onclick=()=>{const [ix,ti]=b.dataset.ev.split(":").map(Number);evStart(ix,ti)});document.querySelectorAll("[data-bil]").forEach(b=>b.onclick=()=>bilStart(+b.dataset.bil));document.querySelectorAll("[data-acq]").forEach(b=>b.onclick=()=>{const [ix,ti]=b.dataset.acq.split(":").map(Number);acqStart(ix,ti)});
+  document.querySelectorAll("[data-ev]").forEach(b=>b.onclick=()=>{const [ix,ti]=b.dataset.ev.split(":").map(Number);evStart(ix,ti)});document.querySelectorAll("[data-bil]").forEach(b=>b.onclick=()=>bilStart(+b.dataset.bil));document.querySelectorAll("[data-acq]").forEach(b=>b.onclick=()=>{const [ix,ti,ty]=b.dataset.acq.split(":");acqStart(+ix,+ti,ty)});
   document.querySelectorAll("[data-sup]").forEach(b=>b.onclick=()=>{const [ix,i]=b.dataset.sup.split(":").map(Number);supOpen(ix,i,b)});
   if(V.v==="ev")evBind();if(V.v==="acq")acqBind();if(V.v==="bil")bilBind();if(V.v==="f")fphBind(V.ix);
   const sx=document.querySelector("[data-sgx]");if(sx)sx.onclick=()=>{if(!sx._a){sx._a=1;const t0=sx.textContent;sx.textContent="Quitter sans enregistrer ?";setTimeout(()=>{sx._a=0;sx.textContent=t0},4000);return}if(V.v==="bls"&&BS){const ix=BS.ix,bi=BS.bi;(BS.ph||[]).forEach(x=>PDB.rm(x.id).catch(()=>{}));BS=null;return nav(bi?{v:"list"}:{v:"it",ix})}const ix=SG?SG.ix:0;SG=null;nav({v:"f",ix})};
@@ -1323,7 +1374,9 @@ const hMin=h=>{const m=/^(\d\d):(\d\d)$/.exec(String(h||""));return m?(+m[1])*60
   document.querySelectorAll("[data-blns]").forEach(b=>b.onclick=()=>blNsAsk(+b.dataset.blns));
   // lot BL 3/3 : « ✎ Faire signer » (ouvre le bon, écran unique), « ✎ Faire émarger » / « Déroulé » (formation), « Faire signer quand même » (bon à venir), recherche des signées
   document.querySelectorAll("[data-bls2]").forEach(b=>b.onclick=()=>{const ix=+b.dataset.bls2;if(!BS||BS.ix!==ix||BS.bi)BS=blNew(ix);nav({v:"it",ix})});
-  document.querySelectorAll("[data-fgo]").forEach(b=>b.onclick=()=>{nav({v:"f",ix:+b.dataset.fgo});setTimeout(()=>{const m=document.querySelector(".ip-main");if(m){m.click();return}const e=document.getElementById("l3em");if(e)e.scrollIntoView({behavior:"smooth",block:"center"})},60)});
+  document.querySelectorAll("[data-home]").forEach(b=>b.onclick=()=>{SG=null;nav({v:"list"})});
+  document.querySelectorAll("[data-fpb]").forEach(b=>b.onclick=()=>{const [ix,k]=b.dataset.fpb.split(":");nav({v:"f",ix:+ix});setTimeout(()=>{const z=document.querySelector(`[data-pbo="${ix}"][data-pbk="${k}"]`);if(z){z.click();z.scrollIntoView({block:"center"})}},60)});
+  document.querySelectorAll("[data-fgo]").forEach(b=>b.onclick=()=>{const fx=D.f[+b.dataset.fgo],o=fx&&!fx.clo?emDue(fx):null;if(o){startSign(+b.dataset.fgo,"em",o.day,o.part);return}nav({v:"f",ix:+b.dataset.fgo});setTimeout(()=>{const m=document.querySelector(".ip-main");if(m){m.click();return}const e=document.getElementById("l3em");if(e)e.scrollIntoView({behavior:"smooth",block:"center"})},60)});
   document.querySelectorAll("[data-fder]").forEach(b=>b.onclick=()=>{const ix=+b.dataset.fder;nav({v:"f",ix});setTimeout(()=>{const c=document.getElementById("cons"+ix);if(!c)return;c.open=true;CDO[c.id]=true;const d=c.querySelector("details");if(d)d.open=true;c.scrollIntoView({behavior:"smooth",block:"start"})},60)});
   document.querySelectorAll("[data-blunl]").forEach(b=>b.onclick=()=>{const ix=+b.dataset.blunl;if(!BS||BS.ix!==ix||BS.bi)BS=blNew(ix);BS.unl=1;view();window.scrollTo(0,0)});
   const us=document.getElementById("usrch");if(us)us.oninput=()=>{const q=nrm(us.value);let n=0;document.querySelectorAll("#s-usig .ip-rw").forEach(w=>{const on=!q||nrm(w.dataset.q||"").includes(q);w.classList.toggle("hide",!on);if(on)n++});const z=document.getElementById("usrch0");if(z)z.classList.toggle("hide",!!n||!q)};
@@ -1453,6 +1506,59 @@ body.ip-fx{padding-bottom:calc(100px + env(safe-area-inset-bottom,0px))}
 .ip-lvq{font-weight:900}
 .ip-lvm{position:absolute;right:4px;top:2px;width:44px;height:44px;border:0;border-radius:10px;background:transparent;color:var(--ds-topas);font:inherit;font-size:22px;font-weight:900;cursor:pointer}
 .ip-lvm[hidden]{display:none!important}.ip-lvm:focus-visible{outline:3px solid var(--ds-topas);outline-offset:-2px}
+</style>
+<style>/* 03/11 : émargement simple (maquette emg-s1b) — pastilles des personnes, « Au tour de », grande zone de signature, Valider · suivant / Passer / Absent */
+.em2h{position:sticky;top:0;z-index:5;display:flex;align-items:center;justify-content:space-between;gap:10px;margin:-16px -14px 12px;padding:12px 14px 12px 18px;background:linear-gradient(90deg,#1d4ed8,#6d28d9);color:#fff;border-radius:0 0 18px 18px}
+.em2ht{font-size:16px;font-weight:800}.em2x{min-width:44px;min-height:44px;border:0;border-radius:12px;background:rgba(255,255,255,.16);color:#fff;font-size:20px;cursor:pointer}
+.em2{display:flex;flex-direction:column;gap:12px;padding-bottom:12px}
+.em2ps{display:flex;flex-wrap:wrap;gap:8px}
+.em2p{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:4px 14px 4px 5px;border-radius:999px;border:1.5px dashed #94a3b8;background:#fff;color:#334155;font:inherit;font-size:15px;font-weight:700;cursor:pointer;max-width:100%}
+.em2pn{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.em2pa{flex:none;display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:50%;color:#fff;font-size:12px;font-weight:800}
+.em2p-ok{border:1.5px solid #86efac;background:#dcfce7;color:#166534}
+.em2p-cur,.em2p.on{border:2px solid #ea580c;background:#fff7ed;color:#9a3412}
+.em2p-pass,.em2p-lt{border:1.5px dashed #64748b;color:#475569}
+.em2p-ab{border:1.5px solid #cbd5e1;background:#f1f5f9;color:#57606f}.em2p-ab .em2pn{text-decoration:line-through}
+.em2p-tr{border:1.5px dashed #94a3b8;color:#475569}
+.em2re{margin:0;font-size:15px;color:#1e3a8a;background:#eef2ff;border-radius:12px;padding:8px 12px}
+.em2c{display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center}
+.em2av{display:flex;align-items:center;justify-content:center;width:64px;height:64px;border-radius:50%;color:#fff;font-size:24px;font-weight:800}
+.em2k{font-size:15px;color:#57606f}.em2n{font-size:24px;font-weight:800;color:#0f172a;line-height:1.2}
+.ip-em2 .sgw-pad.sgw-tall::after{content:"";position:absolute;left:8%;right:8%;bottom:56px;border-bottom:1.5px solid #cbd5e1;pointer-events:none}
+.ip-em2 .sgw-pad.sgw-tall .sgw-ph{align-items:flex-end;padding-bottom:22px;font-size:15px}
+.em2go{display:flex;align-items:center;justify-content:center;width:100%;min-height:58px;border:0;border-radius:16px;background:linear-gradient(90deg,#15803d,#166534);color:#fff;font:inherit;font-size:18px;font-weight:800;cursor:pointer;box-shadow:0 8px 18px rgba(21,128,61,.25)}
+.em2go[disabled]{opacity:.45;cursor:not-allowed;box-shadow:none}
+.em2b2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.em2pass,.em2abs{min-height:48px;border:0;border-radius:14px;font:inherit;font-size:16px;font-weight:800;cursor:pointer}
+.em2pass{background:#e0e7ff;color:#3730a3}.em2abs{background:#ffedd5;color:#9a3412}
+.em2ft{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.em2clr{min-height:44px;border:0;background:none;color:#334155;font:inherit;font-size:15px;font-weight:700;cursor:pointer;padding:0 4px}
+.em2cnt{font-size:15px;color:#57606f}
+.em2rt{margin:4px 0 0;font-size:22px;color:#0f172a}.em2rx{margin:0;font-size:15px;color:#475569}
+.em2r{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;padding:12px;border:1.5px dashed #94a3b8;border-radius:16px;background:#fff;font-size:16px}
+.em2rb{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;width:100%}.em2go.em2sm{min-height:48px;font-size:15px;box-shadow:none}.em2rb .em2pass,.em2rb .em2abs{font-size:15px}
+.em2d{align-items:center;text-align:center;padding-top:18px}
+.em2ok{display:flex;align-items:center;justify-content:center;width:104px;height:104px;border-radius:50%;background:linear-gradient(135deg,#16a34a,#15803d);color:#fff;font-size:52px;font-weight:800;box-shadow:0 12px 26px rgba(21,128,61,.3)}
+.em2d.pend .em2ok{background:linear-gradient(135deg,#f97316,#c2410c);box-shadow:0 12px 26px rgba(194,65,12,.3)}
+.em2d h2{margin:6px 0 0;font-size:24px;color:#0f172a}.em2d p{margin:0;font-size:16px;color:#475569}.em2d.pend h2{color:#9a3412}
+.em2sum{width:100%;background:#fff;border-radius:16px;border:1px solid #e2e8f0;text-align:left}
+.em2sr{display:flex;justify-content:space-between;gap:10px;padding:12px 14px;border-top:1px solid #eef2f7;font-size:16px}.em2sr:first-child{border-top:0}
+.em2s-ok{color:#15803d}.em2s-ab{color:#b42318}.em2s-lt{color:#9a3412}.em2sr small{color:#57606f}
+.em2ref{font-size:15px;color:#57606f}
+.em2home{width:100%;min-height:56px;border:0;border-radius:16px;background:#e0e7ff;color:#1e3a8a;font:inherit;font-size:17px;font-weight:800;cursor:pointer;margin-top:8px}
+</style>
+<style>/* 03/11 : carte de la formation — 4 boutons pleine largeur (états), bas de carte Signaler (rouge) / Remarque (blanc bordé bleu) */
+.ip-ra:has(.ip-f4){display:block}
+.ip-f4{display:flex;flex-direction:column;gap:8px;width:100%;margin-top:4px}
+.ip-f4b{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;min-height:52px;padding:8px 12px 8px 16px;border:0;border-radius:14px;font:inherit;font-size:16px;font-weight:800;color:#fff;cursor:pointer;text-align:left}
+.ip-f4-em{background:#c2410c}.ip-f4-av{background:#7c3aed}.ip-f4-ap{background:linear-gradient(90deg,#7c3aed,#db2777)}
+.ip-f4b.done{background:#ede9fe;color:#5b21b6}
+.ip-f4-de{justify-content:center;background:#fff;color:#0f172a;border:1.5px solid #cbd5e1}
+.ip-f4s{flex:none;padding:3px 10px;border-radius:999px;background:#fff;color:#334155;font-size:15px;font-weight:700;white-space:nowrap}
+.ip-f4-em .ip-f4s{color:#9a3412}.ip-f4-av .ip-f4s{color:#5b21b6}.ip-f4-ap .ip-f4s{color:#9d174d}.ip-f4b .ip-f4s-ok{color:#166534}.ip-f4b .ip-f4s-now{color:#be185d;font-weight:800}.ip-f4b .ip-f4s-pd{color:#9a3412}
+.ip-f4x{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px}
+.ip-f4pb,.ip-f4rm{min-height:52px;border-radius:14px;font:inherit;font-size:15px;font-weight:800;cursor:pointer;padding:6px 8px}
+.ip-f4pb{border:0;background:#dc2626;color:#fff}.ip-f4rm{border:1.5px solid #2563eb;background:#fff;color:#1d4ed8}
 </style>
 </body>
 </html>
