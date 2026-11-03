@@ -291,7 +291,9 @@ body.ip-nb{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
 /* 30/10 — BON D'INTERVENTION créé par le technicien + 📷 PHOTOS sur tous les bons */
 :root{--ds-teal:#0f766e;--ds-p-teal:#e6f8f5;--ds-b-teal:#99e0d6;--ip-grad-bi:linear-gradient(125deg,#0f9b8e,var(--ds-topas))}
 .ip-nav .ip-nplus{flex:1.25;position:relative;overflow:visible;justify-content:flex-end;padding-bottom:8px;color:var(--ds-tx2);font-size:11px;line-height:1.15;text-align:center;white-space:normal}
-.ip-nav .ip-nplus i{position:absolute;left:50%;top:-30px;transform:translateX(-50%);display:flex;align-items:center;justify-content:center;width:66px;height:66px;border-radius:50%;border:4px solid var(--ds-card);background:var(--ip-grad);color:var(--ds-on);font-size:34px;font-weight:300;box-shadow:0 8px 20px rgba(12,79,160,.35)}
+.ip-nav .ip-nplus i{position:absolute;left:50%;top:-30px;transform:translateX(-50%);display:flex;align-items:center;justify-content:center;width:66px;height:66px;border-radius:50%;border:4px solid var(--ds-card);background:linear-gradient(135deg,#14b8a6,#0e7490);color:#fff;font-size:34px;font-weight:300;box-shadow:0 8px 20px rgba(14,116,144,.38)}
+.ip-nav .ip-nplus span{color:#0e7490;font-weight:700}.ip-nav .ip-nplus:focus-visible i{outline-color:#0e7490}
+.ip-newc{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;min-height:56px}.ip-newc small{font-size:14px;font-weight:500;opacity:.9}.ip-cta.ip-newc{background:linear-gradient(135deg,#0f766e,#0e7490)}
 .ip-nav .ip-nplus:focus-visible i{outline:3px solid var(--ds-topas);outline-offset:2px}
 .ip-hd.ip-hdbi{background:var(--ip-grad-bi)}
 .ip-bif{margin:0 0 14px}.ip-lb2{display:block;margin:0 0 6px;font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--ds-mu)}
@@ -582,7 +584,7 @@ async function main(){
  function markTabs(sheet){document.querySelectorAll(".ip-nav [data-tab]").forEach(b=>{const k=b.dataset.tab,on=sheet?k==="topas":(k==="home"&&V.v==="list"&&TAB!=="sig")||(k==="sig"&&V.v==="list"&&TAB==="sig");b.classList.toggle("on",on);if(on)b.setAttribute("aria-current","page");else b.removeAttribute("aria-current")})}
  function flash(t,ok){const o=document.createElement("div");o.className="ip-flash"+(ok?" ip-flash-ok":"");o.setAttribute("role","status");o.textContent=t;document.body.appendChild(o);setTimeout(()=>o.remove(),2600)}
  function goSig(){const s=document.getElementById("s-usig")||document.getElementById("s-uarc");if(!s){flash("Rien de signé pour l’instant.");return}const d=s.querySelector("details");if(d)d.open=true;s.scrollIntoView({behavior:"smooth",block:"start"})}
- function tabGo(k){if(k==="topas")return topasSheet();if(k==="new")return biStart();if(k==="sig"){if(V.v!=="list")nav({v:"list"});TAB="sig";markTabs();setTimeout(goSig,30);return}
+ function tabGo(k){if(k==="topas")return topasSheet();if(k==="new")return newSheet();if(k==="sig"){if(V.v!=="list")nav({v:"list"});TAB="sig";markTabs();setTimeout(goSig,30);return}
   TAB="home";if(V.v!=="list")nav({v:"list"});else{markTabs();window.scrollTo({top:0,behavior:"smooth"})}}
  function topasSheet(){const tel=String(G[1]||"").replace(/[^\d+]/g,""),ad=String(G[4]||"").trim(),ml=D.m||G[2]||"",o=document.createElement("div");
   o.className="nsov ip-sheet";o.setAttribute("role","dialog");o.setAttribute("aria-modal","true");o.setAttribute("aria-label","Contacter TOPAS informatique");
@@ -1393,7 +1395,15 @@ const hMin=h=>{const m=/^(\d\d):(\d\d)$/.exec(String(h||""));return m?(+m[1])*60
  // ouverture depuis le rendez-vous Outlook : intervenant.html?tp=identifiant
  function tpDeep(){try{const id=new URLSearchParams(location.search).get("tp");if(id&&/^[A-Za-z0-9-]{2,40}$/.test(id)&&tpAll().some(t=>t.tid===id))tpStart(id)}catch(e){}}
  function tpBindAll(){document.querySelectorAll("[data-tpe]").forEach(b=>b.onclick=()=>tpStart(b.dataset.tpe));document.querySelectorAll("[data-tpn]").forEach(b=>b.onclick=()=>tpStart());if(V.v==="tp")tpBind()}
- const tpFab=()=>canTP()?'<button type="button" class="ip-fab" data-tpn aria-label="Nouvelle intervention (ajoutée à votre planning)"><i aria-hidden="true">＋</i><span class="ip-fabt">Nouvelle intervention</span></button><div class="ip-fabsp" aria-hidden="true"></div>':"";
+ // (03/11, bloc F) un seul bouton de création, en vert d'eau, au centre de la barre du bas : plus de bouton flottant « Nouvelle intervention ».
+// Le bouton ouvre le choix « Bon d'intervention » / « Nouvelle intervention (au planning) » ; s'il n'y a qu'un choix possible, il l'ouvre directement.
+const tpFab=()=>"";
+function newSheet(){if(!canTP())return biStart();if(!canBI())return tpStart();const o=document.createElement("div");
+ o.className="nsov ip-sheet";o.setAttribute("role","dialog");o.setAttribute("aria-modal","true");o.setAttribute("aria-label","Créer");
+ o.innerHTML=`<div class="nsbx"><h3>＋ Créer</h3><div class="ip-b2"><button type="button" class="ip-cta ip-newc" data-nbi>📝 Bon d’intervention<small>à faire signer par le client</small></button><button type="button" class="ip-btn2 ip-newc" data-ntp>📅 Nouvelle intervention<small>ajoutée à votre planning</small></button></div><div class="btns"><button type="button" class="btn" data-shx>Fermer</button></div></div>`;
+ const close=()=>{o.remove();document.removeEventListener("keydown",ek);markTabs()},ek=e=>{if(e.key==="Escape")close()};
+ o.onclick=e=>{if(e.target===o||e.target.closest("[data-shx]"))return close();if(e.target.closest("[data-nbi]")){close();biStart()}else if(e.target.closest("[data-ntp]")){close();tpStart()}};
+ document.addEventListener("keydown",ek);document.body.appendChild(o);const f=o.querySelector("button");if(f)f.focus()}
  function view(){const faire=V.v==="it"&&!!IT[V.ix]&&(blSt(IT[V.ix]).k==="faire"||(!!BS&&!BS.bi&&BS.ix===V.ix&&BS.step!=="form"));const h=V.v==="f"?formView(V.ix):V.v==="sign"?signView():V.v==="ev"?evView():V.v==="acq"?acqView():V.v==="bil"?bilView():V.v==="it"?itView(V.ix):V.v==="bls"?blView():V.v==="bid"?biView(V.n):V.v==="tp"?tpView():listView(),nb=(V.v==="list"||V.v==="it"||V.v==="f"||V.v==="bid")&&!faire;app.innerHTML=h+(nb?navH():"");document.body.classList.toggle("ip-nb",nb);document.body.classList.toggle("ip-fx",!!document.querySelector(".ip-fix"));bind();tpBindAll()}
  const CDO={};
  function bind(){
