@@ -320,6 +320,7 @@ body.ip-nb{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
 .ip-lgs{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}.ip-lgs button{min-height:44px;padding:8px 14px;border:1.5px solid var(--ds-line);border-radius:var(--ds-r-pill);background:var(--ds-card);color:var(--ds-tx);font:inherit;font-size:15px;font-weight:700;cursor:pointer}.ip-lgs button[aria-pressed="true"]{border-color:var(--ds-teal);background:var(--ds-teal);color:var(--ds-on)}
 .utag.ip-tag.ui{background:var(--ds-teal)}
 .ip-bdt{white-space:pre-wrap;margin:6px 0 10px;padding:10px 12px;border-radius:12px;background:var(--ds-line2);font-size:15px}
+.ip-opt0{font-weight:400;color:#57606f;font-size:14px;text-transform:none;letter-spacing:0}.ip-nl{margin:4px 0 8px 18px;padding:0;font-size:14px;color:#9a3412}
 </style>
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
@@ -792,7 +793,15 @@ async function main(){
 // iPhones), le champ natif est remplacé par deux roues « heures » / « minutes par quart d'heure » (listes natives) ; la valeur reste « HH:MM »
 // dans un champ caché du même identifiant (biha / bihd). ?h12 force les roues, ?h24 force le champ natif (tests).
 const H12=(()=>{try{if(/[?&]h24\b/.test(location.search))return false;if(/[?&]h12\b/.test(location.search))return true;const o=new Intl.DateTimeFormat(undefined,{hour:"numeric"}).resolvedOptions();return o.hourCycle?(o.hourCycle==="h12"||o.hourCycle==="h11"):!!o.hour12}catch(e){return false}})();window.H12=H12;
-const hField=(id,lab,val)=>{val=String(val||"");return H12?`<label class="ip-hl"><span>${lab}</span><div class="ip-wh" role="group" aria-label="${lab} (heures et minutes)"><select class="ip-ws" data-w="h" data-for="${id}" aria-label="${lab} : heures"><option value="">— h</option>${Array.from({length:24},(_,h)=>`<option value="${p2(h)}" ${val.slice(0,2)===p2(h)?"selected":""}>${h} h</option>`).join("")}</select><select class="ip-ws" data-w="m" data-for="${id}" aria-label="${lab} : minutes">${["","00","15","30","45"].map(m=>`<option value="${m}" ${m&&val.slice(3,5)===m?"selected":""}>${m||"— min"}</option>`).join("")}</select></div><input type="hidden" id="${id}" value="${esc(val)}"></label>`:`<label class="ip-hl"><span>${lab}</span><input type="time" id="${id}" step="900" value="${esc(val)}" required aria-required="true"></label>`};
+// (03/11, bloc J) heures : toujours deux listes « Heure » (6 h → 20 h, plus l'heure déjà saisie si elle est hors de cette plage) et « Minutes »
+// (00, 15, 30, 45) + « Maintenant » (heure actuelle arrondie au quart d'heure) ; jamais le champ natif type="time" (mal rendu / coupé sur Android) ;
+// valeur enregistrée inchangée : « HH:MM » dans le champ caché (même id qu'avant).
+const hField=(id,lab,val)=>{val=String(val||"");const hv=val.slice(0,2),H=[];for(let h=6;h<=20;h++)H.push(p2(h));if(/^\d\d$/.test(hv)&&!H.includes(hv)){H.push(hv);H.sort()}
+ return `<div class="ip-hl"><span id="${id}l">${lab}</span><div class="ip-wh" role="group" aria-labelledby="${id}l"><select class="ip-ws" data-w="h" data-for="${id}" aria-label="${lab} : heure"><option value="">Heure</option>${H.map(h=>`<option value="${h}" ${hv===h?"selected":""}>${+h} h</option>`).join("")}</select><select class="ip-ws" data-w="m" data-for="${id}" aria-label="${lab} : minutes">${["","00","15","30","45"].map(m=>`<option value="${m}" ${m&&val.slice(3,5)===m?"selected":""}>${m||"Min."}</option>`).join("")}</select><button type="button" class="ip-hnow" data-hnow="${id}" aria-label="${lab} : maintenant">Maintenant</button></div><input type="hidden" id="${id}" value="${esc(val)}"></div>`};
+// « Maintenant » : heure actuelle arrondie au quart d'heure le plus proche (heure ajoutée à la liste si besoin), puis le même « change » que les listes
+document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-hnow]");if(!b)return;const id=b.dataset.hnow,sh=document.querySelector(`.ip-ws[data-w="h"][data-for="${id}"]`),sm=document.querySelector(`.ip-ws[data-w="m"][data-for="${id}"]`);if(!sh||!sm)return;
+ const d=new Date();let m=Math.round((d.getHours()*60+d.getMinutes())/15)*15;if(m>=1440)m=1425;const hh=p2(Math.floor(m/60)),mm=p2(m%60);
+ if(![...sh.options].some(o=>o.value===hh)){const o=document.createElement("option");o.value=hh;o.textContent=(+hh)+" h";sh.appendChild(o)}sh.value=hh;sm.value=mm;sh.dispatchEvent(new Event("change",{bubbles:true}))});
 const hMin=h=>{const m=/^(\d\d):(\d\d)$/.exec(String(h||""));return m?(+m[1])*60+(+m[2]):null};
  const hFr=h=>{const m=hMin(h);return m==null?"":Math.floor(m/60)+"h"+p2(m%60)};
  const biDur=(ha,hd)=>{const a=hMin(ha),d=hMin(hd);if(a==null||d==null)return null;return Math.round(((d-a+1440)%1440)/15)*15};
@@ -951,7 +960,7 @@ const hMin=h=>{const m=/^(\d\d):(\d\d)$/.exec(String(h||""));return m?(+m[1])*60
   ${bi?"":pbBon(t)}
   ${!ch?`<div class="ip-bich"><button type="button" class="ip-cta" data-bich="0">✍ Faire signer le client</button><button type="button" class="ip-btn2" data-bich="1">📤 Envoyer sans signature</button></div><p class="ip-hint" id="blhint" aria-live="polite"></p><div class="pberr" id="sge" role="alert"></div>`:`<div class="ip-sep ip-sep3" role="separator"><span>${ns?"ENVOI SANS SIGNATURE":"SIGNATURE DU CLIENT"}</span></div>
   ${ns?`<p class="mu ip-nsi">Le bon quitte votre espace. TOPAS informatique saura qu’il n’a pas été signé.</p><div class="nsr" role="radiogroup" aria-label="Raison">${NSR.map((r,i)=>`<button type="button" class="btn nsrb" role="radio" aria-checked="${BS.rs===r}" data-nsr="${i}">${esc(r)}</button>`).join("")}</div><div class="nsaw${BS.rs==="Autre…"?"":" hide"}"><label class="fl" for="nsat">Précisez la raison *</label><textarea id="nsat" rows="3">${esc(BS.rsm)}</textarea></div>`
-   :`<div class="ip-fd"><label class="ip-lb" for="blpr">Nom et prénom du signataire</label><input class="ip-in" id="blpr" autocomplete="name" autocapitalize="words" value="${esc(BS.full||"")}"></div>
+   :`<div class="ip-fd"><label class="ip-lb" for="blpr">Nom et prénom du signataire <span class="ip-opt0">(le prénom ou le nom suffit)</span></label><input class="ip-in" id="blpr" autocomplete="name" autocapitalize="words" value="${esc(BS.full||"")}"></div>
   <div id="blsw"></div>`}
   <div style="margin-top:16px"><button type="button" class="ip-cta" id="blval">${ns?"📤 Confirmer l’envoi sans signature":"✔ Valider la signature"}</button><p class="ip-hint" id="blhint" aria-live="polite"></p></div><div class="pberr" id="sge" role="alert"></div>${bi?`<button type="button" class="ip-bisw" data-bisw>${ns?"Finalement : faire signer le client":"Finalement : envoyer sans signature"}</button>`:ns?`<button type="button" class="ip-bisw" data-nsx>Finalement : faire signer le client</button>`:`<div class="ip-b2 ip-b2b">${late?`<button type="button" class="ip-btn2" data-blns="${ix}">📤 Envoyer sans signature</button>`:""}<button type="button" class="ip-btn2" data-blrep2="${ix}">⏸ Reporter la signature</button></div><div id="blch2"></div>`}`}</section>
   ${bi||fut||ns?"":`<div class="ip-fix"><button type="button" class="ip-cta" data-bls="${ix}">✍ Lancer la signature client</button></div>`}`}`};
@@ -980,12 +989,13 @@ const hMin=h=>{const m=/^(\d\d):(\d\d)$/.exec(String(h||""));return m?(+m[1])*60
  const matLi=m=>m&&m.length?`<ul class="ip-ml">${m.map(x=>`<li>${x[1]} × ${esc(x[0])}</li>`).join("")}</ul>`:"";
  function blView(){if(!BS)return listView();const t=bsT(),cn=t.c||t.nm||"",num=esc(t.b||t.nm||""),mat=matOut(BS.mt);
   if(BS.step==="done")return `<header class="ip-hd${BS.bi?" ip-hdbi":""}"><div class="ip-k">${BS.bi?"Bon d’intervention":"Bon de livraison"}</div><div class="ip-num">${num}</div><div class="ip-sub">${esc(cn)}</div></header>
-  <section class="ip-done${BS.pending?" pend":""}" role="status"><h2>${BS.pending?"✓ Signé, envoi en attente":"✔ Signé et transmis"}</h2>
+  <section class="ip-done${BS.pending?" pend":""}" role="status"><h2>${BS.pending?"✓ Bon signé — envoi au bureau dès le retour du réseau":"✓ Bon signé — envoyé au bureau"}</h2>${BS.bi?"":blLivSum()}
    <div class="ip-kv"><span>Signataire</span><b>${esc(BS.nm)}${BS.fn?" ("+esc(BS.fn)+")":""}</b></div>
    <div class="ip-kv"><span>Signé le</span><b>${esc(fds(BS.dl||T))} à ${esc(BS.hl||"")}</b></div>
    <div class="ip-kv"><span>Intervention terminée</span><b>${terTxt(BS.ter)}</b></div>
    <div class="ip-kv"><span>Remarque</span><b>${BS.res?"oui":"aucune"}</b></div>${BS.res?`<div class="ip-rv">${esc(BS.rc)}</div>`:""}
    <div class="ip-kv"><span>Matériel laissé</span><b>${mat.length?mat.length+" article"+(mat.length>1?"s":""):"aucun"}</b></div>${matLi(mat)}${BS.ph.length?`<div class="ip-kv"><span>Photos</span><b>${BS.ph.length}</b></div><p class="ip-phs" id="phst" role="status">${phStat(BS.ph.map(x=>x.id))}</p>`:""}${BS.bi?`<div class="ip-kv"><span>Horaires</span><b>${esc(biHor(BS))}</b></div>`:""}
+   <div class="ip-kv"><span>Technicien</span><b>${esc(D.i||"")}</b></div>
    <p class="ip-proof">✅ Signé électroniquement par ${esc(BS.nm)}${BS.fn?" ("+esc(BS.fn)+")":""} le ${esc(fds(BS.dl||T))} à ${esc(BS.hl||"")}${BS.rf?" · réf. "+esc(BS.rf):""}${sigKTxt(BS.sk)}</p>
    <p class="mu">${BS.pending?"Pas de connexion pour l’instant : l’envoi se fera tout seul au retour du réseau. Gardez cette page dans votre téléphone.":"TOPAS informatique a reçu le bon signé : il est classé avec l’intervention."}</p></section>
   <button type="button" class="ip-cta" data-blend>🏠 Retour à l’accueil</button><div id="qbn">${bannerHtml()}</div>`;
@@ -1036,10 +1046,12 @@ const hMin=h=>{const m=/^(\d\d):(\d\d)$/.exec(String(h||""));return m?(+m[1])*60
    if(BS.mt.on&&!BS.mt.L.length){e.textContent="Ajoutez l’article laissé, ou éteignez « Matériel laissé ».";g("blmn").focus();return}
    if(ns){const m=String(BS.rsm||"").trim();if(!BS.rs){e.textContent="Choisissez la raison.";document.querySelector("[data-nsr]").focus();return}if(BS.rs==="Autre…"&&m.length<3){e.textContent="Précisez la raison en quelques mots.";g("nsat").focus();return}
     vb.disabled=true;blNsSend(BS.ix,BS.rs==="Autre…"?"Autre":BS.rs,BS.rs==="Autre…"?m:"",matOut(BS.mt),BS.ter,BS.rc,BS.res);return}
-   BS.full=pr.value.trim().replace(/\s+/g," ");const W2=BS.full.split(" ");BS.pr=W2[0]||"";BS.no=W2.slice(1).join(" ");BS.fn="";
-   if(!BS.full){e.textContent="Indiquez le nom et le prénom du signataire.";pr.focus();return}if(W2.length<2||BS.full.length<4){e.textContent="Indiquez le prénom et le nom du signataire (les deux).";pr.focus();return}
-   if(BW.empty()){e.textContent=BW.mode()==="draw"?"Le client doit signer dans le cadre (ou choisir « ✍ Signature simple »).":"Indiquez le nom et le prénom du signataire.";return}
-   BS.nm=BS.full;BS.sg=BW.get();BS.sm=BW.how();BS.sk=BW.kind();BS.step="recap";nav({v:"bls"})}}
+   // (03/11, bloc I) prénom OU nom suffit (au moins 2 lettres) ; « Signé par Marc » ; puis UNE SEULE signature : le client signe → enregistrement
+   // et envoi au bureau tout de suite (plus d'écran « Vérification » ni de « Terminer l'intervention ») ; le technicien (iv), la date et l'heure sont enregistrés seuls.
+   BS.full=pr.value.trim().replace(/\s+/g," ");const W2=BS.full?BS.full.split(" "):[];BS.pr=W2[0]||"";BS.no=W2.slice(1).join(" ");BS.fn="";
+   if(BS.full.replace(/[^A-Za-zÀ-ÖØ-öø-ÿ]/g,"").length<2){e.textContent="Indiquez le prénom ou le nom du signataire (au moins 2 lettres).";pr.focus();return}
+   if(BW.empty()){e.textContent=BW.mode()==="draw"?"Le client doit signer dans le cadre (ou choisir « ✍ Signature simple »).":"Indiquez le prénom ou le nom du signataire.";return}
+   BS.nm=BS.full;BS.sg=BW.get();BS.sm=BW.how();BS.sk=BW.kind();vb.disabled=true;e.textContent="";blFinish().catch(x=>{vb.disabled=false;e.textContent="⚠ Envoi interrompu : "+((x&&x.message)||x)+". Réessayez."})}}
  function biBind(){const g=id=>document.getElementById(id),cl=g("bicl"),cx=g("bicx"),dt=g("bidet"),out=g("bitp");if(!dt)return;
   if(cl)cl.onclick=biCliSheet;if(cx)cx.oninput=()=>{BS.cn=cx.value};
   const ad=g("biad"),dtt=g("bidt"),plt=()=>{const e=g("biplt");if(e)e.textContent=biPlTxt()};if(ad)ad.oninput=()=>{BS.ad=ad.value;plt()};
@@ -1058,6 +1070,9 @@ const hMin=h=>{const m=/^(\d\d):(\d\d)$/.exec(String(h||""));return m?(+m[1])*60
   document.querySelectorAll("[data-blback]").forEach(b=>b.onclick=()=>{BS.step="form";nav({v:"bls"})});
   const f=g("blfin");if(f)f.onclick=()=>{if(phHold(f))return;f.disabled=true;blFinish().catch(e=>{f.disabled=false;const ee=g("sge");if(ee)ee.textContent="⚠ Envoi interrompu : "+((e&&e.message)||e)+". Réessayez."})};
   document.querySelectorAll("[data-blend]").forEach(b=>b.onclick=()=>{BS=null;nav({v:"list"})})}
+ // résumé « Vérifier ce qui est livré » pour l'écran final : lignes livrées / non livrées (BL)
+ function blLivSum(){try{const N=+BS.livn||0,L=Array.isArray(BS.liv)?BS.liv:[],T0=Array.isArray(BS.livT)?BS.livT:[];if(!N)return "";const no=T0.map((x,i)=>L.includes(i)?null:x).filter(x=>x!=null);
+  return `<div class="ip-kv"><span>Lignes livrées</span><b>${L.length} sur ${N}</b></div>${no.length?`<div class="ip-kv"><span>Non livré</span><b class="ko">${no.length}</b></div><ul class="ip-nl">${no.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`:""}`}catch(e){return ""}}
  async function blFinish(){if(BS.bi)return biSend(0);await phSync(BS);const t=IT[BS.ix].t,now=nowS(),rid=Date.now().toString(36)+Math.random().toString(36).slice(2,6),prev=blRec(t.i),v=(prev?prev.v:0)+1;
   const p={t:"fp-sign",k:"bl",id:rid,it:t.i,n:t.b||"",c:String(t.c||"").slice(0,120),bv:t.v||1,v,iv:D.i||"",nm:BS.nm.slice(0,80),pr:BS.pr.slice(0,60),no:BS.no.slice(0,60),fn:BS.fn.slice(0,80),ter:BS.ter==="oui"||BS.ter==="non"?BS.ter:"",res:BS.res?1:0,lb:"rem",rc:BS.res?BS.rc.slice(0,1500):"",noimg:BS.noimg?1:0,sg:BS.sg,sm:BS.sm,sk:BS.sk||"",rf:sigRef(),mat:matOut(BS.mt),ph:phPay(),liv:BS.liv.slice().sort((a,b)=>a-b).slice(0,500),livn:BS.livn||0,livt:Array.isArray(BS.livT)?BS.livT.slice(0,500).map(v=>String(v).slice(0,220)):[],dl:now.dl,hl:now.hl};BS.rf=p.rf;BS.dl=now.dl;BS.hl=now.hl;BS.hl=now.hl;
   const R=recs("bl:"+t.i);R.push({id:rid,v,dl:now.dl,hl:now.hl,nm:p.nm,res:p.res,ter:p.ter,ph:p.ph.map(x=>x[0])});
@@ -1646,6 +1661,10 @@ body.ip-fx{padding-bottom:calc(100px + env(safe-area-inset-bottom,0px))}
 .ip-f4x{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px}
 .ip-f4pb,.ip-f4rm{min-height:52px;border-radius:14px;font:inherit;font-size:15px;font-weight:800;cursor:pointer;padding:6px 8px}
 .ip-f4pb{border:0;background:#dc2626;color:#fff}.ip-f4rm{border:1.5px solid #2563eb;background:#fff;color:#1d4ed8}
+/* (03/11, bloc J) heures en listes Heure / Minutes + « Maintenant », une colonne au téléphone */
+.ip-hl .ip-wh{display:flex;gap:8px;align-items:stretch}.ip-hl .ip-ws{flex:1 1 0;min-width:0;min-height:48px;font-size:16px}
+.ip-hnow{flex:none;min-height:48px;padding:0 12px;border:1.5px solid var(--ds-topas,#0c4fa0);border-radius:12px;background:#fff;color:var(--ds-topas,#0c4fa0);font:inherit;font-size:15px;font-weight:800;cursor:pointer}
+@media (max-width:700px){.ip-hr{grid-template-columns:1fr}.ip-tp2{grid-template-columns:1fr}.ip-hl>span{font-size:14px}}
 </style>
 </body>
 </html>
