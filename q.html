@@ -128,7 +128,7 @@ function lnDead(el,etat){if(!el)return;const E=s=>String(s==null?"":s).replace(/
  lnCoord(el.querySelector("#lnkk"))}
 // Coordonnées de l’organisme (fiche Gestionnaire publiée par l’application : mention_rgpd → k) : nom, adresse, téléphone, e-mail
 async function lnCoord(el){if(!el)return;try{const r=await fetch(SBU+"/rest/v1/rpc/mention_rgpd",{method:"POST",headers:{apikey:SBK,"Content-Type":"application/json"},body:"{}"}),j=r.ok?await r.json():null,k=j&&j.k;if(!k||!k.n)return;const E=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
- el.innerHTML='<b>'+E(k.n)+'</b>'+(k.adr?'<br>'+E(k.adr):'')+(k.tel?'<br>Téléphone : <a href="tel:'+E(String(k.tel).replace(/[^\d+]/g,""))+'">'+E(k.tel)+'</a>':'')+(k.em?'<br>E-mail : <a href="mailto:'+E(k.em)+'">'+E(k.em)+'</a>':'')}catch(e){}}
+ el.innerHTML='<b>'+E(k.n)+'</b>'+(k.adr?'<br>'+E(k.adr):'')+(k.tel?'<br>Téléphone : <a href="tel:'+E(String(k.tel).replace(/[^\d+]/g,""))+'">'+E(k.tel)+'</a>':'')+(k.em?'<br>E-mail : <a href="mailto:'+E(k.em)+'">'+E(k.em)+'</a>':'')+(()=>{const w=String(k.web||"").trim().replace(/^https?:\/\//i,"").replace(/\/+$/,"");return /^[\w.-]+\.[a-z]{2,}(\/\S*)?$/i.test(w)?'<br>Site internet : <a href="https://'+E(w)+'/" target="_blank" rel="noopener">'+E(w)+'</a>':''})()}catch(e){}}
 
 (async function(){
 "use strict";
