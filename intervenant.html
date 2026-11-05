@@ -321,6 +321,43 @@ body.ip-nb{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
 .utag.ip-tag.ui{background:var(--ds-teal)}
 .ip-bdt{white-space:pre-wrap;margin:6px 0 10px;padding:10px 12px;border-radius:12px;background:var(--ds-line2);font-size:15px}
 .ip-opt0{font-weight:400;color:#57606f;font-size:14px;text-transform:none;letter-spacing:0}.ip-nl{margin:4px 0 8px 18px;padding:0;font-size:14px;color:#9a3412}
+/* (05/11) version E : écran d'une formation (maquettes tel-e-multi + tel-e-jours) — fond blanc, textes ≥ 15 px, cibles ≥ 44 px, contraste ≥ 4,5:1 */
+body:has(.ve){background:#fff}.ve .qk{color:#14532d}
+.ve{background:#fff;color:#111827;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;max-width:640px;margin:0 auto}
+.ve-hd{padding:12px 16px 14px;border-bottom:1px solid #e5e7eb;background:#fff}.ve-back{min-height:44px;padding:0 8px 0 0;border:0;background:none;color:#1e3a8a;font:700 15px system-ui,sans-serif;cursor:pointer}
+.ve-per{font-size:15px;color:#4b5563;font-weight:600;margin-top:2px}.ve-cli{margin:2px 0 2px;font-size:26px;line-height:1.15;font-weight:800;text-transform:uppercase;letter-spacing:.01em;color:#111827;word-break:break-word}.ve-sub{font-size:16px;color:#374151}.ve-lt{margin:2px 0;font-size:21px;line-height:1.25;font-weight:800;color:#111827}
+.ve-in{padding:14px 16px 18px;display:flex;flex-direction:column;gap:14px}
+.ve-days{display:flex;gap:8px;overflow-x:auto;padding:10px 2px 2px;margin:0 -2px;scrollbar-width:thin}
+.ve-d{position:relative;flex:1 0 56px;max-width:96px;min-height:76px;border-radius:14px;border:1.5px solid #d1d5db;background:#fff;color:#1f2937;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;cursor:pointer;font-family:inherit;padding:6px 2px}
+.ve-d .ve-dw{font-size:15px;font-weight:600}.ve-d b{font-size:22px;line-height:1.1}.ve-d small{font-size:15px;font-weight:600;color:#4b5563}
+.ve-d-ok{background:#f0fdf4;border-color:#86efac;color:#15803d}.ve-d-ok b,.ve-d-ok small{color:#15803d}
+.ve-d-late{border:2px solid #dc2626}.ve-d-late small{color:#b91c1c}.ve-bang{position:absolute;top:-9px;right:-6px;width:22px;height:22px;border-radius:50%;background:#dc2626;color:#fff;font:800 14px/22px system-ui,sans-serif;font-style:normal;text-align:center}
+.ve-d-auj{background:#111827;border-color:#111827;color:#fff}.ve-d-auj b,.ve-d-auj small{color:#fff}.ve-d.on:not(.ve-d-auj){box-shadow:0 0 0 3px #1e3a8a;border-color:#1e3a8a}.ve-d-auj.on{box-shadow:0 0 0 3px #93c5fd}
+.ve-late{display:flex;align-items:center;gap:10px;justify-content:space-between;padding:10px 14px;border:1.5px solid #fecaca;background:#fef2f2;border-radius:14px;color:#b91c1c;font-size:16px}.ve-late b{line-height:1.3}
+.ve-lgo{flex:0 0 auto;min-height:44px;border:0;background:none;color:#b91c1c;font:800 16px system-ui,sans-serif;text-decoration:underline;cursor:pointer}
+.ve-p{border:2px solid #e5e7eb;border-radius:16px;overflow:hidden;background:#fff}.ve-ph{padding:12px 16px;background:#f8fafc;border-bottom:1px solid #e5e7eb;font-size:17px;font-weight:800;color:#111827}
+.ve-cs{display:grid;grid-template-columns:1fr 1fr}.ve-c{min-height:92px;border:0;border-right:1px solid #e5e7eb;background:#fff;color:#4b5563;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:10px 6px;cursor:pointer;font-family:inherit;text-align:center}.ve-c:last-child{border-right:0}
+.ve-c b{font-size:18px;font-weight:800}.ve-c span{font-size:15px;font-weight:600}
+.ve-c-ok{background:#f0fdf4;color:#15803d}.ve-c-now{background:#c2410c;color:#fff}.ve-c-part{background:#fff7ed;color:#9a3412;box-shadow:inset 0 0 0 2px #fdba74}.ve-c-later,.ve-c-no{background:#fff;color:#4b5563}.ve-c-no{cursor:default}
+.ve-bar{height:10px;margin:12px 16px 14px;border-radius:99px;background:#e5e7eb;overflow:hidden}.ve-bar i{display:block;height:100%;background:#16a34a;border-radius:99px}
+.ve-pn{margin:0;padding:8px 16px 12px;font-size:15px;color:#4b5563;line-height:1.4}.ve-in>.ve-pn{padding:0}
+.ve-bil{display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-height:56px;padding:10px 16px;border:2px solid #e5e7eb;border-radius:16px;background:#fff;color:#111827;font-family:inherit;cursor:pointer;text-align:left}.ve-bil b{font-size:16px}.ve-bil span{font-size:15px;color:#c2410c;font-weight:600}.ve-bil-ok span{color:#15803d}
+.ve-4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.ve-b{min-height:104px;border:1.5px solid #e5e7eb;border-radius:16px;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:10px 2px;cursor:pointer;font-family:inherit;color:#111827;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+.ve-b i{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;font-style:normal}.ve-b span{font-size:15px;font-weight:800}
+.ve-b-der i{background:#dbeafe}.ve-b-sup i{background:#ede9fe}.ve-b-rem i{background:#dcfce7;color:#15803d}.ve-b-pb{border-color:#fca5a5}.ve-b-pb i{background:#fee2e2;color:#b91c1c}.ve-b-pb span{color:#b91c1c}.ve-b.on{box-shadow:0 0 0 3px #1e3a8a}
+.ve-more .pbz{margin-top:0;border-top:0;padding-top:0}.ve-more .pbz .ip-2b{display:none}.ve-more:empty{display:none}
+.ve-mini{display:flex;flex-direction:column;gap:8px;margin:2px 0 4px}.ve-p-s .ve-ph{padding:8px 12px;font-size:15px}.ve-p-s .ve-c{min-height:64px;padding:6px 4px}.ve-p-s .ve-c b{font-size:15px}.ve-p-s .ve-bar{height:7px;margin:8px 12px 10px}
+.ve-go{min-height:60px;border:0;border-radius:16px;background:#c2410c;color:#fff;font:800 18px system-ui,sans-serif;cursor:pointer;padding:10px 14px}.ve-sec{min-height:48px;border:1.5px solid #cbd5e1;border-radius:14px;background:#fff;color:#1e3a8a;font:700 16px system-ui,sans-serif;cursor:pointer;padding:8px 14px}
+.ve-alldone{padding:14px;border-radius:14px;background:#f0fdf4;color:#15803d;font-size:17px;font-weight:800;text-align:center}
+.ve-ou{margin:6px 0 0;font-size:16px;font-weight:800;color:#374151}.ve-rs{display:flex;flex-direction:column;border:1.5px solid #e5e7eb;border-radius:16px;overflow:hidden}
+.ve-r{display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid #e5e7eb;min-height:60px;flex-wrap:wrap}.ve-r:last-child{border-bottom:0}
+.ve-av{flex:0 0 40px;height:40px;border-radius:50%;color:#fff;font:800 15px/40px system-ui,sans-serif;text-align:center}.ve-rn{flex:1 1 120px;min-width:0;font-size:16px;color:#111827;word-break:break-word}
+.ve-st{font-size:15px;font-weight:700;color:#4b5563}.ve-st-ok{color:#15803d}.ve-st-ab{color:#4b5563}.ve-rb{display:flex;gap:8px}
+.ve-sg,.ve-ab{min-height:44px;min-width:44px;padding:0 14px;border-radius:12px;font:700 15px system-ui,sans-serif;cursor:pointer}.ve-sg{border:0;background:#c2410c;color:#fff}.ve-sg2{background:#fff;color:#1e3a8a;border:1.5px solid #cbd5e1}.ve-ab{border:1.5px solid #cbd5e1;background:#fff;color:#374151}
+.ve-me{font-weight:600}.ve-empty{margin:0;padding:18px;border:1.5px dashed #cbd5e1;border-radius:14px;text-align:center;font-size:16px;color:#4b5563}
+.ve-w{display:flex;align-items:center;gap:12px;min-height:64px;padding:10px 14px;border:1.5px solid #e5e7eb;border-radius:16px;background:#fff;color:#111827;text-decoration:none}.ve-w i{flex:0 0 44px;height:44px;border-radius:12px;background:#ede9fe;display:flex;align-items:center;justify-content:center;font-size:22px;font-style:normal}.ve-w span{display:flex;flex-direction:column;gap:2px}.ve-w b{font-size:16px}.ve-w small{font-size:15px;color:#4b5563}
+.ve-cons details{border:1.5px solid #e5e7eb;border-radius:14px;padding:4px 12px}.ve-cons summary{min-height:44px;display:flex;align-items:center;font-size:16px;font-weight:700;cursor:pointer}
+.ve-c:focus-visible,.ve-d:focus-visible,.ve-b:focus-visible,.ve-go:focus-visible,.ve-sg:focus-visible,.ve-ab:focus-visible,.ve-w:focus-visible{outline:3px solid #1e3a8a;outline-offset:2px}
 </style>
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
@@ -675,7 +712,7 @@ async function main(){
  const uF=(x,d,late)=>{const f=x.f,dd=DS(f),dt=d||dd[0]||"",j=dd.indexOf(dt),dn=x.s==="fini",pd=late?pastDue(f).length:0,n=late&&dt?nLate(dt):0,hr=slot(f,dt)[0];
   const emTodo=!dn&&(late||SLOTS(f).some(o=>o.day===T&&!emState(f,o))),todo=emTodo||(!dn&&x.s==="clo");
   const st=dn?stW("sig","Terminée"):n>=2?stW("late","+ 48 h"):emTodo?stW("auj","À émarger"):x.s==="clo"?stW("auj","À clôturer"):x.s==="cours"||x.s==="auj"?stW("ven","En cours"):stW("ven","À venir");
-  const acts=dn?"":f4Btns(f,x.ix,dt);
+  const acts=dn?"":dt&&dt<=T&&!f.clo?vMini(f,x.ix,dt)/* (05/11, version E) */:f4Btns(f,x.ix,dt);
   return {k:dt+" "+hr,todo:!!todo,h:rowW(dn?"sig":todo?"auj":"ven",`<button type="button" class="row urow ip-row" data-f="${x.ix}">${dCol(dt)}<span class="ip-c ul"><b class="uc" title="${esc(f.c||"")}">${esc(f.c||"")}</b><span class="ip-s m">${esc(f.t||"Formation")}${dd.length>1?(dn||j<0?" · "+dd.length+" jours":" · jour "+(j+1)+"/"+dd.length):""}</span>${late&&dt?uAgo(dt)+(pd?`<span class="ip-s m">✍ ${pd} émargement${pd>1?"s":""} à faire signer</span>`:""):""}</span><span class="ip-r">${dn?"":`<span class="ip-hr">${esc(fH(hr))}</span>`}<span class="ip-rt">${f.tst?`<span class="utag ip-tag" style="background:#facc15;color:#422006;border:1px solid #a16207" title="Dossier de test (mails vers l’adresse de test)">TEST</span>`:""}<span class="utag uf ip-tag">Formation</span>${st}</span></span></button>`,acts,(f.c||"")+" "+(f.n||"")+" "+(f.t||""))}};
  // retard : « il y a N jours » (bon ou émargement daté d'avant aujourd'hui, pas signé)
  const uAgo=d=>{const n=Math.round((Date.parse(T)-Date.parse(d))/864e5);return n>0?`<span class="ulate">il y a ${n} jour${n>1?"s":""}</span>`:""};
@@ -1197,39 +1234,103 @@ const hMin=h=>{const m=/^(\d\d):(\d\d)$/.exec(String(h||""));return m?(+m[1])*60
   if(emgAll(f)&&tr.length&&acqReq(f)&&!acqDone(f)){const k=tr.filter((t,i)=>!acqSt(f,i)).length,an=acqNext(f);return `<button type="button" class="btn big2 ip-main" data-acq="${ix}:${an<0?0:an}">🏁 Évaluation après (${k} stagiaire${k>1?"s":""} restant${k>1?"s":""})</button>`}
   if(acqDone(f)||(emgAll(f)&&(!tr.length||!acqReq(f)))){const bil=(f.cl||[]).find(z=>z[0]==="bilan");if(!(bil&&bil[1])&&!BIL(f))return `<button type="button" class="btn big2 ip-main" data-bil="${ix}">📝 Remplir mon bilan</button>`}
   return ""}
- function formView(ix){const f=D.f[ix];if(!f)return listView();const s=stat(f),sl=SLOTS(f),sd=scToday(f),tr=f.tr||[],ma=mainAct(f,ix),sup=Array.isArray(f.sup)?f.sup:[];
-  const sg=sl.filter(o=>emState(f,o)).length,cur=sl.find(o=>o.day===T&&!emState(f,o))||sl.find(o=>o.day<T&&!emState(f,o))||sl.find(o=>!emState(f,o))||null;
-  const dots=sl.map(o=>{const x=emState(f,o),k=(x?"ok":o.day<=T?"due":"")+(cur&&o.day===cur.day&&o.part===cur.part?" cur":"");return `<span class="emd${k.trim()?" "+k.trim():""}" title="${esc(fdm(o.day))} · ${PARTL[o.part]}"></span>`}).join("");
-  const pd=sl.filter(o=>{const x=emState(f,o);return x&&!x.sent}).length,emSub=!sl.length?"Aucune date":`${sg} demi-journée${sg>1?"s":""} signée${sg>1?"s":""} sur ${sl.length}`+(pd?" · "+pd+" en attente d’envoi":"")+(cur?cur.day===T?" · "+(cur.part==="m"?"ce matin":"cet après-midi")+" : à signer":cur.day<T?" · "+esc(fdm(cur.day))+" : en retard":" · prochaine : "+esc(fdm(cur.day)):" · tout est signé");
-  const roB=f.clo?`<span class="mu">🔒 clôturé</span>`:"";
-  const emB=f.clo?roB:cur?`<button type="button" class="btn${cur.day<=T?" p":""}" data-sg="em" data-day="${cur.day}" data-part="${cur.part}" ${cur.day>T?"disabled":""}>✍ Signer</button>`:sl.length?'<span class="ok">✔ Tout signé</span>':"";
-  const emOk=emgAll(f),an=acqNext(f),ac=acqCnt(f),aDone=acqDone(f),aPend=tr.some((t,i)=>{const x=acqSt(f,i);return x&&x.pend}),nO=(f.ob2||[]).length;
-  const aDate=acqDate(f),acqB=!tr.length?'<span class="mu">Aucun stagiaire</span>':!acqReq(f)?'<span class="mu">Non demandée pour cette formation</span>':aDone?`<span class="${aPend?"wt":"ok"}">${aPend?"⏳ Faite le "+esc(dm(aDate))+" · en attente d’envoi":"✔ Faite le "+esc(dm(aDate))}</span>${f.clo?"":`<button type="button" class="btn" data-acq="${ix}:0">Modifier</button>`}`:f.clo?roB:emOk?`<button type="button" class="btn p" data-acq="${ix}:${an<0?0:an}">▶ ${ac?"Continuer · "+ac+" / "+tr.length:"Commencer"}</button>`:'<span class="mu">Après le dernier émargement</span>';
-  const bil=(f.cl||[]).find(z=>z[0]==="bilan"),br=BIL(f),bpd=br&&pend(br.id),bilOk=!!(bil&&bil[1])||!!br,bilOpen=aDone||(emOk&&(!tr.length||!acqReq(f)));
-  const bilB=br?`<span class="${bpd?"wt":"ok"}">${bpd?"⏳":"✔"} Envoyé le ${esc(dm(br.dl))}${bpd?" · en attente d’envoi":""}</span>${f.clo?"":`<button type="button" class="btn" data-bil="${ix}">Modifier</button>`}`:bil&&bil[1]?`<span class="ok">✔ Envoyé${f.bilr?" le "+esc(dm(f.bilr)):", merci"}</span>`:f.clo?roB:!bilOpen?'<span class="mu">Après l’évaluation des acquis</span>':`<button type="button" class="btn gn" data-bil="${ix}">📝 Remplir mon bilan</button>`;
-  return `${f.tst?`<div role="status" style="padding:10px 14px;text-align:center;font:700 15px/1.35 Arial,sans-serif;color:#422006;background:repeating-linear-gradient(135deg,#fef08a 0 14px,#fde047 14px 28px);border-bottom:2px solid #a16207">🧪 TEST — dossier de test : tout fonctionne, les mails partent vers l’adresse de test</div>`:""}<header class="ip-hd"><button type="button" class="ip-back" data-back>‹ Retour</button><div class="ip-k">Formation · ${SL2[s]}</div><div class="ip-num ip-num2">${esc(f.t)}</div><div class="ip-sub">${esc(f.c)} · N° ${esc(f.n)}</div></header>
+ // ---- VERSION E (05/11, maquettes tel-e-multi + tel-e-jours) : écran d'une formation ----
+ // en-tête (durée + période, CLIENT, intitulé · stagiaires) ; jours en cases (vert ✓ tout signé, noir « auj. », bord rouge « ! à finir », gris à venir ;
+ // un appui = afficher ce jour) + bandeau rouge du premier jour passé incomplet ; bandeau « ✍ Émargement · jour » coupé Matin | Après-midi + barre
+ // d'avancement ; bandeau « 📝 Évaluation · pour toute la formation » Avant | Après ; un appui sur une demi-journée → liste (« Faire signer à la suite »
+ // = startSign, ou un par un) ; 4 grands boutons Déroulé · Supports · Remarque · Signaler. Écran de signature (emScreen) et dépôts inchangés.
+ const VDAY={};
+ const vCap=t=>String(t||"").charAt(0).toUpperCase()+String(t||"").slice(1);
+ const vD=(d,o)=>{const x=new Date(d+"T12:00:00");return isNaN(x)?d:x.toLocaleDateString("fr-FR",o)};
+ const vdw=d=>vD(d,{weekday:"long",day:"numeric"}),vWd=d=>vCap(vD(d,{weekday:"short"}).replace(".","")),vNo=d=>vD(d,{day:"numeric"});
+ const vPer=f=>{const L=DS(f),n=L.length;if(!n)return "Dates à définir";if(n===1)return "Formation d’1 jour · "+vD(L[0],{weekday:"long",day:"numeric",month:"long"});
+  return "Formation de "+n+" jours · du "+vD(L[0],{weekday:"short",day:"numeric"})+" au "+vD(L[n-1],{weekday:"short",day:"numeric",month:"short"})};
+ const vDay=(f,ix)=>{const L=DS(f);if(VDAY[ix]&&L.includes(VDAY[ix]))return VDAY[ix];if(L.includes(T))return T;const up=L.find(d=>d>T);return up&&L[0]>T?L[0]:L.filter(d=>d<=T).slice(-1)[0]||L[0]||""};
+ const vDaySt=(f,d)=>{const L=SLOTS(f).filter(o=>o.day===d);if(L.length&&L.every(o=>emSl(f,o).k==="ok"))return "ok";return d<T?"late":d===T?"auj":"later"};
+ const vMiss=(f,sl)=>{const st=emSl(f,sl);return st.k==="ok"?0:st.k==="part"?(st.lt||1):(f.tr||[]).length+1};
+ const vLate=f=>SLOTS(f).find(o=>o.day<T&&emSl(f,o).k!=="ok")||null;
+ const vNbS=n=>n+" stagiaire"+(n>1?"s":"");
+ // une demi-journée : ok (vert) · now (orange plein, à faire maintenant) · part (orange clair, commencé / à finir) · later (gris) · no (pas de demi-journée)
+ function vHalf(f,d,p,first){const has=SLOTS(f).some(o=>o.day===d&&o.part===p),lb=PARTL[p];if(!has)return{k:"no",lb,t:"pas de demi-journée"};
+  const sl={day:d,part:p},st=emSl(f,sl),N=(f.tr||[]).length;
+  if(st.k==="ok")return{k:"ok",lb,t:"✓ "+st.n+"/"+st.N+" + vous"+(st.ab?" · "+st.ab+" abs.":""),pd:st.pd,st};
+  const n=st.k==="part"?st.n:0;if(d>T)return{k:"later",lb,t:"plus tard",st};
+  if(first)return{k:"now",lb,t:n+"/"+N+" · "+(n?"continuer":"commencer")+" ›",st};
+  if(st.k==="part"||d<T)return{k:"part",lb,t:n+"/"+N+" · "+(st.k==="part"?"commencé":"à finir"),st};
+  const h=hrOf(f,d,p)[0];return{k:"later",lb,t:"plus tard"+(h?" · "+fH(h):""),st}}
+ function vEmHalves(f,d){const P=["m","a"],first=P.find(p=>SLOTS(f).some(o=>o.day===d&&o.part===p)&&d<=T&&emSl(f,{day:d,part:p}).k!=="ok");return P.map(p=>vHalf(f,d,p,p===first))}
+ const vProg=(f,d)=>{let tot=0,done=0;const N=(f.tr||[]).length+1;SLOTS(f).filter(o=>o.day===d).forEach(o=>{const st=emSl(f,o);tot+=N;done+=st.k==="ok"?N:st.k==="part"?Math.min(N,st.n+st.ab+1):0});return tot?Math.round(done*100/tot):0};
+ function vEv(f,ty){const tr=f.tr||[],n=tr.length,L=DS(f),due=ty==="av"?L[0]||"":L[L.length-1]||"",lb=ty==="av"?"Avant":"Après";if(!n)return{k:"no",lb,t:"aucun stagiaire"};
+  const st=evSt(f,ty),k=tr.filter((t,i)=>acqSt(f,i,ty)).length;
+  if(st.k==="ok")return{k:"ok",lb,t:"✓ "+k+"/"+n+(st.d?" · "+vdw(String(st.d).slice(0,10)):due?" · "+vdw(due):""),pd:st.pd};
+  return{k:k?"part":"later",lb,t:k?k+"/"+n+" · commencé":due?vdw(due):"à faire",due,n0:k,n}}
+ function vEvs(f){const E=[vEv(f,"av"),vEv(f,"ap")];let got=false;E.forEach(x=>{if(x.k==="ok"||x.k==="no")return;const now=!x.due||x.due<=T;
+  if(now&&!got){got=true;x.k="now";x.t=x.n0+"/"+x.n+" · "+(x.n0?"continuer":"commencer")+" ›"}else if(now&&!x.n0){x.k="part";x.t="0/"+x.n+" · à faire"}});return E}
+ const vMini=(f,ix,d)=>`<div class="ve-mini">${vEmPanel(f,ix,d,1)}${(f.tr||[]).length?vEvPanel(f,ix,1):""}</div>`;
+ const vCell=(x,attr,small)=>x.k==="no"?`<div class="ve-c ve-c-no"><b>${esc(x.lb)}</b><span>${esc(x.t)}</span></div>`:`<button type="button" class="ve-c ve-c-${x.k}${x.pd?" ve-c-pd":""}" ${attr}><b>${esc(x.lb)}</b><span>${esc(x.t)}${x.pd?" · envoi en attente":""}</span></button>`;
+ function vEmPanel(f,ix,d,small){const H=vEmHalves(f,d),pr=vProg(f,d);
+  return `<div class="ve-p${small?" ve-p-s":""}"><div class="ve-ph">✍ Émargement · ${esc(vdw(d))}</div><div class="ve-cs">${H.map((x,i)=>vCell(x,`data-veh="${ix}:${d}:${i?"a":"m"}"`,small)).join("")}</div><div class="ve-bar" role="progressbar" aria-label="Avancement des signatures du jour" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${pr}"><i style="width:${pr}%"></i></div></div>`}
+ function vEvPanel(f,ix,small){const E=vEvs(f);
+  return `<div class="ve-p${small?" ve-p-s":""}"><div class="ve-ph">📝 Évaluation · pour toute la formation</div><div class="ve-cs">${E.map((x,i)=>vCell(x,`data-vev="${ix}:${i?"ap":"av"}"`,small)).join("")}</div>${small?"":`<p class="ve-pn">« Avant » se fait le premier jour, « Après » le dernier jour.</p>`}</div>`}
+ function vDays(f,ix,d){const L=DS(f);if(L.length<2)return "";
+  return `<div class="ve-days" role="group" aria-label="Jours de la formation">${L.map(x=>{const s=vDaySt(f,x),on=x===d;return `<button type="button" class="ve-d ve-d-${s}${x===T?" ve-d-auj":""}${on?" on":""}" data-vday="${ix}:${x}" aria-pressed="${on}" aria-label="${esc(vCap(vD(x,{weekday:"long",day:"numeric",month:"long"})))}${s==="ok"?" : tout est signé":s==="late"?" : à finir":x===T?" : aujourd’hui":""}">${s==="late"?'<i class="ve-bang" aria-hidden="true">!</i>':""}<span class="ve-dw">${esc(vWd(x))}</span><b>${esc(vNo(x))}</b><small>${x===T?"auj.":s==="ok"?"✓":s==="late"?"à finir":"·"}</small></button>`}).join("")}</div>`}
+ function vLateBan(f,ix){if(f.clo)return "";const o=vLate(f);if(!o)return "";const m=vMiss(f,o);
+  return `<div class="ve-late" role="alert"><b>⚠ ${esc(vCap(vdw(o.day)))} ${o.part==="m"?"matin":"après-midi"} : ${m} signature${m>1?"s":""} manque${m>1?"nt":""}</b><button type="button" class="ve-lgo" data-veh="${ix}:${o.day}:${o.part}">Compléter ›</button></div>`}
+ const vBtns=ix=>`<div class="ve-4">${[["der","📄","Déroulé"],["sup","📚","Supports"],["rem","✎","Remarque"],["pb","⚠","Signaler"]].map(([k,i,t])=>`<button type="button" class="ve-b ve-b-${k}" data-vb="${ix}:${k}"><i aria-hidden="true">${i}</i><span>${t}</span></button>`).join("")}</div>`;
+ function formView(ix){const f=D.f[ix];if(!f)return listView();const tr=f.tr||[],d=vDay(f,ix);
+  const bil=(f.cl||[]).find(z=>z[0]==="bilan"),br=BIL(f),bilOk=!!(bil&&bil[1])||!!br,last=DS(f).slice(-1)[0]||"",bilOpen=!f.clo&&(bilOk||emgAll(f)||(last&&last<=T));
+  const bilL=bilOpen||bilOk?`<${f.clo?"div":"button type=\"button\""} class="ve-bil${bilOk?" ve-bil-ok":""}"${f.clo?"":` data-bil="${ix}"`}><b>📝 Mon bilan de formateur</b><span>${br?"✓ envoyé le "+esc(dm(br.dl))+(pend(br.id)?" · envoi en attente":""):bilOk?"✓ envoyé"+(f.bilr?" le "+esc(dm(f.bilr)):""):"à remplir après la formation ›"}</span></${f.clo?"div":"button"}>`:"";/* clôturé : simple information, plus de bouton */
+  return `${f.tst?`<div role="status" style="padding:10px 14px;text-align:center;font:700 15px/1.35 Arial,sans-serif;color:#422006;background:repeating-linear-gradient(135deg,#fef08a 0 14px,#fde047 14px 28px);border-bottom:2px solid #a16207">🧪 TEST — dossier de test : tout fonctionne, les mails partent vers l’adresse de test</div>`:""}<div class="ve">
+  <header class="ve-hd"><button type="button" class="ve-back" data-back>‹ Retour</button><div class="ve-per">${esc(vPer(f))}</div><h1 class="ve-cli">${esc(f.c||"Client")}</h1><div class="ve-sub">${esc(f.t||"Formation")} · ${vNbS(tr.length)}</div></header>
   <div id="qbn">${bannerHtml()}</div>
   ${f.clo?`<div class="qb qk" role="status"><b>🔒 Dossier clôturé par TOPAS informatique le ${esc(f.clo)}</b><span>Les pièces de cette formation ne sont plus modifiables depuis le téléphone ; un envoi reçu après la clôture est rangé en version, sans changer le dossier.</span></div>`:""}
-  <div class="fc s-${s}"><div class="cli">${esc(f.c)}</div>
-   <div class="ln"><i>📅</i><div>${DS(f).map(x=>{const t=slot(f,x);return `<div class="dt${x===T?" now":x<T?" past":""}"><b>${esc(fdl(x))}</b><span>${esc(t[2])}</span></div>`}).join("")||"À définir"}<span class="mu">${esc(f.h)} h au total</span></div></div>
-   ${lieu(f,1)}${ctLine(f,1)}
-   <div class="ln"><i>☎</i><div><b>TOPAS informatique</b>${D.m?`<br><a href="mailto:${esc(D.m)}">✉ ${esc(D.m)}</a>`:""}${G[1]?`<br><a href="tel:${esc(G[1].replace(/\s/g,""))}">☎ ${esc(G[1])}</a>`:""}</div></div>
-   ${ma?`<div class="btns ip-mainw">${ma}</div>`:""}<div class="btns"><button type="button" class="btn" data-ics="${esc(f.n)}">📅 Ajouter à mon agenda</button></div></div>
-  <section class="sec ip-cons" style="--c:var(--bl)"><div class="fc s-venir ip-cl">
-   <details class="ip-cd" id="cons${ix}"><summary class="ip-cs"><span>📋 À consulter</span><small class="mu">déroulé, programme, planification, stagiaires · consultation seule</small></summary><div class="pan">
-    <details ${sd?"open":""}><summary>📋 Déroulé d’intervention${sd?" (jour en cours en premier)":""}</summary><div class="pan">${sd||""}${scAll(f)||"<div class='mu'>Aucun déroulé détaillé pour cette formation.</div>"}</div></details>
-    ${(f.pg||[]).length?`<details><summary>📘 Programme</summary><div class="pan">${progH(f)}</div></details>`:""}
-    <details><summary>📅 Planification</summary><div class="pan">${DS(f).map(x=>{const t=slot(f,x);return `<div class="tl"><b>${esc(fdm(x))}</b><span>${esc(t[2])}</span></div>`}).join("")||"À définir"}<div class="mu" style="margin-top:6px">${esc(f.h)} h au total${f.j?" · "+esc(f.j)+" jour"+(+f.j>1?"s":""):""}</div></div></details>
-    <details><summary>👥 Stagiaires (${tr.length})</summary><div class="pan">${trList(f)}</div></details>
-    ${f.sp&&!sup.length?`<div class="btns"><a class="btn" href="${esc(f.sp)}" target="_blank" rel="noopener">📚 Support de cours</a></div>`:""}</div></details>
-   ${sup.length?`<details class="ip-cd" id="sups${ix}"><summary class="ip-cs"><span>📚 Supports de cours <span class="ip-gn n">${sup.length}</span></span><small class="mu">disponibles sans connexion une fois ouverts</small></summary><div class="pan ip-supl">${sup.map((u,i)=>supRow(u,f,i,ix)).join("")}</div></details>`:""}
-  </div></section>
-  <section class="sec" style="--c:var(--or)"><h2>✍ À faire signer</h2><div class="fc s-clo ip-l3w">
-   <div class="task ip-l3" id="l3em"><span class="ip-l3t">✍ Émargements<br><small class="mu">${emSub}</small><span class="emds" aria-hidden="true">${dots}</span></span>${emB}</div>
-   ${acqLine(f,ix,"av")}${acqLine(f,ix,"ap")}<div hidden class="task ip-l3${emOk&&tr.length&&acqReq(f)?"":" dim"}" id="l3aq"><span class="ip-l3t">✅ Évaluation des acquis<br><small class="mu">par stagiaire · ${aDone?"faite le "+esc(dm(aDate)):ac?"en cours · "+ac+" / "+tr.length:"à faire"}${emOk||aDone?"":" · après le dernier émargement"}${nO?" · "+nO+" objectif"+(nO>1?"s":""):""}</small></span>${acqB}</div>
-   <div class="task ip-l3${bilOpen||bilOk?"":" dim"}" id="l3bil"><span class="ip-l3t">📝 Bilan du formateur<br><small class="mu">${br?"envoyé le "+esc(dm(br.dl)):bil&&bil[1]?"envoyé"+(f.bilr?" le "+esc(dm(f.bilr)):""):"à faire"} · déroulement, difficultés, suites à donner${bilOpen||bilOk?"":" · après l’évaluation des acquis"}</small></span>${bilB}</div>
-  </div></section>
-  <div class="fc s-clo">${pbZone(f,ix)}${fphZone(f,ix)}</div>${foot()}`}
+  <div class="ve-in">${vDays(f,ix,d)}${vLateBan(f,ix)}${d?vEmPanel(f,ix,d):`<div class="ve-p"><div class="ve-ph">✍ Émargement</div><p class="ve-pn">Dates à définir : TOPAS informatique vous prévient dès qu’elles sont fixées.</p></div>`}${vEvPanel(f,ix)}${bilL}${vBtns(ix)}
+  <div class="ve-more">${pbZone(f,ix)}${fphZone(f,ix)}</div></div></div>${foot()}`}
+ // liste d'une demi-journée : « Faire signer à la suite » (= startSign) ou un par un ; le formateur signe en dernier
+ function emlView(){const f=D.f[V.ix];if(!f)return listView();const ix=V.ix,d=V.day,p=V.part,sl={day:d,part:p},st=emSl(f,sl),tr=(f.tr||[]).map(x=>String(x[0]||"").trim()).filter(Boolean),N=tr.length;
+  const r=latest(f.n,"em",d,p),E=r?(Array.isArray(r.ef)?r.ef:(r.e||[])):[],z=nm=>E.find(x=>x&&!x.tr&&x.nm===nm),lt=x=>x&&x.abs&&(x.lt||x.ab===EM_LT);
+  const sOf=nm=>{const x=z(nm);return !x||lt(x)?"todo":x.abs?"abs":"ok"},nS=tr.filter(n=>sOf(n)==="ok").length,nA=tr.filter(n=>sOf(n)==="abs").length,rest=N-nS-nA,fut=d>T,ro=!!f.clo;
+  const big=ro?`<p class="ve-pn">🔒 Dossier clôturé : lecture seule.</p>`:fut?`<p class="ve-pn">Cette demi-journée se signe le jour même (${esc(vdw(d))}).</p>`:st.k==="ok"&&!rest?`<div class="ve-alldone">✓ Tout le monde a signé</div><button type="button" class="ve-sec" data-emsum="${ix}:${d}:${p}">Voir le détail · refaire une signature</button>`
+   :`<button type="button" class="ve-go" data-emall="${ix}:${d}:${p}">✍ Faire signer à la suite (${rest} restant${rest>1?"s":""})</button>`;
+  const row=(nm,i)=>{const s=sOf(nm),x=z(nm);return `<div class="ve-r"><span class="ve-av" style="background:${shade(itvPal(nm)[0],.45)}" aria-hidden="true">${esc(ini2(nm))}</span><b class="ve-rn">${esc(nm)}</b>${s==="ok"?`<span class="ve-st ve-st-ok">✓ signé${x&&x.h?" "+esc(fH(x.h)):""}</span>`:s==="abs"?`<span class="ve-st ve-st-ab">absent${x&&x.ab?" · "+esc(x.ab):""}</span>`:ro||fut?`<span class="ve-st">à signer</span>`:`<span class="ve-rb"><button type="button" class="ve-sg" data-emone="${i}">Signer</button><button type="button" class="ve-ab" data-emab="${i}">Absent</button></span>`}</div>`};
+  return `<div class="ve ve-l"><header class="ve-hd"><button type="button" class="ve-back" data-vbk="${ix}">‹ Retour</button><div class="ve-per">${esc(f.c||"")}</div><h1 class="ve-lt">Émargement · ${p==="m"?"matin":"après-midi"} · ${esc(vCap(fdm(d)))}</h1><div class="ve-sub">${nS} signé${nS>1?"s":""} sur ${N}${nA?" · "+nA+" absent"+(nA>1?"s":""):""}${st.pd?" · envoi en attente":""}</div></header>
+  <div class="ve-in">${big}${N?`<h2 class="ve-ou">Ou un par un</h2><div class="ve-rs">${tr.map(row).join("")}</div>`:`<p class="ve-pn">Aucun stagiaire inscrit.</p>`}<p class="ve-pn ve-me">Vous signez en dernier, une fois tout le monde passé.</p></div></div>`}
+ // liste de l'évaluation (avant / après) : même liste avec « Évaluer »
+ function evlView(){const f=D.f[V.ix];if(!f)return listView();const ix=V.ix,ty=V.ty,tr=f.tr||[],N=tr.length,S0=tr.map((t,i)=>acqSt(f,i,ty)),nE=S0.filter(x=>x&&!x.abs).length,nA=S0.filter(x=>x&&x.abs).length,rest=N-nE-nA,first=S0.findIndex(x=>!x),ro=!!f.clo;
+  const row=(t,i)=>{const nm=String(t[0]||"Stagiaire "+(i+1)),x=S0[i];return `<div class="ve-r"><span class="ve-av" style="background:${shade(itvPal(nm)[0],.45)}" aria-hidden="true">${esc(ini2(nm))}</span><b class="ve-rn">${esc(nm)}</b>${x&&x.abs?`<span class="ve-st ve-st-ab">absent</span>`:x?`<span class="ve-st ve-st-ok">✓ évalué${x.pend?" · envoi en attente":""}</span>${ro?"":`<button type="button" class="ve-sg ve-sg2" data-evone="${i}">Modifier</button>`}`:ro?`<span class="ve-st">à évaluer</span>`:`<button type="button" class="ve-sg" data-evone="${i}">Évaluer</button>`}</div>`};
+  return `<div class="ve ve-l"><header class="ve-hd"><button type="button" class="ve-back" data-vbk="${ix}">‹ Retour</button><div class="ve-per">${esc(f.c||"")}</div><h1 class="ve-lt">Évaluation ${ty==="av"?"avant · positionnement":"après · acquis"}</h1><div class="ve-sub">${nE} évalué${nE>1?"s":""} sur ${N}${nA?" · "+nA+" absent"+(nA>1?"s":""):""}</div></header>
+  <div class="ve-in">${ro?`<p class="ve-pn">🔒 Dossier clôturé : lecture seule.</p>`:rest>0?`<button type="button" class="ve-go" data-evall="${first<0?0:first}">📝 Évaluer à la suite (${rest} restant${rest>1?"s":""})</button>`:`<div class="ve-alldone">✓ Tout le monde est évalué</div>`}
+  ${N?`<h2 class="ve-ou">Ou un par un</h2><div class="ve-rs">${tr.map(row).join("")}</div>`:`<p class="ve-pn">Aucun stagiaire inscrit.</p>`}<p class="ve-pn">« Avant » se fait le premier jour, « Après » le dernier jour.</p></div></div>`}
+ // 📄 Déroulé : déroulé du jour en premier, programme, planification, stagiaires, lieu, contact, ajout à l'agenda
+ function fdView(){const f=D.f[V.ix];if(!f)return listView();const ix=V.ix,sd=scToday(f),tr=f.tr||[];
+  return `<div class="ve ve-l"><header class="ve-hd"><button type="button" class="ve-back" data-vbk="${ix}">‹ Retour</button><div class="ve-per">${esc(f.c||"")}</div><h1 class="ve-lt">📄 Déroulé</h1><div class="ve-sub">${esc(f.t||"")}</div></header>
+  <div class="ve-in ve-cons"><details open><summary>📋 Déroulé d’intervention${sd?" (jour en cours en premier)":""}</summary><div class="pan">${sd||""}${scAll(f)||"<div class='mu'>Aucun déroulé détaillé pour cette formation.</div>"}</div></details>
+  ${(f.pg||[]).length?`<details><summary>📘 Programme</summary><div class="pan">${progH(f)}</div></details>`:""}
+  <details><summary>📅 Planification</summary><div class="pan">${DS(f).map(x=>{const t=slot(f,x);return `<div class="tl"><b>${esc(fdm(x))}</b><span>${esc(t[2])}</span></div>`}).join("")||"À définir"}<div class="mu" style="margin-top:6px">${esc(f.h)} h au total${f.j?" · "+esc(f.j)+" jour"+(+f.j>1?"s":""):""}</div></div></details>
+  <details><summary>👥 Stagiaires (${tr.length})</summary><div class="pan">${trList(f)}</div></details>
+  <details><summary>📍 Lieu et contact</summary><div class="pan fc s-venir">${lieu(f,1)}${ctLine(f,1)}</div></details>
+  <button type="button" class="ve-sec" data-ics="${esc(f.n)}">📅 Ajouter à mon agenda</button></div></div>`}
+ // 📚 Supports : page du site TOPAS du dossier et vidéo (s'ouvrent dans le navigateur), puis les fichiers joints au programme
+ function fsupView(){const f=D.f[V.ix];if(!f)return listView();const ix=V.ix,sup=Array.isArray(f.sup)?f.sup:[],off=navigator.onLine===false,web=[];
+  /* lien propre au dossier (s.suppUrl) d’abord, puis la page du site TOPAS du programme (spgOf) */const sp=String(f.sp||"").trim(),pu=String(f.spu||"").trim();if(/^https?:\/\//i.test(sp))web.push(["📚","Support de cours du dossier",sp]);if(/^https:\/\//i.test(pu)&&pu!==sp)web.push(["📚","Supports de cours — page TOPAS",pu]);if(/^https:\/\//i.test(f.spv||""))web.push(["🎬","Vidéo : la facture électronique",f.spv]);
+  const W=web.map(([i,t,u])=>`<a class="ve-w" href="${esc(u)}" target="_blank" rel="noopener" data-web><i aria-hidden="true">${i}</i><span><b>${esc(t)}</b><small>${off?"connexion nécessaire":"s’ouvre dans le navigateur"}</small></span></a>`).join("");
+  return `<div class="ve ve-l"><header class="ve-hd"><button type="button" class="ve-back" data-vbk="${ix}">‹ Retour</button><div class="ve-per">${esc(f.c||"")}</div><h1 class="ve-lt">📚 Supports</h1><div class="ve-sub">${esc(f.t||"")}</div></header>
+  <div class="ve-in">${W||sup.length?W+(sup.length?`<h2 class="ve-ou">Fichiers du programme</h2><div class="ip-supl">${sup.map((u,i)=>supRow(u,f,i,ix)).join("")}</div>`:""):`<p class="ve-empty">Aucun support pour cette formation.</p>`}</div></div>`}
+ function veBind(){
+  document.querySelectorAll("[data-vday]").forEach(b=>b.onclick=()=>{const [ix,d]=b.dataset.vday.split(":");VDAY[ix]=d;const y=window.scrollY;view();window.scrollTo(0,y)});
+  document.querySelectorAll("[data-veh]").forEach(b=>b.onclick=()=>{const [ix,day,part]=b.dataset.veh.split(":");nav({v:"eml",ix:+ix,day,part})});
+  document.querySelectorAll("[data-vev]").forEach(b=>b.onclick=()=>{const [ix,ty]=b.dataset.vev.split(":");nav({v:"evl",ix:+ix,ty})});
+  document.querySelectorAll("[data-vbk]").forEach(b=>b.onclick=()=>nav({v:"f",ix:+b.dataset.vbk}));
+  document.querySelectorAll("[data-vb]").forEach(b=>b.onclick=()=>{const [ix,k]=b.dataset.vb.split(":");if(k==="der")return nav({v:"fd",ix:+ix});if(k==="sup")return nav({v:"fsup",ix:+ix});
+   const z=document.querySelector(`[data-pbo="${ix}"][data-pbk="${k}"]`);if(!z)return;z.click();const fm=document.getElementById("pbf"+ix);if(fm&&!fm.classList.contains("hide"))fm.scrollIntoView({behavior:"smooth",block:"center"});document.querySelectorAll("[data-vb]").forEach(x=>x.classList.toggle("on",x===b&&fm&&!fm.classList.contains("hide")))});
+  const sg1=(ab,i)=>{const f=D.f[V.ix],nm=String(((f.tr||[])[i]||[])[0]||"").trim(),prev=latest(f.n,"em",V.day,V.part);if(f.clo)return flash("Dossier clôturé par TOPAS : lecture seule.");
+   if(prev&&Array.isArray(prev.ef)&&!(prev.e||[]).some(z=>z&&z.lt))emResume(V.ix,V.day,V.part,nm);else{startSign(V.ix,"em",V.day,V.part);const k=SG.steps.findIndex(s=>!s.tr&&s.nm===nm);if(k>=0){SG.i=k;view()}}
+   if(ab)setTimeout(()=>{const a=document.getElementById("abs");if(a)a.click()},40)};
+  document.querySelectorAll("[data-emone]").forEach(b=>b.onclick=()=>sg1(0,+b.dataset.emone));document.querySelectorAll("[data-emab]").forEach(b=>b.onclick=()=>sg1(1,+b.dataset.emab));
+  document.querySelectorAll("[data-emall]").forEach(b=>b.onclick=()=>{const [ix,day,part]=b.dataset.emall.split(":"),f=D.f[+ix];if(f&&f.clo)return flash("Dossier clôturé par TOPAS : lecture seule.");const st=emSl(f,{day,part});if(st.k==="ok")emResume(+ix,day,part,null);else startSign(+ix,"em",day,part)});
+  document.querySelectorAll("[data-emsum]").forEach(b=>b.onclick=()=>{const [ix,day,part]=b.dataset.emsum.split(":");emSum(+ix,day,part)});
+  document.querySelectorAll("[data-evall],[data-evone]").forEach(b=>b.onclick=()=>acqStart(V.ix,+(b.dataset.evall||b.dataset.evone),V.ty));
+  document.querySelectorAll("[data-web]").forEach(a=>a.onclick=e=>{if(navigator.onLine===false){e.preventDefault();flash("Connexion nécessaire pour ouvrir cette page.")}})}
  // 📷 photos de la formation (31/10) : mêmes photos que sur les bons (réduites, gardées hors connexion, envoyées par espace_photo), rattachées au dossier
  const FPH={};const fphRec=n=>recs(n).filter(r=>r.kd==="fph");
  function fphZone(f,ix){if(!phOn())return"";const S0=FPH[ix]||(FPH[ix]={ph:[],busy:0}),sent=fphRec(f.n).reduce((a,r)=>a+(+r.n||0),0),pdn=fphRec(f.n).filter(r=>pend(r.id)).length;
@@ -1443,7 +1544,7 @@ const hMin=h=>{const m=/^(\d\d):(\d\d)$/.exec(String(h||""));return m?(+m[1])*60
  // (03/11, G) un seul bouton de création ＋ (vert d'eau, barre du bas) : il ouvre DIRECTEMENT le bon d'intervention ; le bon est aussi ajouté
 // au planning du technicien (dépôt « itp », même circuit que l'intervention créée par le technicien). Bouton flottant retiré (bloc F).
 const tpFab=()=>"";
- function view(){const faire=V.v==="it"&&!!IT[V.ix]&&(blSt(IT[V.ix]).k==="faire"||(!!BS&&!BS.bi&&BS.ix===V.ix&&BS.step!=="form"));const h=V.v==="f"?formView(V.ix):V.v==="sign"?signView():V.v==="ev"?evView():V.v==="acq"?acqView():V.v==="bil"?bilView():V.v==="it"?itView(V.ix):V.v==="bls"?blView():V.v==="bid"?biView(V.n):V.v==="tp"?tpView():listView(),nb=(V.v==="list"||V.v==="it"||V.v==="f"||V.v==="bid")&&!faire;app.innerHTML=h+(nb?navH():"");document.body.classList.toggle("ip-nb",nb);document.body.classList.toggle("ip-fx",!!document.querySelector(".ip-fix"));bind();tpBindAll()}
+ function view(){const faire=V.v==="it"&&!!IT[V.ix]&&(blSt(IT[V.ix]).k==="faire"||(!!BS&&!BS.bi&&BS.ix===V.ix&&BS.step!=="form"));const h=V.v==="f"?formView(V.ix):V.v==="eml"?emlView():V.v==="evl"?evlView():V.v==="fd"?fdView():V.v==="fsup"?fsupView():V.v==="sign"?signView():V.v==="ev"?evView():V.v==="acq"?acqView():V.v==="bil"?bilView():V.v==="it"?itView(V.ix):V.v==="bls"?blView():V.v==="bid"?biView(V.n):V.v==="tp"?tpView():listView(),nb=(V.v==="list"||V.v==="it"||V.v==="f"||V.v==="bid"||V.v==="eml"||V.v==="evl"||V.v==="fd"||V.v==="fsup")&&!faire;app.innerHTML=h+(nb?navH():"");document.body.classList.toggle("ip-nb",nb);document.body.classList.toggle("ip-fx",!!document.querySelector(".ip-fix"));bind();tpBindAll()}
  const CDO={};
  function bind(){
   document.querySelectorAll("details.ip-cd").forEach(d=>{if(CDO[d.id])d.open=true;d.ontoggle=()=>{CDO[d.id]=d.open}});
@@ -1453,7 +1554,7 @@ const tpFab=()=>"";
   document.querySelectorAll("[data-sg]").forEach(b=>b.onclick=()=>{const f0=D.f[V.ix];if(f0&&f0.clo)return flash("Dossier clôturé par TOPAS : lecture seule.");startSign(V.ix,b.dataset.sg,b.dataset.day,b.dataset.part)});
   document.querySelectorAll("[data-ev]").forEach(b=>b.onclick=()=>{const [ix,ti]=b.dataset.ev.split(":").map(Number);evStart(ix,ti)});document.querySelectorAll("[data-bil]").forEach(b=>b.onclick=()=>bilStart(+b.dataset.bil));document.querySelectorAll("[data-acq]").forEach(b=>b.onclick=()=>{const [ix,ti,ty]=b.dataset.acq.split(":");acqStart(+ix,+ti,ty)});
   document.querySelectorAll("[data-sup]").forEach(b=>b.onclick=()=>{const [ix,i]=b.dataset.sup.split(":").map(Number);supOpen(ix,i,b)});
-  if(V.v==="ev")evBind();if(V.v==="acq")acqBind();if(V.v==="bil")bilBind();if(V.v==="f")fphBind(V.ix);
+  veBind();if(V.v==="ev")evBind();if(V.v==="acq")acqBind();if(V.v==="bil")bilBind();if(V.v==="f")fphBind(V.ix);
   const sx=document.querySelector("[data-sgx]");if(sx)sx.onclick=()=>{if(!sx._a){sx._a=1;const t0=sx.textContent;sx.textContent="Quitter sans enregistrer ?";setTimeout(()=>{sx._a=0;sx.textContent=t0},4000);return}if(V.v==="bls"&&BS){const ix=BS.ix,bi=BS.bi;(BS.ph||[]).forEach(x=>PDB.rm(x.id).catch(()=>{}));BS=null;return nav(bi?{v:"list"}:{v:"it",ix})}const ix=SG?SG.ix:0;SG=null;nav({v:"f",ix})};
   const sx2=document.querySelector("[data-back2]");if(sx2)sx2.onclick=()=>{const ix=SG.ix;SG=null;nav({v:"f",ix})};
   document.querySelectorAll("[data-sgr]").forEach(b=>b.onclick=()=>{SG.i=+b.dataset.sgr;SG.recap=false;SG.res[SG.i]=null;view()});
@@ -1469,7 +1570,7 @@ const tpFab=()=>"";
   document.querySelectorAll("[data-fpb]").forEach(b=>b.onclick=()=>{const [ix,k]=b.dataset.fpb.split(":");nav({v:"f",ix:+ix});setTimeout(()=>{const z=document.querySelector(`[data-pbo="${ix}"][data-pbk="${k}"]`);if(z){z.click();z.scrollIntoView({block:"center"})}},60)});
   document.querySelectorAll("[data-em3]").forEach(b=>b.onclick=()=>{const [ix,day,part]=b.dataset.em3.split(":"),k=b.dataset.k;if(k==="ok"){emSum(+ix,day,part);return}if(k==="later"){nav({v:"f",ix:+ix});return}startSign(+ix,"em",day,part)});
   document.querySelectorAll("[data-fgo]").forEach(b=>b.onclick=()=>{const fx=D.f[+b.dataset.fgo],o=fx&&!fx.clo?emDue(fx):null;if(o){startSign(+b.dataset.fgo,"em",o.day,o.part);return}nav({v:"f",ix:+b.dataset.fgo});setTimeout(()=>{const m=document.querySelector(".ip-main");if(m){m.click();return}const e=document.getElementById("l3em");if(e)e.scrollIntoView({behavior:"smooth",block:"center"})},60)});
-  document.querySelectorAll("[data-fder]").forEach(b=>b.onclick=()=>{const ix=+b.dataset.fder;nav({v:"f",ix});setTimeout(()=>{const c=document.getElementById("cons"+ix);if(!c)return;c.open=true;CDO[c.id]=true;const d=c.querySelector("details");if(d)d.open=true;c.scrollIntoView({behavior:"smooth",block:"start"})},60)});
+  document.querySelectorAll("[data-fder]").forEach(b=>b.onclick=()=>nav({v:"fd",ix:+b.dataset.fder}));
   document.querySelectorAll("[data-blunl]").forEach(b=>b.onclick=()=>{const ix=+b.dataset.blunl;if(!BS||BS.ix!==ix||BS.bi)BS=blNew(ix);BS.unl=1;view();window.scrollTo(0,0)});
   const us=document.getElementById("usrch");if(us)us.oninput=()=>{const q=nrm(us.value);let n=0;document.querySelectorAll("#s-usig .ip-rw").forEach(w=>{const on=!q||nrm(w.dataset.q||"").includes(q);w.classList.toggle("hide",!on);if(on)n++});const z=document.getElementById("usrch0");if(z)z.classList.toggle("hide",!!n||!q)};
   document.querySelectorAll("[data-bls]").forEach(b=>b.onclick=async()=>{const ix=+b.dataset.bls;b.disabled=true;const P=await blImg(IT[ix].t);b.disabled=false;if(P)blStart(ix);else if(BS&&BS.ix===ix&&BS.noimg)blStart(ix,1);else blChoice(ix)});
