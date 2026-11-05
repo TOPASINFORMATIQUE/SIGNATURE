@@ -374,7 +374,7 @@ const PA6_CSS=`<style>.pa6w{font-family:Arial,Helvetica,sans-serif;color:#1f2937
 .pa6-det{border:2px solid #0C4FA0;border-radius:8px;overflow:hidden;margin:6px 0 0;background:#fff;display:flex;flex-direction:column;flex:1 1 auto;min-height:60px}
 .pa6-dh{background:linear-gradient(90deg,#0C4FA0,#2f7bd8);color:#fff;padding:6px 12px;display:flex;align-items:center;gap:8px;font-weight:800;font-size:14px;letter-spacing:.02em;flex:none}.pa6-dh small{margin-left:auto;font-weight:700;font-size:10.5px}
 .pa6-mods{flex:1 1 auto;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:minmax(0,1fr);padding:8px 14px 0;min-height:0;background:#fff}
-.pa6-c{display:flex;flex-direction:column;justify-content:flex-start;min-width:0;padding:0 12px 8px 0}.pa6-c+.pa6-c{border-left:1px solid #c9d8ec;padding:0 0 8px 12px}.pa6ok.pa6-p1 .pa6-c{justify-content:space-between}.pa6-short .pa6-det{flex:0 0 auto}.pa6-short .pa6-mods{display:grid}.pa6-short .pa6-ft{margin-top:auto}.pa6-gr .pa6-c>.pa6-mod{display:flex;flex-direction:column}.pa6-gr .pa6-mod>ul{flex:1 1 auto;display:flex;flex-direction:column;justify-content:space-around}.pa6-cont{padding-top:0}
+.pa6-c{display:flex;flex-direction:column;justify-content:flex-start;min-width:0;padding:0 12px 8px 0}.pa6-c+.pa6-c{border-left:1px solid #c9d8ec;padding:0 0 8px 12px}.pa6ok.pa6-p1 .pa6-c,.pa6ok.pa6-gr .pa6-c{justify-content:space-between}.pa6-short .pa6-det{flex:0 0 auto}.pa6-short .pa6-mods{display:grid}.pa6-short .pa6-ft{margin-top:auto}.pa6-gr .pa6-c>.pa6-mod{display:flex;flex-direction:column}.pa6-gr .pa6-mod>ul{flex:1 1 auto;display:flex;flex-direction:column;justify-content:space-around}.pa6-cont{padding-top:0}
 .pa6-mod{font-size:var(--mf,11.5px);line-height:1.36;padding:3px 2px 5px;border-bottom:1px dashed #c9d8ec}.pa6-mod ul{padding-left:16px}
 .pa6-mt{font-weight:800;color:#0a3f82;font-size:1.09em;line-height:1.25;margin-bottom:1px}
 .pa6-agr{font-size:10px;color:#475569;margin:4px 2px 0;flex:none}.pa6 .rhf{flex:none;margin:4px 0 0!important}
@@ -427,27 +427,46 @@ function pa6Fit1(w){const P=[...w.querySelectorAll(":scope>.pa6")];if(!P.length)
   // remettre puis appliquer la meilleure coupe (ou aucune si elle n'améliore rien)
   LI.forEach(li=>m.querySelector(":scope>ul").append(li));const base=(()=>{cont.remove();if(A<=B){cols[1].prepend(m)}return Math.max(colH(cols[0]),colH(cols[1]))})();
   if(!best||best.d>=base-.5)return base;if(A<=B)cols[0].append(m);cols[1].prepend(cont);LI.slice(best.j).forEach(li=>ul.append(li));return Math.max(colH(cols[0]),colH(cols[1]))};
+ const fillMin=cols=>Math.min(colH(cols[0]),colH(cols[1]))/Math.max(1,avail(cols));// remplissage de la colonne la plus courte
  const avail=cols=>{const c=cols[0],cs=getComputedStyle(c);return c.clientHeight-parseFloat(cs.paddingBottom)-parseFloat(cs.paddingTop)};
  const fitIn=(L,cols,lo,hi)=>{setF(L,lo);if(split(L,cols)>avail(cols))return null;for(let n=0;n<14;n++){const m=(lo+hi)/2;setF(L,m);if(split(L,cols)<=avail(cols))lo=m;else hi=m}setF(L,lo);split(L,cols);return lo};
  layGen(9.2);let f=fitIn(mods,C,10,16);
  if(f!==null&&f>=15.9){// encore de la place à 16 px : les rubriques grandissent (jusqu'à 13,5 px) tant que le programme détaillé tient à 16 px
   let lo=9.2,hi=13.5;for(let n=0;n<8;n++){const m=(lo+hi)/2;layGen(m);setF(mods,16);if(split(mods,C)<=avail(C))lo=m;else hi=m}layGen(lo);f=fitIn(mods,C,10,16)}
  const pages=[p1];
- if(f===null){// 2e page propre à 10 px : modules jamais coupés ; boutons et mention d'agrément sur la dernière page ; en-tête courant et pied sur chaque page
-  unsplit();setF(mods,10);let rest=mods.slice(),page=p1,cols=C;const ti=(p1.querySelector(".pa6-ti")||{}).textContent||"",nv=(p1.querySelector(".pa6-tg")||{}).textContent||"",dn=(p1.querySelector(".pa6-dn")||{}).textContent||"",lg=p1.querySelector(".pa6-lt img");
-  for(let guard=0;guard<10;guard++){const pf=page.querySelector(".pa6-ft");if(ag)page.insertBefore(ag,pf);if(lk)page.insertBefore(lk,pf);
-   if(split(rest,cols)<=avail(cols)||rest.length<=1)break;
-   if(lk)lk.remove();if(ag)ag.remove();let k=rest.length;while(k>1&&split(rest.slice(0,k),cols)>avail(cols))k--;split(rest.slice(0,k),cols);rest=rest.slice(k);
-   const np=document.createElement("div");np.className="pa6 pa6ok pa6-pk";np.dataset.p=String(pages.length+1);
+ let f2=null;
+ if(f===null){// (05/11 soir) programme sur 2 pages : page 2 = suite du programme détaillé ; point de coupe entre deux modules choisi pour que les DEUX pages soient pleines
+  unsplit();const ti=(p1.querySelector(".pa6-ti")||{}).textContent||"",nv=(p1.querySelector(".pa6-tg")||{}).textContent||"",dn=(p1.querySelector(".pa6-dn")||{}).textContent||"",lg=p1.querySelector(".pa6-lt img");
+  const mk=()=>{const np=document.createElement("div");np.className="pa6 pa6ok pa6-pk";np.dataset.p=String(pages.length+1);
    const rh=document.createElement("div");rh.className="pa6-rh";if(lg){const im=document.createElement("img");im.src=lg.getAttribute("src");im.alt="";rh.append(im)}[["b","Plan d’Action de Formation"],["span",ti+(nv?" · "+nv:"")],["span",dn]].forEach(([t,x])=>{const e=document.createElement(t);e.textContent=x;rh.append(e)});
    np.append(rh);np.insertAdjacentHTML("beforeend",`<div class="pa6-det"><div class="pa6-dh"><span>★ PROGRAMME DÉTAILLÉ DE LA FORMATION (suite)</span><small></small></div><div class="pa6-mods"><div class="pa6-c"></div><div class="pa6-c"></div></div></div>`);
-   np.append(ft.cloneNode(true));w.append(np);pages.push(np);page=np;cols=[...np.querySelectorAll(".pa6-mods .pa6-c")]}
+   np.append(ft.cloneNode(true));w.append(np);pages.push(np);return np};
+  // page 2 : suite + boutons (et mention d'agrément) + pied
+  const p2=mk(),C2=[...p2.querySelectorAll(".pa6-mods .pa6-c")],pf2=p2.querySelector(".pa6-ft");if(ag)p2.insertBefore(ag,pf2);if(lk)p2.insertBefore(lk,pf2);
+  // chaque coupe k : police la plus grande qui tient sur la page 1 (modules 0..k-1) et sur la page 2 (k..n-1) ; on garde la coupe la plus équilibrée
+  // d'abord la plus grande police commune (au quart de pixel), puis les pages les mieux remplies (hauteur utile / hauteur disponible)
+  let best=null;for(let k=1;k<mods.length;k++){unsplit();const A=mods.slice(0,k),B=mods.slice(k),a=fitIn(A,C,10,16);if(a===null)break;const fa=fillMin(C),b=fitIn(B,C2,10,16);if(b===null)continue;const fb=fillMin(C2);
+   const sc=[Math.round(Math.min(a,b)*4)/4,Math.min(fa,fb)];if(!best||sc[0]>best.sc[0]||(sc[0]===best.sc[0]&&sc[1]>best.sc[1]))best={k,a,b,sc}}
+  // police plafonnée à 16 px sur les deux pages : on tient compte des rubriques agrandies en page 1 (elles prennent la place libre),
+  // ce qui permet de laisser plus de modules à la page 2 ; on garde la coupe où la page la moins remplie l'est le plus
+  const grow=A=>{let lo=9.2,hi=13.5;for(let n=0;n<8;n++){const m=(lo+hi)/2;layGen(m);setF(A,16);if(split(A,C)<=avail(C))lo=m;else hi=m}layGen(lo);setF(A,16);split(A,C);return fillMin(C)};
+  if(best&&best.a>=15.9&&best.b>=15.9){let b2=null;for(let k=1;k<mods.length;k++){unsplit();layGen(9.2);const A=mods.slice(0,k),B=mods.slice(k),a=fitIn(A,C,10,16);if(a===null)break;if(a<15.9)continue;const b=fitIn(B,C2,10,16);if(b===null||b<15.9)continue;
+    const fb=fillMin(C2);unsplit();const fa=grow(A),sc=Math.min(fa,fb);if(!b2||sc>b2.sc)b2={k,sc}}layGen(9.2);if(b2)best.k=b2.k}
+  if(best){unsplit();const A=mods.slice(0,best.k);f=fitIn(A,C,10,16);
+   if(f>=15.9){let lo=9.2,hi=13.5;for(let n=0;n<8;n++){const m=(lo+hi)/2;layGen(m);setF(A,16);if(split(A,C)<=avail(C))lo=m;else hi=m}layGen(lo);f=fitIn(A,C,10,16)}// page 1 encore trop grande à 16 px : les rubriques grandissent
+   f2=fitIn(mods.slice(best.k),C2,10,16);p2.classList.add("pa6-gr")}
+  else{// même sur 2 pages ça ne tient pas : pages supplémentaires à 10 px (cas extrême)
+   p2.remove();pages.pop();unsplit();setF(mods,10);let rest=mods.slice(),page=p1,cols=C;
+   for(let guard=0;guard<10;guard++){const pf=page.querySelector(".pa6-ft");if(ag)page.insertBefore(ag,pf);if(lk)page.insertBefore(lk,pf);
+    if(split(rest,cols)<=avail(cols)||rest.length<=1)break;
+    if(lk)lk.remove();if(ag)ag.remove();let k=rest.length;while(k>1&&split(rest.slice(0,k),cols)>avail(cols))k--;split(rest.slice(0,k),cols);rest=rest.slice(k);
+    page=mk();cols=[...page.querySelectorAll(".pa6-mods .pa6-c")]}
+   pages.slice(1).forEach(x=>x.classList.add("pa6-short"))}
  }
- // place restante de la 1re page répartie entre les lignes (chaque module grandit selon son nombre de lignes) : aucune zone blanche
- p1.querySelectorAll(".pa6-c>.pa6-mod").forEach(x=>{x.style.flexGrow=String(x.querySelectorAll("li").length+(x.querySelector(".pa6-mt")?1:0)||1)});p1.classList.add("pa6-gr");
- pages.slice(1).forEach(x=>x.classList.add("pa6-short"));// pages suivantes : cadre à la hauteur du contenu, boutons dessous, pied en bas
+ // place restante répartie entre les lignes (chaque module grandit selon son nombre de lignes) : aucune zone blanche, page 1 et page 2
+ pages.filter((x,i)=>!i||x.classList.contains("pa6-gr")).forEach(pg=>{pg.querySelectorAll(".pa6-c>.pa6-mod").forEach(x=>{x.style.flexGrow=String(x.querySelectorAll("li").length+(x.querySelector(".pa6-mt")?1:0)||1)});pg.classList.add("pa6-gr")});
  const n=pages.length;pages.forEach((p,i)=>{const s=p.querySelector(".pa6-pn");if(s)s.textContent=(p.querySelector(".dmaj")&&p.querySelector(".dmaj").textContent?" · ":"")+"Page "+(i+1)+" / "+n});
- w.dataset.fit="1";w.dataset.pages=String(n);w.dataset.f=f===null?"10":String(Math.round(f*100)/100);
+ w.dataset.fit="1";w.dataset.pages=String(n);w.dataset.f=f===null?"10":String(Math.round(f*100)/100);w.dataset.f2=f2===null?"":String(Math.round(f2*100)/100);
  const cw=w.parentElement?w.parentElement.clientWidth:0;if(cw&&cw<PA6_W&&!w.closest(".h2pw"))w.style.zoom=String(Math.max(.3,cw/PA6_W))}
 /*<PA6*/
 function docProg(){const P=D.pg;if(!P||typeof P!=="object")return"";const g=P.og||{};
