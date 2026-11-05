@@ -346,12 +346,113 @@ function docPlan(){
 function dero(){const R=Array.isArray(D.dr)?D.dr:[];if(!R.length)return"";return `<div class="pdx"><div class="bar">Déroulé de l’intervention</div><div style="font-size:12px;margin:0 0 8px">Horaires indicatifs, adaptés sur place au rythme des stagiaires.</div>${R.map(d=>!(d[1]||[]).length?`<div style="border:2px solid #d97706;background:#fff7ed;color:#7c2d12;border-radius:6px;padding:8px 12px;margin:0 0 8px;font-weight:700">${esc(d[0])}</div>`:`<div class="pdj"><div class="pdh">${esc(d[0])}</div>${(d[1]||[]).map(b=>`<div class="pdb"><div class="pdt">${esc(b[0])}</div>${(b[1]||[]).map(g=>(g[0]?`<div class="pdm">${esc(g[0])}</div>`:"")+((g[1]||[]).length?`<ul>${g[1].map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`:"")).join("")}</div>`).join("")}</div>`).join("")}</div>`}
 function head(){return `<img src="logo.jpg" alt="TOPAS informatique" style="height:56px;margin-bottom:8px"><h1>${TIT}</h1><div class="mu">${ro?"Votre exemplaire, à conserver : imprimez-le ou enregistrez-le en PDF.":plan?"Vérifiez les dates ci-dessous, puis répondez à la question « Ces dates vous conviennent-elles ? » en bas du document.":"Vérifiez le document ci-dessous, puis signez dans le cadre « Signature électronique » du document."}</div>`}
 // Lot 1 audit (C) : le programme (Plan d'Action de Formation) est affiché avec la convention, comme dans le PDF envoyé et la copie signée
-function docProg(){const P=D.pg;if(!P||typeof P!=="object")return"";const E=esc,lst=a=>{let h="",o=false;(a||[]).forEach(x=>{if(/:$/.test(x)){if(o){h+="</ul>";o=false}h+=`<p class="lead">${E(x)}</p>`}else{if(!o){h+="<ul>";o=true}h+=`<li>${E(x)}</li>`}});return h+(o?"</ul>":"")},sec=(n,t,b)=>`<div class="sec"><div class="st"><span class="n">${n}</span>${E(t)}</div>${b}</div>`;
- return `<div class="pbrk"></div><div class="pgx"><div class="top"><img src="logo.jpg" alt="TOPAS informatique"><div><h2>Plan d’Action de Formation</h2><div class="sub"><b>Centre de formation</b>${nda?" · N° "+E(nda):""} · ${LG.re?"Inscrit auprès de "+E(LG.re):"Inscrit auprès du Préfet de la région Rhône-Alpes"}${LG.ta?" · "+E(LG.ta):""}</div></div></div>
-<div class="ban"><b>${E(P.cat)} – ${E(P.title)}</b><br><span class="tg">${E(P.niv)}${P.h?" · "+E(P.h)+" h":""}</span><span class="num">Dossier N° ${E(D.n)}</span></div>
-${sec(1,"Objectifs pédagogiques",lst(P.obj))}${sec(2,"Prérequis, public concerné",lst(P.pre))}<div class="pgdt">${sec(3,"Durée",lst([P.dur]))}${sec(4,"Tarif",lst([P.tar]))}</div>${sec(5,"Moyens pédagogiques",lst(P.moy))}${sec(6,"Méthode pédagogique",lst(P.meth))}${sec(7,"Évaluation de la formation",lst(P.ev))}<div class="pgdt">${sec(8,"Délais d’intervention",lst(P.del))}${sec(9,"Accessibilité aux personnes en situation de handicap",lst(P.acc))}</div>
-<div class="sec det"><div class="st"><span class="n">★</span>Programme détaillé de la formation</div>${(P.mods||[]).map(m=>`<div class="mod">${m.t?`<div class="mt">${E(m.t)}</div>`:""}<ul>${(m.i||[]).map(x=>`<li>${E(x)}</li>`).join("")}</ul></div>`).join("")}</div>
-<div class="ft"><span><b>${E(org)}</b>${nda?" · N° "+E(nda):""}</span><span>Document mis à jour le ${E(P.maj||"")}</span></div></div>`}
+// (05/11) même mise en page que l'application (bloc pa6 identique, logos des éditeurs logo-*.png) ; anciens liens sans « og » : lignes absentes
+/*PA6>*/
+// ===== (05/11) PROGRAMME DE FORMATION, maquette prog-A6 — bloc IDENTIQUE dans formapro.html et signature/index.html (vérifié par tests/programmes-a6.js) =====
+// pa6Html(P,O,E) : P = données du programme (progData), O = organisme / logos / liens, E = échappement HTML. pa6Fit(racine) : mise en page mesurée
+// (rubriques en 3 colonnes équilibrées alignées en bas ; programme détaillé en 2 colonnes équilibrées, police la plus grande entre 10 et 16 px qui tient ;
+// rubriques agrandies s'il reste de la place ; sinon 2e page propre, modules jamais coupés). Feuille = zone imprimable A4 (718 × 1024 px).
+const PA6_W=718,PA6_H=1024;
+function pa6Ed(cat,title){const c=String(cat||"").trim().toUpperCase(),t=String(title||"");if(/^SAGE\b/.test(c))return"sage";if(/^EBP\b/.test(c))return"ebp";if(/^SILAE\b/.test(c))return"silae";if(/microsoft|office\s*365|exchange/i.test(t))return"microsoft";return""}
+const PA6_ICO={h:'<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><rect width="24" height="24" rx="5" fill="#0C4FA0"/><circle cx="12.5" cy="4.6" r="1.9" fill="#fff"/><path d="M11.6 7.4h1.9l-.3 4.6h3.6l2.2 5.2-1.6.7-1.7-3.9h-4.4z" fill="#fff"/><path d="M9.7 10.6a5.2 5.2 0 1 0 6.6 6.4l-1.6-.4a3.6 3.6 0 1 1-4.6-4.4z" fill="#fff"/></svg>',
+ r:'<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><rect width="24" height="24" rx="5" fill="#0C4FA0"/><path d="M6 5.5h8.5a2 2 0 0 1 2 2V19H8a2 2 0 0 1-2-2z" fill="#fff"/><path d="M8 17h8.5v2H8a1 1 0 0 1 0-2z" fill="#9cc3f0"/><path d="M8.5 8.5h5.5M8.5 11h5.5" stroke="#0C4FA0" stroke-width="1.2"/></svg>'};
+const PA6_CSS=`<style>.pa6w{font-family:Arial,Helvetica,sans-serif;color:#1f2937;-webkit-print-color-adjust:exact;print-color-adjust:exact}.pa6w *{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.pa6{width:${PA6_W}px;min-height:${PA6_H}px;background:#fff;display:flex;flex-direction:column;font-size:11px;line-height:1.35;margin:0 auto 16px;box-shadow:0 0 0 1px #e2e8f0}.pa6.pa6ok{height:${PA6_H}px;overflow:hidden}
+.pa6 ul{margin:0;padding-left:12px}.pa6 li{margin:0}.pa6 li::marker{color:#7cb95b}
+.pa6-h{background:linear-gradient(120deg,#0C4FA0,#1f6fd1);border-radius:10px;color:#fff;padding:8px 12px;display:flex;align-items:center;gap:12px;flex:none}
+.pa6-lt{background:#fff;border-radius:9px;padding:5px 9px;flex:none}.pa6-lt img{height:54px;width:auto;display:block}
+.pa6-h1{margin:0;font-size:18px;font-weight:800;color:#fff;line-height:1.2}.pa6-h2{font-size:11px;opacity:.95;margin-top:3px}.pa6-sp{flex:1}
+.pa6-ib{text-align:right;font-size:9.8px;font-weight:700;line-height:1.45;border-left:1px solid rgba(255,255,255,.4);padding-left:12px}.pa6-ib .pa6-cft{font-size:12.5px;font-weight:800;display:block}
+.pa6-fb{display:flex;align-items:center;gap:12px;border:1.5px solid #cfe0f5;border-radius:10px;padding:5px 12px;margin:6px 0 5px;background:#f7fbff;flex:none;min-height:50px}
+.pa6-fb img{height:36px;width:auto;display:block}.pa6-fb .pa6-sep{width:1px;height:30px;background:#cfe0f5;flex:none}.pa6-ti{font-size:21px;font-weight:800;color:#0C4FA0;line-height:1.15}
+.pa6-tg{background:#3d7a22;color:#fff;border-radius:999px;padding:3px 12px;font-size:14px;font-weight:700;white-space:nowrap}.pa6-dn{margin-left:auto;font-size:10.5px;color:#4b5563;white-space:nowrap}
+.pa6-gl{border-bottom:3px solid #7cb95b;margin-bottom:6px;flex:none}
+.pa6-gen{display:grid;grid-template-columns:1fr 1fr 1fr;column-gap:5px;align-items:stretch;flex:none;--rf:9.2px}.pa6-gc{display:flex;flex-direction:column;gap:4px;min-width:0}.pa6-gc>.pa6-sec:last-child{flex:1}
+.pa6-sec{background:#f5f8fd;border:1px solid #dbe5f3;border-radius:6px;padding:3px 6px;font-size:var(--rf);line-height:1.24}
+.pa6-st{font-weight:900;color:#062a5c;font-size:calc(var(--rf) * 1.16);border-bottom:1px solid #c9d8ec;padding-bottom:1px;margin-bottom:2px;line-height:1.25}
+.pa6-lead{color:#0C4FA0;font-weight:700;margin:1px 0}
+.pa6-det{border:2px solid #0C4FA0;border-radius:8px;overflow:hidden;margin:6px 0 0;background:#fff;display:flex;flex-direction:column;flex:1 1 auto;min-height:60px}
+.pa6-dh{background:linear-gradient(90deg,#0C4FA0,#2f7bd8);color:#fff;padding:6px 12px;display:flex;align-items:center;gap:8px;font-weight:800;font-size:14px;letter-spacing:.02em;flex:none}.pa6-dh small{margin-left:auto;font-weight:700;font-size:10.5px}
+.pa6-mods{flex:1 1 auto;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:minmax(0,1fr);padding:8px 14px 0;min-height:0;background:#fff}
+.pa6-c{display:flex;flex-direction:column;justify-content:flex-start;min-width:0;padding:0 12px 8px 0}.pa6-c+.pa6-c{border-left:1px solid #c9d8ec;padding:0 0 8px 12px}.pa6ok.pa6-p1 .pa6-c{justify-content:space-between}.pa6-short .pa6-det{flex:0 0 auto}.pa6-short .pa6-mods{display:grid}.pa6-short .pa6-ft{margin-top:auto}.pa6-gr .pa6-c>.pa6-mod{display:flex;flex-direction:column}.pa6-gr .pa6-mod>ul{flex:1 1 auto;display:flex;flex-direction:column;justify-content:space-around}.pa6-cont{padding-top:0}
+.pa6-mod{font-size:var(--mf,11.5px);line-height:1.36;padding:3px 2px 5px;border-bottom:1px dashed #c9d8ec}.pa6-mod ul{padding-left:16px}
+.pa6-mt{font-weight:800;color:#0a3f82;font-size:1.09em;line-height:1.25;margin-bottom:1px}
+.pa6-agr{font-size:10px;color:#475569;margin:4px 2px 0;flex:none}.pa6 .rhf{flex:none;margin:4px 0 0!important}
+.pa6-lk{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px;flex:none}
+.pa6-lb{display:flex;align-items:center;gap:9px;border-radius:10px;padding:6px 12px;background:linear-gradient(90deg,#e8f1fd,#f5f9ff);border:1.5px solid #0C4FA0;color:#0C4FA0;text-decoration:none;min-height:42px}
+.pa6-lb svg{flex:none;display:block}.pa6-lb b{display:block;font-size:12.5px}.pa6-lb small{display:block;font-size:9.5px;color:#4b5563}.pa6-lb .pa6-ar{margin-left:auto;font-weight:800;font-size:11.5px;text-decoration:underline;white-space:nowrap}
+.pa6-ft{border-top:3px solid #0C4FA0;margin-top:6px;padding-top:3px;display:flex;gap:10px;font-size:10px;color:#4b5563;flex:none}.pa6-ft>span:last-child{margin-left:auto;text-align:right}
+.pa6-rh{display:flex;align-items:center;gap:10px;border-bottom:3px solid #0C4FA0;padding:0 0 5px;margin-bottom:6px;font-size:10.5px;color:#4b5563;flex:none}.pa6-rh img{height:26px;width:auto}.pa6-rh b{color:#0C4FA0;font-size:12px}.pa6-rh span:last-child{margin-left:auto}
+.h2pw .pa6{margin:0;box-shadow:none}.pbrk+.pa6w{margin-top:-8px}.h2pw .pa6-ft,.h2pw .pa6-rh{visibility:hidden}
+@media print{.pa6{margin:0;box-shadow:none;break-after:page;page-break-after:always}.pa6:last-child{break-after:auto;page-break-after:auto}}</style>`;
+function pa6Html(P,O,E){O=O||{};E=E||(x=>String(x==null?"":x));if(!P||typeof P!=="object")return"";
+ const A=a=>Array.isArray(a)?a:(a?[a]:[]),lst=a=>{let h="",o=false;A(a).forEach(x=>{if(/:$/.test(x)){if(o){h+="</ul>";o=false}h+=`<div class="pa6-lead">${E(x)}</div>`}else{if(!o){h+="<ul>";o=true}h+=`<li>${E(x)}</li>`}});return h+(o?"</ul>":"")};
+ const S=[["Objectifs pédagogiques",P.obj],["Prérequis, public concerné",P.pre],["Durée",P.dur],["Tarif",P.tar],["Moyens pédagogiques",P.moy],["Méthode pédagogique",P.meth],["Évaluation de la formation",P.ev],["Délais d’intervention",P.del],["Accessibilité aux personnes en situation de handicap",P.acc]];
+ const v=x=>String(x==null?"":x).trim(),nda=v(O.nda),re=v(O.region),ur=v(O.urssaf),si=v(O.siret),ap=v(O.ape),ta=v(O.ta||P.ta),num=v(O.num),org=v(O.org);
+ const ib=[`<span class="pa6-cft">Centre de Formation</span>`,nda?`N° de déclaration d’activité : ${E(nda)}`:"",re?`inscrit auprès de ${E(re)}`:"",ur?`URSSAF : ${E(ur)}`:"",[si?"SIRET : "+E(si):"",ap?"APE : "+E(ap):""].filter(Boolean).join(" · ")].filter(Boolean).join("<br>");
+ const mods=A(P.mods).filter(m=>m&&(v(m.t)||A(m.i).length)),edk=pa6Ed(P.cat,P.title),eds=edk&&O.ed?O.ed(edk):"",nm={sage:"Sage",ebp:"EBP",microsoft:"Microsoft",silae:"Silae"}[edk]||"";
+ const modH=mods.map((m,i)=>`<div class="pa6-mod" data-i="${i}">${v(m.t)?`<div class="pa6-mt">${E(m.t)}</div>`:""}${A(m.i).length?`<ul>${A(m.i).map(x=>`<li>${E(x)}</li>`).join("")}</ul>`:""}</div>`).join("");
+ const lk=(u,ic,t,s)=>`<a class="pa6-lb" href="${E(u||"#")}" target="_blank" rel="noopener">${PA6_ICO[ic]}<span><b>${t}</b><small>${s}</small></span><span class="pa6-ar">Cliquez ici ›</span></a>`;
+ const maj=v(P.maj),ft=`<div class="pa6-ft"><span><b>${E(org)}</b>${nda?" · N° de déclaration d’activité "+E(nda):""}</span><span><span class="dmaj">${maj?"Document mis à jour le "+E(maj):""}</span><span class="pa6-pn">${maj?" · ":""}Page 1 / 1</span></span></div>`;
+ const page=`<div class="pa6 pa6-p1" data-p="1"><div class="pa6-h"><div class="pa6-lt">${O.logo?`<img src="${E(O.logo)}" alt="${E(org||"Logo")}">`:""}</div><div><div class="pa6-h1">Plan d’Action de Formation</div><div class="pa6-h2">Programme de formation${ta?" · "+E(ta):""}</div></div><span class="pa6-sp"></span><div class="pa6-ib">${ib}</div></div>
+<div class="pa6-fb" data-ed="${edk}">${eds?`<img src="${E(eds)}" alt="${nm}" class="pa6-edl"><span class="pa6-sep"></span>`:""}<span class="pa6-ti">${E(P.title||"")}</span>${v(P.niv)?`<span class="pa6-tg">${E(P.niv)}</span>`:""}${num?`<span class="pa6-dn">Dossier N° ${E(num)}</span>`:""}</div><div class="pa6-gl"></div>
+<div class="pa6-gen">${S.map((x,i)=>`<div class="pa6-sec" data-i="${i}"><div class="pa6-st">${x[0]}</div>${lst(x[1])}</div>`).join("")}</div>
+<div class="pa6-det"><div class="pa6-dh"><span>★ PROGRAMME DÉTAILLÉ DE LA FORMATION</span><small>${mods.length} module${mods.length>1?"s":""}</small></div><div class="pa6-mods"><div class="pa6-c">${modH}</div><div class="pa6-c"></div></div></div>
+${v(P.agr)?`<div class="pa6-agr">${E(P.agr)}</div>`:""}<div class="pa6-lk">${lk(O.hand,"h","Accessibilité handicap","Informations et contact")}${lk(O.ri,"r","Règlement intérieur","À l’intention des participants")}</div><!--docfoot-->${ft}</div>`;
+ return `<div class="pa6w" data-pa6="1">${PA6_CSS}${page}</div>`}
+function pa6Fit(root,force){try{const W=[...(root||document).querySelectorAll(".pa6w")];W.forEach(w=>{if(w.dataset.fit&&!force)return;if(!w.isConnected||!w.getClientRects().length)return;pa6Fit1(w)})}catch(e){}}
+function pa6Fit1(w){const P=[...w.querySelectorAll(":scope>.pa6")];if(!P.length)return;const p1=P[0];w.style.zoom="";
+ // remise à zéro (nouvelle mesure possible à tout moment) : modules, boutons et mention ramenés sur la 1re page, pages suivantes retirées
+ w.querySelectorAll(".pa6-cont").forEach(c=>{const o=[...w.querySelectorAll(".pa6-mod:not(.pa6-cont)")].find(x=>x.dataset.i===c.dataset.i),u=o&&o.querySelector("ul");if(u)c.querySelectorAll("li").forEach(li=>u.append(li));c.remove()});
+ const C=[...p1.querySelectorAll(".pa6-mods .pa6-c")],mods=[...w.querySelectorAll(".pa6-mod")].sort((a,b)=>+a.dataset.i-+b.dataset.i),ft=p1.querySelector(".pa6-ft"),lk=w.querySelector(".pa6-lk"),ag=w.querySelector(".pa6-agr");
+ mods.forEach(x=>C[0].append(x));if(ag)p1.insertBefore(ag,ft);if(lk)p1.insertBefore(lk,ft);P.slice(1).forEach(x=>x.remove());
+ const gen=p1.querySelector(".pa6-gen"),secs=[...gen.querySelectorAll(".pa6-sec")].sort((a,b)=>+a.dataset.i-+b.dataset.i);
+ p1.classList.add("pa6ok");p1.classList.remove("pa6-gr");w.querySelectorAll(".pa6-mod").forEach(x=>x.style.flexGrow="");
+ // rubriques : 3 colonnes contiguës, la plus haute la plus basse possible ; dernière case de chaque colonne étirée (colonnes alignées en bas)
+ const layGen=rf=>{gen.style.setProperty("--rf",rf+"px");gen.innerHTML="";const g=document.createElement("div");g.className="pa6-gc";gen.append(g);const hs=secs.map(x=>{g.append(x);return x.offsetHeight+4});gen.innerHTML="";
+  let best=null;for(let i=1;i<secs.length-1;i++)for(let j=i+1;j<secs.length;j++){const s=[hs.slice(0,i),hs.slice(i,j),hs.slice(j)].map(a=>a.reduce((x,y)=>x+y,0)),m=Math.max(...s),d=m-Math.min(...s);if(!best||m<best.m-.5||(Math.abs(m-best.m)<=.5&&d<best.d))best={i,j,m,d}}
+  [[0,best.i],[best.i,best.j],[best.j,secs.length]].forEach(([a,b])=>{const c=document.createElement("div");c.className="pa6-gc";secs.slice(a,b).forEach(x=>c.append(x));gen.append(c)})};
+ // programme détaillé : 2 colonnes contiguës équilibrées ; renvoie la hauteur de la plus haute colonne
+ const setF=(L,f)=>L.forEach(x=>x.style.setProperty("--mf",f+"px"));
+ // un module trop long pour équilibrer les colonnes continue en haut de la 2e colonne (coupé entre deux lignes, jamais d'une page à l'autre)
+ const unsplit=sc=>(sc||w).querySelectorAll(".pa6-cont").forEach(c=>{const o=[...w.querySelectorAll(".pa6-mod:not(.pa6-cont)")].find(x=>x.dataset.i===c.dataset.i),u=o&&o.querySelector("ul");if(u)c.querySelectorAll("li").forEach(li=>u.append(li));c.remove()});
+ const colH=c=>[...c.children].reduce((a,x)=>a+x.offsetHeight,0);
+ const split=(L,cols,noCut)=>{if(!noCut)unsplit(cols[0].closest(".pa6"));cols[1].innerHTML="";cols[0].innerHTML="";const hs=L.map(x=>{cols[0].append(x);return x.offsetHeight});const tot=hs.reduce((a,b)=>a+b,0);let k=L.length,bd=tot,acc=0;
+  for(let i=1;i<L.length;i++){acc+=hs[i-1];const d=Math.max(acc,tot-acc);if(d<bd){bd=d;k=i}}cols[0].innerHTML="";L.forEach((x,i)=>(i<k?cols[0]:cols[1]).append(x));
+  let A=colH(cols[0]),B=colH(cols[1]);if(noCut||Math.abs(A-B)<=.06*Math.max(A,B))return Math.max(A,B);
+  // module à cheval : le dernier de la 1re colonne (1re trop haute) ou le premier de la 2e (2e trop haute), ramené en 1re colonne puis coupé au mieux
+  const m=A>B?L[k-1]:L[k];if(!m)return Math.max(A,B);if(A<=B)cols[0].append(m);const LI=[...m.querySelectorAll(":scope>ul>li")];if(LI.length<2)return(A<=B?(m.remove(),cols[1].prepend(m),Math.max(A,B)):Math.max(A,B));
+  const cont=document.createElement("div");cont.className="pa6-mod pa6-cont";cont.dataset.i=m.dataset.i;cont.style.setProperty("--mf",m.style.getPropertyValue("--mf"));const ul=document.createElement("ul");cont.append(ul);cols[1].prepend(cont);
+  let best=null;for(let j=LI.length-1;j>=1;j--){LI.slice(j).forEach(li=>ul.append(li));const a=colH(cols[0]),b2=colH(cols[1]),d=Math.max(a,b2);if(!best||d<best.d)best={j,d};}
+  // remettre puis appliquer la meilleure coupe (ou aucune si elle n'améliore rien)
+  LI.forEach(li=>m.querySelector(":scope>ul").append(li));const base=(()=>{cont.remove();if(A<=B){cols[1].prepend(m)}return Math.max(colH(cols[0]),colH(cols[1]))})();
+  if(!best||best.d>=base-.5)return base;if(A<=B)cols[0].append(m);cols[1].prepend(cont);LI.slice(best.j).forEach(li=>ul.append(li));return Math.max(colH(cols[0]),colH(cols[1]))};
+ const avail=cols=>{const c=cols[0],cs=getComputedStyle(c);return c.clientHeight-parseFloat(cs.paddingBottom)-parseFloat(cs.paddingTop)};
+ const fitIn=(L,cols,lo,hi)=>{setF(L,lo);if(split(L,cols)>avail(cols))return null;for(let n=0;n<14;n++){const m=(lo+hi)/2;setF(L,m);if(split(L,cols)<=avail(cols))lo=m;else hi=m}setF(L,lo);split(L,cols);return lo};
+ layGen(9.2);let f=fitIn(mods,C,10,16);
+ if(f!==null&&f>=15.9){// encore de la place à 16 px : les rubriques grandissent (jusqu'à 13,5 px) tant que le programme détaillé tient à 16 px
+  let lo=9.2,hi=13.5;for(let n=0;n<8;n++){const m=(lo+hi)/2;layGen(m);setF(mods,16);if(split(mods,C)<=avail(C))lo=m;else hi=m}layGen(lo);f=fitIn(mods,C,10,16)}
+ const pages=[p1];
+ if(f===null){// 2e page propre à 10 px : modules jamais coupés ; boutons et mention d'agrément sur la dernière page ; en-tête courant et pied sur chaque page
+  unsplit();setF(mods,10);let rest=mods.slice(),page=p1,cols=C;const ti=(p1.querySelector(".pa6-ti")||{}).textContent||"",nv=(p1.querySelector(".pa6-tg")||{}).textContent||"",dn=(p1.querySelector(".pa6-dn")||{}).textContent||"",lg=p1.querySelector(".pa6-lt img");
+  for(let guard=0;guard<10;guard++){const pf=page.querySelector(".pa6-ft");if(ag)page.insertBefore(ag,pf);if(lk)page.insertBefore(lk,pf);
+   if(split(rest,cols)<=avail(cols)||rest.length<=1)break;
+   if(lk)lk.remove();if(ag)ag.remove();let k=rest.length;while(k>1&&split(rest.slice(0,k),cols)>avail(cols))k--;split(rest.slice(0,k),cols);rest=rest.slice(k);
+   const np=document.createElement("div");np.className="pa6 pa6ok pa6-pk";np.dataset.p=String(pages.length+1);
+   const rh=document.createElement("div");rh.className="pa6-rh";if(lg){const im=document.createElement("img");im.src=lg.getAttribute("src");im.alt="";rh.append(im)}[["b","Plan d’Action de Formation"],["span",ti+(nv?" · "+nv:"")],["span",dn]].forEach(([t,x])=>{const e=document.createElement(t);e.textContent=x;rh.append(e)});
+   np.append(rh);np.insertAdjacentHTML("beforeend",`<div class="pa6-det"><div class="pa6-dh"><span>★ PROGRAMME DÉTAILLÉ DE LA FORMATION (suite)</span><small></small></div><div class="pa6-mods"><div class="pa6-c"></div><div class="pa6-c"></div></div></div>`);
+   np.append(ft.cloneNode(true));w.append(np);pages.push(np);page=np;cols=[...np.querySelectorAll(".pa6-mods .pa6-c")]}
+ }
+ // place restante de la 1re page répartie entre les lignes (chaque module grandit selon son nombre de lignes) : aucune zone blanche
+ p1.querySelectorAll(".pa6-c>.pa6-mod").forEach(x=>{x.style.flexGrow=String(x.querySelectorAll("li").length+(x.querySelector(".pa6-mt")?1:0)||1)});p1.classList.add("pa6-gr");
+ pages.slice(1).forEach(x=>x.classList.add("pa6-short"));// pages suivantes : cadre à la hauteur du contenu, boutons dessous, pied en bas
+ const n=pages.length;pages.forEach((p,i)=>{const s=p.querySelector(".pa6-pn");if(s)s.textContent=(p.querySelector(".dmaj")&&p.querySelector(".dmaj").textContent?" · ":"")+"Page "+(i+1)+" / "+n});
+ w.dataset.fit="1";w.dataset.pages=String(n);w.dataset.f=f===null?"10":String(Math.round(f*100)/100);
+ const cw=w.parentElement?w.parentElement.clientWidth:0;if(cw&&cw<PA6_W&&!w.closest(".h2pw"))w.style.zoom=String(Math.max(.3,cw/PA6_W))}
+/*<PA6*/
+function docProg(){const P=D.pg;if(!P||typeof P!=="object")return"";const g=P.og||{};
+ return `<div class="pbrk"></div>`+pa6Html(P,{logo:"logo.jpg",org:g.o||org,nda:g.n||nda,region:g.r||LG.re||"",urssaf:g.u,siret:g.s||siret,ape:g.a,ta:P.ta||LG.ta||"",num:D.n||"",ed:k=>"logo-"+k+".png",hand:(P.lk||{}).h,ri:(P.lk||{}).r},esc)}
+try{new MutationObserver(()=>{if(document.querySelector(".pa6w:not([data-fit])"))requestAnimationFrame(()=>pa6Fit(document))}).observe(document.documentElement,{childList:true,subtree:true})}catch(e){}
 const docX=()=>dev?docDev():plan?docPlan():docConv()+docProg(),W1=dev?"accepté":plan?"validée":"signée";
 
 function render(){
