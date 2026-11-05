@@ -322,7 +322,7 @@ body.ip-nb{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
 .ip-bdt{white-space:pre-wrap;margin:6px 0 10px;padding:10px 12px;border-radius:12px;background:var(--ds-line2);font-size:15px}
 .ip-opt0{font-weight:400;color:#57606f;font-size:14px;text-transform:none;letter-spacing:0}.ip-nl{margin:4px 0 8px 18px;padding:0;font-size:14px;color:#9a3412}
 /* (05/11) version E : écran d'une formation (maquettes tel-e-multi + tel-e-jours) — fond blanc, textes ≥ 15 px, cibles ≥ 44 px, contraste ≥ 4,5:1 */
-html:has(.ve),body:has(.ve){background:#fff}.ve .qk{color:#14532d}
+html:has(.ve),body:has(.ve){background:#fff}.ve .qk,#qbn .qk{color:#14532d}
 .ve{background:#fff;color:#111827;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;max-width:640px;margin:0 auto}
 .ve-hd{padding:12px 16px 14px;border-bottom:1px solid #e5e7eb;background:#fff}.ve-back{min-height:44px;padding:0 8px 0 0;border:0;background:none;color:#1e3a8a;font:700 15px system-ui,sans-serif;cursor:pointer}
 .ve-per{font-size:15px;color:#4b5563;font-weight:600;margin-top:2px}.ve-cli{margin:2px 0 2px;font-size:26px;line-height:1.15;font-weight:800;text-transform:uppercase;letter-spacing:.01em;color:#111827;word-break:break-word}.ve-sub{font-size:16px;color:#374151}.ve-lt{margin:2px 0;font-size:21px;line-height:1.25;font-weight:800;color:#111827}
@@ -358,6 +358,61 @@ html:has(.ve),body:has(.ve){background:#fff}.ve .qk{color:#14532d}
 .ve-w{display:flex;align-items:center;gap:12px;min-height:64px;padding:10px 14px;border:1.5px solid #e5e7eb;border-radius:16px;background:#fff;color:#111827;text-decoration:none}.ve-w i{flex:0 0 44px;height:44px;border-radius:12px;background:#ede9fe;display:flex;align-items:center;justify-content:center;font-size:22px;font-style:normal}.ve-w span{display:flex;flex-direction:column;gap:2px}.ve-w b{font-size:16px}.ve-w small{font-size:15px;color:#4b5563}
 .ve-cons details{border:1.5px solid #e5e7eb;border-radius:14px;padding:4px 12px}.ve-cons summary{min-height:44px;display:flex;align-items:center;font-size:16px;font-weight:700;cursor:pointer}
 .ve-c:focus-visible,.ve-d:focus-visible,.ve-b:focus-visible,.ve-go:focus-visible,.ve-sg:focus-visible,.ve-ab:focus-visible,.ve-w:focus-visible{outline:3px solid #1e3a8a;outline-offset:2px}
+/* (05/11) ORDINATEUR (> 1100 px) : maquette « A liste + détail » — rien ne change sur le téléphone (classes dk-*, body.ip-dk) */
+body.ip-dk{background:#f1f3f9}body.ip-dk .w{max-width:none;margin:0;padding:0}
+.dk{min-height:100vh;display:flex;flex-direction:column;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:#111827}
+.dk-top{position:sticky;top:0;z-index:30;display:flex;align-items:center;gap:18px;padding:12px 28px;background:linear-gradient(90deg,#1747b5 0%,#2f5fe0 45%,#7c3aed 100%);color:#fff}
+.dk-logo{display:inline-flex;background:#fff;border-radius:8px;padding:4px 8px}.dk-logo img{height:30px;display:block}.dk-ttl{font-size:19px;font-weight:800;flex:1}
+.dk-nav{display:flex;gap:10px}.dk-pill{min-height:40px;padding:0 16px;border-radius:99px;border:0;background:rgba(255,255,255,.18);color:#fff;font:700 15px system-ui,sans-serif;cursor:pointer}.dk-pill:hover{background:rgba(255,255,255,.28)}.dk-pill.on{background:#fff;color:#1e3a8a}
+.dk-me{display:flex;align-items:center;gap:10px;font-size:15px;font-weight:600}.dk-me .ip-av{width:40px;height:40px;font-size:15px;border-width:2px}
+.dk-b{flex:1;display:grid;grid-template-columns:400px minmax(0,1fr);gap:20px;padding:20px 28px;align-items:start}
+.dk-l{position:sticky;top:84px;max-height:calc(100vh - 104px);overflow:auto;background:#fff;border:1px solid #e3e7f0;border-radius:16px;padding:14px}
+.dk-srch{margin-bottom:10px}.dk-in{width:100%;box-sizing:border-box;min-height:44px;padding:0 14px;border:1.5px solid #cbd5e1;border-radius:12px;font:15px system-ui,sans-serif;color:#111827}
+.dk-g{margin:6px 0 10px}.dk-gh{list-style:none;cursor:pointer;font-size:14px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:#4b5563;padding:8px 4px}.dk-gh::-webkit-details-marker{display:none}
+.dk-g-reg .dk-gh{color:#b91c1c}.dk-g-auj .dk-gh{color:#c2410c}.dk-gn{font-weight:700}
+.dk-l .ip-ra,.dk-l .ip-hr,.dk-l .ip-hrn,.dk-l .ip-stw,.dk-l .ulate,.dk-l .ip-okp,.dk-l .ip-wait{display:none!important}
+.dk-l .ip-rw{margin:4px 0;border-radius:12px;border:1px solid transparent}.dk-l .ip-rw.hide{display:none}
+.dk-l .ip-row{width:100%;min-height:64px;background:#fff;border:0;border-radius:12px;box-shadow:none;padding:8px 10px;cursor:pointer;text-align:left}
+.dk-l .ip-rw:hover .ip-row{background:#f5f7fc}.dk-l .ip-rw.dk-on{border-color:#a5b4fc;background:#eef2ff}.dk-l .ip-rw.dk-on .ip-row{background:#eef2ff}
+.dk-l .uc{font-size:15px}.dk-l .ip-s,.dk-l .ip-s.m{font-size:14px!important;color:#4b5563}.dk-l .utag,.dk-l .ip-tag{font-size:14px!important}.dk .qk{color:#14532d}.dk-l .ip-d b{font-size:20px}.dk-l .ip-d small{font-size:14px}
+.dk-r{background:#fff;border:1px solid #e3e7f0;border-radius:16px;padding:22px 26px;min-height:60vh}
+.dk-r .ip-fix{position:sticky;left:auto;right:auto}
+.dk-empty{color:#4b5563;font-size:15px;padding:20px 4px}
+.dk-tst{margin:-6px 0 14px;padding:10px 14px;border-radius:10px;font:700 15px/1.35 system-ui,sans-serif;color:#422006;background:repeating-linear-gradient(135deg,#fef08a 0 14px,#fde047 14px 28px);border:2px solid #a16207}
+.dk-fh{display:flex;justify-content:space-between;gap:16px;align-items:flex-start}.dk-fh h1{margin:0;font-size:26px;font-weight:800;text-transform:uppercase}.dk-fh p{margin:4px 0 0;font-size:16px;color:#374151}
+.dk-map{flex:none;display:inline-flex;align-items:center;min-height:44px;padding:0 18px;border:1.5px solid #cbd5e1;border-radius:99px;color:#111827;font:700 15px system-ui,sans-serif;text-decoration:none}.dk-map:hover{background:#f5f7fc}
+.dk-lbl{margin:18px 0 8px;font-size:14px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#4b5563}
+.dk-days{display:flex;gap:12px;flex-wrap:wrap}.dk-day{width:172px;border:1.5px solid #e5e7eb;border-radius:14px;padding:10px;display:flex;flex-direction:column;gap:6px;background:#fff}.dk-auj{border:2.5px solid #ea580c}
+.dk-dh{text-align:center}.dk-dh b{display:block;font-size:16px}.dk-dh small{font-size:14px;color:#4b5563}
+.dk-hp{min-height:36px;border:0;border-radius:8px;font:700 14px system-ui,sans-serif;cursor:pointer;padding:4px 6px}.dk-hp.on{outline:2.5px solid #1e3a8a;outline-offset:1px}
+.dk-hp-ok{background:#f0fdf4;color:#15803d}.dk-hp-now{background:#fff7ed;color:#9a3412;box-shadow:inset 0 0 0 1.5px #fdba74}.dk-hp-later{background:#f3f4f6;color:#4b5563}.dk-hp-late{background:#fef2f2;color:#b91c1c;box-shadow:inset 0 0 0 1.5px #fca5a5}
+.dk-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:18px}.dk-box{border:1.5px solid #e5e7eb;border-radius:14px;padding:14px 16px}.dk-box h3{margin:0 0 8px;font-size:17px}
+.dk-er{display:flex;justify-content:space-between;align-items:center;gap:10px;min-height:44px;border-top:1px solid #eef0f4;font-size:15px}
+.dk-ok{color:#15803d;font-weight:600}.dk-ab{color:#4b5563}.dk-mu{color:#4b5563;font-size:15px}.dk-erb{display:flex;gap:6px}
+.dk-sg,.dk-abb{min-height:36px;padding:0 14px;border-radius:99px;font:700 14px system-ui,sans-serif;cursor:pointer}.dk-sg{border:0;background:#c2410c;color:#fff}.dk-abb{background:#fff;border:1.5px solid #cbd5e1;color:#374151}
+.dk-ef{display:flex;justify-content:space-between;align-items:center;gap:10px;min-height:44px;border-top:1px solid #eef0f4}
+.dk-lk{min-height:36px;border:0;background:none;padding:0 2px;font:600 15px system-ui,sans-serif;color:#1e3a8a;cursor:pointer}.dk-lk-or,.dk-ev-now,.dk-ev-part{color:#c2410c}.dk-ev-ok{color:#15803d}.dk-ev-later{color:#4b5563}
+.dk-sups{margin-top:18px}.dk-sups h4{margin:0 0 8px;font-size:14px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#4b5563}
+.dk-chips{display:flex;flex-wrap:wrap;gap:10px;align-items:center}.dk-chip{display:inline-flex;align-items:center;min-height:40px;padding:0 14px;border:1.5px solid #ddd6fe;border-radius:10px;background:#f5f3ff;color:#4c1d95;font:700 15px system-ui,sans-serif;text-decoration:none;cursor:pointer}.dk-chip:hover{background:#ede9fe}.dk-supst{font-size:14px;color:#4b5563}
+.dk-acts{display:flex;flex-wrap:wrap;gap:12px;margin-top:20px}.dk-main{min-height:48px;padding:0 22px;border:0;border-radius:99px;background:#c2410c;color:#fff;font:800 16px system-ui,sans-serif;cursor:pointer}
+.dk-sec{min-height:48px;padding:0 20px;border:1.5px solid #cbd5e1;border-radius:99px;background:#fff;color:#111827;font:700 15px system-ui,sans-serif;cursor:pointer}.dk-sec-pb{border-color:#fca5a5;color:#b91c1c}
+.dk-r .ve-late{margin-top:14px}.dk-r .ve-more{margin-top:10px}.dk-flash{outline:3px solid #1e3a8a;outline-offset:3px;border-radius:12px}
+.dk button:focus-visible,.dk a:focus-visible,.dk input:focus-visible{outline:3px solid #1e3a8a;outline-offset:2px}
+/* (05/11) accueil du téléphone : cadre orange « Aujourd'hui » (à faire), Déjà fait, À venir — maquettes tel-matin / tel-afaire-v1 */
+.ip-n{display:block;background:none;border:0;padding:10px 0;margin:-8px 0 -10px;color:inherit;font:inherit;font-size:14px;text-align:left;cursor:pointer;min-height:44px}
+.ip-af{margin:14px 0;padding:14px 14px 6px;border:2px solid #fdba74;border-radius:18px;background:#fffbf5}.ip-afh{margin:0 0 10px;font-size:15px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:#9a3412}
+.ip-afn{margin:0 0 10px;padding:10px 12px;border:1.5px solid #bfdbfe;border-radius:12px;background:#eff6ff;color:#1e3a8a;font-size:16px;font-weight:700}
+.ip-afr{padding:12px 0;border-top:1px solid #fde4cc}.ip-afb{display:flex;gap:12px;align-items:flex-start;width:100%;background:none;border:0;padding:0;text-align:left;cursor:pointer;font:inherit;color:inherit}
+.ip-afhr{flex:0 0 70px;font-size:24px;font-weight:800;color:#c2410c;line-height:1.2}.ip-afc{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}.ip-afc .uc{font-size:17px;color:#111827;white-space:normal}
+.ip-afs{display:flex;flex-wrap:wrap;gap:4px 8px;align-items:center;font-size:15px;color:#4b5563}
+.ip-afa{display:flex;gap:10px;margin:10px 0 0 82px}.ip-afa>*{flex:1 1 0;min-height:48px;display:inline-flex;align-items:center;justify-content:center;border-radius:99px;font:700 15px system-ui,sans-serif;text-decoration:none;border:0;cursor:pointer;padding:0 10px}
+.ip-afm{background:#1d4ed8;color:#fff}.ip-afg{background:#c2410c;color:#fff}
+.ip-afok{margin:14px 0;padding:14px 16px;border:1.5px solid #86efac;border-radius:16px;background:#f0fdf4;color:#14532d;font-size:16px;font-weight:800}
+.ip-dh,.ip-vh{margin:16px 2px 8px;font-size:15px;font-weight:800;letter-spacing:.04em;text-transform:uppercase}.ip-dh,#s-udone .ip-dh{color:#4b5563}.ip-akt{display:block}.ip-akm{display:block;margin-top:4px;font-size:14px;font-weight:600;color:#14532d}.ip-vh{color:#1e3a8a}
+.ip-done .ip-ra{display:none}.ip-vrw{display:flex;align-items:center;gap:8px;border-left:5px solid #94a3b8;border-radius:16px;background:#fff;margin:8px 0;padding-right:10px;box-shadow:0 1px 3px rgba(15,23,42,.08)}
+.ip-vr-f{border-left-color:#7c3aed}.ip-vr-b{border-left-color:#0369a1}.ip-vr-i{border-left-color:#0f766e}.ip-vrw .ip-vr{flex:1;min-width:0;box-shadow:none;background:none}.ip-vrw .ip-afm{flex:none;min-height:44px;padding:0 14px;border-radius:99px;display:inline-flex;align-items:center;font:700 15px system-ui,sans-serif;text-decoration:none}
+.ip-vx{margin:6px 4px 0;font-size:14px;color:#4b5563}
+@media (max-width:420px){.ip-afa{margin-left:0}.ip-afhr{flex-basis:62px;font-size:22px}}
 </style>
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
@@ -582,10 +637,15 @@ async function main(){
  let FP=null;
  function flush(){if(FP||!D.t)return FP||Promise.resolve();FP=(async()=>{await 0;try{for(const p of Q()){try{await(p.k==="ph"?phUp(p):sbDep(D.t,p))}catch(e){break}LS.set(QK,Q().filter(x=>!(x.id===p.id&&x.i===p.i)));banner()}}finally{FP=null;banner();try{if(V&&V.v==="f"&&!document.activeElement.matches("input,textarea"))view()}catch(e){}}})();return FP}
  function enqueue(pls){const q=Q().concat(pls);if(!LS.set(QK,q))return false;flush();return true}
+ let HOMEOK=false;
+ // (05/11) heure de la liste reçue : « à 7h44 », ou « le 04/11 à 18h02 » si elle date d'un autre jour
+ const majHM=()=>{const md=MAJ?new Date(MAJ):null;return md&&!isNaN(md)?(md.toDateString()===new Date().toDateString()?"":"le "+String(md.getDate()).padStart(2,"0")+"/"+String(md.getMonth()+1).padStart(2,"0")+" ")+"à "+md.getHours()+"h"+String(md.getMinutes()).padStart(2,"0"):""};
  const bannerHtml=()=>{const q=Q(),n=q.length,nb=q.filter(x=>x.k==="bl"||x.k==="blrep"||x.k==="blns").length,nbi=q.filter(x=>x.k==="bi").length,ntp=q.filter(x=>x.k==="itp"&&!x.bi).length/* (03/11, G) planning d’un bon : compté avec le bon */,np=q.filter(x=>x.k==="ph").length,ns=n-nb-nbi-np-ntp-q.filter(x=>x.k==="itp"&&x.bi).length,any=F.some(x=>recs(x.f.n).length)||IT.some(x=>recs("bl:"+x.t.i).length)||LS.get("fpiv:tp:"+NS,[]).length>0;
   if(n)return `<div class="qb qw" role="status"><b>📤 ${[nb?nb+" bon"+(nb>1?"s":"")+" de livraison":"",nbi?nbi+" bon"+(nbi>1?"s":"")+" d’intervention":"",ntp?ntp+" intervention"+(ntp>1?"s":"")+" créée"+(ntp>1?"s":"")+" ou modifiée"+(ntp>1?"s":""):"",ns?ns+" signature"+(ns>1?"s":""):"",np?np+" photo"+(np>1?"s":""):""].filter(Boolean).join(" et ")} en attente d’envoi</b><span>${D.t?(navigator.onLine===false?"Pas de connexion : elles partiront toutes seules dès son retour.":"Envoi en cours… sinon elles repartiront toutes seules."):"Ce lien ne permet pas l’envoi : contactez "+esc(D.m||"TOPAS informatique")+"."}</span>${D.t?'<button type="button" class="btn" data-qgo>Renvoyer maintenant</button>':""}</div>`;
-  return any?'<div class="qb qk" role="status"><b>✔ Tout est transmis</b></div>':""};
- function banner(){const e=document.getElementById("qbn");if(e){e.innerHTML=bannerHtml();const b=e.querySelector("[data-qgo]");if(b)b.onclick=flush}document.querySelectorAll(".ip-wait[data-pid]").forEach(w=>{if(!pend(w.dataset.pid))w.remove()});document.querySelectorAll("[data-okt][data-pid]").forEach(w=>{if(!pend(w.dataset.pid)){w.textContent=w.dataset.okt;w.removeAttribute("data-pid");const b=w.closest(".ip-em3-pd");if(b)b.classList.remove("ip-em3-pd")}});const ps=document.getElementById("phst");if(ps&&BS&&BS.step==="done")ps.innerHTML=phStat(BS.ph.map(x=>x.id))}
+  const home=typeof V!=="undefined"&&V&&V.v==="list"&&!(typeof dkOn==="function"&&dkOn()),mh=majHM();
+  if(home&&HOMEOK)return "";/* (05/11) tout est fait : le bandeau vert « Rien à faire aujourd’hui — tout est signé et transmis » suffit */
+  return any||(home&&mh)?'<div class="qb qk" role="status"><b>✔ Tout est transmis'+(home&&mh?" · liste à jour "+mh:"")+'</b></div>':""};
+ function banner(){const e=document.getElementById("qbn");if(e){e.innerHTML=bannerHtml();const b=e.querySelector("[data-qgo]");if(b)b.onclick=flush}const ak=document.querySelector(".ip-afok .ip-akt");if(ak)ak.textContent="✔ Rien à faire aujourd’hui — tout est signé"+(Q().length?"":" et transmis");document.querySelectorAll(".ip-wait[data-pid]").forEach(w=>{if(!pend(w.dataset.pid))w.remove()});document.querySelectorAll("[data-okt][data-pid]").forEach(w=>{if(!pend(w.dataset.pid)){w.textContent=w.dataset.okt;w.removeAttribute("data-pid");const b=w.closest(".ip-em3-pd");if(b)b.classList.remove("ip-em3-pd")}});const ps=document.getElementById("phst");if(ps&&BS&&BS.step==="done")ps.innerHTML=phStat(BS.ph.map(x=>x.id))}
  const phCatch=()=>phOrphans().then(n=>{if(n){banner();if(V.v==="list"||V.v==="bid")view()}}).catch(()=>{});
  window.addEventListener("online",()=>{flush();phCatch()});setInterval(()=>{if(Q().length)flush()},20000);
  // ---- navigation interne (le bouton « retour » du téléphone fonctionne)
@@ -622,7 +682,7 @@ async function main(){
  function markTabs(sheet){document.querySelectorAll(".ip-nav [data-tab]").forEach(b=>{const k=b.dataset.tab,on=sheet?k==="topas":(k==="home"&&V.v==="list"&&TAB!=="sig")||(k==="sig"&&V.v==="list"&&TAB==="sig");b.classList.toggle("on",on);if(on)b.setAttribute("aria-current","page");else b.removeAttribute("aria-current")})}
  function flash(t,ok){const o=document.createElement("div");o.className="ip-flash"+(ok?" ip-flash-ok":"");o.setAttribute("role","status");o.textContent=t;document.body.appendChild(o);setTimeout(()=>o.remove(),2600)}
  function goSig(){const s=document.getElementById("s-usig")||document.getElementById("s-uarc");if(!s){flash("Rien de signé pour l’instant.");return}const d=s.querySelector("details");if(d)d.open=true;s.scrollIntoView({behavior:"smooth",block:"start"})}
- function tabGo(k){if(k==="topas")return topasSheet();if(k==="new")return canBI()?biStart():tpStart();/* (03/11, G) plus de fenêtre de choix */if(k==="sig"){if(V.v!=="list")nav({v:"list"});TAB="sig";markTabs();setTimeout(goSig,30);return}
+ function tabGo(k){if(k==="topas")return topasSheet();if(dkOn()&&(k==="home"||k==="sig")){DKSIG=k==="sig";TAB=DKSIG?"sig":"home";if(!DKSIG){nav({v:"list"});return}view();if(DKSIG)setTimeout(goSig,30);return}if(k==="new")return canBI()?biStart():tpStart();/* (03/11, G) plus de fenêtre de choix */if(k==="sig"){if(V.v!=="list")nav({v:"list"});TAB="sig";markTabs();setTimeout(goSig,30);return}
   TAB="home";if(V.v!=="list")nav({v:"list"});else{markTabs();window.scrollTo({top:0,behavior:"smooth"})}}
  function topasSheet(){const tel=String(G[1]||"").replace(/[^\d+]/g,""),ad=String(G[4]||"").trim(),ml=D.m||G[2]||"",o=document.createElement("div");
   o.className="nsov ip-sheet";o.setAttribute("role","dialog");o.setAttribute("aria-modal","true");o.setAttribute("aria-label","Contacter TOPAS informatique");
@@ -713,7 +773,9 @@ async function main(){
   const emTodo=!dn&&(late||SLOTS(f).some(o=>o.day===T&&!emState(f,o))),todo=emTodo||(!dn&&x.s==="clo");
   const st=dn?stW("sig","Terminée"):n>=2?stW("late","+ 48 h"):emTodo?stW("auj","À émarger"):x.s==="clo"?stW("auj","À clôturer"):x.s==="cours"||x.s==="auj"?stW("ven","En cours"):stW("ven","À venir");
   const acts=dn?"":dt&&dt<=T&&!f.clo?vMini(f,x.ix,dt)/* (05/11, version E) */:f4Btns(f,x.ix,dt);
-  return {k:dt+" "+hr,todo:!!todo,h:rowW(dn?"sig":todo?"auj":"ven",`<button type="button" class="row urow ip-row" data-f="${x.ix}">${dCol(dt)}<span class="ip-c ul"><b class="uc" title="${esc(f.c||"")}">${esc(f.c||"")}</b><span class="ip-s m">${esc(f.t||"Formation")}${dd.length>1?(dn||j<0?" · "+dd.length+" jours":" · jour "+(j+1)+"/"+dd.length):""}</span>${late&&dt?uAgo(dt)+(pd?`<span class="ip-s m">✍ ${pd} émargement${pd>1?"s":""} à faire signer</span>`:""):""}</span><span class="ip-r">${dn?"":`<span class="ip-hr">${esc(fH(hr))}</span>`}<span class="ip-rt">${f.tst?`<span class="utag ip-tag" style="background:#facc15;color:#422006;border:1px solid #a16207" title="Dossier de test (mails vers l’adresse de test)">TEST</span>`:""}<span class="utag uf ip-tag">Formation</span>${st}</span></span></button>`,acts,(f.c||"")+" "+(f.n||"")+" "+(f.t||""))}};
+  const evN=!dn&&!f.clo&&(f.tr||[]).length?vEvs(f).findIndex(z=>z.k==="now"&&z.due===T):-1,nx=SLOTS(f).find(o=>o.day===T&&!emState(f,o));
+  const m={t:"f",ix:x.ix,d:dt,hr:nx?hrOf(f,T,nx.part)[0]:hr,c:f.c||"",city:aCity(f.a),a:f.a||"",em:!dn&&!f.clo&&!!nx,ev:evN<0?"":evN?"ap":"av",clo:x.s==="clo"&&!dn};
+  return {m,k:dt+" "+hr,todo:!!todo,h:rowW(dn?"sig":todo?"auj":"ven",`<button type="button" class="row urow ip-row" data-f="${x.ix}">${dCol(dt)}<span class="ip-c ul"><b class="uc" title="${esc(f.c||"")}">${esc(f.c||"")}</b><span class="ip-s m">${esc(f.t||"Formation")}${dd.length>1?(dn||j<0?" · "+dd.length+" jours":" · jour "+(j+1)+"/"+dd.length):""}</span>${late&&dt?uAgo(dt)+(pd?`<span class="ip-s m">✍ ${pd} émargement${pd>1?"s":""} à faire signer</span>`:""):""}</span><span class="ip-r">${dn?"":`<span class="ip-hr">${esc(fH(hr))}</span>`}<span class="ip-rt">${f.tst?`<span class="utag ip-tag" style="background:#facc15;color:#422006;border:1px solid #a16207" title="Dossier de test (mails vers l’adresse de test)">TEST</span>`:""}<span class="utag uf ip-tag">Formation</span>${st}</span></span></button>`,acts,(f.c||"")+" "+(f.n||"")+" "+(f.t||""))}};
  // retard : « il y a N jours » (bon ou émargement daté d'avant aujourd'hui, pas signé)
  const uAgo=d=>{const n=Math.round((Date.parse(T)-Date.parse(d))/864e5);return n>0?`<span class="ulate">il y a ${n} jour${n>1?"s":""}</span>`:""};
  const pastDue=f=>SLOTS(f).filter(sl=>sl.day<T&&!emState(f,sl)).map(sl=>sl.day).sort();
@@ -724,7 +786,7 @@ async function main(){
   const sub=B.k==="sig"?`<span class="ip-s m">${esc(t.b||t.nm||"Bon de livraison")}${bi?" · "+esc(tpTxt(t.tp)):city?" · "+esc(city):""}</span>${pill}`:ok?(B.k==="ns"?`<span class="ip-s m ip-sl ip-sl-ns">📤 Sans signature${s.r?" le "+esc(dm(s.r.dl)):""}</span>`:`<span class="ip-s m ip-sl ip-sl-ok">✓ Signé${s.r?(s.r.hl?" à "+esc(fH(s.r.hl)):"")+(s.r.nm?" par "+esc(s.r.nm):""):t.sd&&t.sd.length>10?" à "+esc(fH(t.sd.slice(11,16)))+(t.sn?" par "+esc(t.sn):""):t.sn?" par "+esc(t.sn):""}${s.r?(s.r.res?" · remarque notée":""):t.sr?" · remarque notée":""}</span>`)+(pd?`<span class="ip-s m ip-wait" data-pid="${esc(s.r.id)}">transmis à TOPAS dès le réseau</span>`:"")
    :`<span class="ip-s m">${esc(t.b||t.nm||"Bon de livraison")}${bi?" · "+esc(tpTxt(t.tp)):city?" · "+esc(city):""}</span>${late&&t.d?uAgo(t.d):""}`;
   const acts=ok?"":B.k==="ven"?mapA(cn,t.a)+`<button type="button" class="ip-ab ip-ab-eye" data-it="${x.ix}">Voir le bon</button>`:`<button type="button" class="ip-ab ip-ab-go" data-bls2="${x.ix}">✎ Faire signer</button>${mapA(cn,t.a)}<button type="button" class="ip-ab ip-ab-eye ip-ab-ic" data-it="${x.ix}" aria-label="Voir le bon" title="Voir le bon">👁</button>`;
-  return {k:kd||((t.d||"9999-12-31")+" "+(t.h||"00:00")),todo:!ok,h:rowW(ok?"sig":B.k==="ven"?"ven":"auj",`<button type="button" class="row urow ip-row${okc?" ip-bsg ip-bsg-"+okc:""}" ${bi?`data-bid="${esc(t.b||"")}"`:`data-it="${x.ix}"`} data-b="${esc(t.b||"")}">${dCol(dd)}<span class="ip-c ul"><b class="uc" title="${esc(cn)}">${esc(cn)}</b>${sub}</span><span class="ip-r">${ok?`<span class="ip-hrn">${esc(t.b||"")}</span>`:hh?`<span class="ip-hr">${esc(fH(hh))}</span>`:""}<span class="ip-rt">${bi?'<span class="utag ui ip-tag">Intervention</span>':'<span class="utag ub ip-tag">BL</span>'}${stW(B.k,B.w)}</span></span></button>`,acts,cn+" "+(t.b||""))}};
+  return {m:{t:bi?"bi":"b",ix:x.ix,d:dd,hr:hh,c:cn,city:aCity(t.a)||city,n:t.b||"",a:t.a||"",ok,ven:B.k==="ven",rsv},k:kd||((t.d||"9999-12-31")+" "+(t.h||"00:00")),todo:!ok,h:rowW(ok?"sig":B.k==="ven"?"ven":"auj",`<button type="button" class="row urow ip-row${okc?" ip-bsg ip-bsg-"+okc:""}" ${bi?`data-bid="${esc(t.b||"")}"`:`data-it="${x.ix}"`} data-b="${esc(t.b||"")}">${dCol(dd)}<span class="ip-c ul"><b class="uc" title="${esc(cn)}">${esc(cn)}</b>${sub}</span><span class="ip-r">${ok?`<span class="ip-hrn">${esc(t.b||"")}</span>`:hh?`<span class="ip-hr">${esc(fH(hh))}</span>`:""}<span class="ip-rt">${bi?'<span class="utag ui ip-tag">Intervention</span>':'<span class="utag ub ip-tag">BL</span>'}${stW(B.k,B.w)}</span></span></button>`,acts,cn+" "+(t.b||""))}};
  // bon signé : classé par sa date de SIGNATURE (pas d'intervention) ; plus de 12 mois → « 🗄 Archives » (jamais invisible)
  const sdOf=x=>{const s=blSt(x);return s.r?String(s.r.dl||"")+" "+String(s.r.hl||""):String(x.t.sd||"")||String(x.t.d||"")};
  // ⏰ À régulariser : tout ce qui est daté d'avant aujourd'hui et pas signé (bons de livraison + émargements), en tête, le plus ancien d'abord
@@ -743,13 +805,34 @@ async function main(){
  const GRP=[["reg","⏰ À régulariser",1],["auj","📅 Aujourd’hui",1],["ven","🔜 À venir",1],["tpx","📅 Interventions passées ou annulées",0],["sig","✓ Signées",0],["arc","🗄 Archives",0]];
  function uList(U){U=U||uGroups();const H=GRP.filter(g=>U[g[0]].length).map(([k,t,op])=>`<section class="sec ip-g ip-g-${k}${k==="reg"?" ureg":""}" id="s-u${k}"><details ${op?"open":""}><summary class="lh"><span class="ip-gt">${t}</span><span class="ip-gn n">${U[k].length}</span></summary>${k==="sig"?'<p class="ip-gx">Les 12 derniers mois.</p><div class="ip-srw"><input type="search" class="ip-in ip-srch" id="usrch" placeholder="Rechercher : n° de BL, client" aria-label="Rechercher dans les bons signés (n° de BL, client)" autocomplete="off" enterkeyhint="search"></div><p class="ip-gx hide" id="usrch0">Aucun bon signé ne correspond.</p>':k==="arc"?'<p class="ip-gx">Signés il y a plus d’un an.</p>':""}${U[k].map(o=>o.h).join("")}</details></section>`).join("");
   return H?`<div class="ip-gs">${H}</div>`:`<div class="empty ip-empty">Rien de prévu pour le moment.</div>`}
- function listView(){const V2=D.v,U=uGroups(),nT=U.reg.concat(U.auj).filter(x=>x.todo!==false).length;
+ // ---- ACCUEIL DU TÉLÉPHONE (05/11, maquettes « tel-matin » et « tel-afaire-v1 ») : ⏰ À régulariser · cadre orange « Aujourd'hui » = seulement ce qui reste
+ // à faire (➜ Prochain, heure en gros, 🧭 Itinéraire + bouton de l'action) · bandeau « Tout est transmis · liste à jour à … » · « Déjà fait aujourd'hui » ·
+ // « 📅 À venir ». En-tête : « n rendez-vous aujourd'hui · le 1er à … ↓ » / « Il reste n choses à faire aujourd'hui ↓ » / « Rien à faire aujourd'hui ✓ »
+ // (n = lignes du cadre orange + À régulariser). Mêmes lignes (uGroups), mêmes fonctions, aucune nouvelle donnée ; l'ordinateur (dkView) ne change pas.
+ const aCity=a=>{const z=String(a||"").split(",").pop().trim().replace(/^\d{5}\s*/,"");return z};
+ const uTag=m=>m.t==="f"?'<span class="utag uf ip-tag">Formation</span>':m.t==="b"?'<span class="utag ub ip-tag">BL</span>':'<span class="utag ui ip-tag">Intervention</span>';
+ const uMap=m=>m.a?`<a class="ip-afm" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(String(m.c||"")+" "+m.a)}" target="_blank" rel="noopener">🧭 Itinéraire</a>`:"";
+ const uOpen=m=>m.t==="f"?`data-f="${m.ix}"`:m.t==="tp"?(m.bn?`data-bin="${esc(m.bn)}"`:`data-tpe="${esc(m.tid)}"`):m.t==="bi"?`data-bid="${esc(m.n)}" data-b="${esc(m.n)}"`:`data-it="${m.ix}" data-b="${esc(m.n)}"`;
+ const uAct=m=>m.t==="f"?(m.em?`<button type="button" class="ip-afg" data-fgo="${m.ix}">✍ Faire émarger</button>`:m.ev?`<button type="button" class="ip-afg" data-vev="${m.ix}:${m.ev}">📝 Compléter l’évaluation</button>`:`<button type="button" class="ip-afg" data-f="${m.ix}">📝 Remplir mon bilan</button>`)
+  :m.t==="tp"?`<button type="button" class="ip-afg" data-tpbon="${esc(m.tid)}">✍ Faire le bon</button>`:`<button type="button" class="ip-afg" data-bls2="${m.ix}">✍ Faire signer</button>`;
+ function uHome(U){const A=(U.auj||[]),todo=A.filter(o=>o.m&&(o.m.t==="f"?!!(o.m.em||o.m.ev||o.m.clo):o.todo!==false)).sort((a,b)=>(a.m.hr||"99").localeCompare(b.m.hr||"99")),done=A.filter(o=>!todo.includes(o)),reg=(U.reg||[]).length,n=todo.length+reg;
+  const p1=todo[0],hd=!n?"Rien à faire aujourd’hui ✓":!done.length&&todo.length&&!reg?todo.length+" rendez-vous aujourd’hui"+(p1.m.hr?" · le 1er à "+fH(p1.m.hr):"")+" ↓":"Il reste "+n+" chose"+(n>1?"s":"")+" à faire aujourd’hui ↓";return {todo,done,n,hd}}
+ function uTodayH(H){const q=Q().length;if(!H.todo.length){const mh=majHM();return `<div class="ip-afok" id="s-uauj" role="status"><span class="ip-akt">✔ Rien à faire aujourd’hui${q?" — tout est signé":" — tout est signé et transmis"}</span>${mh?`<small class="ip-akm">Liste à jour ${esc(mh)}</small>`:""}</div>`}const p=H.todo[0].m;
+  return `<section class="ip-af" id="s-uauj"><h2 class="ip-afh">Aujourd’hui · ${esc(vD(T,{weekday:"long",day:"numeric",month:"short"}))} (${H.todo.length})</h2><p class="ip-afn">➜ Prochain : <b>${esc(p.c)}</b>${p.hr?" à "+esc(fH(p.hr)):""}${p.city?" · "+esc(p.city):""}</p>
+  ${H.todo.map(o=>{const m=o.m;return `<div class="ip-afr" data-q="${esc((m.c||"")+" "+(m.n||""))}"><button type="button" class="ip-afb row" ${uOpen(m)}><span class="ip-afhr">${m.hr?esc(fH(m.hr)):"—"}</span><span class="ip-afc"><b class="uc">${esc(m.c||"")}</b><span class="ip-afs">${uTag(m)}${m.n?"<span>"+esc(m.n)+"</span>":""}${m.city?"<span>"+(m.n?"· ":"")+esc(m.city)+"</span>":""}</span></span></button><div class="ip-afa">${uMap(m)}${uAct(m)}</div></div>`}).join("")}</section>`}
+ function uVenH(L){if(!L.length)return "";return `<section class="sec ip-g ip-g-ven" id="s-uven"><h2 class="ip-vh">📅 À venir (${L.length})</h2>${L.map(o=>{const m=o.m;if(!m)return o.h;return `<div class="ip-rw ip-vrw ip-vr-${m.t==="f"?"f":m.t==="b"?"b":"i"}" data-q="${esc((m.c||"")+" "+(m.n||""))}"><button type="button" class="row urow ip-row ip-vr" ${uOpen(m)}>${dCol(m.d)}<span class="ip-c ul"><b class="uc" title="${esc(m.c)}">${esc(m.c)}</b><span class="ip-s m">${uTag(m)} ${esc([m.hr?fH(m.hr):"",m.city].filter(Boolean).join(" · "))}</span>${m.lab?`<span class="ip-tpls">${m.lab}</span>`:""}</span></button>${uMap(m)}</div>`}).join("")}<p class="ip-vx">« 🧭 Itinéraire » ouvre le GPS du téléphone · un appui sur la ligne ouvre le détail.</p></section>`}
+ function listView(){const V2=D.v,U=uGroups(),H=uHome(U),emp={reg:[],auj:[],ven:[],tpx:[],sig:[],arc:[]};
+  const regH=U.reg.length?uList(Object.assign({},emp,{reg:U.reg})):"",restH=uList(Object.assign({},emp,{tpx:U.tpx||[],sig:U.sig,arc:U.arc})).replace(/^<div class="empty ip-empty">.*<\/div>$/,""),any=U.reg.length+U.auj.length+U.ven.length+(U.tpx||[]).length+U.sig.length+U.arc.length;HOMEOK=!!any&&!H.todo.length;
   return `<header class="ip-hero"><div class="ip-top"><span class="ip-logo"><img src="logo.jpg" alt="TOPAS informatique"></span>${netH()}</div>
-  <div class="ip-me">${avH()}<div class="ip-mt"><h1 class="ip-hi hi">Bonjour${pr?" "+esc(pr):""}</h1><div class="ip-n">${nT?nT+" chose"+(nT>1?"s":"")+" à faire aujourd’hui":"Rien à faire aujourd’hui"}</div></div></div></header>
-  ${majTxt()?`<p class="ip-maj" id="ipmaj">${esc(majTxt())}</p>`:""}<div id="qbn">${bannerHtml()}</div>${horsH()}${EJ?instH():""}
-  ${uList(U)}${tpFab()}
+  <div class="ip-me">${avH()}<div class="ip-mt"><h1 class="ip-hi hi">Bonjour${pr?" "+esc(pr):""}</h1><button type="button" class="ip-n" data-ipn>${esc(H.hd)}</button></div></div></header>
+  ${horsH()}${EJ?instH():""}
+  ${regH}${any?uTodayH(H):""}<div id="qbn">${bannerHtml()}</div>
+  ${H.done.length?`<section class="sec ip-g ip-done" id="s-udone"><h2 class="ip-dh">Déjà fait aujourd’hui (${H.done.length})</h2>${H.done.map(o=>o.h).join("")}</section>`:""}
+  ${uVenH(U.ven)}${restH}${any?"":`<div class="empty ip-empty">Rien de prévu pour le moment.</div>`}${tpFab()}
   ${V2&&V2.t?`<div class="vei"><div class="kk">📢 Info réglementaire</div><h3>${esc(V2.t)}</h3>${V2.r?`<div class="mu" style="color:var(--tx)">${esc(V2.r)}</div>`:""}<div class="mu" style="margin-top:4px">Transmise le ${esc(fds(V2.dd||V2.d||T))}${V2.u?` · <a href="${esc(V2.u)}" target="_blank" rel="noopener">Voir la source</a>`:""}</div><div class="btns">${V2.lu?'<span class="pbok" style="margin:0">✔ Vous l’avez lue, merci</span>':V2.a?`<a class="btn gn" href="${esc(V2.a)}" target="_blank" rel="noopener">✅ J’ai lu – donner mon avis</a>`:""}</div></div>`:""}
   ${foot()}`}
+ // « ✍ Faire le bon » d'une intervention prévue : nouveau bon d'intervention prérempli (client, adresse, date) ; sans droit de bon → l'intervention
+ function tpBon(tid){const t=tpAll().find(z=>z.tid===tid);if(!t)return;if(!canBI())return tpStart(tid);BS=biNew();Object.assign(BS,{cn:t.c||"",ad:t.a||"",d:t.d||T});nav({v:"bls"})}
 
  // ---- interventions : état (signé dans l'application, ou sur ce téléphone), regroupement, ligne, fiche
  // ---- le bon de livraison EN IMAGES (pages rendues par TOPAS Formation), gardé dans le téléphone pour fonctionner hors connexion
@@ -1316,6 +1399,10 @@ const hMin=h=>{const m=/^(\d\d):(\d\d)$/.exec(String(h||""));return m?(+m[1])*60
   const W=web.map(([i,t,u])=>`<a class="ve-w" href="${esc(u)}" target="_blank" rel="noopener" data-web><i aria-hidden="true">${i}</i><span><b>${esc(t)}</b><small>${off?"connexion nécessaire":"s’ouvre dans le navigateur"}</small></span></a>`).join("");
   return `<div class="ve ve-l"><header class="ve-hd"><button type="button" class="ve-back" data-vbk="${ix}">‹ Retour</button><div class="ve-per">${esc(f.c||"")}</div><h1 class="ve-lt">📚 Supports</h1><div class="ve-sub">${esc(f.t||"")}</div></header>
   <div class="ve-in">${W||sup.length?W+(sup.length?`<h2 class="ve-ou">Fichiers du programme</h2><div class="ip-supl">${sup.map((u,i)=>supRow(u,f,i,ix)).join("")}</div>`:""):`<p class="ve-empty">Aucun support pour cette formation.</p>`}</div></div>`}
+ // un stagiaire : signer (ou noter absent) — même écran de signature ; feuille déjà complète → nouvelle version (emResume)
+ function vSg1(ix,day,part,ab,i){const f=D.f[ix],nm=String(((f.tr||[])[i]||[])[0]||"").trim(),prev=latest(f.n,"em",day,part);if(f.clo)return flash("Dossier clôturé par TOPAS : lecture seule.");
+  if(prev&&Array.isArray(prev.ef)&&!(prev.e||[]).some(z=>z&&z.lt))emResume(ix,day,part,nm);else{startSign(ix,"em",day,part);const k=SG.steps.findIndex(s=>!s.tr&&s.nm===nm);if(k>=0){SG.i=k;view()}}
+  if(ab)setTimeout(()=>{const a=document.getElementById("abs");if(a)a.click()},40)}
  function veBind(){
   document.querySelectorAll("[data-vday]").forEach(b=>b.onclick=()=>{const [ix,d]=b.dataset.vday.split(":");VDAY[ix]=d;const y=window.scrollY;view();window.scrollTo(0,y)});
   document.querySelectorAll("[data-veh]").forEach(b=>b.onclick=()=>{const [ix,day,part]=b.dataset.veh.split(":");nav({v:"eml",ix:+ix,day,part})});
@@ -1323,9 +1410,7 @@ const hMin=h=>{const m=/^(\d\d):(\d\d)$/.exec(String(h||""));return m?(+m[1])*60
   document.querySelectorAll("[data-vbk]").forEach(b=>b.onclick=()=>nav({v:"f",ix:+b.dataset.vbk}));
   document.querySelectorAll("[data-vb]").forEach(b=>b.onclick=()=>{const [ix,k]=b.dataset.vb.split(":");if(k==="der")return nav({v:"fd",ix:+ix});if(k==="sup")return nav({v:"fsup",ix:+ix});
    const z=document.querySelector(`[data-pbo="${ix}"][data-pbk="${k}"]`);if(!z)return;z.click();const fm=document.getElementById("pbf"+ix);if(fm&&!fm.classList.contains("hide"))fm.scrollIntoView({behavior:"smooth",block:"center"});document.querySelectorAll("[data-vb]").forEach(x=>x.classList.toggle("on",x===b&&fm&&!fm.classList.contains("hide")))});
-  const sg1=(ab,i)=>{const f=D.f[V.ix],nm=String(((f.tr||[])[i]||[])[0]||"").trim(),prev=latest(f.n,"em",V.day,V.part);if(f.clo)return flash("Dossier clôturé par TOPAS : lecture seule.");
-   if(prev&&Array.isArray(prev.ef)&&!(prev.e||[]).some(z=>z&&z.lt))emResume(V.ix,V.day,V.part,nm);else{startSign(V.ix,"em",V.day,V.part);const k=SG.steps.findIndex(s=>!s.tr&&s.nm===nm);if(k>=0){SG.i=k;view()}}
-   if(ab)setTimeout(()=>{const a=document.getElementById("abs");if(a)a.click()},40)};
+  const sg1=(ab,i)=>vSg1(V.ix,V.day,V.part,ab,i);
   document.querySelectorAll("[data-emone]").forEach(b=>b.onclick=()=>sg1(0,+b.dataset.emone));document.querySelectorAll("[data-emab]").forEach(b=>b.onclick=()=>sg1(1,+b.dataset.emab));
   document.querySelectorAll("[data-emall]").forEach(b=>b.onclick=()=>{const [ix,day,part]=b.dataset.emall.split(":"),f=D.f[+ix];if(f&&f.clo)return flash("Dossier clôturé par TOPAS : lecture seule.");const st=emSl(f,{day,part});if(st.k==="ok")emResume(+ix,day,part,null);else startSign(+ix,"em",day,part)});
   document.querySelectorAll("[data-emsum]").forEach(b=>b.onclick=()=>{const [ix,day,part]=b.dataset.emsum.split(":");emSum(+ix,day,part)});
@@ -1490,7 +1575,7 @@ const hMin=h=>{const m=/^(\d\d):(\d\d)$/.exec(String(h||""));return m?(+m[1])*60
  const tpDateOk=d=>{if(!/^\d{4}-\d\d-\d\d$/.test(d||"")||isNaN(Date.parse(d+"T12:00:00")))return false;const n=dd(T,d);return n>=-31&&n<=366};
  const uTP=t=>{const pd=!!(t.id&&pend(t.id)),an=t.et==="a",g=an?"sig":t.d===T?"auj":"ven",sub=[t.h?fH(t.h):"",tpDuT(t.du),t.o].filter(Boolean).join(" · ");
   const bi=!!t.bi,bn=/^BI-/.test(t.bi)&&biRecs().some(r=>r.n===t.bi)?t.bi:"",lab=an?'<span class="ip-tpl ip-tpl-x">Annulée</span>':'<span class="ip-tpl ip-tpl-me">＋ '+(bi?"Créé":"Créée")+' par vous</span><span class="ip-tpl ip-tpl-pl">📅 Au planning</span>'+(t.ad?'<span class="ip-tpl ip-tpl-ad">Annulation demandée</span>':"");
-  return {k:t.d+" "+(t.h||""),h:rowW(g,`<button type="button" class="row urow ip-row ip-tprow" ${bn?`data-bin="${esc(bn)}"`:`data-tpe="${esc(t.tid)}"`}>${dCol(t.d)}<span class="ip-c ul"><b class="uc" title="${esc(t.c)}">${esc(t.c)}</b><span class="ip-s m">${esc(sub)}</span><span class="ip-tpls">${lab}</span>${pd?`<span class="ip-s m ip-wait" data-pid="${esc(t.id)}">en attente d’envoi</span>`:""}</span><span class="ip-r"><span class="ip-rt"><span class="utag ui ip-tag">${bi?"Bon d’intervention":"Intervention"}</span></span></span></button>`,an||!t.a?"":mapA(t.c,t.a),t.c+" "+t.o)}};
+  return {m:{t:"tp",tid:t.tid,bn,d:t.d,hr:t.h||"",c:t.c||"",city:aCity(t.a),a:t.a||"",an,ok:an||!!t.bi,lab},k:t.d+" "+(t.h||""),todo:!(an||t.bi),h:rowW(g,`<button type="button" class="row urow ip-row ip-tprow" ${bn?`data-bin="${esc(bn)}"`:`data-tpe="${esc(t.tid)}"`}>${dCol(t.d)}<span class="ip-c ul"><b class="uc" title="${esc(t.c)}">${esc(t.c)}</b><span class="ip-s m">${esc(sub)}</span><span class="ip-tpls">${lab}</span>${pd?`<span class="ip-s m ip-wait" data-pid="${esc(t.id)}">en attente d’envoi</span>`:""}</span><span class="ip-r"><span class="ip-rt"><span class="utag ui ip-tag">${bi?"Bon d’intervention":"Intervention"}</span></span></span></button>`,an||!t.a?"":mapA(t.c,t.a),t.c+" "+t.o)}};
  // liste : Aujourd'hui / À venir à leur date ; passées ou annulées : groupe replié (60 derniers jours)
  function tpGroups(U){const up=(a,b)=>a.k.localeCompare(b.k),dn=(a,b)=>b.k.localeCompare(a.k),L=tpAll(),lim=(()=>{const x=new Date(Date.now()-60*864e5);return x.getFullYear()+"-"+p2(x.getMonth()+1)+"-"+p2(x.getDate())})();
   U.auj=U.auj.concat(L.filter(t=>t.et!=="a"&&t.d===T).map(uTP)).sort(up);U.ven=U.ven.concat(L.filter(t=>t.et!=="a"&&t.d>T).map(uTP)).sort(up);
@@ -1544,7 +1629,76 @@ const hMin=h=>{const m=/^(\d\d):(\d\d)$/.exec(String(h||""));return m?(+m[1])*60
  // (03/11, G) un seul bouton de création ＋ (vert d'eau, barre du bas) : il ouvre DIRECTEMENT le bon d'intervention ; le bon est aussi ajouté
 // au planning du technicien (dépôt « itp », même circuit que l'intervention créée par le technicien). Bouton flottant retiré (bloc F).
 const tpFab=()=>"";
- function view(){const faire=V.v==="it"&&!!IT[V.ix]&&(blSt(IT[V.ix]).k==="faire"||(!!BS&&!BS.bi&&BS.ix===V.ix&&BS.step!=="form"));const h=V.v==="f"?formView(V.ix):V.v==="eml"?emlView():V.v==="evl"?evlView():V.v==="fd"?fdView():V.v==="fsup"?fsupView():V.v==="sign"?signView():V.v==="ev"?evView():V.v==="acq"?acqView():V.v==="bil"?bilView():V.v==="it"?itView(V.ix):V.v==="bls"?blView():V.v==="bid"?biView(V.n):V.v==="tp"?tpView():listView(),nb=(V.v==="list"||V.v==="it"||V.v==="f"||V.v==="bid"||V.v==="eml"||V.v==="evl"||V.v==="fd"||V.v==="fsup")&&!faire;app.innerHTML=h+(nb?navH():"");document.body.classList.toggle("ip-nb",nb);document.body.classList.toggle("ip-fx",!!document.querySelector(".ip-fix"));bind();tpBindAll()}
+ // ---- ORDINATEUR (05/11, maquette « A liste + détail ») : au-dessus de 1100 px de large seulement — le téléphone ne change pas.
+ // Même lien, mêmes données, mêmes dépôts : barre du haut (logo, « Espace formateur », Accueil / Signées / TOPAS, initiales + nom),
+ // colonne de gauche = la liste de l'accueil (À régulariser / Aujourd'hui / À venir, mêmes lignes), à droite le détail de la ligne choisie :
+ // formation (dkForm : jours en cases, Émargement de la demi-journée choisie, Évaluation des acquis, supports en pastilles, actions) ;
+ // tout le reste (bon de livraison, signature, listes, évaluation, bilan, déroulé, supports) = les écrans du téléphone, affichés à droite.
+ const DKW=1100,dkOn=()=>{try{return window.innerWidth>DKW}catch(e){return false}};let DKSIG=false,DKLAST=null;const DKH={};
+ function vHtml(){return V.v==="f"?formView(V.ix):V.v==="eml"?emlView():V.v==="evl"?evlView():V.v==="fd"?fdView():V.v==="fsup"?fsupView():V.v==="sign"?signView():V.v==="ev"?evView():V.v==="acq"?acqView():V.v==="bil"?bilView():V.v==="it"?itView(V.ix):V.v==="bls"?blView():V.v==="bid"?biView(V.n):V.v==="tp"?tpView():listView()}
+ // première ligne d'aujourd'hui (sinon à régulariser, sinon à venir) : choisie par défaut
+ function dkFirst(){const U=uGroups();for(const g of ["auj","reg","ven"])for(const o of U[g]||[]){const h=String(o.h||""),a=h.match(/data-f="(\d+)"/),b=h.match(/data-it="(\d+)"/),c=h.match(/data-bid="([^"]+)"/);
+  const i=[a,b,c].map(m=>m?m.index:1e9),k=Math.min(...i);if(k===1e9)continue;if(k===i[0])return{v:"f",ix:+a[1]};if(k===i[1])return{v:"it",ix:+b[1]};return{v:"bid",n:c[1]}}return null}
+ const dkIx=()=>V.v==="sign"&&SG?SG.ix:V.v==="acq"&&AQ?AQ.ix:V.v==="bil"&&BI?BI.ix:V.v==="ev"&&EV?EV.ix:/^(f|eml|evl|fd|fsup)$/.test(V.v)?V.ix:null;
+ function dkTop(){const ttl=shT&&!shF?"Espace intervenant":"Espace formateur",on=k=>k==="sig"?DKSIG:k==="home"&&!DKSIG;
+  const I=[["home","🏠","Accueil"],["sig","✓","Signées"],["topas","☎","TOPAS"]].concat(canBI()||canTP()?[["new","＋",canBI()?"Créer un bon":"Nouvelle intervention"]]:[]);
+  return `<header class="dk-top"><span class="dk-logo"><img src="logo.jpg" alt="TOPAS informatique"></span><b class="dk-ttl">${ttl}</b><nav class="dk-nav" aria-label="Navigation">${I.map(([k,i,t])=>`<button type="button" data-tab="${k}" class="dk-pill${on(k)?" on":""}"${on(k)?' aria-current="page"':""}><span aria-hidden="true">${i}</span> ${t}</button>`).join("")}</nav><span class="dk-me">${avH()}<span class="dk-nm">${esc(D.i||pr||"")}</span></span></header>`}
+ function dkList(){const U=uGroups(),G=[["reg","⏰ À régulariser"],["auj","Aujourd’hui"],["ven","À venir"]].concat(DKSIG?[["sig","✓ Signées"],["arc","🗄 Archives"]]:[]);
+  const H=G.filter(([k])=>(U[k]||[]).length).map(([k,t])=>`<section class="dk-g dk-g-${k}" id="s-u${k}"><details open><summary class="dk-gh">${t}${k==="reg"?` <span class="dk-gn">(${U[k].length})</span>`:""}</summary>${U[k].map(o=>o.h).join("")}</details></section>`).join("");
+  return H||`<p class="dk-empty">Rien de prévu pour le moment.</p>`}
+ // demi-journée sur ordinateur : vert fait, orange en cours, gris à venir, rouge en retard
+ function dkHalf(f,d,p){const sl={day:d,part:p};if(!SLOTS(f).some(o=>o.day===d&&o.part===p))return null;const st=emSl(f,sl),N=(f.tr||[]).length,lb=PARTL[p];
+  if(st.k==="ok")return{k:"ok",t:lb+" ✓ "+st.n+"/"+st.N};if(d<T)return{k:"late",t:lb+" à finir ›"};if(d>T)return{k:"later",t:lb+" à venir"};
+  const first=vEmHalves(f,d).find(x=>x.k==="now"),me=first&&first.lb===lb;return st.k==="part"||me?{k:"now",t:lb+" "+(st.k==="part"?st.n:0)+"/"+N+" ›"}:{k:"later",t:lb+" plus tard"}}
+ function dkSel(f,ix){const S=SLOTS(f),cur=DKH[ix];if(cur&&S.some(o=>o.day===cur.day&&o.part===cur.part))return cur;
+  const ok=o=>emSl(f,o).k==="ok",a=S.find(o=>o.day===T&&!ok(o))||vLate(f)||S.find(o=>o.day===T)||S.find(o=>!ok(o))||S[0]||null;return a?{day:a.day,part:a.part}:null}
+ const dkAct=(f,o)=>!!(o&&!f.clo&&o.day<=T&&emSl(f,o).k!=="ok");
+ function dkEm(f,ix,o){if(!o)return `<div class="dk-box"><h3>✍ Émargement</h3><p class="dk-mu">Dates à définir.</p></div>`;
+  const d=o.day,p=o.part,st=emSl(f,o),tr=(f.tr||[]).map(x=>String(x[0]||"").trim()).filter(Boolean),r=latest(f.n,"em",d,p),E=r?(Array.isArray(r.ef)?r.ef:(r.e||[])):[],z=nm=>E.find(x=>x&&!x.tr&&x.nm===nm),lt=x=>x&&x.abs&&(x.lt||x.ab===EM_LT),fut=d>T,ro=!!f.clo;
+  const row=(nm,i)=>{const x=z(nm),s=!x||lt(x)?"todo":x.abs?"abs":"ok";return `<div class="dk-er"><span>${esc(nm)}</span>${s==="ok"?`<span class="dk-ok">✓ signé</span>`:s==="abs"?`<span class="dk-ab">absent${x.ab?" · "+esc(x.ab):""}</span>`:ro||fut?`<span class="dk-mu">${fut?"à venir":"à signer"}</span>`:`<span class="dk-erb"><button type="button" class="dk-sg" data-dkone="${ix}:${i}">Signer</button><button type="button" class="dk-abb" data-dkab="${ix}:${i}">Absent</button></span>`}</div>`};
+  const MX=8,more=tr.length>MX?tr.length-(MX-1):0,L=more?tr.slice(0,MX-1):tr,all=st.k==="ok"&&!tr.some(n=>{const x=z(n);return !x||lt(x)});
+  const foot=ro?`<span class="dk-mu">🔒 Dossier clôturé : lecture seule</span>`:fut?`<span class="dk-mu">Se signe le jour même · vous en dernier</span>`:all?`<span class="dk-mu">Tout le monde a signé</span><button type="button" class="dk-lk" data-emsum="${ix}:${d}:${p}">Voir le détail ›</button>`:`<span class="dk-mu">${more?"+ "+more+" autre"+(more>1?"s":"")+" · ":""}vous en dernier</span><button type="button" class="dk-lk dk-lk-or" data-emall="${ix}:${d}:${p}">continuer ›</button>`;
+  return `<div class="dk-box"><h3>✍ Émargement — ${esc(vD(d,{weekday:"long"}))} ${p==="m"?"matin":"après-midi"}${d!==T?" "+esc(vNo(d)):""}</h3>${tr.length?L.map(row).join(""):`<p class="dk-mu">Aucun stagiaire inscrit.</p>`}<div class="dk-ef">${foot}</div></div>`}
+ function dkEv(f,ix){const tr=f.tr||[],ro=!!f.clo,E=vEvs(f),cell=(x,ty,lb)=>{const t=x.k==="ok"?x.t.replace(/^✓ /,"✓ "):x.k==="no"?"aucun stagiaire":x.k==="later"?x.t:(x.n0||0)+"/"+x.n+" · "+(x.n-(x.n0||0))+" à faire ›";
+   return `<div class="dk-er"><span>${lb}</span>${x.k==="no"?`<span class="dk-mu">${t}</span>`:`<button type="button" class="dk-lk dk-ev-${x.k}" data-vev="${ix}:${ty}">${esc(t)}</button>`}</div>`};
+  const bil=(f.cl||[]).find(z=>z[0]==="bilan"),br=BIL(f),bilOk=!!(bil&&bil[1])||!!br,last=DS(f).slice(-1)[0]||"",bilOpen=!ro&&(bilOk||emgAll(f)||(last&&last<=T));
+  const bl=bilOk?`<span class="dk-ok">✓ envoyé${br?" le "+esc(dm(br.dl)):f.bilr?" le "+esc(dm(f.bilr)):""}</span>`:bilOpen?`<button type="button" class="dk-lk dk-lk-or" data-bil="${ix}">à remplir ›</button>`:`<span class="dk-mu">en fin de formation</span>`;
+  return `<div class="dk-box"><h3>📝 Évaluation des acquis</h3>${cell(E[0],"av","Avant la formation")}${cell(E[1],"ap","Après la formation")}<div class="dk-er"><span>Bilan du formateur</span>${bl}</div></div>`}
+ function dkSup(f,ix){const sup=Array.isArray(f.sup)?f.sup:[],sp=String(f.sp||"").trim(),pu=String(f.spu||"").trim(),C=[`<button type="button" class="dk-chip" data-vb="${ix}:der">📄 Déroulé de la formation</button>`];
+  if(/^https?:\/\//i.test(sp))C.push(`<a class="dk-chip" href="${esc(sp)}" target="_blank" rel="noopener" data-web>🔗 Support du dossier</a>`);
+  if(/^https:\/\//i.test(pu)&&pu!==sp)C.push(`<a class="dk-chip" href="${esc(pu)}" target="_blank" rel="noopener" data-web>🌐 Page TOPAS – ${esc(f.t||"supports")}</a>`);
+  if(/^https:\/\//i.test(f.spv||""))C.push(`<a class="dk-chip" href="${esc(f.spv)}" target="_blank" rel="noopener" data-web>▶ Vidéo – la facture électronique</a>`);
+  sup.forEach((u,i)=>C.push(`<button type="button" class="dk-chip" data-sup="${ix}:${i}">📎 ${esc(u.t||u.n||"Fichier")}</button><span class="dk-supst" id="supst${ix}-${i}" role="status"></span>`));
+  return `<section class="dk-sups"><h4>📚 Supports de cours</h4><div class="dk-chips">${C.join("")}</div>${sup.length+(C.length-1)?"":`<p class="dk-mu">Aucun support pour cette formation.</p>`}</section>`}
+ function dkForm(ix){const f=D.f[ix];if(!f)return "";const tr=f.tr||[],L=DS(f),o=dkSel(f,ix),sel=o||{},ro=!!f.clo;
+  const per=L.length>1?"du "+vD(L[0],{day:"numeric"})+(L[0].slice(0,7)!==L[L.length-1].slice(0,7)?" "+vD(L[0],{month:"long"}):"")+" au "+vD(L[L.length-1],{day:"numeric",month:"long"}):L.length?vD(L[0],{weekday:"long",day:"numeric",month:"long"}):"dates à définir";
+  const days=L.map((d,j)=>`<div class="dk-day${d===T?" dk-auj":""}"><div class="dk-dh"><b>${esc(vWd(d))}. ${esc(vNo(d))}${d===T?" · auj.":""}</b><small>jour ${j+1}</small></div>${["m","a"].map(p=>{const x=dkHalf(f,d,p);return x?`<button type="button" class="dk-hp dk-hp-${x.k}${sel.day===d&&sel.part===p?" on":""}" data-dkh="${ix}:${d}:${p}" aria-pressed="${sel.day===d&&sel.part===p}">${esc(x.t)}</button>`:""}).join("")}</div>`).join("");
+  const A=dkAct(f,o)?o:SLOTS(f).find(z=>dkAct(f,z))||null,E=vEvs(f),evT=E.findIndex(x=>x.k==="now");
+  const bil=(f.cl||[]).find(z=>z[0]==="bilan"),bilOk=!!(bil&&bil[1])||!!BIL(f),last=L[L.length-1]||"";
+  const main=ro?"":A?`<button type="button" class="dk-main" data-emall="${ix}:${A.day}:${A.part}">✍ Faire émarger ${A.part==="m"?"le matin":"l’après-midi"}${A.day!==T?" du "+esc(dm(A.day)):""}</button>`:evT>=0?`<button type="button" class="dk-main" data-vev="${ix}:${evT?"ap":"av"}">📝 Évaluation ${evT?"après":"avant"} la formation</button>`:!bilOk&&last&&last<=T?`<button type="button" class="dk-main" data-bil="${ix}">📝 Remplir mon bilan</button>`:"";
+  return `${f.tst?`<div role="status" class="dk-tst">🧪 TEST — dossier de test : tout fonctionne, les mails partent vers l’adresse de test</div>`:""}<div class="dk-f">
+  <div class="dk-fh"><div><h1>${esc(f.c||"Client")}</h1><p>${esc(f.t||"Formation")} · ${vNbS(tr.length)} · ${esc(per)}${f.a?` · 📍 ${esc(f.a)}`:""}</p></div>${f.a?`<a class="dk-map" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(String(f.c||"")+" "+f.a)}" target="_blank" rel="noopener">🧭 Itinéraire</a>`:""}</div>
+  <div id="qbn">${bannerHtml()}</div>
+  ${ro?`<div class="qb qk" role="status"><b>🔒 Dossier clôturé par TOPAS informatique le ${esc(f.clo)}</b><span>Les pièces de cette formation ne sont plus modifiables ; un envoi reçu après la clôture est rangé en version, sans changer le dossier.</span></div>`:""}
+  ${vLateBan(f,ix)}${L.length?`<h4 class="dk-lbl">Les jours</h4><div class="dk-days">${days}</div>`:""}
+  <div class="dk-2">${dkEm(f,ix,o)}${dkEv(f,ix)}</div>${dkSup(f,ix)}
+  <div class="dk-acts">${main}${ro?"":`<button type="button" class="dk-sec" data-vb="${ix}:rem">✎ Remarque</button>${phOn()?`<button type="button" class="dk-sec" data-dkph="${ix}">📷 Photos</button>`:""}<button type="button" class="dk-sec dk-sec-pb" data-vb="${ix}:pb">⚠ Signaler</button>`}</div>
+  <div class="ve-more">${pbZone(f,ix)}${fphZone(f,ix)}</div></div>`}
+ function dkView(){if(V.v==="list"){const r=dkFirst();if(r){V=r;try{history.replaceState({v:V},"")}catch(e){}}}
+  const right=V.v==="list"?`<p class="dk-empty">Choisissez une formation ou un bon dans la liste.</p>`:V.v==="f"?dkForm(V.ix):vHtml();
+  app.innerHTML=`<div class="dk">${dkTop()}<div class="dk-b"><aside class="dk-l" aria-label="Mes formations et interventions"><div class="dk-srch"><input type="search" id="dksrch" class="dk-in" placeholder="🔍 Rechercher un client, une formation…" aria-label="Rechercher un client, une formation" autocomplete="off"></div><div class="dk-ls">${dkList()}</div></aside><main class="dk-r" id="dkr">${right}</main></div></div>`;
+  document.body.classList.add("ip-dk");document.body.classList.remove("ip-nb");document.body.classList.toggle("ip-fx",!!document.querySelector(".ip-fix"));DKLAST=true;
+  // ligne choisie surlignée
+  const ix=dkIx(),q=V.v==="it"?`.dk-l .row[data-it="${V.ix}"]`:V.v==="bid"?`.dk-l .row[data-bid="${String(V.n||"").replace(/"/g,"")}"]`:ix!=null?`.dk-l .row[data-f="${ix}"]`:"";
+  if(q){const r=document.querySelector(q);if(r){const w=r.closest(".ip-rw")||r;w.classList.add("dk-on");r.setAttribute("aria-current","true")}}
+  bind();tpBindAll();dkBind()}
+ function dkBind(){const s=document.getElementById("dksrch");if(s)s.oninput=()=>{const t=nrm(s.value);document.querySelectorAll(".dk-l .ip-rw").forEach(w=>w.classList.toggle("hide",!!t&&!nrm(w.dataset.q||"").includes(t)))};
+  document.querySelectorAll("[data-dkh]").forEach(b=>b.onclick=()=>{const [ix,day,part]=b.dataset.dkh.split(":");DKH[ix]={day,part};const y=document.getElementById("dkr").scrollTop;view();const r=document.getElementById("dkr");if(r)r.scrollTop=y});
+  document.querySelectorAll("[data-dkone],[data-dkab]").forEach(b=>b.onclick=()=>{const ab=!!b.dataset.dkab,[ix,i]=(b.dataset.dkone||b.dataset.dkab).split(":").map(Number),f=D.f[ix],o=dkSel(f,ix);if(o)vSg1(ix,o.day,o.part,ab,i)});
+  document.querySelectorAll("[data-dkph]").forEach(b=>b.onclick=()=>{const z=document.getElementById("fph"+b.dataset.dkph);if(z){z.scrollIntoView({behavior:"smooth",block:"center"});z.classList.add("dk-flash");setTimeout(()=>z.classList.remove("dk-flash"),1600)}})}
+ // passage ordinateur ↔ téléphone (fenêtre redimensionnée) : nouvel affichage seulement quand on franchit 1100 px
+ window.addEventListener("resize",()=>{clearTimeout(window._dkT);window._dkT=setTimeout(()=>{if(DKLAST===null)return;if(dkOn()!==DKLAST){if(!dkOn())document.body.classList.remove("ip-dk");view()}},150)});
+ function view(){if(dkOn())return dkView();if(DKLAST!==null)DKLAST=false;const faire=V.v==="it"&&!!IT[V.ix]&&(blSt(IT[V.ix]).k==="faire"||(!!BS&&!BS.bi&&BS.ix===V.ix&&BS.step!=="form"));const h=vHtml(),nb=(V.v==="list"||V.v==="it"||V.v==="f"||V.v==="bid"||V.v==="eml"||V.v==="evl"||V.v==="fd"||V.v==="fsup")&&!faire;app.innerHTML=h+(nb?navH():"");document.body.classList.toggle("ip-nb",nb);document.body.classList.toggle("ip-fx",!!document.querySelector(".ip-fix"));bind();tpBindAll()}
  const CDO={};
  function bind(){
   document.querySelectorAll("details.ip-cd").forEach(d=>{if(CDO[d.id])d.open=true;d.ontoggle=()=>{CDO[d.id]=d.open}});
@@ -1561,7 +1715,7 @@ const tpFab=()=>"";
   const fin=document.getElementById("fin");if(fin)fin.onclick=()=>{fin.disabled=true;finish()};
   if(V.v==="sign"&&SG&&!SG.done){if(SG.kd==="em")emBind();else if(!SG.recap)padInit()}
   if(BS&&(V.v==="bls"||(V.v==="it"&&!BS.bi&&BS.ix===V.ix&&(BS.step!=="form"||blSt(IT[V.ix]).k==="faire")))){if(BS.step==="form")blFormBind();else blBind()}
-  document.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>tabGo(b.dataset.tab));document.querySelectorAll("[data-blbon]").forEach(b=>b.onclick=()=>nav({v:"it",ix:BS.ix}));document.querySelectorAll("[data-blrep2]").forEach(b=>b.onclick=()=>blRepAsk(+b.dataset.blrep2));
+  document.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>tabGo(b.dataset.tab));document.querySelectorAll("[data-tpbon]").forEach(b=>b.onclick=()=>tpBon(b.dataset.tpbon));document.querySelectorAll("[data-ipn]").forEach(b=>b.onclick=()=>{const z=document.getElementById("s-ureg")||document.getElementById("s-uauj");if(z)z.scrollIntoView({behavior:"smooth",block:"start"})});document.querySelectorAll("[data-blbon]").forEach(b=>b.onclick=()=>nav({v:"it",ix:BS.ix}));document.querySelectorAll("[data-blrep2]").forEach(b=>b.onclick=()=>blRepAsk(+b.dataset.blrep2));
   document.querySelectorAll("[data-it]").forEach(b=>b.onclick=()=>nav({v:"it",ix:+b.dataset.it}));document.querySelectorAll("[data-bid]").forEach(b=>b.onclick=()=>nav({v:"bid",n:b.dataset.bid}));
   document.querySelectorAll("[data-blns]").forEach(b=>b.onclick=()=>blNsAsk(+b.dataset.blns));
   // lot BL 3/3 : « ✎ Faire signer » (ouvre le bon, écran unique), « ✎ Faire émarger » / « Déroulé » (formation), « Faire signer quand même » (bon à venir), recherche des signées
