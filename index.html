@@ -256,12 +256,60 @@ function emgsPage(D){const app=$("#app"),G=Array.isArray(D.g)?D.g:[],org=G[0]||"
   const f=$("#sgform");if(f)f.remove();
   $("#res").innerHTML=okHtml();
   window.scrollTo(0,0)}}
+// ===== ✍ CONTRAT D'ABONNEMENT signé en ligne (12/11, Signature abonnements partie B) : lien court de type « abo » (90 jours).
+// Les pages du contrat sont des images lues par contrat_lire (seulement celles du lien, tant qu'il est actif). Le client lit, coche
+// « Lu et approuvé : contrat (page 1) et CGV (page 2) », signe (signature simple ou à la main), indique nom et fonction ; rien n'est
+// validé sans le clic final, « Signé » seulement après la réponse du serveur (sinon « Réessayer » + code de secours). Dépôt k:"abo".
+function aboPage(D){const app=$("#app"),id=new URLSearchParams(location.search).get("l")||"",G=Array.isArray(D.g)?D.g:[],org=G[0]||"",tel=G[2]||"",cm=D.m||G[3]||FB_MAIL,L=Array.isArray(D.L)?D.L:[],KEY="fpsig:abo:"+(D.ab||D.n||"")+":"+(D.v||1);
+ document.title="Contrat d’abonnement "+(D.n||"");let done=null;try{done=JSON.parse(localStorage.getItem(KEY)||"null")}catch(e){}
+ {const n=new Date(),p2=v=>String(v).padStart(2,"0"),T=n.getFullYear()+"-"+p2(n.getMonth()+1)+"-"+p2(n.getDate());
+  if(!done&&/^\d{4}-\d\d-\d\d$/.test(D.x||"")&&T>D.x){document.title="Lien expiré";app.innerHTML='<div class="card" id="expire"><h1>Ce lien a expiré</h1><p>Ce lien a expiré, contactez-nous : '+esc(org||"TOPAS informatique")+(cm?' – <a href="mailto:'+esc(cm)+'">'+esc(cm)+'</a>':'')+(tel?' – '+esc(tel):'')+'.</p><p style="color:#5b6475">Lien valable jusqu’au '+esc(fd(D.x))+'. Écrivez-nous pour recevoir un nouveau lien.</p></div>';return}}
+ const kt=k=>k==="manuscrite"?" · signature manuscrite":k==="simple"?" · signature électronique simple":"",nm0=String(D.nm||"").trim();
+ const info=`<div class="card emgs-c"><div class="emgs-h"><img src="logo.jpg" alt="" style="height:48px"><div><div class="emgs-o">${esc(org)}</div><h1 class="emgs-t">Contrat d’abonnement N° ${esc(D.n||"")} – signature en ligne</h1></div></div>
+  <table class="emgs-i"><tr><th>Client</th><td><b>${esc(D.c||"")}</b></td></tr>${D.s?`<tr><th>Service</th><td>${esc(D.s)}${D.ds&&D.ds!==D.s?"<br><small>"+esc(D.ds)+"</small>":""}</td></tr>`:""}${D.mt?`<tr><th>Montant</th><td>${esc(D.mt)}${D.ttc?" ("+esc(D.ttc)+")":""}</td></tr>`:""}${D.db?`<tr><th>Début</th><td>${esc(D.db)}</td></tr>`:""}</table>
+  <p class="mu" style="margin:6px 0 0">Lisez les ${L.length>1?L.length+" pages":"pages"} du contrat ci-dessous, puis signez en bas de la page.</p></div>
+  <div class="card abo-pgs">${L.length?L.map((u,i)=>`<figure class="abof" id="abof${i}"><figcaption>${esc(u.t||"Page "+(i+1))}</figcaption><div class="mu abos" role="status">⏳ Chargement de la page…</div></figure>`).join(""):"<p>Contrat indisponible.</p>"}</div>`;
+ const form=()=>`<div class="sgf noprint" id="sgform"><div class="sgf-h">✍ SIGNATURE ÉLECTRONIQUE — contrat d’abonnement N° ${esc(D.n||"")}</div>
+  <p class="sgf-mu">Indiquez votre prénom, votre nom et votre fonction : votre signature se compose toute seule, ou signez à la main.</p>
+  <div class="sgf-g"><div><label for="spr">Prénom</label><input type="text" id="spr" autocomplete="given-name" value="${esc(nm0.split(/\s+/)[0]||"")}"></div><div><label for="sno">Nom</label><input type="text" id="sno" autocomplete="family-name" value="${esc(nm0.split(/\s+/).slice(1).join(" "))}"></div></div>
+  <div><label for="sfn">Fonction</label><input type="text" id="sfn" autocomplete="organization-title" placeholder="ex. Gérant"></div>
+  <div id="sgw"></div>
+  <label class="chk"><input type="checkbox" id="ok"><span>Lu et approuvé : contrat (page 1) et CGV (page 2).</span></label>
+  <div class="err" id="err" role="alert"></div>
+  <button class="go" id="go" type="button" disabled>✍ Signer le contrat</button>
+  <p class="sgf-mu" id="abowait">Le bouton s’active quand toutes les pages du contrat sont affichées.</p>
+  <p class="sgf-mu">Les informations saisies sont transmises uniquement à ${esc(org)}. Cette signature électronique simple vaut signature du contrat.</p></div>`;
+ const okHtml=()=>`<div class="card okb noprint" id="abo-ok"><div class="okt">✔ Merci, votre contrat est signé !</div><p>${esc(org)} a bien reçu votre signature. Vous recevrez votre exemplaire signé par e-mail.</p><div class="sgfm">✅ Signé électroniquement par ${esc(done.nm)}${done.fn?" ("+esc(done.fn)+")":""} le ${esc(done.tsl)}${done.rf?" · réf. "+esc(done.rf):""}${kt(done.sk)} · Lu et approuvé : contrat (page 1) et CGV (page 2)</div>${done.sg?sigSvg(done.sg):""}<p>Vous pouvez fermer cette page.</p></div>`;
+ app.innerHTML=info+(done?okHtml():form())+'<div id="res"></div>';
+ let nOk=0;const ready=()=>{const g=$("#go"),w=$("#abowait");if(g&&nOk===L.length&&L.length){g.disabled=false;if(w)w.remove()}};
+ L.forEach(async(u,i)=>{const f=document.getElementById("abof"+i),st=f&&f.querySelector(".abos");if(!st)return;if(!u.cle||!id){st.textContent="Page indisponible.";return}
+  try{let a=0,P=[],h=null;for(;;){const r=await fetch(SBU+"/rest/v1/rpc/contrat_lire",{method:"POST",headers:{apikey:SBK,"Content-Type":"application/json"},body:JSON.stringify({p_lien:id,p_cle:u.cle,p_a:a,p_b:a+4})}),j=r.ok?await r.json():null;
+    if(!j||!j.ok){st.textContent=j&&j.etat==="expire"?"Ce lien a expiré.":"Page indisponible pour l’instant. Réessayez plus tard ou écrivez-nous"+(cm?" : "+cm:"")+".";return}h=j;(j.morceaux||[]).forEach(m=>{P[m.n]=m.b64});a+=5;if(a>=(+j.n||0))break}
+   if(P.filter(Boolean).length<(+h.n||0))throw 0;const t=atob(P.join("")),by=new Uint8Array(t.length);for(let k=0;k<t.length;k++)by[k]=t.charCodeAt(k);const url=URL.createObjectURL(new Blob([by],{type:h.type||"image/jpeg"}));
+   st.outerHTML=`<a href="${url}" target="_blank" rel="noopener" title="Agrandir la page"><img src="${url}" alt="${esc(u.t||"Page "+(i+1))}" class="aboimg"></a>`;nOk++;ready()}
+  catch(e){st.textContent="Page indisponible pour l’instant. Réessayez plus tard."}});
+ if(done)return;
+ const SW=window.SGW_CUR=SIGW.mount($("#sgw"),{name:()=>(($("#spr")||{}).value||"")+" "+(($("#sno")||{}).value||""),max:2200});["#spr","#sno"].forEach(k=>{const i=$(k);if(i)i.addEventListener("input",()=>SW.refresh())});try{SW.refresh()}catch(e){}
+ const ref=()=>{const a="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";let t="";try{const u=new Uint8Array(6);crypto.getRandomValues(u);u.forEach(x=>t+=a[x%a.length])}catch(e){for(let i=0;i<6;i++)t+=a[Math.floor(Math.random()*a.length)]}return "S-"+t};
+ $("#go").onclick=async()=>{const err=$("#err"),pr=$("#spr").value.trim().replace(/\s+/g," "),no=$("#sno").value.trim().replace(/\s+/g," "),fn=$("#sfn").value.trim().replace(/\s+/g," ").slice(0,80);err.textContent="";
+  if(!pr)return(err.textContent="Merci d’indiquer votre prénom.",$("#spr").focus());
+  if(no.length<2)return(err.textContent="Merci d’indiquer votre nom.",$("#sno").focus());
+  if(!SW||SW.empty())return err.textContent=SW&&SW.mode()==="draw"?"Merci de signer dans le cadre (ou choisissez « ✍ Signature simple »).":"Merci d’indiquer votre prénom et votre nom.";
+  if(!$("#ok").checked)return err.textContent="Merci de cocher « Lu et approuvé : contrat (page 1) et CGV (page 2) ».";
+  const go=$("#go");go.disabled=true;go.textContent="Envoi en cours…";const nm=pr+" "+no.toLocaleUpperCase("fr-FR");
+  const now=new Date(),p2=n=>String(n).padStart(2,"0"),dl=now.getFullYear()+"-"+p2(now.getMonth()+1)+"-"+p2(now.getDate()),hl=p2(now.getHours())+":"+p2(now.getMinutes());
+  const payload={t:"fp-sign",k:"abo",ab:D.ab||"",n:D.n||"",v:+D.v||1,nm,pr,no,fn,dl,hl,tsl:fd(dl)+" à "+hl,sg:SW.get(),sm:SW.how(),sk:SW.kind(),rf:ref(),lu:1},code="FPSIG:"+b64u(payload);
+  let ok=false;if(D.t){try{ok=!!(await sbDep(D.t,payload))}catch(e){ok=false}}
+  if(!ok){go.disabled=false;go.textContent="✍ Signer le contrat";$("#res").innerHTML=`<div class="card noprint" id="sigko" style="border-color:var(--ko)" role="alert"><div class="okt" style="color:var(--ko)">Signature non transmise : rien n’a été envoyé</div><p>Le serveur n’a pas répondu : le contrat n’est pas signé. Vérifiez votre connexion puis réessayez ; sinon utilisez le code de secours ci-dessous.</p><button class="go" id="retry" type="button">↻ Réessayer</button>${fbHtml(code,"Contrat signé – "+(D.n||"")+" – "+nm,"Bonjour,\n\n"+nm+" a signé en ligne le contrat d’abonnement N° "+(D.n||"")+" ("+(D.c||"")+"), mais l’envoi automatique a échoué. Voici le code de signature :\n\n")}</div>`;const rt=$("#retry");if(rt)rt.onclick=()=>{$("#res").innerHTML="";go.click()};return}
+  done={nm,fn,tsl:payload.tsl,sg:payload.sg,rf:payload.rf,sk:payload.sk};try{localStorage.setItem(KEY,JSON.stringify(done))}catch(e){}
+  const f=$("#sgform");if(f)f.remove();$("#res").innerHTML=okHtml();window.scrollTo(0,0)}}
 let D=null;
 try{D=await lnLoad()||await load(oldHash())}catch(e){if(e&&e.lien){lnDead($("#app"),e.lien);return}D=null}
 if(D&&typeof D==="object"&&D.m)FB_MAIL=String(D.m).trim();if(D&&typeof D==="object"&&D.tst)tstBanPub();/* 03/11 : dossier de test */
 if(D&&D.k==="sup"){supPage(D);return}
 if(D&&D.k==="ph"){phPage(D);return}
 if(D&&D.k==="emgs"){emgsPage(D);return}
+if(D&&D.k==="abo"){aboPage(D);return}
 const app=$("#app");
 if(!D||!D.n||!D.g){app.innerHTML='<div class="card"><h1>Lien incomplet</h1><p>Ce lien de signature est incomplet ou a été modifié. Merci de rouvrir le lien reçu par e-mail, tel quel, ou de contacter l’organisme de formation.</p></div>';return}
 const plan=D.k==="plan",dev=D.k==="dev",ro=!!D.ro,G=D.g,C=D.c||D.cl||["","",""],tr=D.tr||[];
@@ -616,6 +664,7 @@ try{fetch(SBU+"/rest/v1/rpc/mention_rgpd",{method:"POST",headers:{apikey:SBK,"Co
 /* audit lot C3 (01/11) : convention, planification et devis lisibles au téléphone — 13 px au moins, une colonne ; l'impression A4 ne change pas (règles écran seulement) */
 @media screen and (max-width:700px),screen and (hover:none) and (pointer:coarse) and (max-width:1100px){.cv,.cv .ad,.cv .ft,.cv .px td,.cv .px .hd td,.pln,.dvc,.dvc th,.dvc td,.dvc .in,.dvc .lb,.dvc .bx,.dvc .rg,.dvc .ac,.dvc .ft,.dvc .eb h4,.cv small,.pln small,.dvc small{font-size:13px}.cv [style*="font-size:9"],.cv [style*="font-size:10"],.cv [style*="font-size:11"],.cv [style*="font-size:12"],.pln [style*="font-size:9"],.pln [style*="font-size:10"],.pln [style*="font-size:11"],.pln [style*="font-size:12"],.dvc [style*="font-size:9"],.dvc [style*="font-size:10"],.dvc [style*="font-size:11"],.dvc [style*="font-size:12"]{font-size:13px!important}.cv .hg,.cv .sg,.cv .trg,.pln .hg2,.pln .g2,.pln .rw,.dvc .g2,.dvc .st,.dvc .fin{grid-template-columns:1fr}.cv .r{grid-template-columns:1fr;gap:0}.dvc .hd{flex-direction:column}.dvc .ti{text-align:left}}
 /* émargement d'une demi-journée signé en ligne par un stagiaire (01/11) */
+@media (max-width:700px),(hover:none) and (pointer:coarse) and (max-width:1100px){.okb .sgfm{font-size:14px}}.abo-pgs{display:grid;gap:14px}.abof{margin:0}.abof figcaption{font-weight:700;color:#12308f;margin:0 0 6px}.aboimg{width:100%;height:auto;display:block;border:1px solid #cbd5e1;border-radius:6px;background:#fff}.abos{padding:16px;border:1px dashed #cbd5e1;border-radius:6px}
 .emgs-h{display:flex;gap:12px;align-items:center;margin-bottom:10px}.emgs-o{font-weight:700;color:#12308f}.emgs-t{font-size:20px;font-weight:800;margin:0}.emgs-i{width:100%;border-collapse:collapse;margin:8px 0 4px}.emgs-i th{text-align:left;padding:6px 8px;width:130px;color:#5b6475;font-weight:600;vertical-align:top}.emgs-i td{padding:6px 8px}.emgs-i tr+tr th,.emgs-i tr+tr td{border-top:1px solid #e5e7eb}@media (max-width:700px),(hover:none) and (pointer:coarse) and (max-width:1100px){.emgs-i th{width:105px;font-size:14px}.emgs-i td{font-size:15px}}
 </style>
 </body>
