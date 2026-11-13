@@ -413,6 +413,7 @@ body.ip-dk{background:#f1f3f9}body.ip-dk .w{max-width:none;margin:0;padding:0}
 .ip-vr-f{border-left-color:#7c3aed}.ip-vr-b{border-left-color:#0369a1}.ip-vr-i{border-left-color:#0f766e}.ip-vrw .ip-vr{flex:1;min-width:0;box-shadow:none;background:none}.ip-vrw .ip-afm{flex:none;min-height:44px;padding:0 14px;border-radius:99px;display:inline-flex;align-items:center;font:700 15px system-ui,sans-serif;text-decoration:none}
 .ip-vx{margin:6px 4px 0;font-size:14px;color:#4b5563}
 @media (max-width:420px){.ip-afa{margin-left:0}.ip-afhr{flex-basis:62px;font-size:22px}}
+#espapp .devcode{font-size:14px;color:#475569}#espapp .devcode b{letter-spacing:.08em;color:#0f172a}
 </style>
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
@@ -487,7 +488,12 @@ const SIGW=(()=>{
  return {mount,compose,toSg,styles:ST}})();
 /*/SIGW*/
 const SBU="https://kbfnxqyxqualmqhiufnq.supabase.co",SBK="sb_publishable_5vjNCP7zREh5upGu_pTAIA_mgUPG8Cx";
-const sbDep=(c,p)=>fetch(SBU+"/rest/v1/rpc/deposer",{method:"POST",headers:{apikey:SBK,"Content-Type":"application/json"},body:JSON.stringify({p_canal:c,p_data:p})}).then(r=>{if(!r.ok)throw 0;return 1});
+// LOT SÉCURITÉ (13/11) : avec l'adresse personnelle (?e=jeton), chaque dépôt passe par espace_deposer : la base vérifie le jeton, le téléphone
+// (autorisé par TOPAS) et que le bon / la formation est bien dans la liste de cet espace ; l'heure qui fait foi est celle de la base (srv, gardée par dépôt).
+// Un refus (téléphone non autorisé, accès bloqué) laisse le dépôt dans la file d'envoi : rien n'est perdu, il part quand l'accès est rétabli.
+const SRVK="fpiv:srv";
+const sbDep=(c,p)=>window.__EJ?fetch(SBU+"/rest/v1/rpc/espace_deposer",{method:"POST",headers:{apikey:SBK,"Content-Type":"application/json"},body:JSON.stringify({p_jeton:window.__EJ,p_app:window.__DEVID(),p_data:p})}).then(async r=>{if(!r.ok)throw 0;const j=await r.json().catch(()=>null);if(j&&j.ok===false)throw 0;if(j&&j.srv)try{const S0=LS.get(SRVK,{})||{};S0[String(p.id||"")]=j.srv;const K=Object.keys(S0);if(K.length>300)K.slice(0,K.length-300).forEach(k=>delete S0[k]);LS.set(SRVK,S0)}catch(e){}return 1})
+ :fetch(SBU+"/rest/v1/rpc/deposer",{method:"POST",headers:{apikey:SBK,"Content-Type":"application/json"},body:JSON.stringify({p_canal:c,p_data:p})}).then(r=>{if(!r.ok)throw 0;return 1});
 let FB_MAIL=""; // adresse ADV reçue avec le lien (fiche Gestionnaire) ; rien en dur (lot 7 du 31/10)
 // Secours si le dépôt Supabase échoue : code à coller dans TOPAS Formation (« Coller un code ») + e-mail préparé que la personne envoie elle-même (aucun service tiers)
 function fbHtml(code,subj,intro){const E=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])),mt="mailto:"+FB_MAIL+"?subject="+encodeURIComponent(subj)+"&body="+encodeURIComponent(intro+"\n\n"+code+"\n");
@@ -589,7 +595,7 @@ function espTok(){const q=new URLSearchParams(location.search),e=q.get("e");if(e
  if(e!=null)return e;if(!q.get("l")&&!location.hash.replace(/^#/,"")){const s=LS.get(EK,"");if(s&&/^[A-Za-z0-9_-]{32,80}$/.test(s))return s}return ""}
 async function espLoad(tok){let j=null,net=false;
  try{const ac=window.AbortController?new AbortController():null,tm=setTimeout(()=>{try{ac&&ac.abort()}catch(e){}},9000);
-  const r=await fetch(SBU+"/rest/v1/rpc/espace_lire",{method:"POST",headers:{apikey:SBK,"Content-Type":"application/json"},body:JSON.stringify({p_jeton:tok}),signal:ac?ac.signal:undefined,cache:"no-store"});clearTimeout(tm);j=r.ok?await r.json():null;net=!r.ok&&r.status>=500}
+  const r=await fetch(SBU+"/rest/v1/rpc/espace_lire",{method:"POST",headers:{apikey:SBK,"Content-Type":"application/json"},body:JSON.stringify({p_jeton:tok,p_app:devId()}),signal:ac?ac.signal:undefined,cache:"no-store"});clearTimeout(tm);j=r.ok?await r.json():null;net=!r.ok&&r.status>=500}
  catch(e){net=true}
  if(j&&j.ok&&j.data&&typeof j.data==="object"){const n=new Date(),at=p2(n.getDate())+"/"+p2(n.getMonth()+1)+" à "+p2(n.getHours())+":"+p2(n.getMinutes());
   // (03/11 midi) la liste reçue REMPLACE la copie du téléphone ; seule exception : un bon signé / envoyé sur ce téléphone et pas encore transmis (file d'envoi)
@@ -597,16 +603,28 @@ async function espLoad(tok){let j=null,net=false;
   try{const old=LS.get(EDK,null),qi=new Set((LS.get(QK0(),[])||[]).filter(p=>p&&/^bl|^bi/.test(String(p.k||""))).map(p=>String(p.it||p.i||""))),nw=Array.isArray(j.data.it)?j.data.it:(j.data.it=[]);
    if(old&&old.D&&Array.isArray(old.D.it))old.D.it.forEach(x=>{if(x&&x.i&&qi.has(String(x.i))&&!nw.some(y=>y&&y.i===x.i))nw.push(Object.assign({},x,{kp:1}))})}catch(e){}
   LS.set(EDK,{at,tok,D:j.data,maj:j.maj||""});MAJ=j.maj||"";
-  try{fetch(SBU+"/rest/v1/rpc/espace_appareil",{method:"POST",headers:{apikey:SBK,"Content-Type":"application/json"},body:JSON.stringify({p_jeton:tok,p_app:devId()})}).catch(()=>{})}catch(e){}return{D:j.data,hors:""}}
+  return{D:j.data,hors:""}}
+ // téléphone pas (encore) autorisé : le jeton est GARDÉ (l'accès peut être donné ou rétabli) ; en attente → rien n'est lisible ;
+ // refusé / retiré → effacement à distance des données de ce téléphone, sauf la file d'envoi (bons signés pas encore envoyés)
+ if(j&&j.ok===false&&j.etat==="appareil"){const a=String(j.appareil||"attente");if(a!=="attente")devWipe();else{try{localStorage.removeItem(EDK);localStorage.removeItem("fpiv:D")}catch(e){}}
+  throw Object.assign(new Error("espace"),{etat:"appareil",app:a})}
  if(j&&j.ok===false&&j.etat){try{const c0=LS.get(EDK,null);if(c0&&c0.D&&c0.D.m&&!FB_MAIL)FB_MAIL=String(c0.D.m).trim()}catch(e){}try{localStorage.removeItem(EDK);localStorage.removeItem(EK);localStorage.removeItem("fpiv:D")}catch(e){}
   if(j.etat==="bloque"){try{indexedDB.deleteDatabase("fpiv")}catch(e){}try{Object.keys(localStorage).filter(k=>/^fpiv:(E|D|inst)/.test(k)).forEach(k=>localStorage.removeItem(k))}catch(e){}}
   throw Object.assign(new Error("espace"),{etat:j.etat})}
  const c=LS.get(EDK,null);if(c&&c.D&&c.tok===tok)return{D:c.D,hors:c.at||"",maj:c.maj||""};
  throw Object.assign(new Error("espace"),{etat:net||!j?"reseau":"erreur"})}
+// effacement à distance (13/11) : copie de l'espace, signatures enregistrées, brouillons, bons d'origine ; la file d'envoi (fpiv:q:…) et
+// les photos qu'elle attend sont gardées pour partir dès que l'accès est rétabli ; l'adresse personnelle (jeton) et le code du téléphone aussi
+function devWipe(){let keepPh=false;try{Object.keys(localStorage).forEach(k=>{if(/^fpiv:q:/.test(k)){const q=LS.get(k,[]);if(Array.isArray(q)&&q.length)keepPh=true;return}
+  if(/^fpiv:(r:|d:|D$|srv$)/.test(k)||k===EDK)localStorage.removeItem(k)})}catch(e){}if(!keepPh){try{indexedDB.deleteDatabase("fpiv")}catch(e){}}}
+function devScreen(el,a){document.title="TOPAS Intervenants";const at=a==="attente",code=String(devId()).slice(-6).toUpperCase();
+ el.innerHTML='<div class="fc" id="espapp">'+(at?'<h3>📱 Demande envoyée à TOPAS</h3><p>C’est la première fois que votre espace s’ouvre sur ce téléphone. Pour votre sécurité, TOPAS informatique doit l’autoriser.</p><p>Dès que c’est fait, touchez « ↻ Vérifier maintenant » : votre espace s’affichera. Rien n’est lisible sur ce téléphone en attendant.</p>'
+  :'<h3>⛔ Ce téléphone n’est plus autorisé</h3><p>TOPAS informatique a retiré l’accès de ce téléphone à votre espace. Ses données ont été effacées de ce téléphone.</p><p>Les bons signés pas encore envoyés sont gardés : ils partiront dès que l’accès sera rétabli.</p>')
+  +'<p class="devcode">Code de ce téléphone : <b>'+code+'</b></p>'+(FB_MAIL?'<p>Contact : <a href="mailto:'+FB_MAIL+'">'+FB_MAIL+'</a></p>':'')+'<button type="button" class="btn" onclick="location.reload()">'+(at?'↻ Vérifier maintenant':'🔄 Réessayer')+'</button></div>'}
 function espDead(el,etat){const rs=etat==="reseau",bq=etat==="bloque";document.title="TOPAS Intervenants";el.innerHTML='<div class="fc" id="espko"><h3>'+(rs?"📴 Pas de connexion":bq?"⛔ Accès bloqué":"🔒 Ce lien n’est plus actif")+'</h3><p>'+(bq?"Votre accès à cet espace a été désactivé par TOPAS informatique et sa copie a été retirée de ce téléphone. Contactez TOPAS informatique"+(FB_MAIL?" : <a href=\"mailto:"+FB_MAIL+"\">"+FB_MAIL+"</a>":"")+".":rs?"Votre espace n’a pas encore été enregistré sur ce téléphone. Connectez-vous à Internet (Wi-Fi ou données mobiles) puis rouvrez-le : il restera ensuite disponible même sans réseau.":"Il a peut-être été réinitialisé (nouveau téléphone, téléphone perdu…) ou n’existe pas. Contactez TOPAS informatique pour recevoir votre nouvelle adresse personnelle"+(FB_MAIL?" : <a href=\"mailto:"+FB_MAIL+"\">"+FB_MAIL+"</a>":"")+".")+'</p>'+(rs?'<button type="button" class="btn" onclick="location.reload()">🔄 Réessayer</button>':"")+'</div>'}
 async function main(){
- let D=null,hors="";EJ=espTok();
- if(EJ){try{const r=await espLoad(EJ);D=r.D;hors=r.hors;if(r.maj)MAJ=r.maj}catch(e){espDead(app,e&&e.etat);return}
+ let D=null,hors="";EJ=espTok();try{window.__EJ=EJ;window.__DEVID=devId}catch(e){}/* (13/11) lus par sbDep (déclaré hors de cette portée) */
+ if(EJ){try{const r=await espLoad(EJ);D=r.D;hors=r.hors;if(r.maj)MAJ=r.maj}catch(e){if(e&&e.etat==="appareil"){devScreen(app,e.app);return}espDead(app,e&&e.etat);return}
   (Array.isArray(D.it)?D.it:[]).forEach(t=>{if(t&&t.pe&&t.i)t.pf="e:"+t.i+":"+(t.v||1)})}
  else try{D=await lnLoad()||await load(oldHash());if(D&&D.k==="iv")LS.set("fpiv:D",{at:nowS().dl+" "+nowS().hl,D})}catch(e){
   if(e&&e.lien&&e.lien!=="erreur"){lnDead(app,e.lien);return}
@@ -635,8 +653,10 @@ async function main(){
  const dueEm=f=>SLOTS(f).filter(sl=>sl.day<=T&&!emState(f,sl)).length;
  const stTxt=(x,what)=>x?(x.sent?`<span class="ok">✔ ${what||"Signé"} le ${esc(dm(x.r.dl))} à ${esc(x.r.hl)}${x.r.abs?` · ${x.r.abs} absent${x.r.abs>1?"s":""}`:""}</span>`:`<span class="wt">⏳ ${what||"Signé"} le ${esc(dm(x.r.dl))} à ${esc(x.r.hl)} · en attente d’envoi</span>`):"";
  let FP=null;
- function flush(){if(FP||!D.t)return FP||Promise.resolve();FP=(async()=>{await 0;try{for(const p of Q()){try{await(p.k==="ph"?phUp(p):sbDep(D.t,p))}catch(e){break}LS.set(QK,Q().filter(x=>!(x.id===p.id&&x.i===p.i)));banner()}}finally{FP=null;banner();try{if(V&&V.v==="f"&&!document.activeElement.matches("input,textarea"))view()}catch(e){}}})();return FP}
+ function flush(){if(FP||!D.t)return FP||Promise.resolve();FP=(async()=>{await 0;try{for(const p of Q()){try{await(p.k==="ph"?phUp(p):sbDep(D.t,p))}catch(e){break}LS.set(QK,Q().filter(x=>!(x.id===p.id&&x.i===p.i)));banner()}}finally{FP=null;banner();try{if(!FQ&&V&&V.v==="f"&&!document.activeElement.matches("input,textarea"))view()}catch(e){}}})();return FP}
  function enqueue(pls){const q=Q().concat(pls);if(!LS.set(QK,q))return false;flush();return true}
+ // (13/11) à l’ouverture avec du réseau : la file d’envoi part d’elle-même (ex. accès rétabli par TOPAS après un refus)
+ let FQ=false;setTimeout(()=>{try{if(navigator.onLine!==false&&Q().length&&!FP){FQ=true;flush().finally(()=>{FQ=false})}}catch(e){}},800);/* envoi silencieux : jamais de nouvel affichage pendant une saisie */
  let HOMEOK=false;
  // (05/11) heure de la liste reçue : « à 7h44 », ou « le 04/11 à 18h02 » si elle date d'un autre jour
  const majHM=()=>{const md=MAJ?new Date(MAJ):null;return md&&!isNaN(md)?(md.toDateString()===new Date().toDateString()?"":"le "+String(md.getDate()).padStart(2,"0")+"/"+String(md.getMonth()+1).padStart(2,"0")+" ")+"à "+md.getHours()+"h"+String(md.getMinutes()).padStart(2,"0"):""};
@@ -948,7 +968,7 @@ async function main(){
  const supDj=(f,dj)=>{if(!dj||dj==="all")return "";const m=/^j(\d+)([ma])$/.exec(dj);if(!m)return "";const d=DS(f)[+m[1]-1];return (d?fdm(d):"Jour "+m[1])+" · "+(m[2]==="m"?"matin":"après-midi")};
  async function supCached(u){if(!u.cle)return null;if(SUPB[u.cle])return SUPB[u.cle];const c=await IDB.get(u.cle,"sup");if(c&&c.b){SUPB[u.cle]=c.b;return c.b}return null}
  async function supFetch(u){if(!EJ||!u.cle)return null;let a=0,P=[],h=null;
-  for(;;){const r=await fetch(SBU+"/rest/v1/rpc/espace_fichier",{method:"POST",headers:{apikey:SBK,"Content-Type":"application/json"},body:JSON.stringify({p_jeton:EJ,p_cle:u.cle,p_a:a,p_b:a+4})}),j=r.ok?await r.json():null;if(!j||!j.ok)return null;h=j;(j.morceaux||[]).forEach(m=>{P[m.n]=m.b64});a+=5;if(a>=(+j.n||0))break}
+  for(;;){const r=await fetch(SBU+"/rest/v1/rpc/espace_fichier",{method:"POST",headers:{apikey:SBK,"Content-Type":"application/json"},body:JSON.stringify({p_jeton:EJ,p_app:devId(),p_cle:u.cle,p_a:a,p_b:a+4})}),j=r.ok?await r.json():null;if(!j||!j.ok)return null;h=j;(j.morceaux||[]).forEach(m=>{P[m.n]=m.b64});a+=5;if(a>=(+j.n||0))break}
   if(P.filter(Boolean).length<(+h.n||0))return null;const t=atob(P.join("")),b=new Uint8Array(t.length);for(let i=0;i<t.length;i++)b[i]=t.charCodeAt(i);const bl=new Blob([b],{type:h.type||"application/octet-stream"});
   SUPB[u.cle]=bl;try{await IDB.put(u.cle,{b:bl,nom:h.nom||u.n||"",at:Date.now()},"sup")}catch(e){}return bl}
  function supRow(u,f,i,ix){const ko=supKo(u),web=supWeb(u);
@@ -963,7 +983,7 @@ async function main(){
  function supZoom(url,t){const o=document.createElement("div");o.className="zov";o.setAttribute("role","dialog");o.setAttribute("aria-label",t||"Support");o.innerHTML=`<div class="zbar"><span style="flex:1;font-weight:700">${esc(t||"")}</span><button type="button" class="btn p" data-zx>✕ Fermer</button></div><div class="zsc"><img alt="${esc(t||"Support")}" src="${url}" style="width:100%"></div>`;o.querySelector("[data-zx]").onclick=()=>o.remove();document.body.appendChild(o)}
  async function supPrefetch(){if(!EJ||navigator.onLine===false)return;for(const x of F){if(!["venir","auj","cours"].includes(x.s))continue;for(const u of (x.f.sup||[])){if(!u.cle||(+u.sz||0)>8*1048576)continue;try{if(!(await supCached(u)))await supFetch(u)}catch(e){}}}}
  async function blImg(t){if(!t||!t.pf)return null;if(IMG[t.pf])return IMG[t.pf];const c=await IDB.get(t.pf);if(Array.isArray(c)&&c.length)return IMG[t.pf]=c;
-  try{let P=null;if(t.pf.startsWith("e:")){const r=await fetch(SBU+"/rest/v1/rpc/espace_doc",{method:"POST",headers:{apikey:SBK,"Content-Type":"application/json"},body:JSON.stringify({p_jeton:EJ,p_itv:t.i})}),j=r.ok?await r.json():null;let a=null;try{a=j&&j.ok?JSON.parse(j.b64):null}catch(e){}P=Array.isArray(a)?a.filter(x=>typeof x==="string"&&x.length>100):null}
+  try{let P=null;if(t.pf.startsWith("e:")){const r=await fetch(SBU+"/rest/v1/rpc/espace_doc",{method:"POST",headers:{apikey:SBK,"Content-Type":"application/json"},body:JSON.stringify({p_jeton:EJ,p_app:devId(),p_itv:t.i})}),j=r.ok?await r.json():null;let a=null;try{a=j&&j.ok?JSON.parse(j.b64):null}catch(e){}P=Array.isArray(a)?a.filter(x=>typeof x==="string"&&x.length>100):null}
    else{const r=await fetch(SBU+"/rest/v1/rpc/lien_lire",{method:"POST",headers:{apikey:SBK,"Content-Type":"application/json"},body:JSON.stringify({p_id:t.pf})}),j=r.ok?await r.json():null;P=j&&j.ok&&j.data&&Array.isArray(j.data.p)?j.data.p.filter(x=>typeof x==="string"&&x.length>100):null}
    if(P&&P.length){IMG[t.pf]=P;await IDB.put(t.pf,P);return P}}catch(e){}return null}
  const imgBox=ix=>`<div class="blim" data-blim="${ix}"><p class="mu">Chargement du bon de livraison…</p></div>`;
@@ -1114,7 +1134,7 @@ const hMin=h=>{const m=/^(\d\d):(\d\d)$/.exec(String(h||""));return m?(+m[1])*60
  // file d'envoi : la signature d'abord, puis chaque photo (morceaux de 150 000 caractères) ; la copie gardée sur le téléphone est libérée une fois reçue
  const phPay=()=>(BS.ph||[]).map(x=>[x.id,String(x.lg||"").slice(0,30)]);
  const phQ=num=>(BS.ph||[]).map((x,i)=>({k:"ph",id:x.id,i:"ph",cle:"ph:"+x.id,lg:String(x.lg||"").slice(0,30),nom:String(num||"bon")+" – photo "+(i+1)+(x.lg?" – "+x.lg:"")}));
- const phRpc=o=>fetch(SBU+"/rest/v1/rpc/espace_photo",{method:"POST",headers:{apikey:SBK,"Content-Type":"application/json"},body:JSON.stringify({p_jeton:EJ,p:o})}).then(r=>r.ok?r.json():null);
+ const phRpc=o=>fetch(SBU+"/rest/v1/rpc/espace_photo",{method:"POST",headers:{apikey:SBK,"Content-Type":"application/json"},body:JSON.stringify({p_jeton:EJ,p_app:devId(),p:o})}).then(r=>r.ok?r.json():null);
  async function phUp(p){if(!EJ)throw 0;let r;try{r=await PDB.get(p.id)}catch(e){const er=LS.get(PHER,{});er[p.id]="photo illisible sur le téléphone pour le moment";LS.set(PHER,er);throw e}
   if(!r||!r.b){phMark(PHKO,p.id,{id:p.id,nom:p.nom||""});return 1}
   const b64=await new Promise((ok,ko)=>{const f=new FileReader();f.onload=()=>ok(String(f.result).replace(/^data:[^,]*,/,""));f.onerror=ko;f.readAsDataURL(r.b)}),C=150000,n=Math.ceil(b64.length/C),emp=p.id+"-"+b64.length;
