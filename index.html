@@ -273,6 +273,26 @@ function supPage(D){const app=$("#app"),id=new URLSearchParams(location.search).
    /* (04/11, O) le téléchargement peut être silencieux (téléphone, navigateur d’un logiciel de mail) : lien « Ouvrir » toujours proposé */
    if(st){st.textContent="✔ Téléchargé · ";const o=document.createElement("a");o.href=url;o.target="_blank";o.rel="noopener";o.textContent="Ouvrir le document";o.className="supo";st.appendChild(o)}}
   catch(e){say("Support indisponible pour l’instant. Réessayez plus tard.")}b.disabled=false})}
+// 📄 Certificats de réalisation (13/11, maquette cert-btn2) : lien court de type « cert » du mail « Certifications et supports de cours ».
+// Une ligne par stagiaire « PDF · Nom · 👁 Voir · ⬇ Télécharger » = les mêmes PDF que la pièce jointe (versions figées, lues par contrat_lire,
+// seulement celles listées dans ce lien, tant qu'il est actif). Lien expiré : message + coordonnées. Aucune autre donnée personnelle.
+function certPage(D){const app=$("#app"),id=new URLSearchParams(location.search).get("l")||"",L=Array.isArray(D.L)?D.L:[],G=Array.isArray(D.g)?D.g:[],org=G[0]||D.g||"",cm=D.m||G[3]||FB_MAIL;
+ document.title="Certificats de réalisation"+(D.n?" · N° "+D.n:"");
+ app.innerHTML=`<div class="card"><div class="mu">${esc(typeof org==="string"?org:"")}</div><h1>📄 Certificats de réalisation${D.n?` <span class="crn">· N° ${esc(D.n)}</span>`:""}</h1><p style="margin:4px 0 0">${D.f?`<b>${esc(D.f)}</b>`:""}${D.c?`<br><span class="mu">${esc(D.c)}</span>`:""}</p></div>
+ <div class="card">${L.length?L.map((u,i)=>`<div class="supr crr"><span class="crp" aria-hidden="true">PDF</span><span class="supt"><b>${esc(u.t||"Stagiaire")}</b><br><small class="mu sups" id="crs${i}" role="status"></small></span><span class="crb"><button type="button" class="btn" data-cv="${i}">👁 Voir</button><button type="button" class="btn p" data-cd="${i}">⬇ Télécharger</button></span></div>`).join(""):`<p>Aucun certificat n’est disponible en ligne pour cette formation.${cm?` Pour le recevoir, écrivez à <a href="mailto:${esc(cm)}">${esc(cm)}</a>.`:""}</p><p class="mu" id="crco"></p>`}
+ <p class="mu" style="margin:12px 0 0">Les certificats sont aussi joints au mail. Ce lien est réservé aux destinataires du mail et reste valable 90 jours.${cm?` Une question ? <a href="mailto:${esc(cm)}">${esc(cm)}</a>`:""}</p></div>
+ <style>.crn{font-size:.7em;color:#475569;font-weight:600}.crr{align-items:center}.crp{flex:none;background:#dc2626;color:#fff;font-weight:800;font-size:12px;border-radius:6px;padding:6px 7px;letter-spacing:.5px}.crb{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}.crb .btn{min-height:44px}@media (max-width:700px){.crr{flex-wrap:wrap}.crb{width:100%;justify-content:stretch}.crb .btn{flex:1}}</style>`;
+ if(!L.length)try{lnCoord(document.getElementById("crco"))}catch(e){}
+ const B={};const get=async(i)=>{if(B[i])return B[i];const u=L[i];let a=0,P=[],h=null;for(;;){const r=await fetch(SBU+"/rest/v1/rpc/contrat_lire",{method:"POST",headers:{apikey:SBK,"Content-Type":"application/json"},body:JSON.stringify({p_lien:id,p_cle:u.cle,p_a:a,p_b:a+4})}),j=r.ok?await r.json():null;
+   if(!j||!j.ok)throw Object.assign(new Error("ko"),{etat:j&&j.etat||"erreur"});h=j;(j.morceaux||[]).forEach(m=>{P[m.n]=m.b64});a+=5;if(a>=(+j.n||0))break}
+  if(P.filter(Boolean).length<(+h.n||0))throw Object.assign(new Error("ko"),{etat:"erreur"});const t=atob(P.join("")),by=new Uint8Array(t.length);for(let k=0;k<t.length;k++)by[k]=t.charCodeAt(k);
+  return B[i]={url:URL.createObjectURL(new Blob([by],{type:"application/pdf"})),nom:h.nom||u.nm||("Certificat de realisation - "+(u.t||"stagiaire")+".pdf")}};
+ const why=e=>e&&e.etat==="expire"?"Ce lien a expiré : contactez-nous pour recevoir le certificat"+(cm?" ("+cm+")":"")+".":e&&e.etat==="absent"?"Ce certificat n’est pas encore disponible en ligne : il est joint au mail."+(cm?" Une question : "+cm:""):"Certificat indisponible pour l’instant. Réessayez dans un moment, ou ouvrez la pièce jointe du mail.";
+ const run=async(b,i,dl)=>{const st=document.getElementById("crs"+i),say=t=>{if(st)st.textContent=t};if(!L[i]||!L[i].cle||!id){say("Certificat indisponible : ouvrez la pièce jointe du mail.");return}b.disabled=true;say("⏳ Chargement…");
+  try{const r=await get(i);if(dl){const a2=document.createElement("a");a2.href=r.url;a2.download=r.nom;document.body.appendChild(a2);a2.click();setTimeout(()=>a2.remove(),2000);say("✔ Téléchargé · ");const o=document.createElement("a");o.href=r.url;o.target="_blank";o.rel="noopener";o.textContent="Ouvrir le document";if(st)st.appendChild(o)}
+   else{let w=null;try{w=window.open(r.url,"_blank")}catch(e){}say("");if(!w&&st){const o=document.createElement("a");o.href=r.url;o.target="_blank";o.rel="noopener";o.textContent="Ouvrir le certificat";st.appendChild(o)}}}
+  catch(e){say(why(e));if(e&&e.etat==="expire")try{lnCoord(st)}catch(x){}}b.disabled=false};
+ app.querySelectorAll("[data-cv]").forEach(b=>b.onclick=()=>run(b,+b.dataset.cv,0));app.querySelectorAll("[data-cd]").forEach(b=>b.onclick=()=>run(b,+b.dataset.cd,1))}
 // 📷 Photos d'un bon (31/10) : lien court de type « ph » joint au mail « bon transmis au commercial » ; chaque photo est lue par photo_lire
 // (seulement les photos listées dans ce lien, tant qu'il est actif : 90 jours). Aucune donnée personnelle sur la page (numéro du bon, client, date).
 function phPage(D){const app=$("#app"),id=new URLSearchParams(location.search).get("l")||"",L=Array.isArray(D.L)?D.L:[];document.title="Photos du bon "+(D.n||"");
@@ -622,6 +642,7 @@ if(D&&D.k==="ph"){phPage(D);return}
 if(D&&D.k==="emgs"){emgsPage(D);return}
 if(D&&D.k==="abo"){aboPage(D);return}
 if(D&&D.k==="blc"){blcPage(D);return}
+if(D&&D.k==="cert"){certPage(D);return}
 const app=$("#app");
 if(!D||!D.n||!D.g){app.innerHTML='<div class="card"><h1>Lien incomplet</h1><p>Ce lien de signature est incomplet ou a été modifié. Merci de rouvrir le lien reçu par e-mail, tel quel, ou de contacter l’organisme de formation.</p></div>';return}
 const plan=D.k==="plan",dev=D.k==="dev",ro=!!D.ro,G=D.g,C=D.c||D.cl||["","",""],tr=D.tr||[];
