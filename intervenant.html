@@ -682,7 +682,7 @@ async function main(){
  function markTabs(sheet){document.querySelectorAll(".ip-nav [data-tab]").forEach(b=>{const k=b.dataset.tab,on=sheet?k==="topas":(k==="home"&&V.v==="list"&&TAB!=="sig")||(k==="sig"&&V.v==="list"&&TAB==="sig");b.classList.toggle("on",on);if(on)b.setAttribute("aria-current","page");else b.removeAttribute("aria-current")})}
  function flash(t,ok){const o=document.createElement("div");o.className="ip-flash"+(ok?" ip-flash-ok":"");o.setAttribute("role","status");o.textContent=t;document.body.appendChild(o);setTimeout(()=>o.remove(),2600)}
  function goSig(){const s=document.getElementById("s-usig")||document.getElementById("s-uarc");if(!s){flash("Rien de signé pour l’instant.");return}const d=s.querySelector("details");if(d)d.open=true;s.scrollIntoView({behavior:"smooth",block:"start"})}
- function tabGo(k){if(k==="topas")return topasSheet();if(dkOn()&&(k==="home"||k==="sig")){DKSIG=k==="sig";TAB=DKSIG?"sig":"home";if(!DKSIG){nav({v:"list"});return}view();if(DKSIG)setTimeout(goSig,30);return}if(k==="new")return canBI()?biStart():tpStart();/* (03/11, G) plus de fenêtre de choix */if(k==="sig"){if(V.v!=="list")nav({v:"list"});TAB="sig";markTabs();setTimeout(goSig,30);return}
+ function tabGo(k){if(k==="topas")return topasSheet();if(dkOn()&&(k==="home"||k==="sig")){DKSIG=k==="sig";TAB=DKSIG?"sig":"home";if(!DKSIG){nav({v:"list"});return}view();if(DKSIG)setTimeout(goSig,30);return}if(k==="new")return canBI()?biStart():tpStart();/* (03/11, G) plus de fenêtre de choix */if(!V6&&(k==="sig"||k==="home")){HT7=k==="sig"?"fait":"cours";try{sessionStorage.setItem("fpiv:tab",HT7)}catch(e){}TAB=k==="sig"?"sig":"home";if(V.v!=="list")nav({v:"list"});else{view();window.scrollTo(0,0)}return}if(k==="sig"){if(V.v!=="list")nav({v:"list"});TAB="sig";markTabs();setTimeout(goSig,30);return}
   TAB="home";if(V.v!=="list")nav({v:"list"});else{markTabs();window.scrollTo({top:0,behavior:"smooth"})}}
  function topasSheet(){const tel=String(G[1]||"").replace(/[^\d+]/g,""),ad=String(G[4]||"").trim(),ml=D.m||G[2]||"",o=document.createElement("div");
   o.className="nsov ip-sheet";o.setAttribute("role","dialog");o.setAttribute("aria-modal","true");o.setAttribute("aria-label","Contacter TOPAS informatique");
@@ -765,6 +765,96 @@ async function main(){
   const k=who?SG.steps.findIndex(st=>st.nm===who):emFirst();SG.i=k<0?SG.steps.length-1:k;SG.phase="sign";view();window.scrollTo(0,0)}
  const acqLine=(f,ix,ty)=>{const tr=f.tr||[],st=evSt(f,ty),an=Math.max(0,tr.findIndex((t,i)=>!acqSt(f,i,ty)));
   return `<div class="task ip-l3" id="l3${ty}"><span class="ip-l3t">${ty==="av"?"🎯 Évaluation avant":"🏁 Évaluation après"}<br><small class="mu">${ty==="av"?"positionnement":"acquis"} · par stagiaire · ${esc(st.tl||st.t)}</small></span>${!tr.length?'<span class="mu">Aucun stagiaire</span>':f.clo?'<span class="mu">🔒 clôturé</span>':`<button type="button" class="btn${st.k==="ok"?"":" p"}" data-acq="${ix}:${an}:${ty}">${st.k==="ok"?"Modifier":st.k==="part"?"▶ Continuer":"▶ Commencer"}</button>`}</div>`};
+ // ===== TÉLÉPHONE « v7 » (13/11, maquettes tel-v7 validées par Juliette) : accueil à 3 onglets en couleur (À venir bleu · En cours anthracite ·
+ // Réalisés vert), une ligne par BL / bon / formation (nom de l'entreprise en entier), « ⚠ EN RETARD » en tête d'« En cours », 🧭 Itinéraire à droite
+ // ou « Envoyer à l'ADV sans signature » sur une ligne en retard ; fiche formation (en-tête violet, grand bloc Émargement, Évaluation des acquis,
+ // Programme · Supports · Remarque) ; écran Émargement (une demi-journée = un grand bouton, groupé par jour) ; fiche BL / bon (en-tête bleu, cadre
+ // Date · Adresse · Contact · Livré, « ✍ Faire signer le client »). Mêmes données, mêmes fonctions d'avant ; l'ordinateur (dkView) ne change pas.
+ // Ancienne présentation : ?v6=1 ou localStorage « fpiv:v6 » = "1" (secours, anciens tests).
+ const V6=(()=>{try{return /[?&]v6=1\b/.test(location.search)||localStorage.getItem("fpiv:v6")==="1"}catch(e){return false}})();
+ let HT7=(()=>{try{return sessionStorage.getItem("fpiv:tab")||"cours"}catch(e){return "cours"}})();const OPEN7={};
+ const ago7=d=>{const n=Math.round((Date.parse(T)-Date.parse(d))/864e5);return n>0?"il y a "+n+" jour"+(n>1?"s":""):"aujourd’hui"};
+ const map7=(c,a,lab)=>a?`<a class="ip7-map" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(String(c||"")+" "+a)}" target="_blank" rel="noopener" aria-label="Itinéraire vers ${esc(c||"l’adresse")}"><i aria-hidden="true">🧭</i><span>${lab||"Itinéraire"}</span></a>`:"";
+ const tag7=t=>t==="f"?'<span class="ip7-t ip7-tf">Formation</span>':t==="b"?'<span class="ip7-t ip7-tb">BL</span>':t==="bi"?'<span class="ip7-t ip7-tb">Bon d’intervention</span>':'<span class="ip7-t ip7-ti">Intervention</span>';
+ // une ligne : date · NOM DE L'ENTREPRISE (en entier) · étiquette · détail court · état ; à droite Itinéraire, ou l'envoi sans signature si en retard
+ function r7(o,g){const m=o.m;if(!m)return `<div class="ip7-old">${o.h}</div>`;
+  const det=m.det||[m.n,m.hr?fH(m.hr):"",m.city].filter(Boolean).join(" · "),st=m.st||(g==="done"?"✓ Réalisé":"");
+  const rt=g==="late"&&(m.t==="b"||m.t==="f")?`<button type="button" class="ip7-adv" data-adv="${m.t}:${m.ix}">Envoyer à l’ADV sans signature</button>`:g!=="done"?map7(m.c,m.a):"";
+  return `<div class="ip7-r ip7-${g}" data-q="${esc((m.c||"")+" "+(m.n||""))}"><button type="button" class="ip7-b" ${uOpen(m)}>${dCol(m.d)}<span class="ip7-c"><b class="ip7-n">${esc(m.c||"Client")}</b><span class="ip7-tl">${tag7(m.t)}</span><span class="ip7-s">${esc(det)}</span>${st?`<span class="ip7-st${g==="late"?" ip7-stl":""}">${esc(st)}</span>`:""}${m.lab?`<span class="ip7-lab">${m.lab}</span>`:""}</span></button>${rt?`<div class="ip7-ra">${rt}</div>`:""}</div>`}
+ function homeV7(){for(const k in OPEN7)delete OPEN7[k];const U=uGroups(),A=U.auj||[],late=U.reg||[],today=A.filter(o=>o.m&&o.m.t==="f"||o.todo!==false).sort((a,b)=>String((a.m||{}).hr||"99").localeCompare(String((b.m||{}).hr||"99"))),doneT=A.filter(o=>!today.includes(o));
+  const ven=U.ven||[],fait=doneT.concat(U.sig||[]).concat(U.tpx||[]),arc=U.arc||[],nC=late.length+today.length,nToday=late.length+today.filter(o=>o.todo!==false).length;HOMEOK=!nC;
+  const T3=[["ven","À venir",ven.length],["cours","En cours",nC],["fait","Réalisés",fait.length+arc.length]],V2=D.v;
+  const hd=`<header class="ip7-hd"><div class="ip7-h1"><div class="ip7-hw"><h1 class="ip7-hi hi">Bonjour${pr?" "+esc(pr):""}</h1><p class="ip7-sub">${nToday?nToday+" à faire aujourd’hui":"Rien à faire aujourd’hui ✓"}</p></div>${netH()}</div>
+  <div class="ip7-tabs" role="tablist" aria-label="Mes interventions">${T3.map(([k,l,n])=>`<button type="button" role="tab" id="ht-${k}" class="ip7-tab ip7-tab-${k}${HT7===k?" on":""}" aria-selected="${HT7===k}" aria-controls="ip7p" data-ht="${k}">${l} <span class="ip7-tn">${n}</span></button>`).join("")}</div></header>`;
+  const emp=t=>`<div class="ip7-empty">${t}</div>`;let body="";
+  if(HT7==="ven")body=ven.length?ven.map(o=>r7(o,"ven")).join(""):emp("Rien de prévu pour le moment.");
+  else if(HT7==="fait")body=`<div class="ip7-srw"><input type="search" class="ip-in ip7-srch" id="usrch7" placeholder="Rechercher : client, n° de BL" aria-label="Rechercher dans les réalisés (client, n° de BL)" autocomplete="off" enterkeyhint="search"></div>`+(fait.length?fait.map(o=>r7(o,"done")).join(""):emp("Rien de réalisé pour le moment."))+(arc.length?`<details class="ip7-arc"><summary>🗄 Archives (${arc.length}) · plus d’un an</summary>${arc.map(o=>r7(o,"done")).join("")}</details>`:"")+`<p class="ip7-empty hide" id="usrch70">Aucun bon ne correspond.</p>`;
+  else body=(late.length?`<h2 class="ip7-gh ip7-gh-late"><span>⚠ EN RETARD</span><span>${late.length}</span></h2>${late.map(o=>r7(o,"late")).join("")}`:"")+`<h2 class="ip7-gh"><span>AUJOURD’HUI</span><span>${today.length}</span></h2>`+(today.length?today.map(o=>r7(o,"auj")).join(""):emp("Rien à faire aujourd’hui ✓"))
+   +(V2&&V2.t?`<div class="vei"><div class="kk">📢 Info réglementaire</div><h3>${esc(V2.t)}</h3>${V2.r?`<div class="mu" style="color:var(--tx)">${esc(V2.r)}</div>`:""}<div class="mu" style="margin-top:4px">Transmise le ${esc(fds(V2.dd||V2.d||T))}${V2.u?` · <a href="${esc(V2.u)}" target="_blank" rel="noopener">Voir la source</a>`:""}</div><div class="btns">${V2.lu?'<span class="pbok" style="margin:0">✔ Vous l’avez lue, merci</span>':V2.a?`<a class="btn gn" href="${esc(V2.a)}" target="_blank" rel="noopener">✅ J’ai lu – donner mon avis</a>`:""}</div></div>`:"");
+  return `${hd}${horsH()}${EJ?instH():""}<div id="qbn">${bannerHtml()}</div><div class="ip7-list ip7-l-${HT7}" id="ip7p" role="tabpanel" aria-labelledby="ht-${HT7}">${body}</div>${tpFab()}${foot()}`}
+ // ---- fiche FORMATION : en-tête violet, grand bloc Émargement (une case par jour, « Faire émarger · prochaine demi-journée »), Évaluation des acquis
+ const half7=p=>p==="m"?"matin":"après-midi";
+ const next7=f=>{const L=SLOTS(f).filter(o=>!emnsHas(f,o));return L.find(o=>o.day<=T&&emSl(f,o).k!=="ok")||L.find(o=>o.day>T)||null};
+ function formV7(ix){const f=D.f[ix];if(!f)return listView();const tr=f.tr||[],L=DS(f),lt=pastDue(f).length,nx=next7(f),E=(f.tr||[]).length?vEvs(f):[];
+  const bil=(f.cl||[]).find(z=>z[0]==="bilan"),br=BIL(f),bilOk=!!(bil&&bil[1])||!!br,last=L.slice(-1)[0]||"",bilOpen=!f.clo&&(bilOk||emgAll(f)||(last&&last<=T));
+  const hr=L.length?slot(f,L[0])[2]:"";
+  const days=L.map(d=>{const s=vDaySt(f,d);const k=s==="ok"?"ok":d>T?"fut":"todo";return `<button type="button" class="ip7-day ip7-day-${k}${d===T?" ip7-today":""}" data-emd="${ix}:${d}" aria-label="${esc(vCap(vD(d,{weekday:"long",day:"numeric",month:"long"})))} : ${k==="ok"?"tout est signé":k==="fut"?"à venir":"à finir"}"><span>${esc(vWd(d))}</span><b>${esc(vNo(d))}</b><small>${k==="ok"?"✓":k==="fut"?"à venir":"à finir"}</small></button>`}).join("");
+  const big=f.clo?`<p class="ip7-pn">🔒 Dossier clôturé : lecture seule.</p>`:nx?(nx.day<=T?`<button type="button" class="ip7-go" data-veh="${ix}:${nx.day}:${nx.part}">✍ Faire émarger · ${esc(vdw(nx.day))} ${half7(nx.part)}</button>`:`<button type="button" class="ip7-go ip7-go-fut" data-emd="${ix}:${nx.day}">📅 Prochain émargement · ${esc(vdw(nx.day))} ${half7(nx.part)}</button>`):`<div class="ip7-ok">✓ Tous les émargements sont faits</div>`;
+  const ev=x=>x?`<button type="button" class="ip7-ev ip7-ev-${x.k==="ok"?"ok":x.k==="now"?"now":"later"}" data-vev="${ix}:${x.lb==="Avant"?"av":"ap"}"><b>${esc(x.lb)}</b><span>${esc(x.k==="later"&&x.lb==="Après"&&x.due&&x.due>T?"en fin de stage":x.t)}${x.pd?" · envoi en attente":""}</span></button>`:"";
+  return `${f.tst?`<div role="status" style="padding:10px 14px;text-align:center;font:700 15px/1.35 Arial,sans-serif;color:#422006;background:repeating-linear-gradient(135deg,#fef08a 0 14px,#fde047 14px 28px);border-bottom:2px solid #a16207">🧪 TEST — dossier de test : tout fonctionne, les mails partent vers l’adresse de test</div>`:""}<div class="ve ip7f">
+  <header class="ip7-fh"><button type="button" class="ve-back" data-back>‹ Retour</button><h1 class="ip7-fn">${esc(f.c||"Client")}</h1><div class="ip7-fs">${esc(f.t||"Formation")} · ${vNbS(tr.length)}</div><div class="ip7-fs">${esc(vPer(f))}${hr?" · "+esc(hr):""}</div>${lt&&!f.clo?`<span class="ip7-alert">⚠ ${lt} émargement${lt>1?"s":""} à finir</span>`:""}</header>
+  <div id="qbn">${bannerHtml()}</div>
+  ${f.clo?`<div class="qb qk" role="status"><b>🔒 Dossier clôturé par TOPAS informatique le ${esc(f.clo)}</b><span>Les pièces de cette formation ne sont plus modifiables depuis le téléphone.</span></div>`:""}
+  <div class="ve-in">${f.dc?dcBan(f)+vBtns(ix,1):`
+  <section class="ip7-blk ip7-blk-em" aria-labelledby="ip7emh"><div class="ip7-bh"><h2 id="ip7emh">✍ Émargement</h2><button type="button" class="ip7-cnt" data-emd="${ix}:">${L.length} jour${L.length>1?"s":""} ›</button></div>${L.length?`<div class="ip7-days">${days}</div>`:`<p class="ip7-pn">Dates à définir : TOPAS informatique vous prévient dès qu’elles sont fixées.</p>`}${L.length?big:""}</section>
+  ${tr.length?`<section class="ip7-blk ip7-blk-ev" aria-labelledby="ip7evh"><div class="ip7-bh"><h2 id="ip7evh">📝 Évaluation des acquis</h2></div><div class="ip7-evs">${E.map(ev).join("")}</div></section>`:""}
+  ${bilOpen||bilOk?`<${f.clo?"div":"button type=\"button\""} class="ve-bil${bilOk?" ve-bil-ok":""}"${f.clo?"":` data-bil="${ix}"`}><b>📝 Mon bilan de formateur</b><span>${br?"✓ envoyé le "+esc(dm(br.dl))+(pend(br.id)?" · envoi en attente":""):bilOk?"✓ envoyé"+(f.bilr?" le "+esc(dm(f.bilr)):""):"à remplir après la formation ›"}</span></${f.clo?"div":"button"}>`:""}
+  <div class="ip7-3">${[["der","📋","Programme"],["sup","📚","Supports"],["rem","✎","Remarque"]].map(([k,i,t])=>`<button type="button" class="ip7-3b" data-vb="${ix}:${k}"><i aria-hidden="true">${i}</i><span>${t}</span></button>`).join("")}</div>
+  <div class="ve-more">${pbZone(f,ix)}${fphZone(f,ix)}</div>`}</div></div>${foot()}`}
+ // ---- écran ÉMARGEMENT : une demi-journée = un grand bouton, groupé par jour ; à faire / commencé (jaune + barre) / fait (vert ✓ OK) / à venir
+ function emdV7(){const f=D.f[V.ix];if(!f||f.dc)return f?formV7(V.ix):listView();const ix=V.ix,tr=(f.tr||[]).length,L=DS(f);
+  const sl=(d,p)=>{if(!SLOTS(f).some(o=>o.day===d&&o.part===p))return "";const st=emSl(f,{day:d,part:p}),h=hrOf(f,d,p),N=st.N||tr,n=st.k==="ok"?st.n:st.k==="part"?st.n:0,ns=emnsHas(f,{day:d,part:p});
+   const k=ns?"ns":st.k==="ok"?"ok":st.k==="part"?"part":d>T?"fut":"todo",lab=p==="m"?"Matin":"Après-midi",ic=p==="m"?"☀️":"🌤";
+   const right=k==="ok"?"✓ OK":k==="part"?"Reprendre ›":k==="fut"?"à venir":k==="ns"?"Envoyé sans signature":"Commencer ›";
+   return `<button type="button" class="ip7-hb ip7-hb-${k}" data-veh="${ix}:${d}:${p}"><i aria-hidden="true">${ic}</i><span class="ip7-hbt"><b>${lab}</b><small>${esc(fH(h[0]))}–${esc(fH(h[1]))} · ${n}/${N} signé${n>1?"s":""}${st.ab?" · "+st.ab+" absent"+(st.ab>1?"s":""):""}${st.pd?" · envoi en attente":""}</small>${k==="part"?`<span class="ip7-bar" aria-hidden="true"><i style="width:${N?Math.round(n*100/N):0}%"></i></span>`:""}</span><span class="ip7-hbr">${right}</span></button>`};
+  return `<div class="ve ip7e"><header class="ip7-eh"><button type="button" class="ve-back" data-vbk="${ix}">‹ ${esc(f.c||"Retour")}</button><h1 class="ip7-en">✍ Émargement</h1><div class="ip7-fs">${vNbS(tr)} + formateur</div></header>
+  <div class="ve-in">${L.map(d=>{const late=d<T&&SLOTS(f).some(o=>o.day===d&&!emState(f,o)&&!emnsHas(f,o));return `<section class="ip7-dg" id="emd-${d}"><h2 class="ip7-dh"><span>${esc(vD(d,{weekday:"long",day:"numeric",month:"long"}).toUpperCase())}</span>${late?'<span class="ip7-dl">en retard</span>':d===T?'<span class="ip7-dt">aujourd’hui</span>':""}</h2>${sl(d,"m")}${sl(d,"a")}</section>`}).join("")||'<p class="ip7-pn">Dates à définir.</p>'}</div></div>`}
+ // ---- fiche BL / bon : en-tête bleu, cadre Date · Adresse · Contact · Livré, « ✍ Faire signer le client », Voir le BL · Itinéraire · Photos · Remarque
+ function blCardV7(ix){const x=IT[ix],t=x.t,cn=t.c||t.nm||"Intervention",late=!!t.d&&t.d<T,fut=!!t.d&&t.d>T,lg=livLg(t),nl=lg.length||+t.nl||0,tel=String(t.tel||"").replace(/[^\d+]/g,"");
+  const pill=late?`⚠ Pas signé · intervention le ${esc(dm(t.d))}`:fut?`📅 Intervention prévue le ${esc(dm(t.d))}`:"✍ À faire signer aujourd’hui";
+  return `<header class="ip7-bh0"><button type="button" class="ve-back" data-back>‹ Retour</button><h1 class="ip7-fn">${esc(cn)}</h1><div class="ip7-fs">Bon de livraison ${esc(t.b||t.nm||"")}${t.ref?" · Cde "+esc(t.ref):""}</div><span class="ip7-alert${late?"":" ip7-alert-n"}">${pill}</span></header>
+  <div id="qbn">${bannerHtml()}</div><div class="ve-in">
+  <dl class="ip7-kv"><div><dt>Date</dt><dd>${t.d?esc(vCap(vD(t.d,{weekday:"short",day:"numeric",month:"short"})))+(t.h?" · "+esc(fH(t.h)):""):"à préciser"}</dd></div><div><dt>Adresse</dt><dd>${esc(t.a||"—")}</dd></div><div><dt>Contact</dt><dd>${esc(t.ct||"—")}${tel?` · <a class="ip7-tel" href="tel:${esc(tel)}" aria-label="Appeler ${esc(t.ct||"le contact")}">📞</a>`:""}</dd></div><div><dt>Livré</dt><dd>${nl?nl+" article"+(nl>1?"s":""):"voir le bon"}</dd></div></dl>
+  <button type="button" class="ip7-go" data-bl7="${ix}:sign">✍ Faire signer le client</button>
+  <div class="ip7-4"><button type="button" class="ip7-3b" data-bl7="${ix}:voir"><i aria-hidden="true">👁</i><span>Voir le BL</span></button>${t.a?`<a class="ip7-3b" href="${itMaps(t)}" target="_blank" rel="noopener"><i aria-hidden="true">🧭</i><span>Itinéraire</span></a>`:`<span class="ip7-3b ip7-3x"><i aria-hidden="true">🧭</i><span>Itinéraire</span></span>`}<button type="button" class="ip7-3b" data-bl7="${ix}:photos"><i aria-hidden="true">📷</i><span>Photos</span></button><button type="button" class="ip7-3b" data-bl7="${ix}:rem"><i aria-hidden="true">✎</i><span>Remarque</span></button></div>
+  <div class="ip7-img hide" id="ip7img">${imgBox(ix)}</div>
+  <p class="ip7-abs">Client absent ? <button type="button" class="ip7-lnk" data-blns="${ix}">Envoyer sans signature</button></p></div>${foot()}`}
+ // ---- formation en retard : « Envoyer à l'ADV sans signature » = les feuilles d'émargement partent telles quelles, avec le motif ; au bureau la pièce passe
+ // « Non fourni » avec ce motif (retNfAsk / s.ret, étape 7 orange non bloquante). Rien n'est effacé, les signatures déjà faites restent.
+ const EMNSR=["Feuilles papier remises au bureau","Stagiaires partis avant de signer","Oubli","Autre…"];
+ const emnsRecs=n=>recs("emns:"+n);
+ function emnsHas(f,sl){return emnsRecs(f.n).some(r=>(r.sl||[]).some(z=>z[0]===sl.day&&z[1]===sl.part))}
+ function fNsAsk(ix){const f=D.f[ix];if(!f)return;const P=SLOTS(f).filter(o=>o.day<T&&!emState(f,o)&&!emnsHas(f,o));if(!P.length)return flash("Rien en retard sur cette formation.");
+  const o=document.createElement("div");o.className="ip7-sheet";o.setAttribute("role","dialog");o.setAttribute("aria-modal","true");o.setAttribute("aria-labelledby","emnsh");
+  o.innerHTML=`<div class="ip7-shb"><h2 id="emnsh">Envoyer à l’ADV sans signature</h2><p class="ip7-pn"><b>${esc(f.c||"")}</b> · ${P.length} demi-journée${P.length>1?"s":""} : ${P.map(z=>esc(vdw(z.day))+" "+half7(z.part)).join(", ")}. Les signatures déjà faites sont gardées ; le bureau saura pourquoi le reste manque.</p>
+  <div class="nsr" role="radiogroup" aria-label="Raison">${EMNSR.map((r,i)=>`<button type="button" class="btn nsrb" role="radio" aria-checked="false" data-emr="${i}">${esc(r)}</button>`).join("")}</div><div class="nsaw hide" id="emnsw"><label class="fl" for="emnst">Précisez la raison *</label><textarea id="emnst" rows="3" maxlength="500"></textarea></div>
+  <p class="pberr" id="emnse" role="alert"></p><div class="ip7-shf"><button type="button" class="ip-btn2" data-emx>Annuler</button><button type="button" class="ip-cta" data-emok>📤 Envoyer au bureau</button></div></div>`;
+  document.body.appendChild(o);let rs="";o.querySelectorAll("[data-emr]").forEach(b=>b.onclick=()=>{rs=EMNSR[+b.dataset.emr];o.querySelectorAll("[data-emr]").forEach(z=>z.setAttribute("aria-checked",String(z===b)));o.querySelector("#emnsw").classList.toggle("hide",rs!=="Autre…")});
+  o.querySelector("[data-emx]").onclick=()=>o.remove();
+  o.querySelector("[data-emok]").onclick=()=>{const e=o.querySelector("#emnse"),pr0=o.querySelector("#emnst").value.trim();if(!rs)return e.textContent="Choisissez une raison.";if(rs==="Autre…"&&pr0.length<3)return e.textContent="Précisez la raison.";
+   const now=nowS(),rid=Date.now().toString(36)+Math.random().toString(36).slice(2,6),motif=rs==="Autre…"?pr0:rs+(pr0?" — "+pr0:""),sl=P.map(z=>[z.day,z.part]),p={t:"fp-sign",k:"emns",id:rid,n:f.n,iv:D.i||"",sl,motif:motif.slice(0,500),dl:now.dl,hl:now.hl};
+   const R=emnsRecs(f.n);R.push({id:rid,dl:now.dl,hl:now.hl,sl,motif});if(!LS.set(RK("emns:"+f.n),R)||!enqueue([p])){e.textContent="Impossible d’enregistrer sur ce téléphone.";return}
+   o.remove();flash("📤 Envoyé au bureau sans signature",1);view();flush().then(()=>view())}}
+ // la barre « ✍ Lancer la signature client » ne sert qu'à descendre : cachée dès que la partie signature est visible
+ let IO7=null;function fix7(){try{if(IO7){IO7.disconnect();IO7=null}const s=document.querySelector(".ip-sep3")||document.getElementById("blsw"),fx=document.querySelector(".ip-fix");document.body.classList.remove("ip7-fixoff");if(!s||!fx||!window.IntersectionObserver)return;
+  IO7=new IntersectionObserver(E=>{const v=E.some(x=>x.isIntersecting||x.boundingClientRect.top<0);document.body.classList.toggle("ip7-fixoff",v)});IO7.observe(s)}catch(e){}}
+ function bind7(){document.querySelectorAll("[data-ht]").forEach(b=>b.onclick=()=>{HT7=b.dataset.ht;try{sessionStorage.setItem("fpiv:tab",HT7)}catch(e){}view();window.scrollTo(0,0)});
+  document.querySelectorAll("[data-adv]").forEach(b=>b.onclick=e=>{e.stopPropagation();const [k,ix]=b.dataset.adv.split(":");if(k==="b")blNsAsk(+ix);else fNsAsk(+ix)});
+  document.querySelectorAll("[data-emd]").forEach(b=>b.onclick=()=>{const [ix,d]=b.dataset.emd.split(":");nav({v:"emd",ix:+ix});if(d)setTimeout(()=>{const s=document.getElementById("emd-"+d);if(s)s.scrollIntoView({block:"start"})},40)});
+  document.querySelectorAll("[data-bl7]").forEach(b=>b.onclick=()=>{const [ix,k]=b.dataset.bl7.split(":");if(k==="voir"){const w=document.getElementById("ip7img");if(w){w.classList.toggle("hide");if(!w.classList.contains("hide"))w.scrollIntoView({block:"nearest"})}return}
+   OPEN7[ix]=1;if(!BS||BS.ix!==+ix||BS.bi)BS=blNew(+ix);view();window.scrollTo(0,0);if(k==="photos")setTimeout(()=>{const p=document.getElementById("phb");if(p)p.scrollIntoView({block:"center"})},60);else if(k==="rem")setTimeout(()=>{const r=document.getElementById("blres");if(r){r.scrollIntoView({block:"center"});if(!r.checked)r.click()}},60)});
+  const us=document.getElementById("usrch7");if(us)us.oninput=()=>{const q=nrm(us.value);let n=0;document.querySelectorAll("#ip7p .ip7-r,#ip7p .ip7-old").forEach(w=>{const on=!q||nrm(w.dataset.q||w.textContent||"").includes(q);w.classList.toggle("hide",!on);if(on)n++});const z=document.getElementById("usrch70");if(z)z.classList.toggle("hide",n>0)};
+  document.body.classList.toggle("ip7",!V6);fix7()}
  const f4Btns=(f,ix,dt)=>{const tr=f.tr||[],ev=ty=>{const st=evSt(f,ty),an=Math.max(0,tr.findIndex((t,i)=>!acqSt(f,i,ty)));return `<button type="button" class="ip-f4b ip-f4-${ty}${st.k==="ok"?" done":""}" data-acq="${ix}:${an}:${ty}"><span>${st.k==="ok"?"✓ ":ty==="av"?"🎯 ":"🏁 "}${ty==="av"?"Évaluation avant":"Évaluation après"}</span><span class="ip-f4s ip-f4s-${st.k}${st.pd?" ip-f4s-wait":""}">${esc(st.t)}</span></button>`};
   const SL=dt&&dt<=T&&!f.clo?emSlots(f,dt):[];
   return `<div class="ip-f4">${SL.length?SL.map(sl=>emSlBtn(f,ix,sl,dt)).join(""):`<button type="button" class="ip-f4b ip-f4-em" data-fgo="${ix}"><span>✍ Faire émarger</span><span class="ip-f4s">${esc(emBtnSt(f))}</span></button>`}${tr.length&&!f.clo?ev("av")+ev("ap"):""}<button type="button" class="ip-f4b ip-f4-de" data-fder="${ix}">📄 Déroulé</button>
@@ -774,14 +864,16 @@ async function main(){
   const st=f.dc?stW("ven","📅 Dates à confirmer"):dn?stW("sig","Terminée"):n>=2?stW("late","+ 48 h"):emTodo?stW("auj","À émarger"):x.s==="clo"?stW("auj","À clôturer"):x.s==="cours"||x.s==="auj"?stW("ven","En cours"):stW("ven","À venir");
   const acts=f.dc?`<p class="ip-dcn">📅 Dates à confirmer : émargement et évaluation dès la validation de la planification.</p>`:dn?"":dt&&dt<=T&&!f.clo?vMini(f,x.ix,dt)/* (05/11, version E) */:f4Btns(f,x.ix,dt);
   const evN=!f.dc&&!dn&&!f.clo&&(f.tr||[]).length?vEvs(f).findIndex(z=>z.k==="now"&&z.due===T):-1,nx=f.dc?null:SLOTS(f).find(o=>o.day===T&&!emState(f,o));
-  const m={t:"f",ix:x.ix,d:dt,hr:nx?hrOf(f,T,nx.part)[0]:hr,c:f.c||"",city:aCity(f.a),a:f.a||"",em:!dn&&!f.clo&&!!nx,ev:evN<0?"":evN?"ap":"av",clo:x.s==="clo"&&!dn,dc:f.dc?1:0};
+  const m={t:"f",ix:x.ix,d:dt,hr:nx?hrOf(f,T,nx.part)[0]:hr,c:f.c||"",city:aCity(f.a),a:f.a||"",em:!dn&&!f.clo&&!!nx,ev:evN<0?"":evN?"ap":"av",clo:x.s==="clo"&&!dn,dc:f.dc?1:0,
+   /* (13/11, tel-v7) détail court + état en une phrase pour la ligne de l'accueil */det:[f.t||"Formation",dd.length>1?(dn||j<0?dd.length+" jours":"jour "+(j+1)+"/"+dd.length):"",vNbS((f.tr||[]).length)].filter(Boolean).join(" · "),
+   st:f.dc?"📅 Dates à confirmer":late?(pd?pd+" émargement"+(pd>1?"s":"")+" à faire signer":"Émargement à finir")+(dt?" · "+ago7(dt):""):dn?"✓ Terminée":emTodo?"✍ À émarger aujourd’hui":x.s==="clo"?"À clôturer":x.s==="cours"||x.s==="auj"?"En cours":"À venir"};
   return {m,k:dt+" "+hr,todo:!!todo,h:rowW(dn?"sig":todo?"auj":"ven",`<button type="button" class="row urow ip-row${f.dc?" ip-dcr":""}" data-f="${x.ix}">${dCol(dt)}<span class="ip-c ul"><b class="uc" title="${esc(f.c||"")}">${esc(f.c||"")}</b><span class="ip-s m">${esc(f.t||"Formation")}${dd.length>1?(dn||j<0?" · "+dd.length+" jours":" · jour "+(j+1)+"/"+dd.length):""}</span>${late&&dt?uAgo(dt)+(pd?`<span class="ip-s m">✍ ${pd} émargement${pd>1?"s":""} à faire signer</span>`:""):""}</span><span class="ip-r">${dn?"":`<span class="ip-hr">${esc(fH(hr))}</span>`}<span class="ip-rt">${f.tst?`<span class="utag ip-tag" style="background:#facc15;color:#422006;border:1px solid #a16207" title="Dossier de test (mails vers l’adresse de test)">TEST</span>`:""}<span class="utag uf ip-tag">Formation</span>${st}</span></span></button>`,acts,(f.c||"")+" "+(f.n||"")+" "+(f.t||""))}};
  // retard : « il y a N jours » (bon ou émargement daté d'avant aujourd'hui, pas signé)
  const uAgo=d=>{const n=Math.round((Date.parse(T)-Date.parse(d))/864e5);return n>0?`<span class="ulate">il y a ${n} jour${n>1?"s":""}</span>`:""};
  // (06/11) formation dont la planification n'est pas encore validée : lecture seule (déroulé, supports, adresse, Itinéraire), sans émargement ni évaluation
  const DCTXT="La planification n’est pas encore validée par le client : les dates peuvent encore changer. L’émargement et l’évaluation s’ouvriront dès sa validation.";
  const dcBan=f=>`<div class="ve-dc" role="status"><b>📅 Dates à confirmer</b><span>${DCTXT}</span>${f&&f.a?`<span class="ve-dca">📍 ${esc(f.a)}</span><a class="ve-dcm" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(String(f.c||"")+" "+f.a)}" target="_blank" rel="noopener">🧭 Itinéraire</a>`:""}</div>`;
- const pastDue=f=>f.dc?[]:SLOTS(f).filter(sl=>sl.day<T&&!emState(f,sl)).map(sl=>sl.day).sort();
+ const pastDue=f=>f.dc?[]:SLOTS(f).filter(sl=>sl.day<T&&!emState(f,sl)&&!emnsHas(f,sl)/* (13/11) envoyé à l’ADV sans signature */).map(sl=>sl.day).sort();
  const uB=(x,late,kd)=>{const t=x.t,B=bonSt(x),s=B.s,ok=B.k==="sig"||B.k==="ns",cn=t.c||t.nm||"Intervention",dd=kd?String(kd).slice(0,10):t.d||"",hh=kd?String(kd).slice(11,16):t.h||"",pd=!!(s.r&&pend(s.r.id)),city=itCity(t),bi=t.k==="bi";
   const sgd=s.r?[s.r.dl,s.r.hl]:t.sd?[String(t.sd).slice(0,10),String(t.sd).slice(11,16)]:["",""],rsv=!!(s.r?s.r.rsv:t.rsv),rem=!!(s.r?s.r.res:t.sr),okc=B.k==="sig"?(rsv?"res":"ok"):"";
   // (réponse du 03/11 midi) « ⚠ signé avec réserve » = réserves écrites par le CLIENT à la signature (rsv) ; « ✎ Remarque » = note du TECHNICIEN (res / rc / sr, données inchangées) ; les deux peuvent coexister
@@ -789,7 +881,9 @@ async function main(){
   const sub=B.k==="sig"?`<span class="ip-s m">${esc(t.b||t.nm||"Bon de livraison")}${bi?" · "+esc(tpTxt(t.tp)):city?" · "+esc(city):""}</span>${pill}`:ok?(B.k==="ns"?`<span class="ip-s m ip-sl ip-sl-ns">📤 Sans signature${s.r?" le "+esc(dm(s.r.dl)):""}</span>`:`<span class="ip-s m ip-sl ip-sl-ok">✓ Signé${s.r?(s.r.hl?" à "+esc(fH(s.r.hl)):"")+(s.r.nm?" par "+esc(s.r.nm):""):t.sd&&t.sd.length>10?" à "+esc(fH(t.sd.slice(11,16)))+(t.sn?" par "+esc(t.sn):""):t.sn?" par "+esc(t.sn):""}${s.r?(s.r.res?" · remarque notée":""):t.sr?" · remarque notée":""}</span>`)+(pd?`<span class="ip-s m ip-wait" data-pid="${esc(s.r.id)}">transmis à TOPAS dès le réseau</span>`:"")
    :`<span class="ip-s m">${esc(t.b||t.nm||"Bon de livraison")}${bi?" · "+esc(tpTxt(t.tp)):city?" · "+esc(city):""}</span>${late&&t.d?uAgo(t.d):""}`;
   const acts=ok?"":B.k==="ven"?mapA(cn,t.a)+`<button type="button" class="ip-ab ip-ab-eye" data-it="${x.ix}">Voir le bon</button>`:`<button type="button" class="ip-ab ip-ab-go" data-bls2="${x.ix}">✎ Faire signer</button>${mapA(cn,t.a)}<button type="button" class="ip-ab ip-ab-eye ip-ab-ic" data-it="${x.ix}" aria-label="Voir le bon" title="Voir le bon">👁</button>`;
-  return {m:{t:bi?"bi":"b",ix:x.ix,d:dd,hr:hh,c:cn,city:aCity(t.a)||city,n:t.b||"",a:t.a||"",ok,ven:B.k==="ven",rsv},k:kd||((t.d||"9999-12-31")+" "+(t.h||"00:00")),todo:!ok,h:rowW(ok?"sig":B.k==="ven"?"ven":"auj",`<button type="button" class="row urow ip-row${okc?" ip-bsg ip-bsg-"+okc:""}" ${bi?`data-bid="${esc(t.b||"")}"`:`data-it="${x.ix}"`} data-b="${esc(t.b||"")}">${dCol(dd)}<span class="ip-c ul"><b class="uc" title="${esc(cn)}">${esc(cn)}</b>${sub}</span><span class="ip-r">${ok?`<span class="ip-hrn">${esc(t.b||"")}</span>`:hh?`<span class="ip-hr">${esc(fH(hh))}</span>`:""}<span class="ip-rt">${bi?'<span class="utag ui ip-tag">Intervention</span>':'<span class="utag ub ip-tag">BL</span>'}${stW(B.k,B.w)}</span></span></button>`,acts,cn+" "+(t.b||""))}};
+  return {m:{t:bi?"bi":"b",ix:x.ix,d:dd,hr:hh,c:cn,city:aCity(t.a)||city,n:t.b||"",a:t.a||"",ok,ven:B.k==="ven",rsv,
+   det:[(bi?"Bon d’intervention ":"BL ")+(t.b||t.nm||""),hh?fH(hh):"",aCity(t.a)||city].filter(Boolean).join(" · "),
+   st:B.k==="sig"?(rsv?"⚠ Signé avec réserve":"✓ Signé"+(sgd[0]?" le "+dm(sgd[0]):""))+(pd?" · en attente d’envoi":""):B.k==="ns"?"📤 Envoyé sans signature"+(s.r?" le "+dm(s.r.dl):""):B.k==="ven"?(t.d?"Prévu le "+dm(t.d):"Date à préciser"):late&&t.d?"Pas signé · "+ago7(t.d):"✍ À faire signer"},k:kd||((t.d||"9999-12-31")+" "+(t.h||"00:00")),todo:!ok,h:rowW(ok?"sig":B.k==="ven"?"ven":"auj",`<button type="button" class="row urow ip-row${okc?" ip-bsg ip-bsg-"+okc:""}" ${bi?`data-bid="${esc(t.b||"")}"`:`data-it="${x.ix}"`} data-b="${esc(t.b||"")}">${dCol(dd)}<span class="ip-c ul"><b class="uc" title="${esc(cn)}">${esc(cn)}</b>${sub}</span><span class="ip-r">${ok?`<span class="ip-hrn">${esc(t.b||"")}</span>`:hh?`<span class="ip-hr">${esc(fH(hh))}</span>`:""}<span class="ip-rt">${bi?'<span class="utag ui ip-tag">Intervention</span>':'<span class="utag ub ip-tag">BL</span>'}${stW(B.k,B.w)}</span></span></button>`,acts,cn+" "+(t.b||""))}};
  // bon signé : classé par sa date de SIGNATURE (pas d'intervention) ; plus de 12 mois → « 🗄 Archives » (jamais invisible)
  const sdOf=x=>{const s=blSt(x);return s.r?String(s.r.dl||"")+" "+String(s.r.hl||""):String(x.t.sd||"")||String(x.t.d||"")};
  // ⏰ À régulariser : tout ce qui est daté d'avant aujourd'hui et pas signé (bons de livraison + émargements), en tête, le plus ancien d'abord
@@ -824,7 +918,7 @@ async function main(){
   return `<section class="ip-af" id="s-uauj"><h2 class="ip-afh">Aujourd’hui · ${esc(vD(T,{weekday:"long",day:"numeric",month:"short"}))} (${H.todo.length})</h2><p class="ip-afn">➜ Prochain : <b>${esc(p.c)}</b>${p.hr?" à "+esc(fH(p.hr)):""}${p.city?" · "+esc(p.city):""}</p>
   ${H.todo.map(o=>{const m=o.m;return `<div class="ip-afr" data-q="${esc((m.c||"")+" "+(m.n||""))}"><button type="button" class="ip-afb row" ${uOpen(m)}><span class="ip-afhr">${m.hr?esc(fH(m.hr)):"—"}</span><span class="ip-afc"><b class="uc">${esc(m.c||"")}</b><span class="ip-afs">${uTag(m)}${m.n?"<span>"+esc(m.n)+"</span>":""}${m.city?"<span>"+(m.n?"· ":"")+esc(m.city)+"</span>":""}</span></span></button><div class="ip-afa">${uMap(m)}${uAct(m)}</div></div>`}).join("")}</section>`}
  function uVenH(L){if(!L.length)return "";return `<section class="sec ip-g ip-g-ven" id="s-uven"><h2 class="ip-vh">📅 À venir (${L.length})</h2>${L.map(o=>{const m=o.m;if(!m)return o.h;return `<div class="ip-rw ip-vrw ip-vr-${m.dc?"dc":m.t==="f"?"f":m.t==="b"?"b":"i"}" data-q="${esc((m.c||"")+" "+(m.n||""))}"><button type="button" class="row urow ip-row ip-vr" ${uOpen(m)}>${dCol(m.d)}<span class="ip-c ul"><b class="uc" title="${esc(m.c)}">${esc(m.c)}</b><span class="ip-s m">${uTag(m)} ${esc([m.hr?fH(m.hr):"",m.city].filter(Boolean).join(" · "))}</span>${m.dc?'<span class="ip-dcl">📅 Dates à confirmer</span>':""}${m.lab?`<span class="ip-tpls">${m.lab}</span>`:""}</span></button>${uMap(m)}</div>`}).join("")}<p class="ip-vx">« 🧭 Itinéraire » ouvre le GPS du téléphone · un appui sur la ligne ouvre le détail.</p></section>`}
- function listView(){const V2=D.v,U=uGroups(),H=uHome(U),emp={reg:[],auj:[],ven:[],tpx:[],sig:[],arc:[]};
+ function listView(){if(!V6)return homeV7();const V2=D.v,U=uGroups(),H=uHome(U),emp={reg:[],auj:[],ven:[],tpx:[],sig:[],arc:[]};
   const regH=U.reg.length?uList(Object.assign({},emp,{reg:U.reg})):"",restH=uList(Object.assign({},emp,{tpx:U.tpx||[],sig:U.sig,arc:U.arc})).replace(/^<div class="empty ip-empty">.*<\/div>$/,""),any=U.reg.length+U.auj.length+U.ven.length+(U.tpx||[]).length+U.sig.length+U.arc.length;HOMEOK=!!any&&!H.todo.length;
   return `<header class="ip-hero"><div class="ip-top"><span class="ip-logo"><img src="logo.jpg" alt="TOPAS informatique"></span>${netH()}</div>
   <div class="ip-me">${avH()}<div class="ip-mt"><h1 class="ip-hi hi">Bonjour${pr?" "+esc(pr):""}</h1><button type="button" class="ip-n" data-ipn>${esc(H.hd)}</button></div></div></header>
@@ -892,8 +986,9 @@ async function main(){
  const itCity=t=>{const a=String(t.a||"").split(",").pop().trim();return a||t.c||""};
  // en-tête du bon (lot BL 3/3) : « Bon de livraison · aujourd'hui 10h00 », le client en gros, « N° · Cde · adresse » ; dessous 🧭 Itinéraire et 📞 contact (si publiés)
  const bonHd=(t,cn,k,noact)=>`<header class="ip-hd"><button type="button" class="ip-back" data-back>‹ Retour</button><div class="ip-k">${k||"Bon de livraison"} · ${t.d?esc(dNear(t.d)):"date à préciser"}${t.h?" "+esc(fH(t.h)):""}</div><div class="ip-num">${esc(cn)}</div><div class="ip-sub">${esc(t.b||t.nm||"—")}${t.ref?" · Cde "+esc(t.ref):""}${t.a?" · "+esc(t.a):""}</div></header>${!noact&&(t.a||t.tel)?`<div class="ip-hact">${t.a?`<a class="ip-btn2 ip-map" href="${itMaps(t)}" target="_blank" rel="noopener">🧭 Itinéraire</a>`:""}${t.tel?`<a class="ip-btn2 ip-tel" href="tel:${esc(String(t.tel).replace(/[^\d+]/g,""))}">📞 ${esc(t.ct||t.tel)}</a>`:""}</div>`:""}`;
+ const bl7Card=ix=>!V6&&!OPEN7[ix]&&!(BS&&BS.ix===ix&&!BS.bi);/* (13/11) fiche du bon avant le formulaire de signature */
  function itView(ix){const x=IT[ix];if(!x)return listView();if(BS&&BS.ix===ix&&!BS.bi&&BS.step!=="form")return blView();const t=x.t,s=blSt(x),cn=t.c||t.nm||"Intervention",nl=+t.nl||0;
-  if(s.k==="faire")return blForm(ix);
+  if(s.k==="faire")return bl7Card(ix)?blCardV7(ix):blForm(ix);
   return `${bonHd(t,cn,"",1)}
   <div id="qbn">${bannerHtml()}</div>
   <div class="qb ${s.k==="att"?"qw":"qk"}" role="status"><b>${esc(s.txt)}</b>${s.r&&s.r.res?'<span class="ko">avec remarque</span>':""}</div>
@@ -1084,11 +1179,11 @@ const hMin=h=>{const m=/^(\d\d):(\d\d)$/.exec(String(h||""));return m?(+m[1])*60
   ${matH(BS.mt,"bl")}
   ${phH()}
   ${bi?"":pbBon(t)}
-  ${!ch?`<div class="ip-bich"><button type="button" class="ip-cta" data-bich="0">✍ Faire signer le client</button><button type="button" class="ip-btn2" data-bich="1">📤 Envoyer sans signature</button></div><p class="ip-hint" id="blhint" aria-live="polite"></p><div class="pberr" id="sge" role="alert"></div>`:`<div class="ip-sep ip-sep3" role="separator"><span>${ns?"ENVOI SANS SIGNATURE":"SIGNATURE DU CLIENT"}</span></div>
+  ${!ch?`<div class="ip-bich"><button type="button" class="ip-cta" data-bich="0">✍ Faire signer le client</button><button type="button" class="ip7-lnk ip7-lnkc" data-bich="1">Envoyer sans signature client</button></div><p class="ip-hint" id="blhint" aria-live="polite"></p><div class="pberr" id="sge" role="alert"></div>`:`<div class="ip-sep ip-sep3" role="separator"><span>${ns?"ENVOI SANS SIGNATURE":"SIGNATURE DU CLIENT"}</span></div>
   ${ns?`<p class="mu ip-nsi">Le bon quitte votre espace. TOPAS informatique saura qu’il n’a pas été signé.</p><div class="nsr" role="radiogroup" aria-label="Raison">${NSR.map((r,i)=>`<button type="button" class="btn nsrb" role="radio" aria-checked="${BS.rs===r}" data-nsr="${i}">${esc(r)}</button>`).join("")}</div><div class="nsaw${BS.rs==="Autre…"?"":" hide"}"><label class="fl" for="nsat">Précisez la raison *</label><textarea id="nsat" rows="3">${esc(BS.rsm)}</textarea></div>`
    :`<div class="ip-fd"><label class="ip-lb" for="blpr">Nom et prénom du signataire <span class="ip-opt0">(le prénom ou le nom suffit)</span></label><input class="ip-in" id="blpr" autocomplete="name" autocapitalize="words" value="${esc(BS.full||"")}"></div>
   <div id="blsw"></div>`}
-  <div style="margin-top:16px"><button type="button" class="ip-cta" id="blval">${ns?"📤 Confirmer l’envoi sans signature":"✔ Valider la signature"}</button><p class="ip-hint" id="blhint" aria-live="polite"></p></div><div class="pberr" id="sge" role="alert"></div>${bi?`<button type="button" class="ip-bisw" data-bisw>${ns?"Finalement : faire signer le client":"Finalement : envoyer sans signature"}</button>`:ns?`<button type="button" class="ip-bisw" data-nsx>Finalement : faire signer le client</button>`:`<div class="ip-b2 ip-b2b">${late?`<button type="button" class="ip-btn2" data-blns="${ix}">📤 Envoyer sans signature</button>`:""}<button type="button" class="ip-btn2" data-blrep2="${ix}">⏸ Reporter la signature</button></div><div id="blch2"></div>`}`}</section>
+  <div style="margin-top:16px"><button type="button" class="ip-cta" id="blval">${ns?"📤 Confirmer l’envoi sans signature":"✔ Valider la signature"}</button><p class="ip-hint" id="blhint" aria-live="polite"></p></div><div class="pberr" id="sge" role="alert"></div>${bi?`<button type="button" class="ip-bisw" data-bisw>${ns?"Finalement : faire signer le client":"Envoyer sans signature client"}</button>`:ns?`<button type="button" class="ip-bisw" data-nsx>Finalement : faire signer le client</button>`:`<p class="ip7-nsw"><button type="button" class="ip7-lnk" data-blns="${ix}">Envoyer sans signature client</button></p><div id="blch2"></div>`/* (13/11) plus de « Reporter » */}`}</section>
   ${bi||fut||ns?"":`<div class="ip-fix"><button type="button" class="ip-cta" data-bls="${ix}">✍ Lancer la signature client</button></div>`}`}`};
  function blStart(ix,noimg){if(!BS||BS.ix!==ix)BS=blNew(ix);if(noimg)BS.noimg=1;BS.step="form";BS.unl=1;const here=(V.v==="it"&&V.ix===ix)||(V.v==="bls"&&!BS.bi);if(here&&document.getElementById("blsig")){if(noimg||!document.getElementById("blliv"))view();blGoSign()}else{nav({v:"bls"});blGoSign()}}
  // « ✍ Lancer la signature client » : si le bloc ② n'est pas complet (terminée ?, remarque obligatoire), le message s'affiche et on y revient ; sinon on descend au bloc ③
@@ -1098,10 +1193,9 @@ const hMin=h=>{const m=/^(\d\d):(\d\d)$/.exec(String(h||""));return m?(+m[1])*60
  // bon indisponible : choix explicite, tracé dans l'intervention (signer quand même / reporter)
  function blChoice(ix){const el=document.getElementById("blch");if(!el)return;el.innerHTML=`<div class="blch" role="alert"><b>⚠ Le bon de livraison n’est pas disponible sur ce téléphone.</b><p>Le client ne peut pas voir ce qu’il signe. Choisissez :</p>
   <button type="button" class="btn gn" data-blany="${ix}">✍ Faire signer quand même<br><small style="font-weight:400">ce sera noté sur le bon signé</small></button>
-  <button type="button" class="btn" data-blrep="${ix}">⏸ Reporter la signature</button>
-  <div id="blrepf" class="hide"><label class="fl" for="blrepm">Pourquoi ? <span class="mu">(facultatif)</span></label><textarea class="fl" id="blrepm" rows="3" style="font-weight:400"></textarea><button type="button" class="btn p" data-blrepok="${ix}">Confirmer le report</button></div></div>`;
-  el.querySelector("[data-blany]").onclick=()=>blStart(ix,1);el.querySelector("[data-blrep]").onclick=()=>{document.getElementById("blrepf").classList.remove("hide");document.getElementById("blrepm").focus()};
-  el.querySelector("[data-blrepok]").onclick=()=>blReport(ix,document.getElementById("blrepm").value.trim());el.scrollIntoView({block:"nearest"})}
+  <button type="button" class="btn" data-blrep="${ix}">Envoyer sans signature client</button></div>`;
+  el.querySelector("[data-blany]").onclick=()=>blStart(ix,1);el.querySelector("[data-blrep]").onclick=()=>blNsAsk(ix);
+  el.scrollIntoView({block:"nearest"})}
  function blRepAsk(ix){const el=document.getElementById("blch2")||document.getElementById("blch");if(!el)return;el.innerHTML=`<div class="blch ip-rep" role="group" aria-label="Reporter la signature"><label class="fl" for="blrepm">Pourquoi reporter ? <span class="mu">(facultatif)</span></label><textarea class="ip-in" id="blrepm" rows="3"></textarea><div class="btns"><button type="button" class="btn" data-blrepx>Annuler</button><button type="button" class="btn p" data-blrepok="${ix}">Confirmer le report</button></div></div>`;
   el.querySelector("[data-blrepx]").onclick=()=>{el.innerHTML=""};el.querySelector("[data-blrepok]").onclick=()=>blReport(ix,document.getElementById("blrepm").value.trim());document.getElementById("blrepm").focus();el.scrollIntoView({block:"nearest"})}
  const NSR=["Client absent","Client a refusé de signer","Oubli","Autre…"];
@@ -1363,7 +1457,7 @@ const hMin=h=>{const m=/^(\d\d):(\d\d)$/.exec(String(h||""));return m?(+m[1])*60
  function vLateBan(f,ix){if(f.clo)return "";const o=vLate(f);if(!o)return "";const m=vMiss(f,o);
   return `<div class="ve-late" role="alert"><b>⚠ ${esc(vCap(vdw(o.day)))} ${o.part==="m"?"matin":"après-midi"} : ${m} signature${m>1?"s":""} manque${m>1?"nt":""}</b><button type="button" class="ve-lgo" data-veh="${ix}:${o.day}:${o.part}">Compléter ›</button></div>`}
  const vBtns=(ix,ro)=>`<div class="ve-4${ro?" ve-4ro":""}">${[["der","📄","Déroulé"],["sup","📚","Supports"],["rem","✎","Remarque"],["pb","⚠","Signaler"]].filter(z=>!ro||z[0]==="der"||z[0]==="sup").map(([k,i,t])=>`<button type="button" class="ve-b ve-b-${k}" data-vb="${ix}:${k}"><i aria-hidden="true">${i}</i><span>${t}</span></button>`).join("")}</div>`;
- function formView(ix){const f=D.f[ix];if(!f)return listView();const tr=f.tr||[],d=vDay(f,ix);
+ function formView(ix){if(!V6)return formV7(ix);const f=D.f[ix];if(!f)return listView();const tr=f.tr||[],d=vDay(f,ix);
   const bil=(f.cl||[]).find(z=>z[0]==="bilan"),br=BIL(f),bilOk=!!(bil&&bil[1])||!!br,last=DS(f).slice(-1)[0]||"",bilOpen=!f.clo&&(bilOk||emgAll(f)||(last&&last<=T));
   const bilL=bilOpen||bilOk?`<${f.clo?"div":"button type=\"button\""} class="ve-bil${bilOk?" ve-bil-ok":""}"${f.clo?"":` data-bil="${ix}"`}><b>📝 Mon bilan de formateur</b><span>${br?"✓ envoyé le "+esc(dm(br.dl))+(pend(br.id)?" · envoi en attente":""):bilOk?"✓ envoyé"+(f.bilr?" le "+esc(dm(f.bilr)):""):"à remplir après la formation ›"}</span></${f.clo?"div":"button"}>`:"";/* clôturé : simple information, plus de bouton */
   return `${f.tst?`<div role="status" style="padding:10px 14px;text-align:center;font:700 15px/1.35 Arial,sans-serif;color:#422006;background:repeating-linear-gradient(135deg,#fef08a 0 14px,#fde047 14px 28px);border-bottom:2px solid #a16207">🧪 TEST — dossier de test : tout fonctionne, les mails partent vers l’adresse de test</div>`:""}<div class="ve">
@@ -1638,7 +1732,7 @@ const tpFab=()=>"";
  // formation (dkForm : jours en cases, Émargement de la demi-journée choisie, Évaluation des acquis, supports en pastilles, actions) ;
  // tout le reste (bon de livraison, signature, listes, évaluation, bilan, déroulé, supports) = les écrans du téléphone, affichés à droite.
  const DKW=1100,dkOn=()=>{try{return window.innerWidth>DKW}catch(e){return false}};let DKSIG=false,DKLAST=null;const DKH={};
- function vHtml(){return V.v==="f"?formView(V.ix):V.v==="eml"?emlView():V.v==="evl"?evlView():V.v==="fd"?fdView():V.v==="fsup"?fsupView():V.v==="sign"?signView():V.v==="ev"?evView():V.v==="acq"?acqView():V.v==="bil"?bilView():V.v==="it"?itView(V.ix):V.v==="bls"?blView():V.v==="bid"?biView(V.n):V.v==="tp"?tpView():listView()}
+ function vHtml(){return V.v==="f"?formView(V.ix):V.v==="emd"?emdV7():V.v==="eml"?emlView():V.v==="evl"?evlView():V.v==="fd"?fdView():V.v==="fsup"?fsupView():V.v==="sign"?signView():V.v==="ev"?evView():V.v==="acq"?acqView():V.v==="bil"?bilView():V.v==="it"?itView(V.ix):V.v==="bls"?blView():V.v==="bid"?biView(V.n):V.v==="tp"?tpView():listView()}
  // première ligne d'aujourd'hui (sinon à régulariser, sinon à venir) : choisie par défaut
  function dkFirst(){const U=uGroups();for(const g of ["auj","reg","ven"])for(const o of U[g]||[]){const h=String(o.h||""),a=h.match(/data-f="(\d+)"/),b=h.match(/data-it="(\d+)"/),c=h.match(/data-bid="([^"]+)"/);
   const i=[a,b,c].map(m=>m?m.index:1e9),k=Math.min(...i);if(k===1e9)continue;if(k===i[0])return{v:"f",ix:+a[1]};if(k===i[1])return{v:"it",ix:+b[1]};return{v:"bid",n:c[1]}}return null}
@@ -1701,7 +1795,7 @@ const tpFab=()=>"";
   document.querySelectorAll("[data-dkph]").forEach(b=>b.onclick=()=>{const z=document.getElementById("fph"+b.dataset.dkph);if(z){z.scrollIntoView({behavior:"smooth",block:"center"});z.classList.add("dk-flash");setTimeout(()=>z.classList.remove("dk-flash"),1600)}})}
  // passage ordinateur ↔ téléphone (fenêtre redimensionnée) : nouvel affichage seulement quand on franchit 1100 px
  window.addEventListener("resize",()=>{clearTimeout(window._dkT);window._dkT=setTimeout(()=>{if(DKLAST===null)return;if(dkOn()!==DKLAST){if(!dkOn())document.body.classList.remove("ip-dk");view()}},150)});
- function view(){if(dkOn())return dkView();if(DKLAST!==null)DKLAST=false;const faire=V.v==="it"&&!!IT[V.ix]&&(blSt(IT[V.ix]).k==="faire"||(!!BS&&!BS.bi&&BS.ix===V.ix&&BS.step!=="form"));const h=vHtml(),nb=(V.v==="list"||V.v==="it"||V.v==="f"||V.v==="bid"||V.v==="eml"||V.v==="evl"||V.v==="fd"||V.v==="fsup")&&!faire;app.innerHTML=h+(nb?navH():"");document.body.classList.toggle("ip-nb",nb);document.body.classList.toggle("ip-fx",!!document.querySelector(".ip-fix"));bind();tpBindAll()}
+ function view(){if(dkOn())return dkView();if(DKLAST!==null)DKLAST=false;const faire=V.v==="it"&&!!IT[V.ix]&&(blSt(IT[V.ix]).k==="faire"&&!bl7Card(V.ix)||(!!BS&&!BS.bi&&BS.ix===V.ix&&BS.step!=="form"));const h=vHtml(),nb=(V.v==="list"||V.v==="it"||V.v==="f"||V.v==="bid"||V.v==="eml"||V.v==="emd"||V.v==="evl"||V.v==="fd"||V.v==="fsup")&&!faire;app.innerHTML=h+(nb?navH():"");document.body.classList.toggle("ip-nb",nb);document.body.classList.toggle("ip-fx",!!document.querySelector(".ip-fix"));bind();tpBindAll()}
  const CDO={};
  function bind(){
   document.querySelectorAll("details.ip-cd").forEach(d=>{if(CDO[d.id])d.open=true;d.ontoggle=()=>{CDO[d.id]=d.open}});
@@ -1742,6 +1836,7 @@ const tpFab=()=>"";
    if(ok){const H=pbHist(f.n);H.push({msg,tsl,rem});try{localStorage.setItem(PBK(f.n),JSON.stringify(H))}catch(e){}document.getElementById("pbh"+i).insertAdjacentHTML("beforeend",`<div class="pbok">✔ ${rem?"Remarque envoyée":"Problème envoyé"} le ${esc(tsl)} : TOPAS informatique est prévenu.</div>`);ta.value="";document.getElementById("pbf"+i).classList.add("hide")}
    else{er.innerHTML=fbHtml(code,(rem?"✎ Remarque – ":"⚠ Problème signalé – ")+f.n+" – "+(D.i||""),"Bonjour,\n\n"+msg)}});
   document.querySelectorAll("[data-ics]").forEach(b=>b.onclick=()=>{const f=D.f.find(x=>x.n===b.dataset.ics);if(!f)return;const bl=new Blob([ics(f)],{type:"text/calendar"}),a=document.createElement("a");a.href=URL.createObjectURL(bl);a.download=f.n+"-planning.ics";document.body.appendChild(a);a.click();setTimeout(()=>a.remove(),500)});
+  bind7();/* (13/11) accueil à onglets, fiches v7, barre de signature qui se cache */
  }
  try{history.replaceState({v:{v:"list"}},"")}catch(e){}
  window.addEventListener("beforeunload",e=>{const dirty=(AQ&&Object.values(AQ.all||{}).some(z=>z&&z.dirty))||(BI&&BI.dirty);if(dirty){e.preventDefault();e.returnValue=""}});
@@ -1926,6 +2021,97 @@ body.ip-fx{padding-bottom:calc(100px + env(safe-area-inset-bottom,0px))}
 .ip-hl .ip-wh{display:flex;gap:8px;align-items:stretch}.ip-hl .ip-ws{flex:1 1 0;min-width:0;min-height:48px;font-size:16px}
 .ip-hnow{flex:none;min-height:48px;padding:0 12px;border:1.5px solid var(--ds-topas,#0c4fa0);border-radius:12px;background:#fff;color:var(--ds-topas,#0c4fa0);font:inherit;font-size:15px;font-weight:800;cursor:pointer}
 @media (max-width:700px),(hover:none) and (pointer:coarse) and (max-width:1100px){.ip-hr{grid-template-columns:1fr}.ip-tp2{grid-template-columns:1fr}.ip-hl>span{font-size:14px}}
+</style>
+<style>/* ===== téléphone v7 (13/11, maquettes tel-v7) : aucun orange ; seuls le rouge du retard et le jaune « commencé » ; textes ≥ 14 px, cibles ≥ 44 px, contraste ≥ 4,5:1 */
+.ip7-hd{margin:-16px -14px 12px;padding:14px 16px 12px;background:#fff;border-bottom:1px solid #e5e7eb}
+.ip7-h1{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}.ip7-hw{min-width:0}
+.ip7-hi{margin:0;font-size:22px;line-height:1.2;color:#111827}.ip7-sub{margin:2px 0 0;font-size:15px;color:#374151}
+.ip7-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:12px}
+.ip7-tab{min-height:48px;padding:6px 4px;border:2px solid var(--t7);border-radius:12px;background:#fff;color:var(--t7);font:700 15px/1.2 inherit;font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap}
+.ip7-tab .ip7-tn{display:inline-flex;min-width:24px;height:24px;padding:0 6px;align-items:center;justify-content:center;border-radius:12px;background:var(--t7);color:#fff;font-size:14px}
+.ip7-tab.on{background:var(--t7);color:#fff}.ip7-tab.on .ip7-tn{background:#fff;color:var(--t7)}
+.ip7-tab-ven{--t7:#2563eb}.ip7-tab-cours{--t7:#374151}.ip7-tab-fait{--t7:#15803d}
+.ip7-list{display:flex;flex-direction:column;gap:8px;padding-bottom:12px}
+.ip7-gh{display:flex;justify-content:space-between;align-items:center;margin:8px 2px 0;font-size:14px;font-weight:800;letter-spacing:.04em;color:#374151}
+.ip7-gh-late{color:#b91c1c}
+.ip7-r{display:flex;align-items:stretch;gap:0;border:1px solid #e5e7eb;border-left:6px solid var(--b7,#374151);border-radius:14px;background:#fff;overflow:hidden}
+.ip7-late{--b7:#dc2626;background:#fef2f2;border-color:#fecaca;border-left-color:#dc2626}.ip7-auj{--b7:#374151}.ip7-ven{--b7:#2563eb}.ip7-done{--b7:#16a34a}
+.ip7-b{flex:1;min-width:0;display:flex;align-items:flex-start;gap:10px;padding:10px 8px 10px 10px;border:0;background:transparent;color:#111827;font-family:inherit;text-align:left;cursor:pointer;min-height:64px}
+.ip7-c{display:flex;flex-direction:column;gap:3px;min-width:0;flex:1}
+.ip7-n{font-size:17px;font-weight:800;line-height:1.25;white-space:normal;overflow-wrap:break-word;word-break:normal;hyphens:manual;color:#111827;text-transform:uppercase}
+.ip7-tl{display:flex;flex-wrap:wrap;gap:6px}
+.ip7-t{display:inline-block;padding:1px 8px;border-radius:999px;font-size:14px;font-weight:700;line-height:1.5}
+.ip7-tb{background:#dbeafe;color:#1e40af}.ip7-tf{background:#ede9fe;color:#5b21b6}.ip7-ti{background:#e0f2fe;color:#075985}
+.ip7-s{font-size:14px;color:#374151;overflow-wrap:anywhere}.ip7-st{font-size:14px;font-weight:700;color:#111827}.ip7-stl{color:#b91c1c}
+.ip7-done .ip7-st{color:#15803d}.ip7-lab{font-size:14px}
+.ip7-ra{flex:none;display:flex;align-items:center;padding:8px 8px 8px 0}
+.ip7-map{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;min-width:64px;min-height:56px;padding:4px 6px;border:1.5px solid #cbd5e1;border-radius:12px;background:#fff;color:#1e3a8a;font-size:14px;font-weight:700;text-decoration:none}
+.ip7-map i{font-style:normal;font-size:18px;line-height:1.1}
+.ip7-adv{max-width:112px;min-height:56px;padding:6px 8px;border:2px solid #b91c1c;border-radius:12px;background:#fff;color:#b91c1c;font:700 14px/1.2 inherit;font-family:inherit;cursor:pointer;text-align:center}
+.ip7-empty{padding:18px 12px;text-align:center;color:#374151;font-size:15px;background:#f9fafb;border:1px dashed #d1d5db;border-radius:14px}
+.ip7-empty.hide,.ip7-r.hide,.ip7-old.hide{display:none}
+.ip7-srw{margin:2px 0 4px}.ip7-srch{border:1.5px solid #d1d5db!important;border-radius:12px!important;padding:8px 12px!important;background:#fff!important}
+.ip7-arc summary{min-height:44px;display:flex;align-items:center;font-size:15px;font-weight:700;color:#374151;cursor:pointer}.ip7-arc[open]{display:flex;flex-direction:column;gap:8px}
+/* fiche formation */
+.ip7f .ip7-fh,.ip7e .ip7-eh{padding:10px 16px 16px;color:#fff}.ip7f .ip7-fh{background:#6d28d9}.ip7e .ip7-eh{background:#374151}
+.ip7-fh .ve-back,.ip7-eh .ve-back,.ip7-bh0 .ve-back{color:#fff}
+.ip7-fn,.ip7-en{margin:2px 0 4px;font-size:22px;line-height:1.2;font-weight:800;overflow-wrap:anywhere;text-transform:uppercase}.ip7-en{text-transform:none}
+.ip7-fs{font-size:15px;line-height:1.35;opacity:.95}
+.ip7-alert{display:inline-block;margin-top:8px;padding:4px 12px;border-radius:999px;background:#fef2f2;color:#b91c1c;font-size:14px;font-weight:800}
+.ip7-alert-n{background:#fff;color:#1e3a8a}
+.ip7-blk{border:2px solid #374151;border-radius:16px;padding:12px;background:#fff}.ip7-blk-ev{border-color:#6d28d9}
+.ip7-bh{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}.ip7-bh h2{margin:0;font-size:18px;color:#111827}
+.ip7-cnt{min-height:44px;padding:0 10px;border:0;background:none;color:#374151;font:700 15px inherit;font-family:inherit;cursor:pointer}
+.ip7-days{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:10px}
+.ip7-day{flex:1 0 60px;min-height:68px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;border-radius:12px;border:2px solid #d1d5db;background:#f9fafb;color:#4b5563;font-family:inherit;cursor:pointer}
+.ip7-day span{font-size:14px}.ip7-day b{font-size:19px}.ip7-day small{font-size:14px;font-weight:700}
+.ip7-day-todo{border-color:#374151;background:#374151;color:#fff}.ip7-day-ok{border-color:#15803d;background:#f0fdf4;color:#15803d}.ip7-day-fut{color:#4b5563}
+.ip7-today{box-shadow:0 0 0 3px #c7d2fe}
+.ip7-go{display:flex;width:100%;min-height:58px;align-items:center;justify-content:center;padding:8px 12px;border:0;border-radius:14px;background:#374151;color:#fff;font:800 17px/1.25 inherit;font-family:inherit;cursor:pointer;text-align:center}
+.ip7-go-fut{background:#f3f4f6;color:#374151;border:2px solid #d1d5db}
+.ip7-ok{padding:12px;border-radius:12px;background:#f0fdf4;color:#15803d;font-weight:800;text-align:center}
+.ip7-evs{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.ip7-ev{min-height:64px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:2px;padding:8px 12px;border-radius:12px;border:2px dashed #a78bfa;background:#fff;color:#5b21b6;font-family:inherit;cursor:pointer;text-align:left}
+.ip7-ev b{font-size:16px}.ip7-ev span{font-size:14px}
+.ip7-ev-now{border:2px solid #6d28d9;background:#6d28d9;color:#fff}.ip7-ev-ok{border:2px solid #15803d;background:#f0fdf4;color:#15803d}
+.ip7-3,.ip7-4{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.ip7-4{grid-template-columns:repeat(4,1fr);margin-top:10px}
+.ip7-3b{min-height:64px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:6px 4px;border:1.5px solid #d1d5db;border-radius:12px;background:#fff;color:#1f2937;font:700 14px/1.2 inherit;font-family:inherit;text-decoration:none;cursor:pointer;text-align:center}
+.ip7-3b i{font-style:normal;font-size:20px}.ip7-3x{opacity:.6;cursor:default}
+.ip7-pn{margin:0;font-size:15px;color:#374151}
+/* écran émargement */
+.ip7-dg{display:flex;flex-direction:column;gap:8px}.ip7-dh{display:flex;align-items:center;gap:8px;margin:4px 2px 0;font-size:14px;font-weight:800;letter-spacing:.03em;color:#374151}
+.ip7-dl{padding:1px 8px;border-radius:999px;background:#fef2f2;color:#b91c1c;font-size:14px;letter-spacing:0}.ip7-dt{padding:1px 8px;border-radius:999px;background:#e0e7ff;color:#3730a3;font-size:14px;letter-spacing:0}
+.ip7-hb{display:flex;align-items:center;gap:10px;width:100%;min-height:64px;padding:10px 12px;border:2px solid #374151;border-radius:14px;background:#fff;color:#111827;font-family:inherit;cursor:pointer;text-align:left}
+.ip7-hb i{font-style:normal;font-size:20px}.ip7-hbt{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}.ip7-hbt b{font-size:17px}.ip7-hbt small{font-size:14px;color:#374151}
+.ip7-hbr{flex:none;font-size:15px;font-weight:800}
+.ip7-hb-part{border-color:#a16207;background:#fefce8}.ip7-hb-part .ip7-hbr{color:#713f12}
+.ip7-bar{display:block;height:6px;margin-top:4px;border-radius:3px;background:#fde68a;overflow:hidden}.ip7-bar i{display:block;height:100%;background:#a16207}
+.ip7-hb-ok{border-color:#15803d;background:#f0fdf4}.ip7-hb-ok .ip7-hbr{color:#15803d}
+.ip7-hb-fut{border-color:#d1d5db;background:#f9fafb;color:#4b5563}.ip7-hb-fut .ip7-hbr{color:#4b5563;font-weight:700}
+.ip7-hb-ns{border-color:#d1d5db;background:#f3f4f6}.ip7-hb-ns .ip7-hbr{color:#374151;font-size:14px;max-width:110px;text-align:right}
+/* fiche du bon */
+.ip7-bh0{margin:-16px -14px 14px;padding:10px 16px 16px;background:#1d4ed8;color:#fff}
+.ip7-kv{margin:0;border:1px solid #e5e7eb;border-radius:14px;background:#fff;overflow:hidden}
+.ip7-kv div{display:flex;gap:10px;padding:10px 12px;border-top:1px solid #f1f5f9}.ip7-kv div:first-child{border-top:0}
+.ip7-kv dt{flex:none;width:78px;font-size:14px;font-weight:700;color:#4b5563}.ip7-kv dd{margin:0;flex:1;min-width:0;font-size:15px;color:#111827;overflow-wrap:anywhere}
+.ip7-tel{display:inline-flex;align-items:center;justify-content:center;min-width:44px;min-height:44px;margin:-10px 0;text-decoration:none;font-size:20px}
+.ip7-bh0~.ve-in .ip7-go,.ip7-kv+.ip7-go{margin-top:12px}
+.ip7-img{margin-top:10px}.ip7-img.hide{display:none}
+.ip7-abs{margin:14px 0 0;text-align:center;font-size:15px;color:#374151}
+.ip7-lnk{min-height:44px;padding:0 6px;border:0;background:none;color:#1e3a8a;font:700 15px inherit;font-family:inherit;text-decoration:underline;cursor:pointer}
+.ip7-nsw{margin:12px 0 0;text-align:center}.ip7-lnkc{display:block;margin:8px auto 0}
+.ip7-sheet{position:fixed;inset:0;z-index:90;display:flex;align-items:flex-end;justify-content:center;background:rgba(15,23,42,.45)}
+.ip7-shb{width:100%;max-width:560px;max-height:92vh;overflow:auto;padding:18px 16px calc(16px + env(safe-area-inset-bottom,0px));border-radius:18px 18px 0 0;background:#fff;color:#111827;box-sizing:border-box}
+.ip7-shb h2{margin:0 0 8px;font-size:19px}.ip7-shf{display:flex;gap:8px;margin-top:12px}.ip7-shf>*{flex:1}
+.ip7-shf .ip-cta{background:#374151;box-shadow:none;min-height:52px}
+.ip7-sheet .nsrb[aria-checked="true"]{border-color:#374151;background:#374151;color:#fff}
+.ip7-b .ip-d{display:flex;flex-direction:column;align-items:center;width:44px;flex:none;line-height:1.1;padding-top:2px}.ip7-b .ip-d b{font-size:20px;color:#111827}.ip7-b .ip-d small{font-size:14px;color:#374151}
+.ip7f .ve-bil span{color:#374151}.ip7f .ve-bil{border-color:#d1d5db}.ip7-4 a.ip7-3b,.ip7-3 a.ip7-3b{font-weight:700;color:#1f2937}
+body.ip7 .qb.qw{border-color:#374151;background:#f9fafb;color:#1f2937}body.ip7 .qb.qw b,body.ip7 .qb.qw span{color:#1f2937}/* (13/11) avertissements en anthracite, plus d’orange */
+.ip7-r.ip7-late{flex-wrap:wrap}.ip7-late .ip7-ra{width:100%;padding:0 10px 10px 64px;box-sizing:border-box}.ip7-late .ip7-adv{max-width:none;width:100%;min-height:48px}
+.ip7-tab{gap:4px;padding:6px 2px}
+/* barre « Lancer la signature client » : cachée quand la partie signature est à l'écran */
+body.ip7-fixoff .ip-fix{display:none}
 </style>
 </body>
 </html>
