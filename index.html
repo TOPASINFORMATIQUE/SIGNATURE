@@ -283,6 +283,73 @@ function emgsPage(D){const app=$("#app"),G=Array.isArray(D.g)?D.g:[],org=G[0]||"
 // jusqu'au cadre de la page 2, clic obligatoire = même signature placée (vaut « Lu et approuvé ») ; 4) « Terminer et envoyer » (commentaire
 // facultatif juste au-dessus). Rien n'est déposé avant ce clic ; « Signé » seulement après la réponse du serveur. Liens sans zones : mêmes
 // étapes par des boutons sous le contrat. Dépôt k:"abo" avec h1 (page 1), h2 (page 2), gd:1.
+/* ===== ✍ BON DE LIVRAISON À SIGNER EN LIGNE (13/11) : même fonction que le contrat d'abonnement, sans mode de règlement. Le bon s'affiche page
+   par page (images publiées par TOPAS, lues par contrat_lire) ; un calque cliquable est posé sur le cadre « Nom Prénom du signataire / Date /
+   Signature » de CHAQUE page (D.F). 1er cadre → fenêtre de signature (Prénom, NOM, deux façons de signer) ; cadres suivants : même signature
+   placée d'un clic. Commentaire facultatif puis « Terminer et envoyer » : un seul dépôt k:"blc" (réponse du serveur attendue, sinon Réessayer). */
+function blcPage(D){const app=$("#app"),id=new URLSearchParams(location.search).get("l")||"",G=Array.isArray(D.g)?D.g:[],org=G[0]||"",tel=G[2]||"",cm=D.m||G[3]||FB_MAIL,L=Array.isArray(D.L)?D.L:[],KEY="fpsig:blc:"+(D.it||D.n||"")+":"+(D.v||1);
+ const TT=String(D.ti||("Bon de livraison"+(D.n?" N° "+D.n:"")));document.title=TT;let done=null;try{done=JSON.parse(localStorage.getItem(KEY)||"null")}catch(e){}
+ const kt=k=>k==="manuscrite"?" · signature manuscrite":k==="simple"?" · signature électronique simple":"";
+ const zOk=a=>a&&[a.x,a.y,a.w,a.h].every(v=>typeof v==="number"&&v>=0&&v<=1.01)&&Number.isInteger(a.p)&&a.p>=0&&a.p<L.length;
+ const F=(Array.isArray(D.F)?D.F:[]).filter(zOk).slice(0,4),FB=!F.length;
+ const pc=a=>`left:${(a.x*100).toFixed(2)}%;top:${(a.y*100).toFixed(2)}%;width:${(a.w*100).toFixed(2)}%;height:${(a.h*100).toFixed(2)}%`;
+ const info=`<div class="card emgs-c"><div class="emgs-h"><img src="logo.jpg" alt="" style="height:48px"><div><div class="emgs-o">${esc(org)}</div><h1 class="emgs-t">${esc(TT)}</h1><div class="abo-sub">${esc(D.c||"")}</div></div></div>
+  <table class="emgs-i"><tr><th>Client</th><td><b>${esc(D.c||"")}</b></td></tr>${D.d?`<tr><th>Intervention</th><td>${esc(fd(D.d))}</td></tr>`:""}${D.a?`<tr><th>Adresse</th><td>${esc(D.a)}</td></tr>`:""}</table>
+  ${done?"":`<p class="mu abs-how">Vérifiez le bon, puis signez-le comme sur papier, directement sur le document : cliquez dans le cadre de signature${F.length>1?" de chaque page":""}.</p>`}</div>`;
+ const figs=L.length?L.map((u,i)=>`<figure class="abof" id="abof${i}" data-p="${i}"><figcaption>${esc(u.t||"Page "+(i+1))}</figcaption><div class="abs-im"><div class="mu abos" role="status">⏳ Chargement de la page…</div><div class="abs-ov" id="abov${i}"></div></div></figure>`).join(""):"<p>Bon de livraison indisponible.</p>";
+ const fb=FB?`<div class="card abs-fb" id="abofb"><h2 class="abs-h">✍ Signature du bon de livraison</h2><button type="button" class="abs-fbb" data-act="f0" id="fbs1">✍ Signer le bon de livraison</button><div class="abs-fbp" id="fbp1"></div></div>`:"";
+ const fin=`<div class="card abs-fin noprint" id="abofin" hidden><div class="abo-cm"><label for="abocm">Commentaire <span class="sgf-mu">(facultatif)</span></label><textarea id="abocm" rows="2" maxlength="1000" placeholder="Une remarque sur la livraison ou l’intervention ? Écrivez-la ici…"></textarea></div>
+  <p class="sgf-mu">En cliquant sur « Terminer », vous confirmez la réception de ce qui figure sur le bon de livraison. Cette signature électronique simple vaut signature du bon ; elle est transmise uniquement à ${esc(org)}.</p>
+  <div class="err" id="err" role="alert"></div><button class="go" id="go" type="button">✓ Terminer et envoyer le bon signé</button></div>`;
+ const dlg=`<div class="abs-dlg" id="abodlg" role="dialog" aria-modal="true" aria-labelledby="abodlgt" hidden><div class="abs-dlgb sgf"><h2 class="abs-h" id="abodlgt">✍ Signature du bon de livraison</h2>
+  <div class="abs-nm"><div><label for="spr">Prénom</label><input type="text" id="spr" autocomplete="given-name"></div><div><label for="sno">NOM</label><input type="text" id="sno" autocomplete="family-name"></div></div>
+  <div id="sgw"></div><div class="err" id="err1" role="alert"></div><div class="abs-dlga"><button type="button" class="abs-no" id="dlgno">Annuler</button><button type="button" class="go" id="dlgok">✓ Valider ma signature</button></div></div></div>`;
+ const okHtml=()=>`<div class="card okb noprint" id="blc-ok"><div class="okt">✔ Merci, le bon de livraison est signé !</div><p>${esc(org)} a bien reçu votre signature. Vous recevrez votre exemplaire signé par e-mail.</p><div class="sgfm">✅ Signé électroniquement par ${esc(done.nm)} le ${esc(done.tsl)}${done.rf?" · réf. "+esc(done.rf):""}${kt(done.sk)}</div>${done.cm?`<p>Votre commentaire : « ${esc(done.cm)} »</p>`:""}${done.sg?sigSvg(done.sg):""}<p>Vous pouvez fermer cette page.</p></div>`;
+ app.innerHTML=info+(done?okHtml():`<div id="abs"><div class="card abo-pgs">${figs}</div>${fb}${fin}</div>${dlg}<div class="abs-msg" id="abomsg" role="status" aria-live="polite" hidden></div>`)+'<div id="res"></div>';
+ let nOk=0;
+ L.forEach(async(u,i)=>{const f=document.getElementById("abof"+i),st=f&&f.querySelector(".abos");if(!st)return;if(!u.cle||!id){st.textContent="Page indisponible.";return}
+  try{let a=0,P=[],h=null;for(;;){const r=await fetch(SBU+"/rest/v1/rpc/contrat_lire",{method:"POST",headers:{apikey:SBK,"Content-Type":"application/json"},body:JSON.stringify({p_lien:id,p_cle:u.cle,p_a:a,p_b:a+4})}),j=r.ok?await r.json():null;
+    if(!j||!j.ok){st.textContent=j&&j.etat==="expire"?"Ce lien a expiré.":"Page indisponible pour l’instant. Réessayez plus tard ou écrivez-nous"+(cm?" : "+cm:"")+".";return}h=j;(j.morceaux||[]).forEach(m=>{P[m.n]=m.b64});a+=5;if(a>=(+j.n||0))break}
+   if(P.filter(Boolean).length<(+h.n||0))throw 0;const t=atob(P.join("")),by=new Uint8Array(t.length);for(let k=0;k<t.length;k++)by[k]=t.charCodeAt(k);const url=URL.createObjectURL(new Blob([by],{type:h.type||"image/jpeg"}));
+   st.outerHTML=`<img src="${url}" alt="${esc(u.t||"Page "+(i+1))}" class="aboimg">`;const cap=f.querySelector("figcaption");if(cap)cap.insertAdjacentHTML("beforeend",` · <a href="${url}" target="_blank" rel="noopener">🔍 Agrandir</a>`);nOk++;if(!done)paint()}
+  catch(e){st.textContent="Page indisponible pour l’instant. Réessayez plus tard."}});
+ if(done)return;
+ /* état : s1 = signature (copie figée, heure du 1er cadre) ; H[j] = heure de la signature placée dans le cadre j */
+ let s1=null,H=[],sending=false,msgT=0;const NF=Math.max(1,F.length);
+ const SW=window.SGW_CUR=SIGW.mount($("#sgw"),{name:()=>((($("#spr")||{}).value||"")+" "+(($("#sno")||{}).value||"")).trim(),max:2200});["#spr","#sno"].forEach(s=>{const i=$(s);if(i)i.addEventListener("input",()=>SW.refresh())});
+ const now=()=>{const n=new Date(),p2=v=>String(v).padStart(2,"0");return {dl:n.getFullYear()+"-"+p2(n.getMonth()+1)+"-"+p2(n.getDate()),hl:p2(n.getHours())+":"+p2(n.getMinutes())}};
+ const say=(t,ko)=>{const m=$("#abomsg");if(!m)return;m.textContent=t;m.className="abs-msg"+(ko?" ko":"");m.hidden=false;clearTimeout(msgT);msgT=setTimeout(()=>{m.hidden=true},5000)};
+ const goTo=el=>{if(!el)return;try{el.scrollIntoView({block:"center"})}catch(e){}};
+ const pv=h=>`<span class="abs-sv">${sigSvg(s1.sg)}</span><span class="abs-sn">${esc(s1.nm)} · ${esc(fd(s1.dl))} ${esc(h.replace(":","h"))}</span>`;
+ const allOk=()=>!!s1&&H.filter(Boolean).length>=NF;
+ function paint(){L.forEach((u,i)=>{const o=document.getElementById("abov"+i);if(!o)return;let h="";
+  F.forEach((z,j)=>{if(z.p!==i)return;const on=!H[j]&&(j===0||!!s1);h+=`<button type="button" class="abs-fr ${H[j]?"done":on?"on":"lock"}" id="blcf${j}" data-act="f${j}" style="${pc(z)}" aria-label="${H[j]?"Signature placée":"Cliquez ici pour signer"}">${H[j]?"":on?`<span class="abs-cta">✍ Cliquez ici pour signer${j&&s1?"<small>nom et signature repris</small>":""}</span>`:""}</button>`;
+   if(H[j])h+=`<div class="abs-zn" style="${pc(z)}">${pv(H[j])}</div>`});o.innerHTML=h});
+  const p1=$("#fbp1");if(p1)p1.innerHTML=s1?`<div class="abs-pvb">✓ Bon signé : ${pv(H[0])}</div>`:"";const fn=$("#abofin");if(fn)fn.hidden=!allOk()}
+ const openSig=()=>{const d=$("#abodlg"),m0=$("#abomsg");if(m0)m0.hidden=true;d.hidden=false;document.body.classList.add("abs-lock");$("#err1").textContent="";try{SW.refresh()}catch(e){}setTimeout(()=>{const i=$("#spr").value?$("#sno"):$("#spr");try{i.focus({preventScroll:true})}catch(e){}},30)};
+ const closeSig=()=>{$("#abodlg").hidden=true;document.body.classList.remove("abs-lock")};
+ const next=()=>{const j=F.findIndex((z,k)=>!H[k]);if(j>=0){say("✓ Signature placée — encore "+(NF-H.filter(Boolean).length)+" cadre"+(NF-H.filter(Boolean).length>1?"s":"")+" à signer (page "+(F[j].p+1)+")");setTimeout(()=>goTo($("#blcf"+j)),80)}else{say("✓ Bon signé — vous pouvez terminer et envoyer.");setTimeout(()=>goTo($("#abofin")),80)}};
+ function act(a){if(sending)return;const j=+String(a).slice(1)||0;
+  if(j===0&&!s1)return openSig();if(j===0&&s1&&!F.length)return openSig();
+  if(!s1){say("Signez d’abord le premier cadre de signature.",1);goTo($("#blcf0"));return}
+  if(H[j])return;H[j]=now().hl;paint();next()}
+ document.addEventListener("click",e=>{const b=e.target.closest("#abs [data-act]");if(b)act(b.dataset.act)});
+ $("#dlgno").onclick=closeSig;$("#abodlg").addEventListener("keydown",e=>{if(e.key==="Escape")closeSig()});
+ $("#dlgok").onclick=()=>{const e=$("#err1"),pr=$("#spr").value.trim().replace(/\s+/g," "),no=$("#sno").value.trim().replace(/\s+/g," ");e.textContent="";
+  if(!pr)return(e.textContent="Merci d’indiquer votre prénom.",$("#spr").focus());if(!no)return(e.textContent="Merci d’indiquer votre NOM.",$("#sno").focus());
+  if(!SW||SW.empty())return e.textContent=SW&&SW.mode()==="draw"?"Merci de signer dans le cadre (ou choisissez « ✍ Signature simple »).":"Merci d’indiquer votre prénom et votre nom.";
+  const T=now();s1={pr,no,nm:pr+" "+no,sg:SW.get(),sm:SW.how(),sk:SW.kind(),dl:T.dl};H=[T.hl];closeSig();paint();next()};
+ const ref=()=>{const a="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";let t="";try{const u=new Uint8Array(6);crypto.getRandomValues(u);u.forEach(x=>t+=a[x%a.length])}catch(e){for(let i=0;i<6;i++)t+=a[Math.floor(Math.random()*a.length)]}return "S-"+t};
+ $("#go").onclick=async()=>{const err=$("#err"),c=String(($("#abocm")||{}).value||"").trim().slice(0,1000);err.textContent="";
+  if(!allOk()){const j=F.findIndex((z,k)=>!H[k]);return act("f"+Math.max(0,j))}
+  if(nOk<L.length)return err.textContent="Patientez : le bon n’est pas encore entièrement affiché.";
+  const go=$("#go");go.disabled=true;go.textContent="Envoi en cours…";sending=true;const T=now(),rf=ref(),hl=H[H.length-1]||T.hl;
+  const payload={t:"fp-sign",k:"blc",id:rf,it:D.it||"",n:D.n||"",bv:+D.v||1,nm:s1.nm,pr:s1.pr,no:s1.no,fn:"",dl:T.dl,hl,h1:H[0],hs:H.slice(0,4),tsl:fd(T.dl)+" à "+hl,sg:s1.sg,sm:s1.sm,sk:s1.sk,rf,lu:1,cm:c,res:c?1:0,lb:"rem",rc:c},code="FPSIG:"+b64u(payload);
+  let ok=false;if(D.t){try{ok=!!(await sbDep(D.t,payload))}catch(e){ok=false}}
+  if(!ok){sending=false;go.disabled=false;go.textContent="✓ Terminer et envoyer le bon signé";$("#res").innerHTML=`<div class="card noprint" id="sigko" style="border-color:var(--ko)" role="alert"><div class="okt" style="color:var(--ko)">Signature non transmise : rien n’a été envoyé</div><p>Le serveur n’a pas répondu : le bon n’est pas signé. Vérifiez votre connexion puis réessayez ; sinon utilisez le code de secours ci-dessous.</p><button class="go" id="retry" type="button">↻ Réessayer</button>${fbHtml(code,TT+" signé – "+s1.nm,"Bonjour,\n\n"+s1.nm+" a signé en ligne le "+TT.charAt(0).toLowerCase()+TT.slice(1)+" ("+(D.c||"")+"), mais l’envoi automatique a échoué. Voici le code de signature :\n\n")}</div>`;const rt=$("#retry");if(rt)rt.onclick=()=>{$("#res").innerHTML="";go.click()};return}
+  done={nm:s1.nm,tsl:payload.tsl,sg:payload.sg,rf,sk:payload.sk,cm:c};try{localStorage.setItem(KEY,JSON.stringify(done))}catch(e){}
+  const a=$("#abs");if(a)a.remove();const d=$("#abodlg");if(d)d.remove();$("#res").innerHTML=okHtml();window.scrollTo(0,0)};
+ paint()}
 function aboPage(D){const app=$("#app"),id=new URLSearchParams(location.search).get("l")||"",G=Array.isArray(D.g)?D.g:[],org=G[0]||"",tel=G[2]||"",cm=D.m||G[3]||FB_MAIL,L=Array.isArray(D.L)?D.L:[],KEY="fpsig:abo:"+(D.ab||D.n||"")+":"+(D.v||1);
  const TT="Contrat "+(D.it||"d’abonnement")+(D.n?" N° "+D.n:"");document.title=TT;let done=null;try{done=JSON.parse(localStorage.getItem(KEY)||"null")}catch(e){}
  {const n=new Date(),p2=v=>String(v).padStart(2,"0"),T=n.getFullYear()+"-"+p2(n.getMonth()+1)+"-"+p2(n.getDate());
@@ -377,6 +444,7 @@ if(D&&D.k==="sup"){supPage(D);return}
 if(D&&D.k==="ph"){phPage(D);return}
 if(D&&D.k==="emgs"){emgsPage(D);return}
 if(D&&D.k==="abo"){aboPage(D);return}
+if(D&&D.k==="blc"){blcPage(D);return}
 const app=$("#app");
 if(!D||!D.n||!D.g){app.innerHTML='<div class="card"><h1>Lien incomplet</h1><p>Ce lien de signature est incomplet ou a été modifié. Merci de rouvrir le lien reçu par e-mail, tel quel, ou de contacter l’organisme de formation.</p></div>';return}
 const plan=D.k==="plan",dev=D.k==="dev",ro=!!D.ro,G=D.g,C=D.c||D.cl||["","",""],tr=D.tr||[];
