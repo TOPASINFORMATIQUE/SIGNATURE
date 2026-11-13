@@ -80,6 +80,40 @@ input[type=date]{font:inherit;padding:10px;border:1px solid var(--br);border-rad
 .pdx{margin-top:22px;break-before:page;page-break-before:always}.pdj{border:1px solid #c9cde0;border-radius:6px;margin:8px 0;overflow:hidden}.pdh{background:#12308f;color:#fff;font-weight:700;padding:6px 10px}.pdb{padding:4px 10px 2px;break-inside:avoid}.pdt{font-weight:700;color:#12308f;margin-top:4px}.pdm{font-weight:600;margin-top:3px}.pdb ul{margin:2px 0 4px 18px;padding:0}
 
 /* contrat d'abonnement : on signe en cliquant sur les cadres du contrat (13/11) */
+/* (13/11 soir) contrat en PAGE ENTIÈRE + panneau « Signer le contrat » (aboPageV2, maquette abo-page) */
+body.abv-on{overflow:hidden}
+body.abv-on .abs-msg{left:auto;right:12px;top:auto;bottom:12px;transform:none;max-width:336px}/* message posé sur le panneau, jamais sur le contrat */
+@media (max-width:700px){body.abv-on .abs-msg{left:8px;right:8px;max-width:none}}
+.abv3{position:fixed;inset:0;z-index:40;display:grid;grid-template-columns:minmax(0,1fr) 360px;background:#e2e8f0}
+.abv3 .abz.abv-view{max-height:none;height:100%;overflow:auto;background:#e2e8f0;overscroll-behavior:contain;outline:none}
+.abv3 .abz-in{display:flex;flex-direction:column;align-items:center;gap:16px;padding:12px 16px;width:auto!important;min-width:min-content}
+.abv3 .abof{margin:0;flex:none;background:#fff;box-shadow:0 4px 18px rgba(15,23,42,.18);border-radius:2px}
+.abv3 .aboimg{border:0;border-radius:2px;width:100%;height:auto;display:block}
+.abv3 .abv-cap{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.abv3 .abs-ov>*{position:absolute}
+.abv3 .abos{padding:40px 16px;text-align:center}
+.abv-pan{background:#fff;border-left:1px solid #cbd5e1;overflow:auto;padding:18px 18px 22px;display:flex;flex-direction:column;gap:12px;font-size:15px;color:#0f172a}
+.abv-hd{display:flex;gap:12px;align-items:center}.abv-hd img{height:44px;width:auto}.abv-org{font:700 14px system-ui,sans-serif;color:#1e3a8a}.abv-ti{font:800 17px/1.25 system-ui,sans-serif;color:#0f172a}.abv-sub{font-size:14px;color:#475569}
+.abv-inf{width:100%;border-collapse:collapse;font-size:14px}.abv-inf th{text-align:left;color:#475569;font-weight:600;padding:4px 8px 4px 0;width:72px;vertical-align:top}.abv-inf td{padding:4px 0;border-bottom:1px solid #e2e8f0}
+.abv-h2{margin:6px 0 0;font:800 18px system-ui,sans-serif;color:#14532d}
+.abv-steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.abv-s{display:flex;gap:10px;align-items:flex-start;padding:8px 10px;border:1px solid #e2e8f0;border-radius:10px;background:#f8fafc}.abv-s b{display:block;font-size:15px}.abv-s small{display:block;color:#475569;font-size:14px;line-height:1.35}
+.abv-s.cur{border-color:#16a34a;background:#f0fdf4;box-shadow:0 0 0 2px rgba(22,163,74,.18)}.abv-s.ok .abv-n{background:#15803d;border-color:#15803d;color:#fff}
+.abv-n{flex:none;width:26px;height:26px;border-radius:50%;border:2px solid #94a3b8;display:flex;align-items:center;justify-content:center;font:800 14px system-ui,sans-serif;color:#334155;background:#fff}.abv-s.cur .abv-n{border-color:#16a34a;color:#15803d}
+.abv-ch{font-weight:700;color:#14532d}.abv-lk2{background:none;border:0;color:#1d4ed8;text-decoration:underline;font:inherit;font-size:14px;cursor:pointer;padding:0 2px;min-height:24px}
+.abv-act{display:flex;flex-direction:column;gap:8px}.abv-act .abv-cta,.abv-act .abv-sec{width:100%}.abv-row{display:flex;gap:8px;flex-wrap:wrap}.abv-row>*{flex:1 1 140px}
+.abv-ok{margin:0;color:#14532d;font-weight:700}.abv-rgf{border:1px solid #e2e8f0;border-radius:10px;padding:6px 10px;margin:0}.abv-rgf legend{font-size:14px;color:#334155;padding:0 4px}
+.abv-rgo{display:flex;gap:8px;align-items:flex-start;padding:6px 0;font-size:14.5px;cursor:pointer;min-height:36px}.abv-rgo input{width:20px;height:20px;flex:none;margin-top:1px}
+.abv-zoom{display:flex;gap:6px;flex-wrap:wrap}.abv-zoom .abz-b{flex:1 1 auto}
+.abv-cmd summary{cursor:pointer;color:#334155;font-size:14px;min-height:32px}.abv-cmd textarea{width:100%;box-sizing:border-box;margin-top:6px;font:15px system-ui,sans-serif}
+.abv-nb2{margin:0;color:#475569;font-size:13.5px}.abv-chm{display:none}
+.abv3 .abv-fr{pointer-events:auto;background:transparent;border:3px solid transparent;border-radius:3px;cursor:pointer;padding:0}
+.abv3 .abv-fr.on,.abv3 .abv-fr2.on{border-color:#16a34a;box-shadow:0 0 0 3px rgba(22,163,74,.25);background:rgba(220,252,231,.2)}
+.abv3 .abv-fr.lock,.abv3 .abv-fr2.lock{border:2px dashed #94a3b8}.abv3 .abv-fr.done{border:2px solid #16a34a;background:transparent}
+.abv3 .abs-rg{border-radius:3px}
+@media (max-width:700px){.abv3{grid-template-columns:1fr;grid-template-rows:minmax(0,1fr) auto}.abv-pan{border-left:0;border-top:1px solid #cbd5e1;max-height:46vh;padding:10px 14px 14px;gap:8px;box-shadow:0 -6px 18px rgba(15,23,42,.12)}
+ .abv-hd img{height:32px}.abv-ti{font-size:15px}.abv-infw,.abv-sub{display:none}.abv-h2{font-size:16px;margin:0}.abv-steps{flex-direction:row;gap:4px}.abv-s{flex:1;padding:6px;gap:6px}.abv-s small{display:none}.abv-s b{font-size:14px}
+ .abv-s:not(.cur) b{font-weight:600;color:#475569}.abv-chm:not(:empty){display:block;font-size:14px;color:#14532d}.abv3 .abz-in{padding:8px;gap:10px}.abv-zoom .abz-b,.abv-act .abv-cta,.abv-act .abv-sec,.abv-lk2,.abv-cmd summary,.abv-rgo{min-height:44px}.abv-nb2{font-size:14px}}
 /* (13/11 correctif) visionneuse zoomable et signature lisible (aboPageV2) */
 .abv2 .abz-card{padding:0;overflow:hidden;width:min(1100px,calc(100vw - 32px));position:relative;left:50%;transform:translateX(-50%)}
 .abz-hd{display:flex;justify-content:space-between;align-items:center;gap:8px 12px;flex-wrap:wrap;background:#15803d;color:#fff;padding:10px 14px}.abz-ti{font-size:15px}
@@ -366,72 +400,99 @@ function blcPage(D){const app=$("#app"),id=new URLSearchParams(location.search).
   done={nm:s1.nm,tsl:payload.tsl,sg:payload.sg,rf,sk:payload.sk,cm:c};try{localStorage.setItem(KEY,JSON.stringify(done))}catch(e){}
   const a=$("#abs");if(a)a.remove();const d=$("#abodlg");if(d)d.remove();$("#res").innerHTML=okHtml();window.scrollTo(0,0)};
  paint()}
-// (13/11, correctif URGENT — captures de Juliette) signature du contrat d'abonnement lisible : visionneuse zoomable (pages HD, 🔍 − / + ,
-// « Voir la page entière », pincer au téléphone), zoom automatique à chaque étape (1 cases du règlement, 2 cadre « Pour le Client »,
-// 3 cadre de la page 2), zones des cases calées une par ligne (jamais sur la ligne voisine, anciens liens compris), bouton SOUS le cadre,
-// signature écrite à la main dans le cadre agrandi, affichée en grand dans le cadre, puis défilement doux (~2 s) jusqu'au cadre de la page 2
-// (même signature), « Lu et approuvé » + « Valider et envoyer » obligatoires. Dépôt identique (k:"abo", h1, h2, gd:2) : PDF signé inchangé.
-function aboPageV2(C){const {D,app,id,org,cm,L,KEY,TT,info,RG,rc0,F1,F2,rgT,pa0}=C,R1=1.4142;
+// (13/11 soir, correctif — capture de Juliette, maquette abo-page) le contrat s'affiche PAGE ENTIÈRE, comme le PDF : ordinateur = chaque page
+// ajustée à la hauteur de la fenêtre (page 1 entière visible sans défiler), téléphone = ajustée à la largeur (zoom à deux doigts), pages HD.
+// Plus de zoom automatique qui coupe le contrat. Panneau « Signer le contrat » à droite (ordinateur) / en bas (téléphone), dans sa propre colonne :
+// il ne recouvre jamais le contrat. Étapes 1 Mode de règlement (choix affiché + « modifier ») · 2 Signer la page 1 · 3 Valider la page 2,
+// bouton de l'étape en cours, loupe − / + et « Ajuster à l'écran ». Zones des cases = le carré + sa ligne de texte, recoupées sur l'image au
+// premier trait de cadre rencontré (jamais sur le cadre des totaux, anciens liens compris). Fenêtre de signature, signature visible dans le cadre,
+// défilement doux vers la page 2, « Lu et approuvé » + « Valider et envoyer » : comme v496. Dépôt identique (k:"abo", h1, h2, gd:2).
+function aboPageV2(C){const {D,app,id,org,cm,L,KEY,TT,rc0,F1,F2,pa0}=C,R1=1.4142;
+ const RG=(C.RG||[]).map(l=>String(l||"").replace(/\s+(TOTAL\s+(HT|TTC)|TVA\s+\d|MONTANT\s+(HT|TTC)|NET\s+A\s+PAYER)\b.*$/i,"").trim());
  const ZR=(()=>{const Z=(C.ZR||[]).map(z=>Object.assign({},z,{b:z.b?Object.assign({},z.b):null}));if(!Z.length)return Z;
-  const ov=Z.some((z,j)=>j&&Z[j-1].y+Z[j-1].h>z.y+.0005);if(!ov)return Z;/* anciens liens : zones qui se chevauchent → une bande par ligne, centrée sur le texte */
+  const ov=Z.some((z,j)=>j&&Z[j-1].y+Z[j-1].h>z.y+.0005);if(!ov)return Z;/* anciens liens : zones qui se chevauchent → une bande par ligne */
   const bt=Z.map(z=>z.y+z.h),dd=Z.length>1?bt.slice(1).map((v,j)=>v-bt[j]).sort((a,b)=>a-b)[Math.floor((Z.length-1)/2)]:Z[0].h,d=Math.max(.006,Math.min(.04,dd));
   return Z.map((z,j)=>{const c=bt[j]-.45*d,t=c-d/2+.0006,h=d-.0012,bh=Math.min(h*.78,(z.b&&z.b.w?z.b.w*R1:h*.78)),bw=bh/R1;return Object.assign(z,{y:+t.toFixed(4),h:+h.toFixed(4),b:{x:z.b?z.b.x:z.x+.004,w:+bw.toFixed(4),y:+(c-bh/2).toFixed(4),h:+bh.toFixed(4)}})})})();
  const pc=a=>`left:${(a.x*100).toFixed(3)}%;top:${(a.y*100).toFixed(3)}%;width:${(a.w*100).toFixed(3)}%;height:${(a.h*100).toFixed(3)}%`;
  const XS=`<svg viewBox="0 0 10 10" preserveAspectRatio="none" aria-hidden="true"><path d="M1.6 1.6L8.4 8.4M8.4 1.6L1.6 8.4"/></svg>`;
- const figs=L.map((u,i)=>`<figure class="abof" id="abof${i}" data-p="${i}"><figcaption>${esc(u.t||"Page "+(i+1))}</figcaption><div class="abs-im"><div class="mu abos" role="status">⏳ Chargement de la page…</div><div class="abs-ov" id="abov${i}"></div></div></figure>`).join("");
+ const mob=()=>innerWidth<=700;
+ const figs=L.map((u,i)=>`<figure class="abof" id="abof${i}" data-p="${i}"><figcaption class="abv-cap">${esc(u.t||"Page "+(i+1))}</figcaption><div class="abs-im"><div class="mu abos" role="status">⏳ Chargement de la page…</div><div class="abs-ov" id="abov${i}"></div></div></figure>`).join("");
  const dlg=`<div class="abs-dlg abv-dlg" id="abodlg" role="dialog" aria-modal="true" aria-labelledby="abodlgt" hidden><div class="abs-dlgb sgf abv-frame"><h2 class="abs-h" id="abodlgt">✍ Pour le Client — Date, cachet &amp; signature</h2>
   <div class="abs-nm"><div><label for="spr">Prénom</label><input type="text" id="spr" autocomplete="given-name" value="${esc(pa0.length>1?pa0[0]:"")}"></div><div><label for="sno">NOM</label><input type="text" id="sno" autocomplete="family-name" value="${esc(pa0.length>1?pa0.slice(1).join(" "):pa0[0]||"")}"></div></div>
   <p class="abv-how" id="abvhow">Signez ci-dessous avec le doigt ou la souris, comme sur papier.</p><div id="sgw"></div>
   <div class="abv-sw"><button type="button" class="abv-lk" id="abvmode">Signature simple (écrite à partir du nom)</button></div>
   <div class="err" id="err1" role="alert"></div><div class="abs-dlga"><button type="button" class="abs-no" id="dlgno">Annuler</button><button type="button" class="abs-no" id="dlgclr">↺ Effacer</button><button type="button" class="go" id="dlgok">✓ Valider ma signature</button></div></div></div>`;
- app.innerHTML=info+`<div id="abs" class="abv2"><div class="card abz-card"><div class="abz-hd"><b class="abz-ti" id="abzti">${esc(TT)}</b><span class="abz-st" id="abzst" role="status" aria-live="polite"></span></div>
-  <div class="abz" id="abz" tabindex="0" aria-label="Contrat : faites glisser pour vous déplacer"><div class="abz-in" id="abzin">${figs}</div></div>
-  <div class="abz-tb"><button type="button" class="abz-b" data-z="-1" aria-label="Réduire">🔍 −</button><button type="button" class="abz-b" data-z="1" aria-label="Agrandir">🔍 +</button><button type="button" class="abz-b" data-z="0">Voir la page entière</button><button type="button" class="abz-b abz-go2" id="abzgo2" hidden>Aller à la 2e signature ↓</button></div></div>
-  <div class="card abo-cm abv-cm"><label for="abocm">Commentaire <span class="sgf-mu">(facultatif)</span></label><textarea id="abocm" rows="2" maxlength="1000" placeholder="Une remarque sur le contrat ? Écrivez-la ici…"></textarea></div></div>${dlg}<div class="abs-msg" id="abomsg" role="status" aria-live="polite" hidden></div><div id="res"></div>`;
- let nOk=0,ri=rc0,s1=null,sending=false,msgT=0,lu=false,anim=null,zoom=1;const z=$("#abz"),zin=$("#abzin");
+ const sub=[D.of||D.s,D.c].filter(Boolean).join(" · ");
+ const inf=`<table class="abv-inf"><tr><th>Client</th><td><b>${esc(D.c||"")}</b></td></tr>${D.s?`<tr><th>Service</th><td>${esc(D.s)}</td></tr>`:""}${D.mt?`<tr><th>Montant</th><td>${esc(D.mt)}${D.ttc?" ("+esc(D.ttc)+")":""}</td></tr>`:""}${D.db?`<tr><th>Début</th><td>${esc(D.db)}</td></tr>`:""}</table>`;
+ document.body.classList.add("abv-on");
+ app.innerHTML=`<div id="abs" class="abv3"><div class="abz abv-view" id="abz" tabindex="0" aria-label="Contrat à signer (pages entières)"><div class="abz-in" id="abzin">${figs}</div></div>
+  <aside class="abv-pan" id="abvp" aria-label="Signer le contrat"><div class="abv-hd"><img src="logo.jpg" alt=""><div><div class="abv-org">${esc(org)}</div><div class="abv-ti" id="abzti">${esc(TT)}</div>${sub?`<div class="abv-sub">${esc(sub)}</div>`:""}</div></div>
+   <div class="abv-infw">${inf}</div>
+   <h2 class="abv-h2">Signer le contrat</h2><ol class="abv-steps" id="abvst"></ol><div class="abv-chm" id="abvch"></div><div class="abv-act" id="abvact" role="region" aria-live="polite"></div>
+   <div class="abv-zoom" role="group" aria-label="Taille du contrat"><button type="button" class="abz-b" data-z="-1" aria-label="Réduire">🔍 −</button><button type="button" class="abz-b" data-z="1" aria-label="Agrandir">🔍 +</button><button type="button" class="abz-b" data-z="0">Ajuster à l’écran</button></div>
+   <details class="abv-cmd"><summary>Ajouter un commentaire <span class="sgf-mu">(facultatif)</span></summary><textarea id="abocm" rows="2" maxlength="1000" placeholder="Une remarque sur le contrat ? Écrivez-la ici…" aria-label="Commentaire (facultatif)"></textarea></details>
+   <p class="abv-nb2">Rien n’est envoyé avant le dernier bouton « Valider et envoyer ».</p></aside></div>${dlg}<div class="abs-msg" id="abomsg" role="status" aria-live="polite" hidden></div><div id="res"></div>`;
+ let nOk=0,ri=rc0,s1=null,sending=false,msgT=0,lu=false,anim=null,zoom=1,ed1=false;const z=$("#abz"),zin=$("#abzin");
  const say=(t,ko)=>{const m=$("#abomsg");if(!m)return;m.textContent=t;m.className="abs-msg"+(ko?" ko":"");m.hidden=false;clearTimeout(msgT);msgT=setTimeout(()=>{m.hidden=true},5000)};
  const now=()=>{const n=new Date(),p2=v=>String(v).padStart(2,"0");return {dl:n.getFullYear()+"-"+p2(n.getMonth()+1)+"-"+p2(n.getDate()),hl:p2(n.getHours())+":"+p2(n.getMinutes())}};
- const step=()=>RG.length&&ri<0?1:!s1?2:3,ratio=p=>{const im=document.querySelector("#abof"+p+" img");return im&&im.naturalWidth?im.naturalHeight/im.naturalWidth:R1};
+ const step=()=>RG.length&&ri<0?1:!s1?2:3,ratio=p=>{const im=document.querySelector("#abof"+(p||0)+" img");return im&&im.naturalWidth?im.naturalHeight/im.naturalWidth:R1};
  const pv=h=>`<span class="abs-sv">${sigSvg(s1.sg)}</span><span class="abs-sn">${esc(s1.nm)} · ${esc(fd(s1.dl))} ${esc(String(h).replace(":","h"))}</span>`;
- // ---- zoom : largeur du contenu = zoom × largeur de la visionneuse ; les calques sont en % de la page
- const setZoom=(s,ax,ay)=>{s=Math.max(1,Math.min(6,s));const cw=z.clientWidth,ch=z.clientHeight,fx=ax==null?cw/2:ax,fy=ay==null?ch/2:ay,px=(z.scrollLeft+fx)/(zin.offsetWidth||1),py=(z.scrollTop+fy)/(zin.offsetHeight||1);
-  zoom=s;zin.style.width=(s*100)+"%";document.querySelectorAll(".abof").forEach(f=>f.style.setProperty("--pw",f.clientWidth+"px"));z.scrollLeft=px*zin.offsetWidth-fx;z.scrollTop=py*zin.offsetHeight-fy};
- const stopAnim=()=>{if(anim){cancelAnimationFrame(anim.r);const go=$("#abzgo2");if(go&&step()===3)go.hidden=false;anim=null}};
+ // ---- taille des pages : zoom 1 = page ENTIÈRE (hauteur de la fenêtre sur ordinateur, largeur au téléphone)
+ const baseW=()=>{const r=ratio(0),vw=z.clientWidth,vh=z.clientHeight;return mob()?Math.max(200,vw-16):Math.max(240,Math.min((vh-24)/r,vw-32))};
+ const setZoom=(s,ax,ay)=>{s=Math.max(.5,Math.min(5,s));const cw=z.clientWidth,ch=z.clientHeight,fx=ax==null?cw/2:ax,fy=ay==null?ch/2:ay,px=(z.scrollLeft+fx)/(zin.scrollWidth||1),py=(z.scrollTop+fy)/(zin.scrollHeight||1);
+  zoom=s;const w=Math.round(baseW()*s);document.querySelectorAll("#abzin .abof").forEach(f=>{f.style.width=w+"px";f.style.setProperty("--pw",w+"px")});z.scrollLeft=px*zin.scrollWidth-fx;z.scrollTop=py*zin.scrollHeight-fy};
+ const stopAnim=()=>{if(anim){cancelAnimationFrame(anim.r);anim=null}};
  const glide=(L0,T0,dur,cb)=>{stopAnim();const l1=z.scrollLeft,t1=z.scrollTop,st=performance.now(),e=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
   if(dur<=0||matchMedia("(prefers-reduced-motion: reduce)").matches){z.scrollLeft=L0;z.scrollTop=T0;if(cb)cb();return}
   const a={r:0};anim=a;const f=t=>{if(anim!==a)return;const k=Math.min(1,(t-st)/dur),q=e(k);z.scrollLeft=l1+(L0-l1)*q;z.scrollTop=t1+(T0-t1)*q;if(k<1)a.r=requestAnimationFrame(f);else{anim=null;if(cb)cb()}};a.r=requestAnimationFrame(f)};
  ["wheel","touchstart","pointerdown","keydown"].forEach(ev=>z.addEventListener(ev,()=>{if(anim)stopAnim()},{passive:true}));
- // lisible : hauteur d'une ligne de texte du contrat (≈ 0,9 % de la hauteur de page) ≥ 15 px à l'écran
- const TXT=ZR.length?Math.max(.006,Math.min(.014,ZR[0].h*.62)):.009,readS=p=>15/(TXT*z.clientWidth*ratio(p));
- const focus=(r,p,o)=>{o=o||{};const s=Math.max(1,Math.min(6,o.read?Math.max(readS(p),Math.min(.94/r.w,6)):Math.min(.94/r.w,Math.max(o.min||1,readS(p)))));setZoom(s);
-  const f=$("#abof"+p),im=f&&f.querySelector(".abs-im");if(!im)return;const W=im.offsetWidth,H=im.offsetHeight,ox=im.offsetLeft,oy=im.offsetTop/* .abs-im est positionné dans #abz : décalage déjà depuis le haut du contrat */,cw=z.clientWidth,ch=z.clientHeight;
-  const rw=r.w*W,rh=r.h*H,L0=ox+r.x*W-(rw<cw?(cw-rw)/2:12),T0=oy+r.y*H-(rh+(o.below||0)<ch?Math.max(12,(ch-rh-(o.below||0))/2):12);glide(Math.max(0,L0),Math.max(0,T0),o.dur==null?450:o.dur,o.cb)};
- const R1Z=()=>{if(!ZR.length)return null;const p=ZR[0].p,x0=Math.min(...ZR.map(a=>a.x)),y0=Math.min(...ZR.map(a=>a.y)),x1=Math.max(...ZR.map(a=>a.x+a.w)),y1=Math.max(...ZR.map(a=>a.y+a.h));
-  if(F1&&F1.p===p&&innerWidth>700){const y2=F1.y+F1.h;return {p,r:{x:Math.min(x0,.06),y:y0-.012,w:Math.max(x1,F1.x+F1.w)-Math.min(x0,.06),h:y2-y0+.03}}}return {p,r:{x:x0-.01,y:y0-.01,w:x1-x0+.02,h:y1-y0+.02}}};
- const goStep=(dur)=>{const k=step();if(k===1){const a=R1Z();if(a)focus(a.r,a.p,{read:innerWidth<=700,dur})}else if(k===2&&F1)focus({x:F1.x-.01,y:F1.y-.01,w:F1.w+.02,h:F1.h+.02},F1.p,{below:70,dur});else if(k===3&&F2)focus({x:F2.x-.01,y:F2.y-.01,w:F2.w+.02,h:F2.h+.02},F2.p,{below:150,dur})};
- // ---- calques
- function paint(){const k=step();
+ // montrer une zone SANS changer la taille : la page entière reste visible quand elle tient dans la fenêtre
+ const show=(r,p,dur,cb)=>{const f=$("#abof"+p),im=f&&f.querySelector(".abs-im");if(!im)return;const W=im.offsetWidth,H=im.offsetHeight,top=f.offsetTop,ch=z.clientHeight,cw=z.clientWidth;
+  let T0=H+24<=ch?top-12:top+r.y*H-Math.max(12,(ch-r.h*H)/2);const L0=W<=cw?0:f.offsetLeft+r.x*W-Math.max(12,(cw-r.w*W)/2);glide(Math.max(0,L0),Math.max(0,T0),dur==null?450:dur,cb)};
+ const rgBox=()=>{if(!ZR.length)return null;const x0=Math.min(...ZR.map(a=>a.x)),y0=Math.min(...ZR.map(a=>a.y)),x1=Math.max(...ZR.map(a=>a.x+a.w)),y1=Math.max(...ZR.map(a=>a.y+a.h));return {p:ZR[0].p,r:{x:x0,y:y0,w:x1-x0,h:y1-y0}}};
+ const goStep=dur=>{const k=step();if(k===1){const a=rgBox();if(a)show(a.r,a.p,dur)}else if(k===2&&F1)show(F1,F1.p,dur);else if(k===3&&F2)show(F2,F2.p,dur)};
+ // ---- zones recoupées sur l'image : premier trait de cadre (ligne sombre continue) rencontré = bord de la zone ; jamais sur un autre cadre
+ const trim=(i,img)=>{try{const Zi=ZR.filter(a=>a.p===i);if(!Zi.length)return;const cw=Math.min(1600,img.naturalWidth),k=cw/img.naturalWidth,ch=Math.round(img.naturalHeight*k),c=document.createElement("canvas");c.width=cw;c.height=ch;
+   const x=c.getContext("2d",{willReadFrequently:true});x.drawImage(img,0,0,cw,ch);const d=x.getImageData(0,0,cw,ch).data,dk=(X,Y)=>{const o=(Y*cw+X)*4;return d[o]+d[o+1]+d[o+2]<330};
+   Zi.forEach(a=>{let x0=Math.round(a.x*cw),x1=Math.round((a.x+a.w)*cw),y0=Math.round(a.y*ch),y1=Math.round((a.y+a.h)*ch);const bx1=a.b?Math.round((a.b.x+a.b.w)*cw):x0,bx0=a.b?Math.round(a.b.x*cw):x0,h=Math.max(1,y1-y0);
+    const col=X=>{let n=0;for(let Y=y0;Y<y1;Y++)if(dk(X,Y))n++;return n/h};for(let X=bx1+3;X<x1;X++)if(col(X)>=.8){x1=X-2;break}for(let X=bx0-2;X>x0;X--)if(col(X)>=.8){x0=X+2;break}
+    const w=Math.max(1,x1-x0),row=Y=>{let n=0;for(let X=x0;X<x1;X++)if(dk(X,Y))n++;return n/w},cy=(y0+y1)/2;for(let Y=y0;Y<y1;Y++)if(row(Y)>=.6){if(Y<cy)y0=Y+2;else{y1=Y-1;break}}
+    if(x1>x0+4&&y1>y0+2){a.x=x0/cw;a.w=(x1-x0)/cw;a.y=y0/ch;a.h=(y1-y0)/ch}a.tr=1})}catch(e){}};
+ // ---- panneau
+ function panel(){const k=step(),st=$("#abvst"),ac=$("#abvact");if(!st||!ac)return;const S=[];
+  if(RG.length)S.push([1,"Mode de règlement",ri>=0?`<span class="abv-ch">${esc(RG[ri])}</span> <button type="button" class="abv-lk2" data-act="mod1">modifier</button>`:"à cocher sur la page 1",ri>=0]);
+  S.push([2,"Signer la page 1",s1?`signée par ${esc(s1.nm)} · ${esc(fd(s1.dl))} ${esc(s1.h1.replace(":","h"))}`:"cadre « Pour le Client »",!!s1]);S.push([3,"Valider la page 2","« Lu et approuvé » puis envoi",false]);
+  {const c=$("#abvch");if(c)c.innerHTML=RG.length&&ri>=0?`Règlement : <b>${esc(RG[ri])}</b> · <button type="button" class="abv-lk2" data-act="mod1">modifier</button>`:""}/* téléphone : le choix reste lisible sous les étapes */
+  st.innerHTML=S.map(([n,t,d,ok],i)=>`<li class="abv-s${ok?" ok":""}${n===k?" cur":""}" id="abvs${n}"><span class="abv-n" aria-hidden="true">${ok?"✓":RG.length?n:i+1}</span><div><b>${t}</b><small>${d}</small></div></li>`).join("");
+  let h="";if(k===1||ed1)h=`<fieldset class="abv-rgf"><legend>Choisissez votre mode de règlement (ou cochez la case sur le contrat)</legend>${RG.map((l,j)=>`<label class="abv-rgo"><input type="radio" name="abvrg" value="${j}"${ri===j?" checked":""}> <span>${esc(l)}</span></label>`).join("")}</fieldset>${ed1&&k>1?`<button type="button" class="abv-sec" data-act="ok1">OK</button>`:`<button type="button" class="abv-sec" data-act="see1">Voir les cases sur le contrat</button>`}`;
+  else if(k===2)h=`<button type="button" class="abv-cta" data-act="f1">✍ Signer dans le cadre « Pour le Client »</button><button type="button" class="abv-sec" data-act="see2">Voir le cadre sur le contrat</button>`;
+  else h=`<p class="abv-ok">✓ Page 1 signée — la même signature est reprise en page 2.</p><div class="abv-row"><button type="button" class="abv-sec" data-act="redo">↺ Refaire la signature</button><button type="button" class="abv-sec" id="abzgo2" data-act="go2">Aller à la 2e signature ↓</button></div>
+   <label class="abv-lu"><input type="checkbox" id="abolu"${lu?" checked":""}> <span>Lu et approuvé — Contrat (page 1) et CGV (page 2)</span></label><button type="button" class="abv-cta" id="go" data-act="send"${lu?"":" disabled aria-disabled=\"true\""}>✓ Valider et envoyer le contrat signé</button>`;
+  ac.innerHTML=h;const lc=$("#abolu");if(lc)lc.onchange=()=>{lu=lc.checked;const g=$("#go");if(g){g.disabled=!lu;g.setAttribute("aria-disabled",String(!lu))}paint(1)};
+  ac.querySelectorAll('input[name=abvrg]').forEach(r=>r.onchange=()=>pick(+r.value))}
+ // ---- calques sur les pages
+ function paint(noPanel){const k=step();
   L.forEach((u,i)=>{const o=document.getElementById("abov"+i);if(!o)return;let h="";
-   ZR.forEach((a,j)=>{if(a.p!==i)return;h+=`<button type="button" class="abs-rg${ri<0?" todo":ri===j?" on":""}" data-rg="${j}" style="${pc(a)}" aria-pressed="${ri===j}" aria-label="Choisir : ${esc(RG[j])}"></button>`;if(ri===j&&a.b)h+=`<span class="abs-x" style="${pc(a.b)}">${XS}</span>`});
-   if(F1&&F1.p===i){h+=`<button type="button" class="abv-fr ${s1?"done":k===2?"on":"lock"}" id="abgf1" data-act="f1" style="${pc(F1)}" aria-label="${s1?"Signature de la page 1 (cliquer pour la refaire)":"Signer dans le cadre « Pour le Client »"}"></button>`;
-    if(s1&&F1.z)h+=`<div class="abs-zn abv-zn" style="${pc(F1.z)}">${pv(s1.h1)}</div>`;
-    const top=`left:${(F1.x*100).toFixed(3)}%;width:${(F1.w*100).toFixed(3)}%;top:calc(${((F1.y+F1.h)*100).toFixed(3)}% + 8px)`;
-    if(k===2)h+=`<div class="abv-under" id="abvu1" style="${top}"><button type="button" class="abv-cta" data-act="f1">✍ Signer dans le cadre « Pour le Client »</button></div>`;
-    else if(s1)h+=`<div class="abv-under" id="abvu1" style="${top}"><button type="button" class="abv-sec" data-act="redo">↺ Refaire la signature</button><button type="button" class="abv-cta abv-teal" data-act="go2">Continuer → signature page 2</button></div>`}
-   if(F2&&F2.p===i){h+=`<div class="abv-fr2 ${k===3?"on":"lock"}" id="abgf2" style="${pc(F2)}"></div>`;if(s1&&F2.z)h+=`<div class="abs-zn abv-zn" style="${pc(F2.z)}">${pv(now().hl)}</div>`;
-    if(k===3)h+=`<div class="abv-under abv-fin" id="abvu2" style="left:${(Math.min(F2.x,.5)*100).toFixed(3)}%;width:${(Math.max(F2.w,.42)*100).toFixed(3)}%;top:calc(${((F2.y+F2.h)*100).toFixed(3)}% + 8px)"><label class="abv-lu"><input type="checkbox" id="abolu"${lu?" checked":""}> <span>Lu et approuvé — Contrat (page 1) et CGV (page 2)</span></label><button type="button" class="abv-cta" id="go" data-act="send"${lu?"":" disabled aria-disabled=\"true\""}>✓ Valider et envoyer le contrat signé</button><small class="abv-nb">Rien n’est envoyé avant ce clic.</small></div>`}
+   ZR.forEach((a,j)=>{if(a.p!==i)return;h+=`<button type="button" class="abs-rg${ri<0?" todo":ri===j?" on":""}" data-rg="${j}" style="${pc(a)}" aria-pressed="${ri===j}" aria-label="Choisir : ${esc(RG[j]||"")}"></button>`;if(ri===j&&a.b)h+=`<span class="abs-x" style="${pc(a.b)}">${XS}</span>`});
+   if(F1&&F1.p===i){h+=`<button type="button" class="abv-fr ${s1?"done":k===2?"on":"lock"}" id="abgf1" data-act="f1" style="${pc(F1)}" aria-label="${s1?"Signature de la page 1 (cliquer pour la refaire)":"Signer dans le cadre « Pour le Client »"}"></button>`;if(s1&&F1.z)h+=`<div class="abs-zn abv-zn" style="${pc(F1.z)}">${pv(s1.h1)}</div>`}
+   if(F2&&F2.p===i){h+=`<div class="abv-fr2 ${k===3?"on":"lock"}" id="abgf2" style="${pc(F2)}"></div>`;if(s1&&F2.z)h+=`<div class="abs-zn abv-zn" style="${pc(F2.z)}">${pv(now().hl)}</div>`}
    o.innerHTML=h});
-  const st=$("#abzst"),ti=$("#abzti");if(st)st.textContent=k===1?"Étape 1 : cochez votre règlement":k===2?"Étape 2 : signez dans le cadre « Pour le Client »":"Étape 3 : page 2 — Lu et approuvé";
-  if(ti)ti.textContent=TT+" · page "+((k===3&&F2?F2.p:k===2&&F1?F1.p:ZR.length?ZR[0].p:0)+1);if(st)st.className="abz-st"+(k===3?" ok":"");
-  const lc=$("#abolu");if(lc)lc.onchange=()=>{lu=lc.checked;const g=$("#go");if(g){g.disabled=!lu;g.setAttribute("aria-disabled",String(!lu))}};const go2=$("#abzgo2");if(go2&&k!==3)go2.hidden=true}
+  if(!noPanel)panel()}
+ const pick=j=>{if(sending||!(j>=0&&j<RG.length))return;ri=j;ed1=false;paint();say("✓ Mode de règlement choisi : "+RG[ri]+(s1?"":" — signez maintenant la page 1."));if(!s1)setTimeout(()=>goStep(600),400)};
  // ---- pages (même lecture qu'avant, contrat_lire)
  L.forEach(async(u,i)=>{const f=document.getElementById("abof"+i),st=f&&f.querySelector(".abos");if(!st)return;if(!u.cle||!id){st.textContent="Page indisponible.";return}
   try{let a=0,P=[],h=null;for(;;){const r=await fetch(SBU+"/rest/v1/rpc/contrat_lire",{method:"POST",headers:{apikey:SBK,"Content-Type":"application/json"},body:JSON.stringify({p_lien:id,p_cle:u.cle,p_a:a,p_b:a+4})}),j=r.ok?await r.json():null;
     if(!j||!j.ok){st.textContent=j&&j.etat==="expire"?"Ce lien a expiré.":"Page indisponible pour l’instant. Réessayez plus tard ou écrivez-nous"+(cm?" : "+cm:"")+".";return}h=j;(j.morceaux||[]).forEach(m=>{P[m.n]=m.b64});a+=5;if(a>=(+j.n||0))break}
    if(P.filter(Boolean).length<(+h.n||0))throw 0;const t=atob(P.join("")),by=new Uint8Array(t.length);for(let k=0;k<t.length;k++)by[k]=t.charCodeAt(k);const url=URL.createObjectURL(new Blob([by],{type:h.type||"image/jpeg"}));
-   const im=new Image();im.className="aboimg";im.alt=u.t||"Page "+(i+1);im.decoding="async";im.onload=()=>{nOk++;f.style.setProperty("--pw",f.clientWidth+"px");paint();if(nOk===L.length)setTimeout(()=>goStep(600),60)};im.src=url;st.replaceWith(im)}
+   const im=new Image();im.className="aboimg";im.alt=u.t||"Page "+(i+1);im.decoding="async";im.onload=()=>{nOk++;trim(i,im);setZoom(zoom);paint();if(nOk===L.length){z.scrollTop=0;z.scrollLeft=0}};im.src=url;st.replaceWith(im)}
   catch(e){st.textContent="Page indisponible pour l’instant. Réessayez plus tard."}});
- // ---- signature dans le cadre agrandi (à la main par défaut)
+ setZoom(1);
+ // ---- pincer pour zoomer (téléphone / tablette)
+ let pin=null;const dist=T=>Math.hypot(T[0].clientX-T[1].clientX,T[0].clientY-T[1].clientY);
+ z.addEventListener("touchstart",e=>{if(e.touches.length===2){const r=z.getBoundingClientRect();pin={d:dist(e.touches),z:zoom,x:(e.touches[0].clientX+e.touches[1].clientX)/2-r.left,y:(e.touches[0].clientY+e.touches[1].clientY)/2-r.top}}},{passive:true});
+ z.addEventListener("touchmove",e=>{if(pin&&e.touches.length===2){e.preventDefault();setZoom(pin.z*dist(e.touches)/pin.d,pin.x,pin.y)}},{passive:false});
+ z.addEventListener("touchend",e=>{if(e.touches.length<2)pin=null},{passive:true});
+ // ---- signature (fenêtre par-dessus la page, à la main par défaut)
  const KP={mode:"draw",drw:[]};let SW=null;const mount=()=>{KP.drw=[];SW=window.SGW_CUR=SIGW.mount($("#sgw"),{name:()=>((($("#spr")||{}).value||"")+" "+(($("#sno")||{}).value||"")).trim(),max:2200,keep:KP});const mb=$("#abvmode");if(mb)mb.textContent=SW.mode()==="draw"?"Signature simple (écrite à partir du nom)":"Signer à la main (doigt ou souris)";const hw=$("#abvhow");if(hw)hw.textContent=SW.mode()==="draw"?"Signez ci-dessous avec le doigt ou la souris, comme sur papier.":"Votre signature est écrite à partir de votre prénom et de votre nom."};
  ["#spr","#sno"].forEach(s=>{const i=$(s);if(i)i.addEventListener("input",()=>{try{SW.refresh()}catch(e){}})});
  const openSig=()=>{const d=$("#abodlg");$("#err1").textContent="";d.hidden=false;document.body.classList.add("abs-lock");KP.mode="draw";mount();setTimeout(()=>{const i=$("#spr").value?$("#sno"):$("#spr");try{i.focus({preventScroll:true})}catch(e){}},60)};
@@ -444,24 +505,26 @@ function aboPageV2(C){const {D,app,id,org,cm,L,KEY,TT,info,RG,rc0,F1,F2,rgT,pa0}
   if(!SW||SW.empty())return e.textContent=SW&&SW.mode()==="draw"?"Merci de signer dans le cadre avec le doigt ou la souris.":"Merci d’indiquer votre prénom et votre nom.";
   if(tooShort())return e.textContent="Signature trop courte : signez comme sur papier, sur toute la largeur du cadre.";
   const T=now();s1={pr,no,nm:pr+" "+no,sg:SW.get(),sm:SW.how(),sk:SW.kind(),h1:T.hl,dl:T.dl};lu=false;closeSig();paint();say("✓ Page 1 signée — votre signature est dans le cadre. Le contrat descend vers la 2e signature…");
-  focus({x:F1.x-.01,y:F1.y-.01,w:F1.w+.02,h:F1.h+.02},F1.p,{below:70,dur:350,cb:()=>setTimeout(()=>{if(step()===3){const g=$("#abzgo2");if(g)g.hidden=false;goStep(2000)}},1100)})};
+  if(F1)show(F1,F1.p,300,()=>setTimeout(()=>{if(step()===3)goStep(2000)},900))};
  // ---- actions
  function act(a){if(sending)return;
-  if(a==="f1"){if(RG.length&&ri<0){say("Cochez d’abord votre mode de règlement (une case en bas de la page 1).",1);goStep(400);document.querySelectorAll(".abs-rg").forEach(b=>{b.classList.remove("flash");void b.offsetWidth;b.classList.add("flash")});return}return openSig()}
-  if(a==="redo")return openSig();if(a==="go2"){const g=$("#abzgo2");if(g)g.hidden=false;return goStep(2000)}if(a==="send")return send()}
- document.addEventListener("click",e=>{const b=e.target.closest("#abs [data-act],#abs [data-rg],#abs [data-z],#abzgo2");if(!b)return;
-  if(b.id==="abzgo2"){b.hidden=true;return goStep(1200)}if(b.dataset.z!=null){const v=+b.dataset.z;if(!v){setZoom(1);const p=step()===3&&F2?F2.p:0,f=$("#abof"+p);if(f)glide(0,f.offsetTop,300)}else setZoom(zoom*(v>0?1.3:1/1.3));return}
-  if(b.dataset.rg!=null){if(sending)return;ri=+b.dataset.rg;paint();say("✓ Mode de règlement choisi : "+RG[ri]+(s1?"":" — signez maintenant dans le cadre « Pour le Client »."));if(!s1)setTimeout(()=>goStep(700),500);return}act(b.dataset.act)});
+  if(a==="f1"){if(RG.length&&ri<0){say("Choisissez d’abord votre mode de règlement (étape 1).",1);goStep(400);document.querySelectorAll(".abs-rg").forEach(b=>{b.classList.remove("flash");void b.offsetWidth;b.classList.add("flash")});return}return openSig()}
+  if(a==="redo")return openSig();if(a==="go2")return goStep(1500);if(a==="send")return send();
+  if(a==="see1"){goStep(500);document.querySelectorAll(".abs-rg").forEach(b=>{b.classList.remove("flash");void b.offsetWidth;b.classList.add("flash")});return}
+  if(a==="see2"&&F1)return show(F1,F1.p,500);if(a==="mod1"){ed1=true;panel();const r=rgBox();if(r)show(r.r,r.p,500);return}if(a==="ok1"){ed1=false;panel();return}}
+ document.addEventListener("click",e=>{const b=e.target.closest("#abs [data-act],#abs [data-rg],#abs [data-z]");if(!b)return;
+  if(b.dataset.z!=null){const v=+b.dataset.z;if(!v){setZoom(1);const k=step(),p=k===3&&F2?F2.p:k===2&&F1?F1.p:0,f=$("#abof"+p);if(f)glide(0,Math.max(0,f.offsetTop-12),300)}else setZoom(zoom*(v>0?1.25:1/1.25));return}
+  if(b.dataset.rg!=null)return pick(+b.dataset.rg);act(b.dataset.act)});
  window.addEventListener("resize",()=>{clearTimeout(window._abvR);window._abvR=setTimeout(()=>{setZoom(zoom)},150)});
  const ref=()=>{const a="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";let t="";try{const u=new Uint8Array(6);crypto.getRandomValues(u);u.forEach(x=>t+=a[x%a.length])}catch(e){for(let i=0;i<6;i++)t+=a[Math.floor(Math.random()*a.length)]}return "S-"+t};
- async function send(){const c=String(($("#abocm")||{}).value||"").trim().slice(0,1000);if(RG.length&&ri<0){say("Cochez d’abord votre mode de règlement.",1);return goStep(400)}if(!s1)return act("f1");
+ async function send(){const c=String(($("#abocm")||{}).value||"").trim().slice(0,1000);if(RG.length&&ri<0){say("Choisissez d’abord votre mode de règlement.",1);return goStep(400)}if(!s1)return act("f1");
   if(!lu)return say("Cochez « Lu et approuvé — Contrat (page 1) et CGV (page 2) » pour valider.",1);if(nOk<L.length)return say("Patientez : le contrat n’est pas encore entièrement affiché.",1);
   const go=$("#go");if(go){go.disabled=true;go.textContent="Envoi en cours…"}sending=true;const T=now(),s2=T.hl;
   const payload={t:"fp-sign",k:"abo",ab:D.ab||"",n:D.n||"",v:+D.v||1,nm:s1.nm,pr:s1.pr,no:s1.no,fn:"",dl:T.dl,hl:s2,h1:s1.h1,h2:s2,tsl:fd(T.dl)+" à "+s2,sg:s1.sg,sm:s1.sm,sk:s1.sk,rf:ref(),lu:1,rg:ri,rgl:ri>=0?RG[ri]:"",cm:c,gd:2},code="FPSIG:"+b64u(payload);
   let ok=false;if(D.t){try{ok=!!(await sbDep(D.t,payload))}catch(e){ok=false}}
-  if(!ok){sending=false;if(go){go.disabled=false;go.textContent="✓ Valider et envoyer le contrat signé"}$("#res").innerHTML=`<div class="card noprint" id="sigko" style="border-color:var(--ko)" role="alert"><div class="okt" style="color:var(--ko)">Signature non transmise : rien n’a été envoyé</div><p>Le serveur n’a pas répondu : le contrat n’est pas signé. Vérifiez votre connexion puis réessayez ; sinon utilisez le code de secours ci-dessous.</p><button class="go" id="retry" type="button">↻ Réessayer</button>${fbHtml(code,"Contrat signé – "+(D.n||"")+" – "+s1.nm,"Bonjour,\n\n"+s1.nm+" a signé en ligne le contrat d’abonnement N° "+(D.n||"")+" ("+(D.c||"")+"), mais l’envoi automatique a échoué. Voici le code de signature :\n\n")}</div>`;const rt=$("#retry");if(rt)rt.onclick=()=>{$("#res").innerHTML="";send()};try{$("#res").scrollIntoView({block:"start"})}catch(e){}return}
+  if(!ok){sending=false;if(go){go.disabled=false;go.textContent="✓ Valider et envoyer le contrat signé"}const rs=$("#abvres")||document.createElement("div");rs.id="abvres";rs.innerHTML=`<div class="card noprint" id="sigko" style="border-color:var(--ko)" role="alert"><div class="okt" style="color:var(--ko)">Signature non transmise : rien n’a été envoyé</div><p>Le serveur n’a pas répondu : le contrat n’est pas signé. Vérifiez votre connexion puis réessayez ; sinon utilisez le code de secours ci-dessous.</p><button class="go" id="retry" type="button">↻ Réessayer</button>${fbHtml(code,"Contrat signé – "+(D.n||"")+" – "+s1.nm,"Bonjour,\n\n"+s1.nm+" a signé en ligne le contrat d’abonnement N° "+(D.n||"")+" ("+(D.c||"")+"), mais l’envoi automatique a échoué. Voici le code de signature :\n\n")}</div>`;$("#abvp").appendChild(rs);const rt=$("#retry");if(rt)rt.onclick=()=>{rs.remove();send()};try{rs.scrollIntoView({block:"start"})}catch(e){}return}
   const done={nm:s1.nm,fn:"",tsl:payload.tsl,sg:payload.sg,rf:payload.rf,sk:payload.sk,rgl:payload.rgl,cm:c};try{localStorage.setItem(KEY,JSON.stringify(done))}catch(e){}
-  const a=$("#abs");if(a)a.remove();const d=$("#abodlg");if(d)d.remove();$("#res").innerHTML=C.okHtml(done);window.scrollTo(0,0)}
+  const a=$("#abs");if(a)a.remove();const d=$("#abodlg");if(d)d.remove();document.body.classList.remove("abv-on");$("#res").innerHTML=C.okHtml(done);window.scrollTo(0,0)}
  paint()}
 function aboPage(D){const app=$("#app"),id=new URLSearchParams(location.search).get("l")||"",G=Array.isArray(D.g)?D.g:[],org=G[0]||"",tel=G[2]||"",cm=D.m||G[3]||FB_MAIL,L=Array.isArray(D.L)?D.L:[],KEY="fpsig:abo:"+(D.ab||D.n||"")+":"+(D.v||1);
  const TT="Contrat "+(D.it||"d’abonnement")+(D.n?" N° "+D.n:"");document.title=TT;let done=null;try{done=JSON.parse(localStorage.getItem(KEY)||"null")}catch(e){}
