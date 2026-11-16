@@ -85,6 +85,13 @@ body.abv-on{overflow:hidden}
 body.abv-on .abs-msg{left:auto;right:12px;top:auto;bottom:12px;transform:none;max-width:336px}/* message posé sur le panneau, jamais sur le contrat */
 @media (max-width:700px){body.abv-on .abs-msg{left:8px;right:8px;max-width:none}}
 .abv3{position:fixed;inset:0;z-index:40;display:grid;grid-template-columns:minmax(0,1fr) 360px;background:#e2e8f0}
+.abv-dlg .sgw-tabs{display:grid}.abv-dlg .sgw-tb{min-height:48px!important;font-size:15px!important}/* 16/11 : les deux choix de signature visibles, cibles ≥ 44 px */
+@media print{/* 16/11 : impression de la page de signature = le contrat seul (pages entières), sans panneau, sans cadre vert ni case mise en avant : seulement la croix choisie et la signature */
+ body.abv-on{overflow:visible!important;background:#fff!important}.abv3{position:static!important;display:block!important;background:#fff!important}
+ .abv-pan,.abs-msg,#abodlg,.abv-cap,.abs-dlg,.rgpdm,#res .noprint{display:none!important}
+ .abv3 .abz.abv-view{height:auto!important;overflow:visible!important;background:#fff!important}.abv3 .abz-in{display:block!important;padding:0!important;min-width:0!important}
+ #abzin .abof{width:100%!important;margin:0!important;box-shadow:none!important;break-after:page;page-break-after:always}#abzin .abof:last-child{break-after:auto;page-break-after:auto}
+ .abs-rg,.abs-rga,.abv-fr,.abv-fr2,.abs-rg.on,.abv-fr.on,.abv-fr.done,.abv-fr.lock,.abv-fr2.on,.abv-fr2.lock{border-color:transparent!important;background:transparent!important;box-shadow:none!important;outline:0!important;animation:none!important}}
 .abv3 .abz.abv-view{max-height:none;height:100%;overflow:auto;background:#e2e8f0;overscroll-behavior:contain;outline:none}
 .abv3 .abz-in{display:flex;flex-direction:column;align-items:center;gap:16px;padding:12px 16px;width:auto!important;min-width:min-content}
 .abv3 .abof{margin:0;flex:none;background:#fff;box-shadow:0 4px 18px rgba(15,23,42,.18);border-radius:2px}
@@ -128,17 +135,17 @@ body.abv-on .abs-msg{left:auto;right:12px;top:auto;bottom:12px;transform:none;ma
 .abv-cta{min-height:44px;border:0;border-radius:999px;background:#16a34a;color:#fff;font:700 15px/1.2 system-ui,sans-serif;padding:10px 18px;box-shadow:0 4px 12px rgba(21,128,61,.3);cursor:pointer}.abv-cta[disabled]{opacity:.55;cursor:not-allowed}.abv-teal{background:#0f766e}
 .abv-sec{min-height:44px;border:1px solid #cbd5e1;background:#fff;color:#0f172a;border-radius:999px;padding:8px 14px;font:600 14px system-ui,sans-serif;cursor:pointer}
 .abv-fin{flex-direction:column;background:#fff;border:2px solid #16a34a;border-radius:12px;padding:10px 12px;box-shadow:0 6px 18px rgba(15,23,42,.15)}.abv-lu{display:flex;gap:10px;align-items:center;font:600 15px system-ui,sans-serif;min-height:44px;color:#14532d;cursor:pointer}.abv-lu input{width:24px;height:24px;flex:none}.abv-nb{color:#475569;font-size:13px}
-.abv-dlg .sgw-tabs{display:none}.abv-frame{border:3px solid #16a34a;animation:abvin .35s ease}@keyframes abvin{from{transform:scale(.7);opacity:.3}to{transform:none;opacity:1}}.abv-how{margin:4px 0 6px;color:#334155}.abv-sw{text-align:right}.abv-lk{background:none;border:0;color:#475569;text-decoration:underline;font:14px system-ui,sans-serif;cursor:pointer;padding:8px 0;min-height:44px}
+.abv-frame{border:3px solid #16a34a;animation:abvin .35s ease}@keyframes abvin{from{transform:scale(.7);opacity:.3}to{transform:none;opacity:1}}.abv-how{margin:4px 0 6px;color:#334155}.abv-sw{text-align:right}.abv-lk{background:none;border:0;color:#475569;text-decoration:underline;font:14px system-ui,sans-serif;cursor:pointer;padding:8px 0;min-height:44px}
 @media (max-width:700px){.abv2 .abz-card{width:auto;left:0;transform:none}.abz{max-height:70vh}.abz-st{font-size:14px}}
 .abs-how{margin:6px 0 0}.abs-im{position:relative}.abs-ov{position:absolute;inset:0;pointer-events:none}.abs-ov>*{position:absolute;box-sizing:border-box}
-.abs-rg,.abs-rga{pointer-events:auto;background:transparent;border:2px solid transparent;border-radius:5px;cursor:pointer;padding:0}.abs-rg.todo,.abs-rga.todo{background:rgba(253,224,71,.30);border-color:#eab308}
+.abs-rg,.abs-rga{pointer-events:auto;background:transparent;border:2px solid transparent;border-radius:5px;cursor:pointer;padding:0}.abs-rg.todo,.abs-rga.todo{background:transparent;border-color:transparent}/* 16/11 : aucune case présélectionnée ni mise en avant ; liseré seulement sur la case cliquée (.on) */
 .abs-rg:hover,.abs-rg:focus-visible,.abs-rga:focus-visible{background:rgba(253,224,71,.45);outline:3px solid #1d4ed8;outline-offset:1px}.abs-rg.on{background:rgba(187,247,208,.45);border-color:#16a34a}
 .abs-rga{min-height:44px;transform:translateY(-50%)}.flash{animation:absfl .9s ease 2}@keyframes absfl{50%{box-shadow:0 0 0 6px rgba(234,179,8,.55)}}
 .abs-x svg{width:100%;height:100%;display:block}.abs-x path{fill:none;stroke:#15803d;stroke-width:1.8;stroke-linecap:round}
 .abs-fr{pointer-events:auto;background:transparent;border:3px solid transparent;border-radius:6px;cursor:pointer;padding:0;display:flex;align-items:flex-end;justify-content:center;min-height:44px}
 .abs-fr.lock{border:2px dashed #94a3b8}.abs-fr.on{border-color:#16a34a;background:rgba(220,252,231,.35);box-shadow:0 0 0 4px rgba(22,163,74,.18)}.abs-fr.done{border:2px solid rgba(22,163,74,.55)}.abs-fr:focus-visible{outline:3px solid #1d4ed8;outline-offset:2px}
 .abs-cta{display:inline-flex;flex-direction:column;align-items:center;margin:0 0 8%;background:#15803d;color:#fff;font:700 clamp(12px,1.25vw,15px)/1.25 system-ui,sans-serif;border-radius:999px;padding:6px 14px;box-shadow:0 4px 12px rgba(21,128,61,.3)}.abs-cta small{font-weight:600;font-size:.8em;opacity:.95}
-.abs-zn{display:flex;flex-direction:column;align-items:flex-start;overflow:hidden;container-type:size}.abs-zn .abs-sv{flex:0 0 68%;height:68%;display:block}.abs-zn svg{height:100%;width:auto;max-width:100%}.abs-zn .abs-sn{font:600 min(20cqh,5.2cqw)/1.15 Arial,sans-serif;color:#12308f;white-space:nowrap}
+.abs-zn{display:flex;flex-direction:column;align-items:flex-start;overflow:hidden;container-type:size}.abs-zn .abs-sv{flex:1 1 auto;min-height:0;width:100%;display:block}.abs-zn svg{height:100%;width:100%;display:block}.abs-zn .abs-sn{flex:none;font:600 13px/1.2 Arial,Helvetica,sans-serif;letter-spacing:0;color:#12308f;white-space:nowrap;padding-top:2px}
 .abs-fin{border:2px solid #15803d}.abs-fb .abs-fbb{display:block;width:100%;min-height:48px;margin:10px 0 4px;border:2px solid #15803d;border-radius:12px;background:#fff;color:#14532d;font:700 16px/1.3 inherit;font-family:inherit;cursor:pointer;padding:10px 14px}
 .abs-pvb{display:flex;flex-wrap:wrap;align-items:center;gap:10px;color:#166534;font-weight:600}.abs-pvb .abs-sv svg{height:46px;width:auto}.abs-h{font-size:18px;margin:0 0 8px}
 .abs-dlg{position:fixed;inset:0;z-index:50;background:rgba(15,23,42,.55);display:flex;align-items:center;justify-content:center;padding:16px}.abs-dlg[hidden]{display:none}.abs-dlgb{background:#fff;border-radius:16px;max-width:520px;width:100%;max-height:calc(100vh - 32px);overflow:auto;padding:18px;box-sizing:border-box}
@@ -390,11 +397,11 @@ function blcPage(D){const app=$("#app"),id=new URLSearchParams(location.search).
  const now=()=>{const n=new Date(),p2=v=>String(v).padStart(2,"0");return {dl:n.getFullYear()+"-"+p2(n.getMonth()+1)+"-"+p2(n.getDate()),hl:p2(n.getHours())+":"+p2(n.getMinutes())}};
  const say=(t,ko)=>{const m=$("#abomsg");if(!m)return;m.textContent=t;m.className="abs-msg"+(ko?" ko":"");m.hidden=false;clearTimeout(msgT);msgT=setTimeout(()=>{m.hidden=true},5000)};
  const goTo=el=>{if(!el)return;try{el.scrollIntoView({block:"center"})}catch(e){}};
- const pv=h=>`<span class="abs-sv">${sigSvg(s1.sg)}</span><span class="abs-sn">${esc(s1.nm)} · ${esc(fd(s1.dl))} ${esc(h.replace(":","h"))}</span>`;
+ const pv=h=>`<span class="abs-sv">${sigSvgFit(s1.sg)}</span><span class="abs-sn">${esc(s1.nm)} · ${esc(fd(s1.dl))} ${esc(h.replace(":","h"))}</span>`;
  const allOk=()=>!!s1&&H.filter(Boolean).length>=NF;
  function paint(){L.forEach((u,i)=>{const o=document.getElementById("abov"+i);if(!o)return;let h="";
   F.forEach((z,j)=>{if(z.p!==i)return;const on=!H[j]&&(j===0||!!s1);h+=`<button type="button" class="abs-fr ${H[j]?"done":on?"on":"lock"}" id="blcf${j}" data-act="f${j}" style="${pc(z)}" aria-label="${H[j]?"Signature placée":"Cliquez ici pour signer"}">${H[j]?"":on?`<span class="abs-cta">✍ Cliquez ici pour signer${j&&s1?"<small>nom et signature repris</small>":""}</span>`:""}</button>`;
-   if(H[j])h+=`<div class="abs-zn" style="${pc(z)}">${pv(H[j])}</div>`});o.innerHTML=h});
+   if(H[j])h+=`<div class="abs-zn" style="${pc(z)}">${pv(H[j])}</div>`});o.innerHTML=h});try{requestAnimationFrame(snFit)}catch(e){}
   const p1=$("#fbp1");if(p1)p1.innerHTML=s1?`<div class="abs-pvb">✓ Bon signé : ${pv(H[0])}</div>`:"";const fn=$("#abofin");if(fn)fn.hidden=!allOk()}
  const openSig=()=>{const d=$("#abodlg"),m0=$("#abomsg");if(m0)m0.hidden=true;d.hidden=false;document.body.classList.add("abs-lock");$("#err1").textContent="";try{SW.refresh()}catch(e){}setTimeout(()=>{const i=$("#spr").value?$("#sno"):$("#spr");try{i.focus({preventScroll:true})}catch(e){}},30)};
  const closeSig=()=>{$("#abodlg").hidden=true;document.body.classList.remove("abs-lock")};
@@ -439,8 +446,8 @@ function aboPageV2(C){const {D,app,id,org,cm,L,KEY,TT,rc0,F1,F2,pa0}=C,R1=1.4142
  const figs=L.map((u,i)=>`<figure class="abof" id="abof${i}" data-p="${i}"><figcaption class="abv-cap">${esc(u.t||"Page "+(i+1))}</figcaption><div class="abs-im"><div class="mu abos" role="status">⏳ Chargement de la page…</div><div class="abs-ov" id="abov${i}"></div></div></figure>`).join("");
  const dlg=`<div class="abs-dlg abv-dlg" id="abodlg" role="dialog" aria-modal="true" aria-labelledby="abodlgt" hidden><div class="abs-dlgb sgf abv-frame"><h2 class="abs-h" id="abodlgt">✍ Pour le Client — Date, cachet &amp; signature</h2>
   <div class="abs-nm"><div><label for="spr">Prénom</label><input type="text" id="spr" autocomplete="given-name" value="${esc(pa0.length>1?pa0[0]:"")}"></div><div><label for="sno">NOM</label><input type="text" id="sno" autocomplete="family-name" value="${esc(pa0.length>1?pa0.slice(1).join(" "):pa0[0]||"")}"></div></div>
-  <p class="abv-how" id="abvhow">Signez ci-dessous avec le doigt ou la souris, comme sur papier.</p><div id="sgw"></div>
-  <div class="abv-sw"><button type="button" class="abv-lk" id="abvmode">Signature simple (écrite à partir du nom)</button></div>
+  <p class="abv-how" id="abvhow">Choisissez : « ✍ Signature simple » (écrite à partir de votre nom) ou « ✏ Signer à la main ».</p><div id="sgw"></div>
+  
   <div class="err" id="err1" role="alert"></div><div class="abs-dlga"><button type="button" class="abs-no" id="dlgno">Annuler</button><button type="button" class="abs-no" id="dlgclr">↺ Effacer</button><button type="button" class="go" id="dlgok">✓ Valider ma signature</button></div></div></div>`;
  const sub=[D.of||D.s,D.c].filter(Boolean).join(" · ");
  const inf=`<table class="abv-inf"><tr><th>Client</th><td><b>${esc(D.c||"")}</b></td></tr>${D.s?`<tr><th>Service</th><td>${esc(D.s)}</td></tr>`:""}${D.mt?`<tr><th>Montant</th><td>${esc(D.mt)}${D.ttc?" ("+esc(D.ttc)+")":""}</td></tr>`:""}${D.db?`<tr><th>Début</th><td>${esc(D.db)}</td></tr>`:""}</table>`;
@@ -456,11 +463,11 @@ function aboPageV2(C){const {D,app,id,org,cm,L,KEY,TT,rc0,F1,F2,pa0}=C,R1=1.4142
  const say=(t,ko)=>{const m=$("#abomsg");if(!m)return;m.textContent=t;m.className="abs-msg"+(ko?" ko":"");m.hidden=false;clearTimeout(msgT);msgT=setTimeout(()=>{m.hidden=true},5000)};
  const now=()=>{const n=new Date(),p2=v=>String(v).padStart(2,"0");return {dl:n.getFullYear()+"-"+p2(n.getMonth()+1)+"-"+p2(n.getDate()),hl:p2(n.getHours())+":"+p2(n.getMinutes())}};
  const step=()=>RG.length&&ri<0?1:!s1?2:3,ratio=p=>{const im=document.querySelector("#abof"+(p||0)+" img");return im&&im.naturalWidth?im.naturalHeight/im.naturalWidth:R1};
- const pv=h=>`<span class="abs-sv">${sigSvg(s1.sg)}</span><span class="abs-sn">${esc(s1.nm)} · ${esc(fd(s1.dl))} ${esc(String(h).replace(":","h"))}</span>`;
+ const pv=h=>`<span class="abs-sv">${sigSvgFit(s1.sg)}</span><span class="abs-sn">${esc(s1.nm)} · ${esc(fd(s1.dl))} ${esc(String(h).replace(":","h"))}</span>`;
  // ---- taille des pages : zoom 1 = page ENTIÈRE (hauteur de la fenêtre sur ordinateur, largeur au téléphone)
  const baseW=()=>{const r=ratio(0),vw=z.clientWidth,vh=z.clientHeight;return mob()?Math.max(200,vw-16):Math.max(240,Math.min((vh-24)/r,vw-32))};
  const setZoom=(s,ax,ay)=>{s=Math.max(.5,Math.min(5,s));const cw=z.clientWidth,ch=z.clientHeight,fx=ax==null?cw/2:ax,fy=ay==null?ch/2:ay,px=(z.scrollLeft+fx)/(zin.scrollWidth||1),py=(z.scrollTop+fy)/(zin.scrollHeight||1);
-  zoom=s;const w=Math.round(baseW()*s);document.querySelectorAll("#abzin .abof").forEach(f=>{f.style.width=w+"px";f.style.setProperty("--pw",w+"px")});z.scrollLeft=px*zin.scrollWidth-fx;z.scrollTop=py*zin.scrollHeight-fy};
+  zoom=s;const w=Math.round(baseW()*s);document.querySelectorAll("#abzin .abof").forEach(f=>{f.style.width=w+"px";f.style.setProperty("--pw",w+"px")});z.scrollLeft=px*zin.scrollWidth-fx;z.scrollTop=py*zin.scrollHeight-fy;try{requestAnimationFrame(snFit)}catch(e){}};
  const stopAnim=()=>{if(anim){cancelAnimationFrame(anim.r);anim=null}};
  const glide=(L0,T0,dur,cb)=>{stopAnim();const l1=z.scrollLeft,t1=z.scrollTop,st=performance.now(),e=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
   if(dur<=0||matchMedia("(prefers-reduced-motion: reduce)").matches){z.scrollLeft=L0;z.scrollTop=T0;if(cb)cb();return}
@@ -497,7 +504,7 @@ function aboPageV2(C){const {D,app,id,org,cm,L,KEY,TT,rc0,F1,F2,pa0}=C,R1=1.4142
    if(F1&&F1.p===i){h+=`<button type="button" class="abv-fr ${s1?"done":k===2?"on":"lock"}" id="abgf1" data-act="f1" style="${pc(F1)}" aria-label="${s1?"Signature de la page 1 (cliquer pour la refaire)":"Signer dans le cadre « Pour le Client »"}"></button>`;if(s1&&F1.z)h+=`<div class="abs-zn abv-zn" style="${pc(F1.z)}">${pv(s1.h1)}</div>`}
    if(F2&&F2.p===i){h+=`<div class="abv-fr2 ${k===3?"on":"lock"}" id="abgf2" style="${pc(F2)}"></div>`;if(s1&&F2.z)h+=`<div class="abs-zn abv-zn" style="${pc(F2.z)}">${pv(now().hl)}</div>`}
    o.innerHTML=h});
-  if(!noPanel)panel()}
+  if(!noPanel)panel();try{requestAnimationFrame(snFit)}catch(e){}}
  const pick=j=>{if(sending||!(j>=0&&j<RG.length))return;ri=j;ed1=false;paint();say("✓ Mode de règlement choisi : "+RG[ri]+(s1?"":" — signez maintenant la page 1."));if(!s1)setTimeout(()=>goStep(600),400)};
  // ---- pages (même lecture qu'avant, contrat_lire)
  L.forEach(async(u,i)=>{const f=document.getElementById("abof"+i),st=f&&f.querySelector(".abos");if(!st)return;if(!u.cle||!id){st.textContent="Page indisponible.";return}
@@ -513,17 +520,16 @@ function aboPageV2(C){const {D,app,id,org,cm,L,KEY,TT,rc0,F1,F2,pa0}=C,R1=1.4142
  z.addEventListener("touchmove",e=>{if(pin&&e.touches.length===2){e.preventDefault();setZoom(pin.z*dist(e.touches)/pin.d,pin.x,pin.y)}},{passive:false});
  z.addEventListener("touchend",e=>{if(e.touches.length<2)pin=null},{passive:true});
  // ---- signature (fenêtre par-dessus la page, à la main par défaut)
- const KP={mode:"draw",drw:[]};let SW=null;const mount=()=>{KP.drw=[];SW=window.SGW_CUR=SIGW.mount($("#sgw"),{name:()=>((($("#spr")||{}).value||"")+" "+(($("#sno")||{}).value||"")).trim(),max:2200,keep:KP});const mb=$("#abvmode");if(mb)mb.textContent=SW.mode()==="draw"?"Signature simple (écrite à partir du nom)":"Signer à la main (doigt ou souris)";const hw=$("#abvhow");if(hw)hw.textContent=SW.mode()==="draw"?"Signez ci-dessous avec le doigt ou la souris, comme sur papier.":"Votre signature est écrite à partir de votre prénom et de votre nom."};
+ const KP={mode:"txt",drw:[]};let SW=null;const hw=()=>{const e=$("#abvhow");if(e&&SW)e.textContent=SW.mode()==="draw"?"Signez dans le cadre avec le doigt ou la souris : un paraphe ou vos initiales suffisent.":"Votre signature est écrite à partir de votre prénom et de votre nom. Vous pouvez aussi « ✏ Signer à la main »."};const mount=()=>{KP.drw=KP.mode==="draw"?KP.drw:[];SW=window.SGW_CUR=SIGW.mount($("#sgw"),{name:()=>((($("#spr")||{}).value||"")+" "+(($("#sno")||{}).value||"")).trim(),max:2200,keep:KP});hw()};$("#sgw").addEventListener("click",()=>setTimeout(hw,0));/* 16/11 : deux choix visibles (onglets de SIGW), « Signature simple » d’abord */
  ["#spr","#sno"].forEach(s=>{const i=$(s);if(i)i.addEventListener("input",()=>{try{SW.refresh()}catch(e){}})});
- const openSig=()=>{const d=$("#abodlg");$("#err1").textContent="";d.hidden=false;document.body.classList.add("abs-lock");KP.mode="draw";mount();setTimeout(()=>{const i=$("#spr").value?$("#sno"):$("#spr");try{i.focus({preventScroll:true})}catch(e){}},60)};
+ const openSig=()=>{const d=$("#abodlg");$("#err1").textContent="";d.hidden=false;document.body.classList.add("abs-lock");mount();setTimeout(()=>{const i=$("#spr").value?$("#sno"):$("#spr");try{i.focus({preventScroll:true})}catch(e){}},60)};
  const closeSig=()=>{$("#abodlg").hidden=true;document.body.classList.remove("abs-lock")};
- $("#dlgno").onclick=closeSig;$("#abodlg").addEventListener("keydown",e=>{if(e.key==="Escape")closeSig()});$("#dlgclr").onclick=()=>{KP.mode=SW?SW.mode():"draw";mount()};
- $("#abvmode").onclick=()=>{KP.mode=SW&&SW.mode()==="draw"?"txt":"draw";const keepD=KP.drw;mount();if(KP.mode==="draw")KP.drw=keepD};
- const tooShort=()=>{if(!SW||SW.mode()!=="draw")return false;const P=[].concat(...(KP.drw||[]));if(P.length<12)return true;const xs=P.map(p=>p[0]),ys=P.map(p=>p[1]);return Math.max(...xs)-Math.min(...xs)<36&&Math.max(...ys)-Math.min(...ys)<36};
+ $("#dlgno").onclick=closeSig;$("#abodlg").addEventListener("keydown",e=>{if(e.key==="Escape")closeSig()});$("#dlgclr").onclick=()=>{KP.mode=SW?SW.mode():"txt";KP.drw=[];mount()};
+ /* 16/11 : paraphe, initiales ou simple trait acceptés ; seul un simple point est refusé (le cadre vide est refusé plus haut) */const tooShort=()=>{if(!SW||SW.mode()!=="draw")return false;const P=[].concat(...(KP.drw||[]));if(!P.length)return false;const xs=P.map(p=>p[0]),ys=P.map(p=>p[1]);return Math.max(...xs)-Math.min(...xs)<4&&Math.max(...ys)-Math.min(...ys)<4};
  $("#dlgok").onclick=()=>{const e=$("#err1"),pr=$("#spr").value.trim().replace(/\s+/g," "),no=$("#sno").value.trim().replace(/\s+/g," ");e.textContent="";
   if(!pr)return(e.textContent="Merci d’indiquer votre prénom.",$("#spr").focus());if(!no)return(e.textContent="Merci d’indiquer votre NOM.",$("#sno").focus());
-  if(!SW||SW.empty())return e.textContent=SW&&SW.mode()==="draw"?"Merci de signer dans le cadre avec le doigt ou la souris.":"Merci d’indiquer votre prénom et votre nom.";
-  if(tooShort())return e.textContent="Signature trop courte : signez comme sur papier, sur toute la largeur du cadre.";
+  if(!SW||SW.empty())return e.textContent=SW&&SW.mode()==="draw"?"Le cadre de signature est vide : signez avec le doigt ou la souris (un paraphe ou vos initiales suffisent), ou choisissez « ✍ Signature simple ».":"Merci d’indiquer votre prénom et votre nom : votre signature s’écrit à partir d’eux.";
+  if(tooShort())return e.textContent="Un simple point ne suffit pas : tracez un paraphe, vos initiales ou un trait, ou choisissez « ✍ Signature simple ».";
   const T=now();s1={pr,no,nm:pr+" "+no,sg:SW.get(),sm:SW.how(),sk:SW.kind(),h1:T.hl,dl:T.dl};lu=false;closeSig();paint();say("✓ Page 1 signée — votre signature est dans le cadre. Le contrat descend vers la 2e signature…");
   if(F1)show(F1,F1.p,300,()=>setTimeout(()=>{if(step()===3)goStep(2000)},900))};
  // ---- actions
@@ -901,6 +907,12 @@ async function refuse(){
  $("#res").innerHTML=`<div class="card okb noprint" id="rok"><div class="okt">✔ Merci, nous avons bien reçu votre réponse.</div><p>Nous revenons vers vous avec de nouvelles dates. Vous pouvez fermer cette page.</p></div>`;
  window.scrollTo(0,0)}
 function sigSvg(sg){let d="";String(sg||"").split(";").forEach(st=>{const P=st.split(",").map(q=>q.split(".").map(v=>parseInt(v,36))).filter(q=>q.length===2&&!isNaN(q[0])&&!isNaN(q[1]));if(!P.length)return;if(P.length===1)P.push([P[0][0]+1,P[0][1]]);d+="M"+P.map(q=>q[0]+" "+q[1]).join("L")});return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 140" width="200" height="87"><path d="${d}" fill="none" stroke="#12308f" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`}
+// (16/11) signature recadrée sur son tracé (et non sur tout le carré de signature) : elle remplit le cadre du contrat, lisible ; trait d'épaisseur constante
+function sigSvgFit(sg){const P=[];let d="";String(sg||"").split(";").forEach(st=>{const Q=st.split(",").map(q=>q.split(".").map(v=>parseInt(v,36))).filter(q=>q.length===2&&!isNaN(q[0])&&!isNaN(q[1]));if(!Q.length)return;if(Q.length===1)Q.push([Q[0][0]+1,Q[0][1]]);Q.forEach(q=>P.push(q));d+="M"+Q.map(q=>q[0]+" "+q[1]).join("L")});
+ if(!P.length)return "";const xs=P.map(q=>q[0]),ys=P.map(q=>q[1]),x0=Math.min(...xs),y0=Math.min(...ys),w=Math.max(8,Math.max(...xs)-x0),h=Math.max(8,Math.max(...ys)-y0),m=Math.max(4,Math.max(w,h)*.04);
+ return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${x0-m} ${y0-m} ${w+2*m} ${h+2*m}" preserveAspectRatio="xMidYMid meet" width="100%" height="100%"><path d="${d}" fill="none" stroke="#12308f" stroke-width="2.4" vector-effect="non-scaling-stroke" stroke-linecap="round" stroke-linejoin="round"/></svg>`}
+// (16/11) nom + date sous la signature : taille calculée en pixels (plus d'unités relatives au cadre, mal imprimées par certains navigateurs), une ligne, jamais coupée
+function snFit(){document.querySelectorAll(".abs-zn").forEach(z=>{const n=z.querySelector(".abs-sn");if(!n)return;const W=z.clientWidth,H=z.clientHeight;if(!W||!H)return;let f=Math.max(8,Math.min(22,H*.2));n.style.fontSize=f+"px";while(n.scrollWidth>W&&f>6){f-=.5;n.style.fontSize=f+"px"}})}
 function sigDoc(p){return `<div style="margin-top:16px;border:1px solid var(--br);border-radius:8px;padding:10px 14px"><b>${plan?"Validée":"Signée"} en ligne</b> par ${esc(p.nm)}${p.fn?" ("+esc(p.fn)+")":""}, ${esc(C[0])}, le ${esc(p.tsl)}<br><span style="background:#fff;display:inline-block;border-radius:6px">${sigSvg(p.sg)}</span></div>`}
 
 let SW=null;
