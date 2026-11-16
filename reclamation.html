@@ -2,6 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; connect-src 'self' https://kbfnxqyxqualmqhiufnq.supabase.co; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; font-src 'self' data:; object-src 'none'; base-uri 'none'; form-action 'self'; manifest-src 'self'">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="color-scheme" content="light only">
 <meta name="robots" content="noindex,nofollow">
@@ -115,7 +116,11 @@ input[type=email],input[type=tel],select{width:100%;font:inherit;font-size:17px;
 <div class="w"><div id="app" aria-live="polite"></div><div class="ft" id="ft"></div></div>
 <script>
 const SBU="https://kbfnxqyxqualmqhiufnq.supabase.co",SBK="sb_publishable_5vjNCP7zREh5upGu_pTAIA_mgUPG8Cx";
-const sbDep=(c,p)=>fetch(SBU+"/rest/v1/rpc/deposer",{method:"POST",headers:{apikey:SBK,"Content-Type":"application/json"},body:JSON.stringify({p_canal:c,p_data:p})}).then(r=>{if(!r.ok)throw 0;return 1});
+// (16/11, audit sécurité B3) lien court « ?l= » : dépôt par deposer_lien — la base vérifie que le lien est actif, non expiré, du même type et du même dossier,
+// et prend le canal dans le lien (jamais dans la page). Ancien lien « ?c=canal » : plus de dépôt, la demande part par e-mail (secours).
+const LNID=(()=>{try{const v=new URLSearchParams(location.search).get("l")||"";return /^[a-z0-9]{8,12}$/.test(v)?v:""}catch(e){return ""}})();
+const sbDep=(c,p)=>LNID?fetch(SBU+"/rest/v1/rpc/deposer_lien",{method:"POST",headers:{apikey:SBK,"Content-Type":"application/json"},body:JSON.stringify({p_lien:LNID,p_data:p})}).then(async r=>{if(!r.ok)throw 0;const j=await r.json().catch(()=>null);if(!j||j.ok!==true)throw 0;return 1})
+ :fetch(SBU+"/rest/v1/rpc/deposer",{method:"POST",headers:{apikey:SBK,"Content-Type":"application/json"},body:JSON.stringify({p_canal:c,p_data:p})}).then(r=>{if(!r.ok)throw 0;return 1});
 let FB_MAIL=""; // adresse ADV reçue avec le lien (fiche Gestionnaire) ; rien en dur (lot 7 du 31/10)
 // Secours si le dépôt Supabase échoue : code à coller dans TOPAS Formation (« Coller un code ») + e-mail préparé que la personne envoie elle-même (aucun service tiers)
 function fbHtml(code,subj,intro){const E=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])),mt="mailto:"+FB_MAIL+"?subject="+encodeURIComponent(subj)+"&body="+encodeURIComponent(intro+"\n\n"+code+"\n");
@@ -129,7 +134,7 @@ const $=s=>document.querySelector(s);
 const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const b64u=o=>btoa(unescape(encodeURIComponent(JSON.stringify(o)))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
 // Paramètres du lien contrôlés : m = une adresse e-mail seulement (sinon ignorée), a / j = délais annoncés (heures ouvrées / jours) tels que réglés dans TOPAS Formation ; le nom de l’organisme n’est plus lu dans l’adresse (« o » ignoré) : il vient des coordonnées publiées (mention_rgpd → k), sinon libellé générique
-const P=new URLSearchParams(location.search),C=(P.get("c")||"").replace(/[^A-Za-z0-9_-]/g,""),M=(m=>/^[^\s@,;<>"'()]+@[^\s@,;<>"'()]+\.[A-Za-z]{2,}$/.test(m)&&m.length<=120?m:"")((P.get("m")||"").trim().replace(/^mailto:/i,"")),A=Math.min(Math.max(0,Math.floor(+P.get("a")||0)),999),J=Math.min(Math.max(0,Math.floor(+P.get("j")||0)),365);FB_MAIL=M;let ORG="TOPAS informatique";
+const P=new URLSearchParams(location.search),mOk=m=>(m=String(m||"").trim().replace(/^mailto:/i,""),/^[^\s@,;<>"'()]+@[^\s@,;<>"'()]+\.[A-Za-z]{2,}$/.test(m)&&m.length<=120?m:""),aOk=v=>Math.min(Math.max(0,Math.floor(+v||0)),999),jOk=v=>Math.min(Math.max(0,Math.floor(+v||0)),365);let M=mOk(P.get("m")),A=aOk(P.get("a")),J=jOk(P.get("j")),LKO="";FB_MAIL=M;let ORG="TOPAS informatique";
 const QUI=[["client","🏢 Entreprise cliente"],["stagiaire","🎓 Stagiaire"],["formateur","🧑‍🏫 Formateur"],["financeur","💼 Financeur"],["autre","✉ Autre"]];
 const app=$("#app");const ftDraw=()=>{$("#ft").textContent=ORG+" – organisme de formation certifié Qualiopi · vos informations servent uniquement au traitement de votre demande"+(M?" · Contact : "+M:"")};ftDraw();
 // nom de l’organisme : coordonnées publiées par l’application (jamais écrit en dur, jamais lu dans l’adresse)
@@ -157,12 +162,13 @@ async function submit(){const v=id=>($("#"+id).value||"").trim(),qui=(document.q
  const btn=$("#send");btn.disabled=true;btn.textContent="Envoi en cours…";
  const now=new Date(),p2=n=>String(n).padStart(2,"0"),dl=now.getFullYear()+"-"+p2(now.getMonth()+1)+"-"+p2(now.getDate()),hl=p2(now.getHours())+":"+p2(now.getMinutes()),cut=(s,n)=>String(s).slice(0,n);
  const p={t:"fp-rec",id:RID,qui,nm:cut(v("nm"),80),em:cut(v("em"),120),tel:cut(v("tel"),30),f:cut(v("fo"),120),obj:cut(v("ob"),160),desc:cut(v("de"),2600),pj,dl,hl};
- const code="FPREC:"+b64u(p),sends=[];if(C)sends.push(sbDep(C,p));
+ const code="FPREC:"+b64u(p),sends=[];if(LNID&&!LKO)sends.push(sbDep("",p));
  const R=await Promise.allSettled(sends);if(R.some(r=>r.status==="fulfilled"))return thanks(p);
  btn.disabled=false;btn.textContent="✔ Envoyer";const mt="mailto:"+encodeURIComponent(M)+"?subject="+encodeURIComponent("Réclamation – "+p.obj)+"&body="+encodeURIComponent("Bonjour,\n\n"+p.desc+"\n\n"+p.nm+" – "+p.em+"\n\n"+code+"\n");
- $("#err").innerHTML='<p style="margin:0 0 8px">Si votre envoi était tout de même arrivé, un nouvel essai porte le même identifiant : il ne créera pas de doublon.</p>'+fbHtml(code,"Réclamation – "+p.obj,"Bonjour,\n\n"+p.desc+"\n\n"+p.nm+" – "+p.em)}
+ $("#err").innerHTML=(LNID&&!LKO?'<p style="margin:0 0 8px">Si votre envoi était tout de même arrivé, un nouvel essai porte le même identifiant : il ne créera pas de doublon.</p>':'<p style="margin:0 0 8px"><b>Ce lien de réclamation est ancien ou n’est plus valable</b> : votre demande part par e-mail.</p>')+fbHtml(code,"Réclamation – "+p.obj,"Bonjour,\n\n"+p.desc+"\n\n"+p.nm+" – "+p.em)}
 function thanks(p){app.innerHTML=shell(`<div class="thx"><div class="ckb" aria-hidden="true">✓</div><h1>Merci, c’est envoyé !</h1><p>Votre demande « ${esc(p.obj)} » a bien été transmise à ${esc(ORG)} le ${esc(p.dl.split("-").reverse().join("/"))} à ${esc(p.hl)}.</p><p>Vous recevrez un accusé de réception à <b>${esc(p.em)}</b>${A?" sous "+A+" heures ouvrées":""}, puis notre réponse${J?" sous "+J+" jours":""}.</p><p style="color:var(--mu);font-size:15px;margin-top:18px">Vous pouvez fermer cette page.</p></div>`);window.scrollTo(0,0)}
-form();
+// (16/11) lien court : adresse de contact et délais lus dans le lien (lien_lire), jamais le canal
+(async()=>{if(LNID){try{const r=await fetch(SBU+"/rest/v1/rpc/lien_lire",{method:"POST",headers:{apikey:SBK,"Content-Type":"application/json"},body:JSON.stringify({p_id:LNID})}),j=r.ok?await r.json():null;if(j&&j.ok&&j.data&&typeof j.data==="object"&&j.type==="recl"){const d=j.data;M=mOk(d.m)||M;A=aOk(d.a)||A;J=jOk(d.j)||J;FB_MAIL=M;ftDraw()}else LKO=(j&&j.etat)||"inconnu"}catch(e){LKO="erreur"}}form()})();
 })();
 </script>
 <!-- Mention d'information RGPD (identique sur les 4 pages publiques ; texte modifiable dans TOPAS Formation › Gestionnaire › RGPD) -->

@@ -2,6 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; connect-src 'self' https://kbfnxqyxqualmqhiufnq.supabase.co; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; font-src 'self' data:; object-src 'none'; base-uri 'none'; form-action 'none'; manifest-src 'self'">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="color-scheme" content="light only">
 <meta name="robots" content="noindex,nofollow">
@@ -230,7 +231,11 @@ const SIGW=(()=>{
  return {mount,compose,toSg,styles:ST}})();
 /*/SIGW*/
 const SBU="https://kbfnxqyxqualmqhiufnq.supabase.co",SBK="sb_publishable_5vjNCP7zREh5upGu_pTAIA_mgUPG8Cx";
-const sbDep=(c,p)=>fetch(SBU+"/rest/v1/rpc/deposer",{method:"POST",headers:{apikey:SBK,"Content-Type":"application/json"},body:JSON.stringify({p_canal:c,p_data:p})}).then(r=>{if(!r.ok)throw 0;return 1});
+// (16/11, audit sécurité B3) lien court « ?l= » : dépôt par deposer_lien — la base vérifie que le lien est actif, non expiré, du même type et du même dossier,
+// et prend le canal dans le lien (jamais dans la page). Ancien lien « # » : ancien dépôt par canal (mis « À vérifier » chez TOPAS), fermé ensuite → secours affiché.
+const LNID=(()=>{try{const v=new URLSearchParams(location.search).get("l")||"";return /^[a-z0-9]{8,12}$/.test(v)?v:""}catch(e){return ""}})();
+const sbDep=(c,p)=>LNID?fetch(SBU+"/rest/v1/rpc/deposer_lien",{method:"POST",headers:{apikey:SBK,"Content-Type":"application/json"},body:JSON.stringify({p_lien:LNID,p_data:p})}).then(async r=>{if(!r.ok)throw 0;const j=await r.json().catch(()=>null);if(!j||j.ok!==true)throw 0;return 1})
+ :fetch(SBU+"/rest/v1/rpc/deposer",{method:"POST",headers:{apikey:SBK,"Content-Type":"application/json"},body:JSON.stringify({p_canal:c,p_data:p})}).then(r=>{if(!r.ok)throw 0;return 1});
 let FB_MAIL=""; // adresse ADV reçue avec le lien (fiche Gestionnaire) ; rien en dur (lot 7 du 31/10)
 // Secours si le dépôt Supabase échoue : code à coller dans TOPAS Formation (« Coller un code ») + e-mail préparé que la personne envoie elle-même (aucun service tiers)
 function fbHtml(code,subj,intro){const E=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])),mt="mailto:"+FB_MAIL+"?subject="+encodeURIComponent(subj)+"&body="+encodeURIComponent(intro+"\n\n"+code+"\n");
@@ -258,8 +263,15 @@ async function lnCoord(el){if(!el)return;try{const r=await fetch(SBU+"/rest/v1/r
 const $=s=>document.querySelector(s);
 const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const eur=n=>Number(n||0).toLocaleString("fr-FR",{minimumFractionDigits:2,maximumFractionDigits:2});
-const fd=d=>{if(!d)return"—";const x=new Date(d+"T12:00:00");return isNaN(x)?d:x.toLocaleDateString("fr-FR",{day:"2-digit",month:"2-digit",year:"numeric"})};
-const fdl=d=>{const x=new Date(d+"T12:00:00");return isNaN(x)?d:x.toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long",year:"numeric"})};
+// (16/11, sécurité B1) tout ce qui vient du lien ou de la base est contrôlé avant d'être écrit dans la page :
+// dates = AAAA-MM-JJ seulement (sinon « — »), adresses web = https:// seulement, nombres finis seulement, fichiers lus = types sûrs seulement
+const dOk=d=>{const m=/^(\d{4}-\d\d-\d\d)/.exec(String(d==null?"":d));return m?m[1]:""};
+const safeUrl=u=>{u=String(u==null?"":u).trim();return /^https:\/\/[^\s"'<>`\\]+$/i.test(u)||/^data:image\/(png|jpeg);base64,[A-Za-z0-9+/=]+$/.test(u)?u:""};
+const nf=v=>{v=+v;return Number.isFinite(v)?v:0};
+const imgT=t=>/^image\/(png|jpeg|gif|webp)$/i.test(String(t||""))?String(t):"image/jpeg";
+const safeT=t=>{t=String(t||"").toLowerCase();return /^(image\/(png|jpeg|gif|webp|heic|heif)|application\/(pdf|zip|octet-stream|msword|vnd\.[a-z0-9.+-]+)|video\/(mp4|webm|quicktime)|audio\/(mpeg|mp4|ogg|wav)|text\/(plain|csv))$/.test(t)?t:"application/octet-stream"};
+const fd=d=>{if(!d)return"—";const x=new Date(dOk(d)+"T12:00:00");return !dOk(d)||isNaN(x)?"—":x.toLocaleDateString("fr-FR",{day:"2-digit",month:"2-digit",year:"numeric"})};
+const fdl=d=>{const x=new Date(dOk(d)+"T12:00:00");return !dOk(d)||isNaN(x)?"—":x.toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long",year:"numeric"})};
 const b64u=o=>btoa(unescape(encodeURIComponent(JSON.stringify(o)))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
 function unb64u(t){t=String(t).replace(/-/g,"+").replace(/_/g,"/");while(t.length%4)t+="=";return JSON.parse(decodeURIComponent(escape(atob(t))))}
 async function load(h){if(h.startsWith("z.")){let t=h.slice(2).replace(/-/g,"+").replace(/_/g,"/");while(t.length%4)t+="=";const bin=atob(t),u=Uint8Array.from(bin,c=>c.charCodeAt(0)),ds=new DecompressionStream("deflate-raw"),w=ds.writable.getWriter();w.write(u);w.close();return JSON.parse(await new Response(ds.readable).text())}return unb64u(h)}
@@ -269,13 +281,13 @@ function supPage(D){const app=$("#app"),id=new URLSearchParams(location.search).
  document.title="Supports de cours – "+(D.f||"");const mb=n=>n>=1048576?(n/1048576).toFixed(1).replace(".",",")+" Mo":n>=1024?Math.round(n/1024)+" Ko":"";
  const meta=u=>[u.k==="pdf"?"PDF":u.k==="img"?"Image":u.k==="fiche"?"Fiche":u.k==="video"?"Vidéo":u.k==="lien"?"Lien web":"Fichier",u.sz?mb(u.sz):""].filter(Boolean).join(" · ");
  app.innerHTML=`<div class="card"><div class="mu">${esc(D.g||"")}</div><h1>📚 Supports de cours</h1><p style="margin:4px 0 0"><b>${esc(D.f||"")}</b>${D.n?` <span class="mu">· N° ${esc(D.n)}</span>`:""}${D.c?`<br><span class="mu">${esc(D.c)}</span>`:""}</p></div>
- <div class="card">${L.length?L.map((u,i)=>{const web=u.k==="lien"||u.k==="video";return `<div class="supr"><span class="supi" aria-hidden="true">${IC[u.k]||"💾"}</span><span class="supt"><b>${esc(u.t||u.n||"Support")}</b><br><small class="mu">${esc(meta(u))}</small><br><small class="mu sups" id="sups${i}" role="status"></small></span>${web?(u.u?`<a class="btn p" href="${esc(u.u)}" target="_blank" rel="noopener">${u.k==="video"?"▶ Regarder":"↗ Ouvrir"}</a>`:'<span class="mu">Adresse manquante</span>'):u.cle&&id?`<button type="button" class="btn p" data-dl="${i}">⬇ Télécharger</button>`:`<span class="mu">À demander à ${esc(D.g||"l’organisme de formation")}${D.m?` : <a href="mailto:${esc(D.m)}">${esc(D.m)}</a>`:""}</span>`}</div>`}).join(""):`<p>Aucun support n’est disponible en ligne pour cette formation.${D.m?` Pour le recevoir, écrivez à <a href="mailto:${esc(D.m)}">${esc(D.m)}</a>.`:""}</p><p class="mu" id="supco"></p>`}
+ <div class="card">${L.length?L.map((u,i)=>{const web=u.k==="lien"||u.k==="video";return `<div class="supr"><span class="supi" aria-hidden="true">${IC[u.k]||"💾"}</span><span class="supt"><b>${esc(u.t||u.n||"Support")}</b><br><small class="mu">${esc(meta(u))}</small><br><small class="mu sups" id="sups${i}" role="status"></small></span>${web?(safeUrl(u.u)?`<a class="btn p" href="${esc(safeUrl(u.u))}" target="_blank" rel="noopener">${u.k==="video"?"▶ Regarder":"↗ Ouvrir"}</a>`:'<span class="mu">Adresse manquante</span>'):u.cle&&id?`<button type="button" class="btn p" data-dl="${i}">⬇ Télécharger</button>`:`<span class="mu">À demander à ${esc(D.g||"l’organisme de formation")}${D.m?` : <a href="mailto:${esc(D.m)}">${esc(D.m)}</a>`:""}</span>`}</div>`}).join(""):`<p>Aucun support n’est disponible en ligne pour cette formation.${D.m?` Pour le recevoir, écrivez à <a href="mailto:${esc(D.m)}">${esc(D.m)}</a>.`:""}</p><p class="mu" id="supco"></p>`}
  <p class="mu" style="margin:12px 0 0">Ce lien est réservé aux stagiaires de cette formation et reste valable 90 jours après l’envoi du certificat.${D.m?` Une question ? <a href="mailto:${esc(D.m)}">${esc(D.m)}</a>`:""}</p></div>`;
  if(!L.length)try{lnCoord(document.getElementById("supco"))}catch(e){}/* 04/11 (P) : liste vide = message + coordonnées */
  app.querySelectorAll("[data-dl]").forEach(b=>b.onclick=async()=>{const u=L[+b.dataset.dl],st=document.getElementById("sups"+b.dataset.dl),say=t=>{if(st)st.textContent=t};b.disabled=true;say("⏳ Téléchargement…");
   try{let a=0,P=[],h=null;for(;;){const r=await fetch(SBU+"/rest/v1/rpc/support_lire",{method:"POST",headers:{apikey:SBK,"Content-Type":"application/json"},body:JSON.stringify({p_lien:id,p_cle:u.cle,p_a:a,p_b:a+4})}),j=r.ok?await r.json():null;
     if(!j||!j.ok){const qui=D.m?" Écrivez à "+D.m+" pour le recevoir.":"";say(j&&j.etat==="expire"?"Ce lien a expiré : demandez le support à l’organisme de formation."+qui:j&&j.etat==="absent"?"Ce support n’est pas encore disponible en ligne."+qui:"Support indisponible pour l’instant (pas de réponse du serveur). Réessayez dans un moment."+qui);b.disabled=false;return}h=j;(j.morceaux||[]).forEach(m=>{P[m.n]=m.b64});a+=5;if(a>=(+j.n||0))break}
-   if(P.filter(Boolean).length<(+h.n||0))throw 0;const t=atob(P.join("")),by=new Uint8Array(t.length);for(let i=0;i<t.length;i++)by[i]=t.charCodeAt(i);const bl=new Blob([by],{type:h.type||"application/octet-stream"}),url=URL.createObjectURL(bl);
+   if(P.filter(Boolean).length<(+h.n||0))throw 0;const t=atob(P.join("")),by=new Uint8Array(t.length);for(let i=0;i<t.length;i++)by[i]=t.charCodeAt(i);const bl=new Blob([by],{type:safeT(h.type)}),url=URL.createObjectURL(bl);
    const a2=document.createElement("a");a2.href=url;a2.download=h.nom||u.n||(u.t||"support");if("download" in a2){document.body.appendChild(a2);a2.click();setTimeout(()=>a2.remove(),2000)}else{try{window.open(url,"_blank")}catch(e){}}
    /* (04/11, O) le téléchargement peut être silencieux (téléphone, navigateur d’un logiciel de mail) : lien « Ouvrir » toujours proposé */
    if(st){st.textContent="✔ Téléchargé · ";const o=document.createElement("a");o.href=url;o.target="_blank";o.rel="noopener";o.textContent="Ouvrir le document";o.className="supo";st.appendChild(o)}}
@@ -309,7 +321,7 @@ function phPage(D){const app=$("#app"),id=new URLSearchParams(location.search).g
  L.forEach(async(u,i)=>{const f=document.getElementById("phf"+i),st=f&&f.querySelector(".phs");if(!st)return;if(!u.cle||!id){st.textContent="Photo indisponible.";return}
   try{let a=0,P=[],h=null;for(;;){const r=await fetch(SBU+"/rest/v1/rpc/photo_lire",{method:"POST",headers:{apikey:SBK,"Content-Type":"application/json"},body:JSON.stringify({p_lien:id,p_cle:u.cle,p_a:a,p_b:a+4})}),j=r.ok?await r.json():null;
     if(!j||!j.ok){st.textContent=j&&j.etat==="expire"?"Ce lien a expiré.":"Photo indisponible pour l’instant. Réessayez plus tard.";return}h=j;(j.morceaux||[]).forEach(m=>{P[m.n]=m.b64});a+=5;if(a>=(+j.n||0))break}
-   if(P.filter(Boolean).length<(+h.n||0))throw 0;const t=atob(P.join("")),by=new Uint8Array(t.length);for(let k=0;k<t.length;k++)by[k]=t.charCodeAt(k);const url=URL.createObjectURL(new Blob([by],{type:h.type||"image/jpeg"}));
+   if(P.filter(Boolean).length<(+h.n||0))throw 0;const t=atob(P.join("")),by=new Uint8Array(t.length);for(let k=0;k<t.length;k++)by[k]=t.charCodeAt(k);const url=URL.createObjectURL(new Blob([by],{type:imgT(h.type)}));
    st.outerHTML=`<a href="${url}" download="${esc(h.nom||"photo-"+(i+1)+".jpg")}"><img src="${url}" alt="${esc(u.t||"Photo "+(i+1))}" style="max-width:100%;border-radius:10px;display:block"></a>`}
   catch(e){st.textContent="Photo indisponible pour l’instant. Réessayez plus tard."}})}
 // ===== ✍ ÉMARGEMENT D'UNE DEMI-JOURNÉE signé en ligne par UN stagiaire (01/11, partie 3) : lien du mail « ✉ Réclamer au stagiaire » (type « emgs », 90 jours).
@@ -369,7 +381,7 @@ function blcPage(D){const app=$("#app"),id=new URLSearchParams(location.search).
  const kt=k=>k==="manuscrite"?" · signature manuscrite":k==="simple"?" · signature électronique simple":"";
  const zOk=a=>a&&[a.x,a.y,a.w,a.h].every(v=>typeof v==="number"&&v>=0&&v<=1.01)&&Number.isInteger(a.p)&&a.p>=0&&a.p<L.length;
  const F=(Array.isArray(D.F)?D.F:[]).filter(zOk).slice(0,4),FB=!F.length;
- const pc=a=>`left:${(a.x*100).toFixed(2)}%;top:${(a.y*100).toFixed(2)}%;width:${(a.w*100).toFixed(2)}%;height:${(a.h*100).toFixed(2)}%`;
+ const pc=a=>`left:${(nf(a.x)*100).toFixed(2)}%;top:${(nf(a.y)*100).toFixed(2)}%;width:${(nf(a.w)*100).toFixed(2)}%;height:${(nf(a.h)*100).toFixed(2)}%`;
  const info=`<div class="card emgs-c"><div class="emgs-h"><img src="logo.jpg" alt="" style="height:48px"><div><div class="emgs-o">${esc(org)}</div><h1 class="emgs-t">${esc(TT)}</h1><div class="abo-sub">${esc(D.c||"")}</div></div></div>
   <table class="emgs-i"><tr><th>Client</th><td><b>${esc(D.c||"")}</b></td></tr>${D.d?`<tr><th>Intervention</th><td>${esc(fd(D.d))}</td></tr>`:""}${D.a?`<tr><th>Adresse</th><td>${esc(D.a)}</td></tr>`:""}</table>
   ${done?"":`<p class="mu abs-how">Vérifiez le bon, puis signez-le comme sur papier, directement sur le document : cliquez dans le cadre de signature${F.length>1?" de chaque page":""}.</p>`}</div>`;
@@ -387,7 +399,7 @@ function blcPage(D){const app=$("#app"),id=new URLSearchParams(location.search).
  L.forEach(async(u,i)=>{const f=document.getElementById("abof"+i),st=f&&f.querySelector(".abos");if(!st)return;if(!u.cle||!id){st.textContent="Page indisponible.";return}
   try{let a=0,P=[],h=null;for(;;){const r=await fetch(SBU+"/rest/v1/rpc/contrat_lire",{method:"POST",headers:{apikey:SBK,"Content-Type":"application/json"},body:JSON.stringify({p_lien:id,p_cle:u.cle,p_a:a,p_b:a+4})}),j=r.ok?await r.json():null;
     if(!j||!j.ok){st.textContent=j&&j.etat==="expire"?"Ce lien a expiré.":"Page indisponible pour l’instant. Réessayez plus tard ou écrivez-nous"+(cm?" : "+cm:"")+".";return}h=j;(j.morceaux||[]).forEach(m=>{P[m.n]=m.b64});a+=5;if(a>=(+j.n||0))break}
-   if(P.filter(Boolean).length<(+h.n||0))throw 0;const t=atob(P.join("")),by=new Uint8Array(t.length);for(let k=0;k<t.length;k++)by[k]=t.charCodeAt(k);const url=URL.createObjectURL(new Blob([by],{type:h.type||"image/jpeg"}));
+   if(P.filter(Boolean).length<(+h.n||0))throw 0;const t=atob(P.join("")),by=new Uint8Array(t.length);for(let k=0;k<t.length;k++)by[k]=t.charCodeAt(k);const url=URL.createObjectURL(new Blob([by],{type:imgT(h.type)}));
    st.outerHTML=`<img src="${url}" alt="${esc(u.t||"Page "+(i+1))}" class="aboimg">`;const cap=f.querySelector("figcaption");if(cap)cap.insertAdjacentHTML("beforeend",` · <a href="${url}" target="_blank" rel="noopener">🔍 Agrandir</a>`);nOk++;if(!done)paint()}
   catch(e){st.textContent="Page indisponible pour l’instant. Réessayez plus tard."}});
  if(done)return;
@@ -440,7 +452,7 @@ function aboPageV2(C){const {D,app,id,org,cm,L,KEY,TT,rc0,F1,F2,pa0}=C,R1=1.4142
   const ov=Z.some((z,j)=>j&&Z[j-1].y+Z[j-1].h>z.y+.0005);if(!ov)return Z;/* anciens liens : zones qui se chevauchent → une bande par ligne */
   const bt=Z.map(z=>z.y+z.h),dd=Z.length>1?bt.slice(1).map((v,j)=>v-bt[j]).sort((a,b)=>a-b)[Math.floor((Z.length-1)/2)]:Z[0].h,d=Math.max(.006,Math.min(.04,dd));
   return Z.map((z,j)=>{const c=bt[j]-.45*d,t=c-d/2+.0006,h=d-.0012,bh=Math.min(h*.78,(z.b&&z.b.w?z.b.w*R1:h*.78)),bw=bh/R1;return Object.assign(z,{y:+t.toFixed(4),h:+h.toFixed(4),b:{x:z.b?z.b.x:z.x+.004,w:+bw.toFixed(4),y:+(c-bh/2).toFixed(4),h:+bh.toFixed(4)}})})})();
- const pc=a=>`left:${(a.x*100).toFixed(3)}%;top:${(a.y*100).toFixed(3)}%;width:${(a.w*100).toFixed(3)}%;height:${(a.h*100).toFixed(3)}%`;
+ const pc=a=>`left:${(nf(a.x)*100).toFixed(3)}%;top:${(nf(a.y)*100).toFixed(3)}%;width:${(nf(a.w)*100).toFixed(3)}%;height:${(nf(a.h)*100).toFixed(3)}%`;
  const XS=`<svg viewBox="0 0 10 10" preserveAspectRatio="none" aria-hidden="true"><path d="M1.6 1.6L8.4 8.4M8.4 1.6L1.6 8.4"/></svg>`;
  const mob=()=>innerWidth<=700;
  const figs=L.map((u,i)=>`<figure class="abof" id="abof${i}" data-p="${i}"><figcaption class="abv-cap">${esc(u.t||"Page "+(i+1))}</figcaption><div class="abs-im"><div class="mu abos" role="status">⏳ Chargement de la page…</div><div class="abs-ov" id="abov${i}"></div></div></figure>`).join("");
@@ -510,7 +522,7 @@ function aboPageV2(C){const {D,app,id,org,cm,L,KEY,TT,rc0,F1,F2,pa0}=C,R1=1.4142
  L.forEach(async(u,i)=>{const f=document.getElementById("abof"+i),st=f&&f.querySelector(".abos");if(!st)return;if(!u.cle||!id){st.textContent="Page indisponible.";return}
   try{let a=0,P=[],h=null;for(;;){const r=await fetch(SBU+"/rest/v1/rpc/contrat_lire",{method:"POST",headers:{apikey:SBK,"Content-Type":"application/json"},body:JSON.stringify({p_lien:id,p_cle:u.cle,p_a:a,p_b:a+4})}),j=r.ok?await r.json():null;
     if(!j||!j.ok){st.textContent=j&&j.etat==="expire"?"Ce lien a expiré.":"Page indisponible pour l’instant. Réessayez plus tard ou écrivez-nous"+(cm?" : "+cm:"")+".";return}h=j;(j.morceaux||[]).forEach(m=>{P[m.n]=m.b64});a+=5;if(a>=(+j.n||0))break}
-   if(P.filter(Boolean).length<(+h.n||0))throw 0;const t=atob(P.join("")),by=new Uint8Array(t.length);for(let k=0;k<t.length;k++)by[k]=t.charCodeAt(k);const url=URL.createObjectURL(new Blob([by],{type:h.type||"image/jpeg"}));
+   if(P.filter(Boolean).length<(+h.n||0))throw 0;const t=atob(P.join("")),by=new Uint8Array(t.length);for(let k=0;k<t.length;k++)by[k]=t.charCodeAt(k);const url=URL.createObjectURL(new Blob([by],{type:imgT(h.type)}));
    const im=new Image();im.className="aboimg";im.alt=u.t||"Page "+(i+1);im.decoding="async";im.onload=()=>{nOk++;trim(i,im);setZoom(zoom);paint();if(nOk===L.length){z.scrollTop=0;z.scrollLeft=0}};im.src=url;st.replaceWith(im)}
   catch(e){st.textContent="Page indisponible pour l’instant. Réessayez plus tard."}});
  setZoom(1);
@@ -560,7 +572,7 @@ function aboPage(D){const app=$("#app"),id=new URLSearchParams(location.search).
  const RG=Array.isArray(D.R)?D.R.filter(Boolean).slice(0,6):[],rc0=Number.isInteger(D.rc)&&D.rc>=0&&D.rc<RG.length?D.rc:-1,Z=D.Z&&typeof D.Z==="object"?D.Z:{};
  const zOk=a=>a&&[a.x,a.y,a.w,a.h].every(v=>typeof v==="number"&&v>=0&&v<=1.01)&&Number.isInteger(a.p)&&a.p>=0&&a.p<L.length;
  const ZR=Array.isArray(Z.rg)&&Z.rg.length===RG.length&&Z.rg.every(zOk)?Z.rg:[],F1=zOk(Z.f1)?Z.f1:null,F2=zOk(Z.f2)?Z.f2:null,FB=!F1||!F2||(RG.length&&!ZR.length);
- const pc=a=>`left:${(a.x*100).toFixed(2)}%;top:${(a.y*100).toFixed(2)}%;width:${(a.w*100).toFixed(2)}%;height:${(a.h*100).toFixed(2)}%`;
+ const pc=a=>`left:${(nf(a.x)*100).toFixed(2)}%;top:${(nf(a.y)*100).toFixed(2)}%;width:${(nf(a.w)*100).toFixed(2)}%;height:${(nf(a.h)*100).toFixed(2)}%`;
  const rgT=l=>{const m=String(l).match(/^(.*?)\s*\/\s*(.*)$/);const cap=t=>t?t.charAt(0).toUpperCase()+t.slice(1).toLowerCase():"";const acc=t=>t.replace(/^Prelevement/,"Prélèvement");return m?[cap(m[1]),acc(cap(m[2]))]:[String(l),""]};
  const info=`<div class="card emgs-c"><div class="emgs-h"><img src="logo.jpg" alt="" style="height:48px"><div><div class="emgs-o">${esc(org)}</div><h1 class="emgs-t">${esc(TT)}</h1><div class="abo-sub">${esc([D.of||D.s,D.c].filter(Boolean).join(" · "))}</div></div></div>
   <table class="emgs-i"><tr><th>Client</th><td><b>${esc(D.c||"")}</b></td></tr>${D.s?`<tr><th>Service</th><td>${esc(D.s)}${D.ds&&D.ds!==D.s?"<br><small>"+esc(D.ds)+"</small>":""}</td></tr>`:""}${D.mt?`<tr><th>Montant</th><td>${esc(D.mt)}${D.ttc?" ("+esc(D.ttc)+")":""}</td></tr>`:""}${D.db?`<tr><th>Début</th><td>${esc(D.db)}</td></tr>`:""}</table>
@@ -583,7 +595,7 @@ function aboPage(D){const app=$("#app"),id=new URLSearchParams(location.search).
  L.forEach(async(u,i)=>{const f=document.getElementById("abof"+i),st=f&&f.querySelector(".abos");if(!st)return;if(!u.cle||!id){st.textContent="Page indisponible.";return}
   try{let a=0,P=[],h=null;for(;;){const r=await fetch(SBU+"/rest/v1/rpc/contrat_lire",{method:"POST",headers:{apikey:SBK,"Content-Type":"application/json"},body:JSON.stringify({p_lien:id,p_cle:u.cle,p_a:a,p_b:a+4})}),j=r.ok?await r.json():null;
     if(!j||!j.ok){st.textContent=j&&j.etat==="expire"?"Ce lien a expiré.":"Page indisponible pour l’instant. Réessayez plus tard ou écrivez-nous"+(cm?" : "+cm:"")+".";return}h=j;(j.morceaux||[]).forEach(m=>{P[m.n]=m.b64});a+=5;if(a>=(+j.n||0))break}
-   if(P.filter(Boolean).length<(+h.n||0))throw 0;const t=atob(P.join("")),by=new Uint8Array(t.length);for(let k=0;k<t.length;k++)by[k]=t.charCodeAt(k);const url=URL.createObjectURL(new Blob([by],{type:h.type||"image/jpeg"}));
+   if(P.filter(Boolean).length<(+h.n||0))throw 0;const t=atob(P.join("")),by=new Uint8Array(t.length);for(let k=0;k<t.length;k++)by[k]=t.charCodeAt(k);const url=URL.createObjectURL(new Blob([by],{type:imgT(h.type)}));
    st.outerHTML=`<img src="${url}" alt="${esc(u.t||"Page "+(i+1))}" class="aboimg">`;const cap=f.querySelector("figcaption");if(cap)cap.insertAdjacentHTML("beforeend",` · <a href="${url}" target="_blank" rel="noopener">🔍 Agrandir</a>`);nOk++;if(!done)paint()}
   catch(e){st.textContent="Page indisponible pour l’instant. Réessayez plus tard."}});
  if(done)return;
@@ -599,7 +611,7 @@ function aboPage(D){const app=$("#app"),id=new URLSearchParams(location.search).
  function paint(){L.forEach((u,i)=>{const o=document.getElementById("abov"+i);if(!o)return;let h="";
   if(ZR.length){const mine=ZR.map((z,j)=>[z,j]).filter(([z])=>z.p===i);
    if(mine.length&&mob()){const x0=Math.min(...mine.map(([z])=>z.x)),y0=Math.min(...mine.map(([z])=>z.y)),x1=Math.max(...mine.map(([z])=>z.x+z.w)),y1=Math.max(...mine.map(([z])=>z.y+z.h));
-    h+=`<button type="button" class="abs-rga${ri<0?" todo":""}" data-act="rgm" style="left:${(x0*100).toFixed(2)}%;width:${((x1-x0)*100).toFixed(2)}%;top:${((y0+y1)*50).toFixed(2)}%;height:${((y1-y0)*100).toFixed(2)}%" aria-label="${ri<0?"Choisir mon mode de règlement":"Changer de mode de règlement"}"></button>`}
+    h+=`<button type="button" class="abs-rga${ri<0?" todo":""}" data-act="rgm" style="left:${(nf(x0)*100).toFixed(2)}%;width:${(nf(x1-x0)*100).toFixed(2)}%;top:${(nf(y0+y1)*50).toFixed(2)}%;height:${(nf(y1-y0)*100).toFixed(2)}%" aria-label="${ri<0?"Choisir mon mode de règlement":"Changer de mode de règlement"}"></button>`}
    else mine.forEach(([z,j])=>{h+=`<button type="button" class="abs-rg${ri<0?" todo":ri===j?" on":""}" data-rg="${j}" style="${pc(z)}" aria-pressed="${ri===j}" aria-label="Choisir : ${esc(RG[j])}"></button>`});
    mine.forEach(([z,j])=>{if(ri===j&&z.b)h+=`<span class="abs-x" style="${pc(Object.assign({},z.b))}">${XS}</span>`})}
   if(F1&&F1.p===i){h+=`<button type="button" class="abs-fr ${s1?"done":RG.length&&ri<0?"lock":"on"}" id="abgf1" data-act="f1" style="${pc(F1)}" aria-label="${s1?"Signature de la page 1 (cliquer pour la modifier)":"Cliquez ici pour signer la page 1"}">${s1?"":`<span class="abs-cta">✍ Cliquez ici pour signer</span>`}</button>`;
@@ -663,8 +675,8 @@ let done=null;try{done=JSON.parse(localStorage.getItem(KEY)||"null")}catch(e){}
  if(!ro&&!done&&/^\d{4}-\d\d-\d\d$/.test(D.x||"")&&T>D.x){document.title="Lien expiré";app.innerHTML='<div class="card" id="expire"><h1>Ce lien a expiré</h1><p>Ce lien a expiré, contactez-nous : '+esc(org||"TOPAS informatique")+(cm?' – <a href="mailto:'+esc(cm)+'">'+esc(cm)+'</a>':'')+(tel?' – '+esc(tel):'')+'.</p><p style="color:#5b6475">Lien valable jusqu’au '+esc(fd(D.x))+'. Écrivez-nous pour recevoir un nouveau lien.</p></div>';return}}
 if(ro)done=D.sig||null;
 
-const frd=d=>{if(!d)return"—";const x=d.split("-");return (+x[2])+"/"+(+x[1])+"/"+x[0].slice(2)};
-const fjn=n=>String(n).replace(".",",");
+const frd=d=>{const v=dOk(d);if(!v)return"—";const x=v.split("-");return (+x[2])+"/"+(+x[1])+"/"+x[0].slice(2)};
+const fjn=n=>{const v=typeof n==="number"?n:typeof n==="string"&&/^\s*-?\d+(?:[.,]\d+)?\s*$/.test(n)?+n.replace(",","."):NaN;return Number.isFinite(v)?String(v).replace(".",","):""};
 const nmT=i=>esc(tr[i]||"")+((D.tf||[])[i]?" "+esc(D.tf[i]):"");
 function sigMent(p){return `✅ Signé électroniquement par ${esc(p.nm)}${p.fn?" ("+esc(p.fn)+")":""} le ${esc(p.tsl)}${p.rf?" · réf. "+esc(p.rf):""}${sigKTxt(p.sk)}`}
 function sigBlock(){if(done&&done.lg&&!done.sg)return `<div class="sgfm">✅ Validée en ligne, sans signature, par ${esc(done.nm)} le ${esc(done.tsl)}${done.rf?" · réf. "+esc(done.rf):""}</div>`;return done&&done.sg?`<br>${sigSvg(done.sg)}<div class="sgfm">${sigMent(done)}</div>`:""}
@@ -698,7 +710,7 @@ ${row("Intitulé du stage :",`<b>${esc(D.f)}</b>`)}${row("Objectif :",esc(D.o||"
 <tr><td class="lb">Taux horaire HT :</td><td>${eur(pj/hj)} €</td><td></td><td></td></tr></table>
 <table class="tt"><tr><td class="sl">Soit Coût Total</td><td class="am"><table><tr><td>Total H.T.</td><td class="v">${eur(tot)} €</td></tr><tr><td>${tvaLbl()}</td><td class="v">${eur(tva)} €</td></tr><tr class="tc"><td>Total TTC</td><td class="v">${eur(tot+tva)} €</td></tr></table></td></tr></table>${tvaNote()}${annulHtml()}
 <div style="text-align:center;margin:14px 0 10px">Fait en double exemplaire ${ville?"à "+esc(ville)+" &nbsp;":""}le ${esc(dcf)}</div>
-<div class="sg"><div><b class="mr">Cachet &amp; Signature de l’Organisme</b><br><img src="stamp.jpg" alt="Cachet TOPAS"></div><div id="sigent"><b class="mr">Cachet &amp; Signature de l’Entreprise</b>${done?sigBlock():ro?"":'<div style="margin-top:22px;font-size:12px;color:#12308f;font-weight:700">⬇ À signer juste en dessous</div>'}</div></div>${sigForm()}
+<div class="sg"><div><b class="mr">Cachet &amp; Signature de l’Organisme</b><br>${/^data:image\/jpeg;base64,[A-Za-z0-9+\/=]+$/.test(String(D.cs||""))?'<img src="'+D.cs+'" alt="Cachet TOPAS">':'<div style="margin-top:10px;font-size:12px;color:#57606f">Cachet et signature de l’organisme sur l’exemplaire PDF</div>'}</div><div id="sigent"><b class="mr">Cachet &amp; Signature de l’Entreprise</b>${done?sigBlock():ro?"":'<div style="margin-top:22px;font-size:12px;color:#12308f;font-weight:700">⬇ À signer juste en dessous</div>'}</div></div>${sigForm()}
 <div class="ft"><span>${formeTxt()} au capital de ${esc(G[11]||"")}</span>${rcsTxt()?`<span>${rcsTxt().replace(/^ · /,"")}</span>`:""}<span>APE ${esc(G[9]||"")}</span><span>TVA INTRA : ${esc(G[10]||"")}</span><span>N° Siret : ${esc((siret||"").replace(/\s/g,""))}</span></div></div>`;
 }
 function docDev(){const E=esc,g=G,ca=D.ca||[],cl=D.cl||[],en=D.en||[],L=D.L||[],be=D.be||[],st=D.st||[],li=D.li||[],rf=D.rf;
@@ -858,7 +870,7 @@ function pa6Fit1(w){const P=[...w.querySelectorAll(":scope>.pa6")];if(!P.length)
  const cw=w.parentElement?w.parentElement.clientWidth:0;if(cw&&cw<PA6_W&&!w.closest(".h2pw"))w.style.zoom=String(Math.max(.3,cw/PA6_W))}
 /*<PA6*/
 function docProg(){const P=D.pg;if(!P||typeof P!=="object")return"";const g=P.og||{};
- return pa6Html(P,{logo:"logo.jpg",org:g.o||org,nda:g.n||nda,region:g.r||LG.re||"",urssaf:g.u,siret:g.s||siret,ape:g.a,ta:P.ta||LG.ta||"",num:D.n||"",ed:k=>"logo-"+k+".png",hand:(P.lk||{}).h,ri:(P.lk||{}).r},esc)}
+ return pa6Html(P,{logo:"logo.jpg",org:g.o||org,nda:g.n||nda,region:g.r||LG.re||"",urssaf:g.u,siret:g.s||siret,ape:g.a,ta:P.ta||LG.ta||"",num:D.n||"",ed:k=>"logo-"+k+".png",hand:safeUrl((P.lk||{}).h),ri:safeUrl((P.lk||{}).r)},esc)}
 try{new MutationObserver(()=>{if(document.querySelector(".pa6w:not([data-fit])"))requestAnimationFrame(()=>pa6Fit(document))}).observe(document.documentElement,{childList:true,subtree:true})}catch(e){}
 // 09/11 : convention et programme = deux documents distincts (comme les deux pièces jointes du mail)
 const pgOn=()=>!dev&&!plan&&!!(D.pg&&typeof D.pg==="object"),docX=()=>dev?docDev():plan?docPlan():docConv(),W1=dev?"accepté":plan?"validée":"signée";

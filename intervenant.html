@@ -2,6 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; connect-src 'self' https://kbfnxqyxqualmqhiufnq.supabase.co; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; font-src 'self' data:; object-src 'none'; base-uri 'none'; form-action 'self'; worker-src 'self' blob:; manifest-src 'self'">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="color-scheme" content="light only">
 <meta name="robots" content="noindex,nofollow">
@@ -493,7 +494,9 @@ const SBU="https://kbfnxqyxqualmqhiufnq.supabase.co",SBK="sb_publishable_5vjNCP7
 // Un refus (téléphone non autorisé, accès bloqué) laisse le dépôt dans la file d'envoi : rien n'est perdu, il part quand l'accès est rétabli.
 const SRVK="fpiv:srv";
 const sbDep=(c,p)=>window.__EJ?fetch(SBU+"/rest/v1/rpc/espace_deposer",{method:"POST",headers:{apikey:SBK,"Content-Type":"application/json"},body:JSON.stringify({p_jeton:window.__EJ,p_app:window.__DEVID(),p_data:p})}).then(async r=>{if(!r.ok)throw 0;const j=await r.json().catch(()=>null);if(j&&j.ok===false)throw 0;if(j&&j.srv)try{const S0=LS.get(SRVK,{})||{};S0[String(p.id||"")]=j.srv;const K=Object.keys(S0);if(K.length>300)K.slice(0,K.length-300).forEach(k=>delete S0[k]);LS.set(SRVK,S0)}catch(e){}return 1})
+ :LNID?fetch(SBU+"/rest/v1/rpc/deposer_lien",{method:"POST",headers:{apikey:SBK,"Content-Type":"application/json"},body:JSON.stringify({p_lien:LNID,p_data:p})}).then(async r=>{if(!r.ok)throw 0;const j=await r.json().catch(()=>null);if(!j||j.ok!==true)throw 0;return 1})/* (16/11, audit B3) lien court : dépôt vérifié par la base (lien actif, canal du lien) */
  :fetch(SBU+"/rest/v1/rpc/deposer",{method:"POST",headers:{apikey:SBK,"Content-Type":"application/json"},body:JSON.stringify({p_canal:c,p_data:p})}).then(r=>{if(!r.ok)throw 0;return 1});
+const LNID=(()=>{try{const v=new URLSearchParams(location.search).get("l")||"";return /^[a-z0-9]{8,12}$/.test(v)?v:""}catch(e){return ""}})();
 let FB_MAIL=""; // adresse ADV reçue avec le lien (fiche Gestionnaire) ; rien en dur (lot 7 du 31/10)
 // Secours si le dépôt Supabase échoue : code à coller dans TOPAS Formation (« Coller un code ») + e-mail préparé que la personne envoie elle-même (aucun service tiers)
 function fbHtml(code,subj,intro){const E=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])),mt="mailto:"+FB_MAIL+"?subject="+encodeURIComponent(subj)+"&body="+encodeURIComponent(intro+"\n\n"+code+"\n");
@@ -518,9 +521,15 @@ async function lnCoord(el){if(!el)return;try{const r=await fetch(SBU+"/rest/v1/r
 "use strict";
 const $=s=>document.querySelector(s),app=$("#app");
 const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const fdl=d=>{const x=new Date(d+"T12:00:00");return isNaN(x)?d:x.toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long",year:"numeric"})};
-const fdm=d=>{const x=new Date(d+"T12:00:00");return isNaN(x)?d:x.toLocaleDateString("fr-FR",{weekday:"short",day:"numeric",month:"short"})};
-const fds=d=>{const x=new Date(d+"T12:00:00");return isNaN(x)?d:x.toLocaleDateString("fr-FR",{day:"2-digit",month:"2-digit",year:"numeric"})};
+// (16/11, sécurité B1) tout ce qui vient du lien, de l’espace ou de la base est contrôlé avant d’être écrit dans la page :
+// dates = AAAA-MM-JJ seulement (sinon « — »), adresses web = https:// seulement, images = base64 seulement, types de fichiers sûrs seulement
+const dOk=d=>{const m=/^(\d{4}-\d\d-\d\d)/.exec(String(d==null?"":d));return m?m[1]:""},dBad=d=>d?"—":"";
+const safeUrl=u=>{u=String(u==null?"":u).trim();return /^https:\/\/[^\s"'<>`\\]+$/i.test(u)||/^data:image\/(png|jpeg);base64,[A-Za-z0-9+/=]+$/.test(u)?u:""};
+const b64ok=x=>typeof x==="string"&&x.length>100&&/^[A-Za-z0-9+/=]+$/.test(x);
+const safeT=t=>{t=String(t||"").toLowerCase();return /^(image\/(png|jpeg|gif|webp|heic|heif)|application\/(pdf|zip|octet-stream|msword|vnd\.[a-z0-9.+-]+)|video\/(mp4|webm|quicktime)|audio\/(mpeg|mp4|ogg|wav)|text\/(plain|csv))$/.test(t)?t:"application/octet-stream"};
+const fdl=d=>{const x=new Date(dOk(d)+"T12:00:00");return !dOk(d)||isNaN(x)?dBad(d):x.toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long",year:"numeric"})};
+const fdm=d=>{const x=new Date(dOk(d)+"T12:00:00");return !dOk(d)||isNaN(x)?dBad(d):x.toLocaleDateString("fr-FR",{weekday:"short",day:"numeric",month:"short"})};
+const fds=d=>{const x=new Date(dOk(d)+"T12:00:00");return !dOk(d)||isNaN(x)?dBad(d):x.toLocaleDateString("fr-FR",{day:"2-digit",month:"2-digit",year:"numeric"})};
 const b64u=o=>btoa(unescape(encodeURIComponent(JSON.stringify(o)))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
 const PBK=n=>"fppb:"+n;const pbHist=n=>{try{return JSON.parse(localStorage.getItem(PBK(n))||"[]")}catch(e){return[]}};
 function unb64u(t){t=String(t).replace(/-/g,"+").replace(/_/g,"/");while(t.length%4)t+="=";return t}
@@ -538,7 +547,7 @@ const hOf=(f,d)=>(f.hf||{})[d]?3.5:7;
 const today=()=>{const n=new Date(),p=x=>String(x).padStart(2,"0");return n.getFullYear()+"-"+p(n.getMonth()+1)+"-"+p(n.getDate())};
 const T=today(),dd=(a,b)=>Math.round((Date.parse(b+"T12:00:00")-Date.parse(a+"T12:00:00"))/864e5);
 const rel=d=>{const n=dd(T,d);return n===0?"aujourd’hui":n===1?"demain":n===-1?"hier":n>0?"dans "+n+" jours":"il y a "+(-n)+" jours"};
-const DS=f=>[...new Set((f.ds||[]).filter(Boolean))].sort();
+const DS=f=>[...new Set((Array.isArray(f.ds)?f.ds:[]).filter(x=>typeof x==="string"&&/^\d{4}-\d\d-\d\d$/.test(x)))].sort();
 // statut calculé le jour de la lecture (le lien peut être ouvert plusieurs jours après l'envoi)
 function stat(f){const d=DS(f),a=d[0],z=d[d.length-1];if(!a)return"venir";if(f.dc)return z<T?"fini":"venir";/* (06/11) dates à confirmer */if(d.includes(T))return"auj";if(a>T)return"venir";if(z>=T)return"cours";return (f.cl||[]).some(x=>!x[1])?"clo":"fini"}
 const SL={auj:"Aujourd’hui",cours:"En cours",venir:"À venir",clo:"À clôturer",fini:"Terminée"};
@@ -571,8 +580,8 @@ const progH=f=>`${f.ob?`<h4>Objectif</h4><div>${esc(f.ob)}</div>`:""}<h4 style="
 // ===== Espace de terrain : listes → formation → signature sur téléphone (27/10) =====
 const LS={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){return false}}};
 const p2=n=>String(n).padStart(2,"0"),nowS=()=>{const n=new Date();return{dl:n.getFullYear()+"-"+p2(n.getMonth()+1)+"-"+p2(n.getDate()),hl:p2(n.getHours())+":"+p2(n.getMinutes())}};
-const fdw=d=>{const x=new Date(d+"T12:00:00");return isNaN(x)?d:["Dim","Lun","Mar","Mer","Jeu","Ven","Sam"][x.getDay()]+" "+dm(d)};
-const dm=d=>{const x=new Date(d+"T12:00:00");return isNaN(x)?d:p2(x.getDate())+"/"+p2(x.getMonth()+1)};
+const fdw=d=>{const x=new Date(dOk(d)+"T12:00:00");return !dOk(d)||isNaN(x)?dBad(d):["Dim","Lun","Mar","Mer","Jeu","Ven","Sam"][x.getDay()]+" "+dm(d)};
+const dm=d=>{const x=new Date(dOk(d)+"T12:00:00");return !dOk(d)||isNaN(x)?dBad(d):p2(x.getDate())+"/"+p2(x.getMonth()+1)};
 // couleur stable de la personne : MÊME calcul que TOPAS Formation (nrm / ITVPAL / itvPal), l'avatar a la couleur de sa carte dans Interventions
 const nrm=x=>String(x||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9 ]+/g," ").replace(/\s+/g," ").trim();
 const ITVPAL=[["#3b82f6","#eaf2ff","#d6e6ff"],["#14b8a6","#e6f8f5","#c9efe9"],["#f97316","#fff1e6","#ffdfc6"],["#8b5cf6","#f1ecff","#e1d6ff"],["#f43f5e","#ffeaee","#ffd3dc"]];
@@ -606,7 +615,7 @@ async function espLoad(tok){let j=null,net=false;
   return{D:j.data,hors:""}}
  // téléphone pas (encore) autorisé : le jeton est GARDÉ (l'accès peut être donné ou rétabli) ; en attente → rien n'est lisible ;
  // refusé / retiré → effacement à distance des données de ce téléphone, sauf la file d'envoi (bons signés pas encore envoyés)
- if(j&&j.ok===false&&j.etat==="appareil"){const a=String(j.appareil||"attente");if(a!=="attente")devWipe();else{try{localStorage.removeItem(EDK);localStorage.removeItem("fpiv:D")}catch(e){}}
+ if(j&&j.ok===false&&j.etat==="appareil"){const a=String(j.appareil||"attente");if(a!=="attente"&&a!=="trop")devWipe();/* (16/11, B2) « trop » = déjà 5 téléphones en attente pour cet espace : rien n’est effacé */else{try{localStorage.removeItem(EDK);localStorage.removeItem("fpiv:D")}catch(e){}}
   throw Object.assign(new Error("espace"),{etat:"appareil",app:a})}
  if(j&&j.ok===false&&j.etat){try{const c0=LS.get(EDK,null);if(c0&&c0.D&&c0.D.m&&!FB_MAIL)FB_MAIL=String(c0.D.m).trim()}catch(e){}try{localStorage.removeItem(EDK);localStorage.removeItem(EK);localStorage.removeItem("fpiv:D")}catch(e){}
   if(j.etat==="bloque"){try{indexedDB.deleteDatabase("fpiv")}catch(e){}try{Object.keys(localStorage).filter(k=>/^fpiv:(E|D|inst)/.test(k)).forEach(k=>localStorage.removeItem(k))}catch(e){}}
@@ -617,11 +626,11 @@ async function espLoad(tok){let j=null,net=false;
 // les photos qu'elle attend sont gardées pour partir dès que l'accès est rétabli ; l'adresse personnelle (jeton) et le code du téléphone aussi
 function devWipe(){let keepPh=false;try{Object.keys(localStorage).forEach(k=>{if(/^fpiv:q:/.test(k)){const q=LS.get(k,[]);if(Array.isArray(q)&&q.length)keepPh=true;return}
   if(/^fpiv:(r:|d:|D$|srv$)/.test(k)||k===EDK)localStorage.removeItem(k)})}catch(e){}if(!keepPh){try{indexedDB.deleteDatabase("fpiv")}catch(e){}}}
-function devScreen(el,a){document.title="TOPAS Intervenants";const at=a==="attente",code=String(devId()).slice(-6).toUpperCase();
+function devScreen(el,a){document.title="TOPAS Intervenants";if(a==="trop"){const code=String(devId()).slice(-6).toUpperCase();el.innerHTML='<div class="fc" id="espapp"><h3>📱 Trop de téléphones en attente</h3><p>Plusieurs téléphones attendent déjà l’autorisation de TOPAS informatique pour cet espace. Appelez le bureau : il autorisera le bon téléphone (ou retirera les autres), puis touchez « ↻ Vérifier maintenant ».</p><p class="devcode">Code de ce téléphone : <b>'+code+'</b></p>'+(FB_MAIL?'<p>Contact : <a href="mailto:'+FB_MAIL+'">'+FB_MAIL+'</a></p>':'')+'<button type="button" class="btn" onclick="location.reload()">↻ Vérifier maintenant</button></div>';return}const at=a==="attente",code=String(devId()).slice(-6).toUpperCase();
  el.innerHTML='<div class="fc" id="espapp">'+(at?'<h3>📱 Demande envoyée à TOPAS</h3><p>C’est la première fois que votre espace s’ouvre sur ce téléphone. Pour votre sécurité, TOPAS informatique doit l’autoriser.</p><p>Dès que c’est fait, touchez « ↻ Vérifier maintenant » : votre espace s’affichera. Rien n’est lisible sur ce téléphone en attendant.</p>'
   :'<h3>⛔ Ce téléphone n’est plus autorisé</h3><p>TOPAS informatique a retiré l’accès de ce téléphone à votre espace. Ses données ont été effacées de ce téléphone.</p><p>Les bons signés pas encore envoyés sont gardés : ils partiront dès que l’accès sera rétabli.</p>')
-  +'<p class="devcode">Code de ce téléphone : <b>'+code+'</b></p>'+(FB_MAIL?'<p>Contact : <a href="mailto:'+FB_MAIL+'">'+FB_MAIL+'</a></p>':'')+'<button type="button" class="btn" onclick="location.reload()">'+(at?'↻ Vérifier maintenant':'🔄 Réessayer')+'</button></div>'}
-function espDead(el,etat){const rs=etat==="reseau",bq=etat==="bloque";document.title="TOPAS Intervenants";el.innerHTML='<div class="fc" id="espko"><h3>'+(rs?"📴 Pas de connexion":bq?"⛔ Accès bloqué":"🔒 Ce lien n’est plus actif")+'</h3><p>'+(bq?"Votre accès à cet espace a été désactivé par TOPAS informatique et sa copie a été retirée de ce téléphone. Contactez TOPAS informatique"+(FB_MAIL?" : <a href=\"mailto:"+FB_MAIL+"\">"+FB_MAIL+"</a>":"")+".":rs?"Votre espace n’a pas encore été enregistré sur ce téléphone. Connectez-vous à Internet (Wi-Fi ou données mobiles) puis rouvrez-le : il restera ensuite disponible même sans réseau.":"Il a peut-être été réinitialisé (nouveau téléphone, téléphone perdu…) ou n’existe pas. Contactez TOPAS informatique pour recevoir votre nouvelle adresse personnelle"+(FB_MAIL?" : <a href=\"mailto:"+FB_MAIL+"\">"+FB_MAIL+"</a>":"")+".")+'</p>'+(rs?'<button type="button" class="btn" onclick="location.reload()">🔄 Réessayer</button>':"")+'</div>'}
+  +'<p class="devcode">Code de ce téléphone : <b>'+code+'</b></p>'+(FB_MAIL?'<p>Contact : <a href="mailto:'+esc(FB_MAIL)+'">'+esc(FB_MAIL)+'</a></p>':'')+'<button type="button" class="btn" onclick="location.reload()">'+(at?'↻ Vérifier maintenant':'🔄 Réessayer')+'</button></div>'}
+function espDead(el,etat){const rs=etat==="reseau",bq=etat==="bloque";document.title="TOPAS Intervenants";el.innerHTML='<div class="fc" id="espko"><h3>'+(rs?"📴 Pas de connexion":bq?"⛔ Accès bloqué":"🔒 Ce lien n’est plus actif")+'</h3><p>'+(bq?"Votre accès à cet espace a été désactivé par TOPAS informatique et sa copie a été retirée de ce téléphone. Contactez TOPAS informatique"+(FB_MAIL?" : <a href=\"mailto:"+esc(FB_MAIL)+"\">"+esc(FB_MAIL)+"</a>":"")+".":rs?"Votre espace n’a pas encore été enregistré sur ce téléphone. Connectez-vous à Internet (Wi-Fi ou données mobiles) puis rouvrez-le : il restera ensuite disponible même sans réseau.":"Il a peut-être été réinitialisé (nouveau téléphone, téléphone perdu…) ou n’existe pas. Contactez TOPAS informatique pour recevoir votre nouvelle adresse personnelle"+(FB_MAIL?" : <a href=\"mailto:"+esc(FB_MAIL)+"\">"+esc(FB_MAIL)+"</a>":"")+".")+'</p>'+(rs?'<button type="button" class="btn" onclick="location.reload()">🔄 Réessayer</button>':"")+'</div>'}
 async function main(){
  let D=null,hors="";EJ=espTok();try{window.__EJ=EJ;window.__DEVID=devId}catch(e){}/* (13/11) lus par sbDep (déclaré hors de cette portée) */
  if(EJ){try{const r=await espLoad(EJ);D=r.D;hors=r.hors;if(r.maj)MAJ=r.maj}catch(e){if(e&&e.etat==="appareil"){devScreen(app,e.app);return}espDead(app,e&&e.etat);return}
@@ -665,7 +674,7 @@ async function main(){
   const home=typeof V!=="undefined"&&V&&V.v==="list"&&!(typeof dkOn==="function"&&dkOn()),mh=majHM();
   if(home&&HOMEOK)return "";/* (05/11) tout est fait : le bandeau vert « Rien à faire aujourd’hui — tout est signé et transmis » suffit */
   return any||(home&&mh)?'<div class="qb qk" role="status"><b>✔ Tout est transmis'+(home&&mh?" · liste à jour "+mh:"")+'</b></div>':""};
- function banner(){const e=document.getElementById("qbn");if(e){e.innerHTML=bannerHtml();const b=e.querySelector("[data-qgo]");if(b)b.onclick=flush}const ak=document.querySelector(".ip-afok .ip-akt");if(ak)ak.textContent="✔ Rien à faire aujourd’hui — tout est signé"+(Q().length?"":" et transmis");document.querySelectorAll(".ip-wait[data-pid]").forEach(w=>{if(!pend(w.dataset.pid))w.remove()});document.querySelectorAll("[data-okt][data-pid]").forEach(w=>{if(!pend(w.dataset.pid)){w.textContent=w.dataset.okt;w.removeAttribute("data-pid");const b=w.closest(".ip-em3-pd");if(b)b.classList.remove("ip-em3-pd")}});const ps=document.getElementById("phst");if(ps&&BS&&BS.step==="done")ps.innerHTML=phStat(BS.ph.map(x=>x.id))}
+ function banner(){const e=document.getElementById("qbn");if(e){e.innerHTML=bannerHtml();const b=e.querySelector("[data-qgo]");if(b)b.onclick=flush}const ak=document.querySelector(".ip-afok .ip-akt");if(ak)ak.textContent="✔ Rien à faire aujourd’hui — tout est signé"+(Q().length?"":" et transmis");document.querySelectorAll(".ip-wait[data-pid]").forEach(w=>{if(!pend(w.dataset.pid))w.remove()});document.querySelectorAll(".ip-tpl-wt[data-pids]").forEach(w=>{if(!w.dataset.pids.split(" ").some(pend))w.remove()});document.querySelectorAll("[data-okt][data-pid]").forEach(w=>{if(!pend(w.dataset.pid)){w.textContent=w.dataset.okt;w.removeAttribute("data-pid");const b=w.closest(".ip-em3-pd");if(b)b.classList.remove("ip-em3-pd")}});const ps=document.getElementById("phst");if(ps&&BS&&BS.step==="done")ps.innerHTML=phStat(BS.ph.map(x=>x.id))}
  const phCatch=()=>phOrphans().then(n=>{if(n){banner();if(V.v==="list"||V.v==="bid")view()}}).catch(()=>{});
  window.addEventListener("online",()=>{flush();phCatch()});setInterval(()=>{if(Q().length)flush()},20000);
  // ---- navigation interne (le bouton « retour » du téléphone fonctionne)
@@ -692,7 +701,7 @@ async function main(){
  // rond d'initiales : couleur stable itvPal(nom complet), comme sa carte dans TOPAS Formation
  const avH=()=>{const nm=String(D.i||pr||"").trim(),P=itvPal(nm||"?"),p0=(pr||nm.split(/\s+/)[0]||"").trim(),n0=(D.p&&nm.startsWith(D.p)?nm.slice(D.p.length):nm.split(/\s+/).slice(1).join(" ")).trim();
   return `<span class="ip-av" aria-hidden="true" style="--a:${shade(P[0],.3)};--b:${shade(P[0],.5)}">${esc(((p0[0]||"")+(n0[0]||"")).toUpperCase()||"?")}</span>`};
- const fH=h=>{const m=/^(\d{1,2}):(\d\d)$/.exec(String(h||""));return m?(+m[1])+"h"+m[2]:String(h||"")},dNear=d=>{const n=dd(T,d);return Math.abs(n)<=1?rel(d):fdm(d)};
+ const fH=h=>{const m=/^(\d{1,2}):(\d\d)$/.exec(String(h||""));return m?(+m[1])+"h"+m[2]:String(h||"").replace(/[<>"'&`]/g,"")},dNear=d=>{const n=dd(T,d);return Math.abs(n)<=1?rel(d):fdm(d)};
  const MOI=d=>{const x=new Date(d+"T12:00:00");return isNaN(x)?"":x.toLocaleDateString("fr-FR",{month:"short"})};
  const dCol=d=>/^\d{4}-\d\d-\d\d$/.test(d||"")?`<span class="ip-d"><b>${new Date(d+"T12:00:00").getDate()}</b><small>${esc(MOI(d))}</small></span>`:`<span class="ip-d"><b>?</b><small>date</small></span>`;
  // barre du bas : 🏠 Accueil · 📄 Signées (fait défiler jusqu'au groupe) · ☎ TOPAS (numéro et adresse de la fiche Gestionnaire)
@@ -810,7 +819,7 @@ async function main(){
   if(HT7==="ven")body=ven.length?ven.map(o=>r7(o,"ven")).join(""):emp("Rien de prévu pour le moment.");
   else if(HT7==="fait")body=`<div class="ip7-srw"><input type="search" class="ip-in ip7-srch" id="usrch7" placeholder="Rechercher : client, n° de BL" aria-label="Rechercher dans les réalisés (client, n° de BL)" autocomplete="off" enterkeyhint="search"></div>`+(fait.length?fait.map(o=>r7(o,"done")).join(""):emp("Rien de réalisé pour le moment."))+(arc.length?`<details class="ip7-arc"><summary>🗄 Archives (${arc.length}) · plus d’un an</summary>${arc.map(o=>r7(o,"done")).join("")}</details>`:"")+`<p class="ip7-empty hide" id="usrch70">Aucun bon ne correspond.</p>`;
   else body=(late.length?`<h2 class="ip7-gh ip7-gh-late"><span>⚠ EN RETARD</span><span>${late.length}</span></h2>${late.map(o=>r7(o,"late")).join("")}`:"")+`<h2 class="ip7-gh"><span>AUJOURD’HUI</span><span>${today.length}</span></h2>`+(today.length?today.map(o=>r7(o,"auj")).join(""):emp("Rien à faire aujourd’hui ✓"))
-   +(V2&&V2.t?`<div class="vei"><div class="kk">📢 Info réglementaire</div><h3>${esc(V2.t)}</h3>${V2.r?`<div class="mu" style="color:var(--tx)">${esc(V2.r)}</div>`:""}<div class="mu" style="margin-top:4px">Transmise le ${esc(fds(V2.dd||V2.d||T))}${V2.u?` · <a href="${esc(V2.u)}" target="_blank" rel="noopener">Voir la source</a>`:""}</div><div class="btns">${V2.lu?'<span class="pbok" style="margin:0">✔ Vous l’avez lue, merci</span>':V2.a?`<a class="btn gn" href="${esc(V2.a)}" target="_blank" rel="noopener">✅ J’ai lu – donner mon avis</a>`:""}</div></div>`:"");
+   +(V2&&V2.t?`<div class="vei"><div class="kk">📢 Info réglementaire</div><h3>${esc(V2.t)}</h3>${V2.r?`<div class="mu" style="color:var(--tx)">${esc(V2.r)}</div>`:""}<div class="mu" style="margin-top:4px">Transmise le ${esc(fds(V2.dd||V2.d||T))}${safeUrl(V2.u)?` · <a href="${esc(safeUrl(V2.u))}" target="_blank" rel="noopener">Voir la source</a>`:""}</div><div class="btns">${V2.lu?'<span class="pbok" style="margin:0">✔ Vous l’avez lue, merci</span>':safeUrl(V2.a)?`<a class="btn gn" href="${esc(safeUrl(V2.a))}" target="_blank" rel="noopener">✅ J’ai lu – donner mon avis</a>`:""}</div></div>`:"");
   return `${hd}${horsH()}${EJ?instH():""}<div id="qbn">${bannerHtml()}</div><div class="ip7-list ip7-l-${HT7}" id="ip7p" role="tabpanel" aria-labelledby="ht-${HT7}">${body}</div>${tpFab()}${foot()}`}
  // ---- fiche FORMATION : en-tête violet, grand bloc Émargement (une case par jour, « Faire émarger · prochaine demi-journée »), Évaluation des acquis
  const half7=p=>p==="m"?"matin":"après-midi";
@@ -936,7 +945,7 @@ async function main(){
   const p1=todo[0],hd=!n?"Rien à faire aujourd’hui ✓":!done.length&&todo.length&&!reg?todo.length+" rendez-vous aujourd’hui"+(p1.m.hr?" · le 1er à "+fH(p1.m.hr):"")+" ↓":"Il reste "+n+" chose"+(n>1?"s":"")+" à faire aujourd’hui ↓";return {todo,done,n,hd}}
  function uTodayH(H){const q=Q().length;if(!H.todo.length){const mh=majHM();return `<div class="ip-afok" id="s-uauj" role="status"><span class="ip-akt">✔ Rien à faire aujourd’hui${q?" — tout est signé":" — tout est signé et transmis"}</span>${mh?`<small class="ip-akm">Liste à jour ${esc(mh)}</small>`:""}</div>`}const p=H.todo[0].m;
   return `<section class="ip-af" id="s-uauj"><h2 class="ip-afh">Aujourd’hui · ${esc(vD(T,{weekday:"long",day:"numeric",month:"short"}))} (${H.todo.length})</h2><p class="ip-afn">➜ Prochain : <b>${esc(p.c)}</b>${p.hr?" à "+esc(fH(p.hr)):""}${p.city?" · "+esc(p.city):""}</p>
-  ${H.todo.map(o=>{const m=o.m;return `<div class="ip-afr" data-q="${esc((m.c||"")+" "+(m.n||""))}"><button type="button" class="ip-afb row" ${uOpen(m)}><span class="ip-afhr">${m.hr?esc(fH(m.hr)):"—"}</span><span class="ip-afc"><b class="uc">${esc(m.c||"")}</b><span class="ip-afs">${uTag(m)}${m.n?"<span>"+esc(m.n)+"</span>":""}${m.city?"<span>"+(m.n?"· ":"")+esc(m.city)+"</span>":""}</span></span></button><div class="ip-afa">${uMap(m)}${uAct(m)}</div></div>`}).join("")}</section>`}
+  ${H.todo.map(o=>{const m=o.m;return `<div class="ip-afr" data-q="${esc((m.c||"")+" "+(m.n||""))}"><button type="button" class="ip-afb row" ${uOpen(m)}><span class="ip-afhr">${m.hr?esc(fH(m.hr)):"—"}</span><span class="ip-afc"><b class="uc">${esc(m.c||"")}</b><span class="ip-afs">${uTag(m)}${m.n?"<span>"+esc(m.n)+"</span>":""}${m.city?"<span>"+(m.n?"· ":"")+esc(m.city)+"</span>":""}</span>${m.fl?`<span class="ip-tpls">${m.fl}</span>`:""}</span></button><div class="ip-afa">${uMap(m)}${uAct(m)}</div></div>`}).join("")}</section>`}
  function uVenH(L){if(!L.length)return "";return `<section class="sec ip-g ip-g-ven" id="s-uven"><h2 class="ip-vh">📅 À venir (${L.length})</h2>${L.map(o=>{const m=o.m;if(!m)return o.h;return `<div class="ip-rw ip-vrw ip-vr-${m.dc?"dc":m.t==="f"?"f":m.t==="b"?"b":"i"}" data-q="${esc((m.c||"")+" "+(m.n||""))}"><button type="button" class="row urow ip-row ip-vr" ${uOpen(m)}>${dCol(m.d)}<span class="ip-c ul"><b class="uc" title="${esc(m.c)}">${esc(m.c)}</b><span class="ip-s m">${uTag(m)} ${esc([m.hr?fH(m.hr):"",m.city].filter(Boolean).join(" · "))}</span>${m.dc?'<span class="ip-dcl">📅 Dates à confirmer</span>':""}${m.lab?`<span class="ip-tpls">${m.lab}</span>`:""}</span></button>${uMap(m)}</div>`}).join("")}<p class="ip-vx">« 🧭 Itinéraire » ouvre le GPS du téléphone · un appui sur la ligne ouvre le détail.</p></section>`}
  function listView(){if(!V6)return homeV7();const V2=D.v,U=uGroups(),H=uHome(U),emp={reg:[],auj:[],ven:[],tpx:[],sig:[],arc:[]};
   const regH=U.reg.length?uList(Object.assign({},emp,{reg:U.reg})):"",restH=uList(Object.assign({},emp,{tpx:U.tpx||[],sig:U.sig,arc:U.arc})).replace(/^<div class="empty ip-empty">.*<\/div>$/,""),any=U.reg.length+U.auj.length+U.ven.length+(U.tpx||[]).length+U.sig.length+U.arc.length;HOMEOK=!!any&&!H.todo.length;
@@ -946,7 +955,7 @@ async function main(){
   ${regH}${any?uTodayH(H):""}<div id="qbn">${bannerHtml()}</div>
   ${H.done.length?`<section class="sec ip-g ip-done" id="s-udone"><h2 class="ip-dh">Déjà fait aujourd’hui (${H.done.length})</h2>${H.done.map(o=>o.h).join("")}</section>`:""}
   ${uVenH(U.ven)}${restH}${any?"":`<div class="empty ip-empty">Rien de prévu pour le moment.</div>`}${tpFab()}
-  ${V2&&V2.t?`<div class="vei"><div class="kk">📢 Info réglementaire</div><h3>${esc(V2.t)}</h3>${V2.r?`<div class="mu" style="color:var(--tx)">${esc(V2.r)}</div>`:""}<div class="mu" style="margin-top:4px">Transmise le ${esc(fds(V2.dd||V2.d||T))}${V2.u?` · <a href="${esc(V2.u)}" target="_blank" rel="noopener">Voir la source</a>`:""}</div><div class="btns">${V2.lu?'<span class="pbok" style="margin:0">✔ Vous l’avez lue, merci</span>':V2.a?`<a class="btn gn" href="${esc(V2.a)}" target="_blank" rel="noopener">✅ J’ai lu – donner mon avis</a>`:""}</div></div>`:""}
+  ${V2&&V2.t?`<div class="vei"><div class="kk">📢 Info réglementaire</div><h3>${esc(V2.t)}</h3>${V2.r?`<div class="mu" style="color:var(--tx)">${esc(V2.r)}</div>`:""}<div class="mu" style="margin-top:4px">Transmise le ${esc(fds(V2.dd||V2.d||T))}${safeUrl(V2.u)?` · <a href="${esc(safeUrl(V2.u))}" target="_blank" rel="noopener">Voir la source</a>`:""}</div><div class="btns">${V2.lu?'<span class="pbok" style="margin:0">✔ Vous l’avez lue, merci</span>':safeUrl(V2.a)?`<a class="btn gn" href="${esc(safeUrl(V2.a))}" target="_blank" rel="noopener">✅ J’ai lu – donner mon avis</a>`:""}</div></div>`:""}
   ${foot()}`}
  // « ✍ Faire le bon » d'une intervention prévue : nouveau bon d'intervention prérempli (client, adresse, date) ; sans droit de bon → l'intervention
  function tpBon(tid){const t=tpAll().find(z=>z.tid===tid);if(!t)return;if(!canBI())return tpStart(tid);BS=biNew();Object.assign(BS,{cn:t.c||"",ad:t.a||"",d:t.d||T});nav({v:"bls"})}
@@ -962,29 +971,29 @@ async function main(){
  // un lien ou une vidéo s'ouvre dans le navigateur (connexion nécessaire). Préchargement dès qu'il y a du réseau (formations à venir / en cours, ≤ 8 Mo).
  const SUPI={pdf:"📄",img:"🖼",fiche:"📝",video:"🎬",file:"💾",lien:"🔗"},SUPB={};
  const supWeb=u=>u.k==="lien"||u.k==="video";
- const supKo=u=>supWeb(u)?(u.u?"":"Adresse manquante."):!u.cle?"Pas encore disponible : TOPAS informatique n’a pas fini de le publier.":!EJ?"Ouvrez votre espace permanent (lien personnel) pour consulter ce fichier.":"";
+ const supKo=u=>supWeb(u)?(safeUrl(u.u)?"":"Adresse manquante."):!u.cle?"Pas encore disponible : TOPAS informatique n’a pas fini de le publier.":!EJ?"Ouvrez votre espace permanent (lien personnel) pour consulter ce fichier.":"";
  const supMb=n=>n>=1048576?(n/1048576).toFixed(1).replace(".",",")+" Mo":n>=1024?Math.round(n/1024)+" Ko":n?n+" o":"";
  const supMeta=u=>[u.k==="pdf"?"PDF":u.k==="img"?"Image":u.k==="fiche"?"Fiche":u.k==="video"?"Vidéo":u.k==="lien"?"Lien web":"Fichier",u.pg?u.pg+" page"+(u.pg>1?"s":""):"",u.du||"",u.sz?supMb(u.sz):""].filter(Boolean).join(" · ");
  const supDj=(f,dj)=>{if(!dj||dj==="all")return "";const m=/^j(\d+)([ma])$/.exec(dj);if(!m)return "";const d=DS(f)[+m[1]-1];return (d?fdm(d):"Jour "+m[1])+" · "+(m[2]==="m"?"matin":"après-midi")};
  async function supCached(u){if(!u.cle)return null;if(SUPB[u.cle])return SUPB[u.cle];const c=await IDB.get(u.cle,"sup");if(c&&c.b){SUPB[u.cle]=c.b;return c.b}return null}
  async function supFetch(u){if(!EJ||!u.cle)return null;let a=0,P=[],h=null;
   for(;;){const r=await fetch(SBU+"/rest/v1/rpc/espace_fichier",{method:"POST",headers:{apikey:SBK,"Content-Type":"application/json"},body:JSON.stringify({p_jeton:EJ,p_app:devId(),p_cle:u.cle,p_a:a,p_b:a+4})}),j=r.ok?await r.json():null;if(!j||!j.ok)return null;h=j;(j.morceaux||[]).forEach(m=>{P[m.n]=m.b64});a+=5;if(a>=(+j.n||0))break}
-  if(P.filter(Boolean).length<(+h.n||0))return null;const t=atob(P.join("")),b=new Uint8Array(t.length);for(let i=0;i<t.length;i++)b[i]=t.charCodeAt(i);const bl=new Blob([b],{type:h.type||"application/octet-stream"});
+  if(P.filter(Boolean).length<(+h.n||0))return null;const t=atob(P.join("")),b=new Uint8Array(t.length);for(let i=0;i<t.length;i++)b[i]=t.charCodeAt(i);const bl=new Blob([b],{type:safeT(h.type)});
   SUPB[u.cle]=bl;try{await IDB.put(u.cle,{b:bl,nom:h.nom||u.n||"",at:Date.now()},"sup")}catch(e){}return bl}
  function supRow(u,f,i,ix){const ko=supKo(u),web=supWeb(u);
-  return `<div class="task sup-r"><span class="sup-i" aria-hidden="true">${SUPI[u.k]||"💾"}</span><span><b>${esc(u.t||u.n||"Support")}</b><br><small class="mu">${esc(supMeta(u))}${supDj(f,u.dj)?" · "+esc(supDj(f,u.dj)):""}${u.vis==="tous"?" · remis aussi aux stagiaires":""}${web?" · connexion nécessaire":""}</small>${ko?`<br><small class="ko">${esc(ko)}</small>`:""}</span>${web?(ko?"":`<a class="btn" href="${esc(u.u)}" target="_blank" rel="noopener">${u.k==="video"?"▶ Regarder":"↗ Ouvrir"}</a>`):`<button type="button" class="btn ${ko?"":"p"}" data-sup="${ix}:${i}" ${ko?"disabled":""}>📂 Ouvrir</button>`}<small class="mu sup-st" id="supst${ix}-${i}" role="status"></small></div>`}
+  return `<div class="task sup-r"><span class="sup-i" aria-hidden="true">${SUPI[u.k]||"💾"}</span><span><b>${esc(u.t||u.n||"Support")}</b><br><small class="mu">${esc(supMeta(u))}${supDj(f,u.dj)?" · "+esc(supDj(f,u.dj)):""}${u.vis==="tous"?" · remis aussi aux stagiaires":""}${web?" · connexion nécessaire":""}</small>${ko?`<br><small class="ko">${esc(ko)}</small>`:""}</span>${web?(ko?"":`<a class="btn" href="${esc(safeUrl(u.u))}" target="_blank" rel="noopener">${u.k==="video"?"▶ Regarder":"↗ Ouvrir"}</a>`):`<button type="button" class="btn ${ko?"":"p"}" data-sup="${ix}:${i}" ${ko?"disabled":""}>📂 Ouvrir</button>`}<small class="mu sup-st" id="supst${ix}-${i}" role="status"></small></div>`}
  const supSec=(f,ix)=>{const L=Array.isArray(f.sup)?f.sup:[];if(!L.length)return"";return `<section class="sec" style="--c:var(--ds-violet,#7c3aed)"><h2>📚 Supports de cours <span class="ip-gn n">${L.length}</span></h2><div class="fc s-venir" style="padding:6px 16px">${L.map((u,i)=>supRow(u,f,i,ix)).join("")}<p class="mu" style="margin:8px 0 6px;font-size:14px">Un fichier ouvert une fois reste disponible sans connexion.</p></div></section>`};
  async function supOpen(ix,i,btn){const f=D.f[ix],u=f&&(f.sup||[])[i];if(!u)return;const st=document.getElementById("supst"+ix+"-"+i),say=t=>{if(st)st.textContent=t},off="Pas de connexion : ce support n’a pas encore été chargé sur ce téléphone.";
   if(btn){btn.disabled=true;btn.setAttribute("aria-busy","true")}say("⏳ Ouverture…");let b=null;try{b=await supCached(u);if(!b){if(navigator.onLine===false)say(off);else{say("⏳ Téléchargement…");b=await supFetch(u)}}}catch(e){b=null}
   if(btn){btn.disabled=false;btn.removeAttribute("aria-busy")}
   if(!b){say(navigator.onLine===false?off:"Support indisponible pour l’instant. Réessayez plus tard.");return}
-  say("");const url=URL.createObjectURL(b);if(/^image\//.test(b.type)){supZoom(url,u.t||u.n||"");return}
+  say("");if(b.type!==safeT(b.type))b=b.slice(0,b.size,safeT(b.type));const url=URL.createObjectURL(b);if(/^image\//.test(b.type)){supZoom(url,u.t||u.n||"");return}
   const a=document.createElement("a");a.href=url;a.download=u.n||((u.t||"support")+(u.k==="pdf"?".pdf":""));a.target="_blank";a.rel="noopener";document.body.appendChild(a);a.click();setTimeout(()=>{a.remove()},2000)}
  function supZoom(url,t){const o=document.createElement("div");o.className="zov";o.setAttribute("role","dialog");o.setAttribute("aria-label",t||"Support");o.innerHTML=`<div class="zbar"><span style="flex:1;font-weight:700">${esc(t||"")}</span><button type="button" class="btn p" data-zx>✕ Fermer</button></div><div class="zsc"><img alt="${esc(t||"Support")}" src="${url}" style="width:100%"></div>`;o.querySelector("[data-zx]").onclick=()=>o.remove();document.body.appendChild(o)}
  async function supPrefetch(){if(!EJ||navigator.onLine===false)return;for(const x of F){if(!["venir","auj","cours"].includes(x.s))continue;for(const u of (x.f.sup||[])){if(!u.cle||(+u.sz||0)>8*1048576)continue;try{if(!(await supCached(u)))await supFetch(u)}catch(e){}}}}
- async function blImg(t){if(!t||!t.pf)return null;if(IMG[t.pf])return IMG[t.pf];const c=await IDB.get(t.pf);if(Array.isArray(c)&&c.length)return IMG[t.pf]=c;
-  try{let P=null;if(t.pf.startsWith("e:")){const r=await fetch(SBU+"/rest/v1/rpc/espace_doc",{method:"POST",headers:{apikey:SBK,"Content-Type":"application/json"},body:JSON.stringify({p_jeton:EJ,p_app:devId(),p_itv:t.i})}),j=r.ok?await r.json():null;let a=null;try{a=j&&j.ok?JSON.parse(j.b64):null}catch(e){}P=Array.isArray(a)?a.filter(x=>typeof x==="string"&&x.length>100):null}
-   else{const r=await fetch(SBU+"/rest/v1/rpc/lien_lire",{method:"POST",headers:{apikey:SBK,"Content-Type":"application/json"},body:JSON.stringify({p_id:t.pf})}),j=r.ok?await r.json():null;P=j&&j.ok&&j.data&&Array.isArray(j.data.p)?j.data.p.filter(x=>typeof x==="string"&&x.length>100):null}
+ async function blImg(t){if(!t||!t.pf)return null;if(IMG[t.pf])return IMG[t.pf];const c=await IDB.get(t.pf);if(Array.isArray(c)&&c.length&&c.every(b64ok))return IMG[t.pf]=c;
+  try{let P=null;if(t.pf.startsWith("e:")){const r=await fetch(SBU+"/rest/v1/rpc/espace_doc",{method:"POST",headers:{apikey:SBK,"Content-Type":"application/json"},body:JSON.stringify({p_jeton:EJ,p_app:devId(),p_itv:t.i})}),j=r.ok?await r.json():null;let a=null;try{a=j&&j.ok?JSON.parse(j.b64):null}catch(e){}P=Array.isArray(a)?a.filter(b64ok):null}
+   else{const r=await fetch(SBU+"/rest/v1/rpc/lien_lire",{method:"POST",headers:{apikey:SBK,"Content-Type":"application/json"},body:JSON.stringify({p_id:t.pf})}),j=r.ok?await r.json():null;P=j&&j.ok&&j.data&&Array.isArray(j.data.p)?j.data.p.filter(b64ok):null}
    if(P&&P.length){IMG[t.pf]=P;await IDB.put(t.pf,P);return P}}catch(e){}return null}
  const imgBox=ix=>`<div class="blim" data-blim="${ix}"><p class="mu">Chargement du bon de livraison…</p></div>`;
  async function fillImgs(){for(const el of document.querySelectorAll("[data-blim]")){const ix=+el.dataset.blim,x=IT[ix];if(!x)continue;const P=await blImg(x.t);if(!document.body.contains(el))continue;
@@ -1441,7 +1450,7 @@ const hMin=h=>{const m=/^(\d\d):(\d\d)$/.exec(String(h||""));return m?(+m[1])*60
  // = startSign, ou un par un) ; 4 grands boutons Déroulé · Supports · Remarque · Signaler. Écran de signature (emScreen) et dépôts inchangés.
  const VDAY={};
  const vCap=t=>String(t||"").charAt(0).toUpperCase()+String(t||"").slice(1);
- const vD=(d,o)=>{const x=new Date(d+"T12:00:00");return isNaN(x)?d:x.toLocaleDateString("fr-FR",o)};
+ const vD=(d,o)=>{const x=new Date(dOk(d)+"T12:00:00");return !dOk(d)||isNaN(x)?dBad(d):x.toLocaleDateString("fr-FR",o)};
  const vdw=d=>vD(d,{weekday:"long",day:"numeric"}),vWd=d=>vCap(vD(d,{weekday:"short"}).replace(".","")),vNo=d=>vD(d,{day:"numeric"});
  const vPer=f=>{const L=DS(f),n=L.length;if(!n)return "Dates à définir";if(n===1)return "Formation d’1 jour · "+vD(L[0],{weekday:"long",day:"numeric",month:"long"});
   return "Formation de "+n+" jours · du "+vD(L[0],{weekday:"short",day:"numeric"})+" au "+vD(L[n-1],{weekday:"short",day:"numeric",month:"short"})};
@@ -1512,7 +1521,7 @@ const hMin=h=>{const m=/^(\d\d):(\d\d)$/.exec(String(h||""));return m?(+m[1])*60
   <button type="button" class="ve-sec" data-ics="${esc(f.n)}">📅 Ajouter à mon agenda</button></div></div>`}
  // 📚 Supports : page du site TOPAS du dossier et vidéo (s'ouvrent dans le navigateur), puis les fichiers joints au programme
  function fsupView(){const f=D.f[V.ix];if(!f)return listView();const ix=V.ix,sup=Array.isArray(f.sup)?f.sup:[],off=navigator.onLine===false,web=[];
-  /* lien propre au dossier (s.suppUrl) d’abord, puis la page du site TOPAS du programme (spgOf) */const sp=String(f.sp||"").trim(),pu=String(f.spu||"").trim();if(/^https?:\/\//i.test(sp))web.push(["📚","Support de cours du dossier",sp]);if(/^https:\/\//i.test(pu)&&pu!==sp)web.push(["📚","Supports de cours — page TOPAS",pu]);if(/^https:\/\//i.test(f.spv||""))web.push(["🎬","Vidéo : la facture électronique",f.spv]);
+  /* lien propre au dossier (s.suppUrl) d’abord, puis la page du site TOPAS du programme (spgOf) */const sp=String(f.sp||"").trim(),pu=String(f.spu||"").trim();if(safeUrl(sp))web.push(["📚","Support de cours du dossier",safeUrl(sp)]);if(safeUrl(pu)&&pu!==sp)web.push(["📚","Supports de cours — page TOPAS",pu]);if(safeUrl(f.spv))web.push(["🎬","Vidéo : la facture électronique",safeUrl(f.spv)]);
   const W=web.map(([i,t,u])=>`<a class="ve-w" href="${esc(u)}" target="_blank" rel="noopener" data-web><i aria-hidden="true">${i}</i><span><b>${esc(t)}</b><small>${off?"connexion nécessaire":"s’ouvre dans le navigateur"}</small></span></a>`).join("");
   return `<div class="ve ve-l"><header class="ve-hd"><button type="button" class="ve-back" data-vbk="${ix}">‹ Retour</button><div class="ve-per">${esc(f.c||"")}</div><h1 class="ve-lt">📚 Supports</h1><div class="ve-sub">${esc(f.t||"")}</div></header>
   <div class="ve-in">${W||sup.length?W+(sup.length?`<h2 class="ve-ou">Fichiers du programme</h2><div class="ip-supl">${sup.map((u,i)=>supRow(u,f,i,ix)).join("")}</div>`:""):`<p class="ve-empty">Aucun support pour cette formation.</p>`}</div></div>`}
@@ -1558,7 +1567,7 @@ const hMin=h=>{const m=/^(\d\d):(\d\d)$/.exec(String(h||""));return m?(+m[1])*60
  // une réponse par stagiaire (« Passez le téléphone à … »), envoyée comme une réponse en ligne (dépôt fp-q, src « tel »), hors connexion possible.
  let EV=null;const EVSC={sat:[["😀","Très satisfaisant"],["🙂","Satisfaisant"],["😕","Peu satisfaisant"],["😞","Insatisfaisant"]],qual:[["😀","Très bien"],["🙂","Bien"],["😕","Moyen"],["😞","Insuffisant"]]};
  function evStart(ix,ti){const f=D.f[ix];if(!f)return;const kd=ti<0?"bilan":"post",q=D.qd&&D.qd[kd];if(!q||!Array.isArray(q.i))return;EV={ix,kd,ti,nm:kd==="bilan"?(D.i||"Formateur"):String(((f.tr||[])[ti]||[])[0]||"Stagiaire "+(ti+1)),q,A:{},done:null};if(kd==="bilan"){const g=acqGroup(f);if(g)EV.A.obj=g}nav({v:"ev"})}
- const evQ=(q,v)=>{const id="evq_"+q.id;if(q.k==="star")return `<div class="ev-st" role="group" aria-label="${esc(q.t)}">${[1,2,3,4,5].map(n=>`<button type="button" class="ev-s" data-evv="${n}" aria-pressed="${String(v)===String(n)}" aria-label="${n} étoile${n>1?"s":""}">${+v>=n?"★":"☆"}</button>`).join("")}</div>`;
+ const evQ=(q,v)=>{const id="evq_"+String(q.id).replace(/[^\w-]/g,"_");if(q.k==="star")return `<div class="ev-st" role="group" aria-label="${esc(q.t)}">${[1,2,3,4,5].map(n=>`<button type="button" class="ev-s" data-evv="${n}" aria-pressed="${String(v)===String(n)}" aria-label="${n} étoile${n>1?"s":""}">${+v>=n?"★":"☆"}</button>`).join("")}</div>`;
   if(q.k==="scale"){const SC=EVSC[q.p==="qual"?"qual":"sat"];return `<div class="ev-sc">${SC.map(o=>`<button type="button" class="ev-o" data-evv="${esc(o[1])}" aria-pressed="${v===o[1]}"><span aria-hidden="true">${o[0]}</span>${esc(o[1])}</button>`).join("")}</div>`}
   if(q.k==="radio")return `<div class="ev-ro">${(q.o||[]).map(o=>`<button type="button" class="ev-o" data-evv="${esc(o)}" aria-pressed="${v===o}">${esc(o)}</button>`).join("")}</div>`;
   if(q.k==="area")return `<textarea id="${id}" rows="3" data-evt="1" aria-label="${esc(q.t)}">${esc(v||"")}</textarea>`;return `<input id="${id}" type="text" data-evt="1" aria-label="${esc(q.t)}" value="${esc(v||"")}">`};
@@ -1690,9 +1699,14 @@ const hMin=h=>{const m=/^(\d\d):(\d\d)$/.exec(String(h||""));return m?(+m[1])*60
  function tpAll(){const M={};TPS.forEach(t=>{M[t.tid]={s:t,r:null}});tpRecs().forEach(r=>{if(r&&r.tid)(M[r.tid]=M[r.tid]||{s:null,r:null}).r=r});
   return Object.values(M).map(({s,r})=>{const b=r&&(!s||(+r.v||1)>=(+s.v||1))?r:s;return {tid:b.tid,bi:String((r&&r.bi)||(s&&s.bi)||""),c:String(b.c||""),a:String(b.a||""),d:String(b.d||""),h:String(b.h||""),du:+b.du||90,o:String(b.o||""),v:Math.max(+(s&&s.v)||1,+(r&&r.v)||1),et:s&&s.et==="a"?"a":"",an:s&&s.an&&!s.ad?1:0,ad:s?(s.et||s.an&&!s.ad?0:(s.ad||(r&&r.ann)?1:0)):(r&&r.ann?1:0),id:r&&r.id||"",loc:!!r,srv:!!s}}).filter(t=>t.tid&&/^\d{4}-\d\d-\d\d$/.test(t.d))}
  const tpDateOk=d=>{if(!/^\d{4}-\d\d-\d\d$/.test(d||"")||isNaN(Date.parse(d+"T12:00:00")))return false;const n=dd(T,d);return n>=-31&&n<=366};
- const uTP=t=>{const pd=!!(t.id&&pend(t.id)),an=t.et==="a",g=an?"sig":t.d===T?"auj":"ven",sub=[t.h?fH(t.h):"",tpDuT(t.du),t.o].filter(Boolean).join(" · ");
-  const bi=!!t.bi,bn=/^BI-/.test(t.bi)&&biRecs().some(r=>r.n===t.bi)?t.bi:"",lab=an?'<span class="ip-tpl ip-tpl-x">Annulée</span>':'<span class="ip-tpl ip-tpl-me">＋ '+(bi?"Créé":"Créée")+' par vous</span><span class="ip-tpl ip-tpl-pl">📅 Au planning</span>'+(t.ad?'<span class="ip-tpl ip-tpl-ad">Annulation demandée</span>':"");
-  return {m:{t:"tp",tid:t.tid,bn,d:t.d,hr:t.h||"",c:t.c||"",city:aCity(t.a),a:t.a||"",an,ok:an||!!t.bi,lab},k:t.d+" "+(t.h||""),todo:!(an||t.bi),h:rowW(g,`<button type="button" class="row urow ip-row ip-tprow" ${bn?`data-bin="${esc(bn)}"`:`data-tpe="${esc(t.tid)}"`}>${dCol(t.d)}<span class="ip-c ul"><b class="uc" title="${esc(t.c)}">${esc(t.c)}</b><span class="ip-s m">${esc(sub)}</span><span class="ip-tpls">${lab}</span>${pd?`<span class="ip-s m ip-wait" data-pid="${esc(t.id)}">en attente d’envoi</span>`:""}</span><span class="ip-r"><span class="ip-rt"><span class="utag ui ip-tag">${bi?"Bon d’intervention":"Intervention"}</span></span></span></button>`,an||!t.a?"":mapA(t.c,t.a),t.c+" "+t.o)}};
+ // (16/11) deux états remis SUR LA LIGNE (accueil, Aujourd'hui, À venir, En cours, liste de l'ordinateur) : « ⏳ en attente d'envoi » = dépôt « itp » de
+ // cette intervention (ou « bi » de son bon) encore dans la file locale fpiv:q: (pend, même source que le bandeau) ; « ↩ annulation demandée » = t.ad (tpAll,
+ // même source que la fiche). Aucune nouvelle donnée ; la pastille d'attente s'efface toute seule à l'envoi (banner, data-pids).
+ const tpPids=t=>{const r=t.bi?biRecs().find(z=>z&&z.n===t.bi):null;return [t.id,r&&r.id].filter(id=>id&&pend(id))};
+ const tpFl=t=>{const P=t.et==="a"?[]:tpPids(t);return (P.length?`<span class="ip-tpl ip-tpl-wt" data-pids="${esc(P.join(" "))}">⏳ en attente d’envoi</span>`:"")+(t.et!=="a"&&t.ad?'<span class="ip-tpl ip-tpl-ad">↩ annulation demandée</span>':"")};
+ const uTP=t=>{const fl=tpFl(t),an=t.et==="a",g=an?"sig":t.d===T?"auj":"ven",sub=[t.h?fH(t.h):"",tpDuT(t.du),t.o].filter(Boolean).join(" · ");
+  const bi=!!t.bi,bn=/^BI-/.test(t.bi)&&biRecs().some(r=>r.n===t.bi)?t.bi:"",lab=an?'<span class="ip-tpl ip-tpl-x">Annulée</span>':'<span class="ip-tpl ip-tpl-me">＋ '+(bi?"Créé":"Créée")+' par vous</span><span class="ip-tpl ip-tpl-pl">📅 Au planning</span>'+fl;
+  return {m:{t:"tp",tid:t.tid,bn,d:t.d,hr:t.h||"",c:t.c||"",city:aCity(t.a),a:t.a||"",an,ok:an||!!t.bi,lab,fl},k:t.d+" "+(t.h||""),todo:!(an||t.bi),h:rowW(g,`<button type="button" class="row urow ip-row ip-tprow" ${bn?`data-bin="${esc(bn)}"`:`data-tpe="${esc(t.tid)}"`}>${dCol(t.d)}<span class="ip-c ul"><b class="uc" title="${esc(t.c)}">${esc(t.c)}</b><span class="ip-s m">${esc(sub)}</span><span class="ip-tpls">${lab}</span></span><span class="ip-r"><span class="ip-rt"><span class="utag ui ip-tag">${bi?"Bon d’intervention":"Intervention"}</span></span></span></button>`,an||!t.a?"":mapA(t.c,t.a),t.c+" "+t.o)}};
  // liste : Aujourd'hui / À venir à leur date ; passées ou annulées : groupe replié (60 derniers jours)
  function tpGroups(U){const up=(a,b)=>a.k.localeCompare(b.k),dn=(a,b)=>b.k.localeCompare(a.k),L=tpAll(),lim=(()=>{const x=new Date(Date.now()-60*864e5);return x.getFullYear()+"-"+p2(x.getMonth()+1)+"-"+p2(x.getDate())})();
   U.auj=U.auj.concat(L.filter(t=>t.et!=="a"&&t.d===T).map(uTP)).sort(up);U.ven=U.ven.concat(L.filter(t=>t.et!=="a"&&t.d>T).map(uTP)).sort(up);
@@ -1782,9 +1796,9 @@ const tpFab=()=>"";
   const bl=bilOk?`<span class="dk-ok">✓ envoyé${br?" le "+esc(dm(br.dl)):f.bilr?" le "+esc(dm(f.bilr)):""}</span>`:bilOpen?`<button type="button" class="dk-lk dk-lk-or" data-bil="${ix}">à remplir ›</button>`:`<span class="dk-mu">en fin de formation</span>`;
   return `<div class="dk-box"><h3>📝 Évaluation des acquis</h3>${cell(E[0],"av","Avant la formation")}${cell(E[1],"ap","Après la formation")}<div class="dk-er"><span>Bilan du formateur</span>${bl}</div></div>`}
  function dkSup(f,ix){const sup=Array.isArray(f.sup)?f.sup:[],sp=String(f.sp||"").trim(),pu=String(f.spu||"").trim(),C=[`<button type="button" class="dk-chip" data-vb="${ix}:der">📄 Déroulé de la formation</button>`];
-  if(/^https?:\/\//i.test(sp))C.push(`<a class="dk-chip" href="${esc(sp)}" target="_blank" rel="noopener" data-web>🔗 Support du dossier</a>`);
-  if(/^https:\/\//i.test(pu)&&pu!==sp)C.push(`<a class="dk-chip" href="${esc(pu)}" target="_blank" rel="noopener" data-web>🌐 Page TOPAS – ${esc(f.t||"supports")}</a>`);
-  if(/^https:\/\//i.test(f.spv||""))C.push(`<a class="dk-chip" href="${esc(f.spv)}" target="_blank" rel="noopener" data-web>▶ Vidéo – la facture électronique</a>`);
+  if(safeUrl(sp))C.push(`<a class="dk-chip" href="${esc(safeUrl(sp))}" target="_blank" rel="noopener" data-web>🔗 Support du dossier</a>`);
+  if(safeUrl(pu)&&pu!==sp)C.push(`<a class="dk-chip" href="${esc(pu)}" target="_blank" rel="noopener" data-web>🌐 Page TOPAS – ${esc(f.t||"supports")}</a>`);
+  if(safeUrl(f.spv))C.push(`<a class="dk-chip" href="${esc(safeUrl(f.spv))}" target="_blank" rel="noopener" data-web>▶ Vidéo – la facture électronique</a>`);
   sup.forEach((u,i)=>C.push(`<button type="button" class="dk-chip" data-sup="${ix}:${i}">📎 ${esc(u.t||u.n||"Fichier")}</button><span class="dk-supst" id="supst${ix}-${i}" role="status"></span>`));
   return `<section class="dk-sups"><h4>📚 Supports de cours</h4><div class="dk-chips">${C.join("")}</div>${sup.length+(C.length-1)?"":`<p class="dk-mu">Aucun support pour cette formation.</p>`}</section>`}
  function dkForm(ix){const f=D.f[ix];if(!f)return "";const tr=f.tr||[],L=DS(f),o=dkSel(f,ix),sel=o||{},ro=!!f.clo;
@@ -1959,7 +1973,7 @@ body.ip-fx{padding-bottom:calc(100px + env(safe-area-inset-bottom,0px))}
 .ip-tplkb{flex:none;margin-left:38px;padding:6px 10px;border-radius:999px;background:#0e7490;color:#fff;font-size:14px;font-weight:800;white-space:nowrap}
 .ip-tpls{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
 .ip-tpl{display:inline-flex;align-items:center;min-height:26px;padding:2px 10px;border-radius:999px;font-size:14px;font-weight:700;white-space:nowrap}
-.ip-tpl-me{background:#e0f2fe;color:#075985}.ip-tpl-pl{background:#ccfbf1;color:#115e59}.ip-tpl-ad{background:#fff7ed;color:#9a3412}.ip-tpl-x{background:#eef1f5;color:#475569}
+.ip-tpl-me{background:#e0f2fe;color:#075985}.ip-tpl-pl{background:#ccfbf1;color:#115e59}.ip-tpl-ad{background:#fff7ed;color:#9a3412;box-shadow:inset 0 0 0 1px #fdba74}.ip-tpl-wt{background:#eef1f5;color:#475569;box-shadow:inset 0 0 0 1px #cbd5e1}.ip-tpl-x{background:#eef1f5;color:#475569}
 .ip-tpann{margin-top:6px;border-color:#fca5a5;color:#991b1b}.ip-tpann.on{background:#fef2f2}
 #tperr:empty{display:none}
 .ip-flash-ok{background:#166534;color:#fff}
@@ -2063,7 +2077,7 @@ body.ip-fx{padding-bottom:calc(100px + env(safe-area-inset-bottom,0px))}
 .ip7-t{display:inline-block;padding:1px 8px;border-radius:999px;font-size:14px;font-weight:700;line-height:1.5}
 .ip7-tb{background:#dbeafe;color:#1e40af}.ip7-tf{background:#ede9fe;color:#5b21b6}.ip7-ti{background:#e0f2fe;color:#075985}
 .ip7-s{font-size:14px;color:#374151;overflow-wrap:anywhere}.ip7-st{font-size:14px;font-weight:700;color:#111827}.ip7-stl{color:#b91c1c}
-.ip7-done .ip7-st{color:#15803d}.ip7-lab{font-size:14px}
+.ip7-done .ip7-st{color:#15803d}.ip7-lab{font-size:14px;display:flex;flex-wrap:wrap;gap:6px;margin-top:2px}
 .ip7-ra{flex:none;display:flex;align-items:center;padding:8px 8px 8px 0}
 .ip7-map{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;min-width:64px;min-height:56px;padding:4px 6px;border:1.5px solid #cbd5e1;border-radius:12px;background:#fff;color:#1e3a8a;font-size:14px;font-weight:700;text-decoration:none}
 .ip7-map i{font-style:normal;font-size:18px;line-height:1.1}
