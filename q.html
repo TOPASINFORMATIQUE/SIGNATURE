@@ -2,6 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; connect-src 'self' https://kbfnxqyxqualmqhiufnq.supabase.co; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; font-src 'self' data:; object-src 'none'; base-uri 'none'; form-action 'none'; manifest-src 'self'">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="color-scheme" content="light only">
 <meta name="robots" content="noindex,nofollow">
@@ -108,7 +109,11 @@ button,a.btn{font:inherit;font-weight:700;border:0;border-radius:14px;padding:14
 <div class="w"><div id="app" aria-live="polite"></div><div class="ft" id="ft"></div></div>
 <script>
 const SBU="https://kbfnxqyxqualmqhiufnq.supabase.co",SBK="sb_publishable_5vjNCP7zREh5upGu_pTAIA_mgUPG8Cx";
-const sbDep=(c,p)=>fetch(SBU+"/rest/v1/rpc/deposer",{method:"POST",headers:{apikey:SBK,"Content-Type":"application/json"},body:JSON.stringify({p_canal:c,p_data:p})}).then(r=>{if(!r.ok)throw 0;return 1});
+// (16/11, audit sécurité B3) lien court « ?l= » : dépôt par deposer_lien — la base vérifie que le lien est actif, non expiré, du même type et du même dossier,
+// et prend le canal dans le lien (jamais dans la page). Ancien lien « # » : ancien dépôt par canal (mis « À vérifier » chez TOPAS), fermé ensuite → secours affiché.
+const LNID=(()=>{try{const v=new URLSearchParams(location.search).get("l")||"";return /^[a-z0-9]{8,12}$/.test(v)?v:""}catch(e){return ""}})();
+const sbDep=(c,p)=>LNID?fetch(SBU+"/rest/v1/rpc/deposer_lien",{method:"POST",headers:{apikey:SBK,"Content-Type":"application/json"},body:JSON.stringify({p_lien:LNID,p_data:p})}).then(async r=>{if(!r.ok)throw 0;const j=await r.json().catch(()=>null);if(!j||j.ok!==true)throw 0;return 1})
+ :fetch(SBU+"/rest/v1/rpc/deposer",{method:"POST",headers:{apikey:SBK,"Content-Type":"application/json"},body:JSON.stringify({p_canal:c,p_data:p})}).then(r=>{if(!r.ok)throw 0;return 1});
 let FB_MAIL=""; // adresse ADV reçue avec le lien (fiche Gestionnaire) ; rien en dur (lot 7 du 31/10)
 // Secours si le dépôt Supabase échoue : code à saisir dans TOPAS Formation (« 📥 Saisir une réponse reçue par mail ») + e-mail préparé que la personne envoie elle-même (aucun service tiers)
 function fbHtml(code,subj,intro){const E=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])),mt="mailto:"+FB_MAIL+"?subject="+encodeURIComponent(subj)+"&body="+encodeURIComponent(intro+"\n\n"+code+"\n");
@@ -135,7 +140,10 @@ async function lnCoord(el){if(!el)return;try{const r=await fetch(SBU+"/rest/v1/r
 "use strict";
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const fd=d=>{if(!d)return"";const x=new Date(d+"T12:00:00");return isNaN(x)?d:x.toLocaleDateString("fr-FR",{day:"2-digit",month:"2-digit",year:"numeric"})};
+// (16/11, sécurité B1) dates du lien : AAAA-MM-JJ seulement (sinon « — ») ; adresses web : https:// seulement
+const dOk=d=>{const m=/^(\d{4}-\d\d-\d\d)/.exec(String(d==null?"":d));return m?m[1]:""};
+const safeUrl=u=>{u=String(u==null?"":u).trim();return /^https:\/\/[^\s"'<>`\\]+$/i.test(u)?u:""};
+const fd=d=>{if(!d)return"";const x=new Date(dOk(d)+"T12:00:00");return !dOk(d)||isNaN(x)?"—":x.toLocaleDateString("fr-FR",{day:"2-digit",month:"2-digit",year:"numeric"})};
 const b64u=o=>btoa(unescape(encodeURIComponent(JSON.stringify(o)))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
 function unb64u(t){t=String(t).replace(/-/g,"+").replace(/_/g,"/");while(t.length%4)t+="=";return JSON.parse(decodeURIComponent(escape(atob(t))))}
 const ls={get:k=>{try{return localStorage.getItem(k)}catch(e){return null}},set:(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}},del:k=>{try{localStorage.removeItem(k)}catch(e){}}};
@@ -216,7 +224,7 @@ let DEF={
    {id:"ame",t:"Points à améliorer",k:"area"},
    {id:"cm",t:"Commentaire",k:"area"}]}
 }[K];
-if(D.x&&Array.isArray(D.x.i)&&D.x.i.length){const KM={t:"text",a:"area",r:"radio",s:"scale",g:"star"};DEF={title:D.x.ti||DEF.title,intro:D.x.in||"",items:D.x.i.filter(a=>!(IDF.length&&/^(soc|nom)$/.test(String(a[0])))).map(a=>({id:String(a[0]),k:KM[a[1]]||"text",t:String(a[2]||""),req:a[3]?1:0,o:a[1]==="s"?(a[4]==="qual"?QUAL:SAT):(Array.isArray(a[4])?a[4]:[]),pre:a[0]==="soc"?(D.c||""):a[0]==="nom"?((D.nm||"")+(D.fn?" / "+D.fn:"")):""}))}}
+if(D.x&&Array.isArray(D.x.i)&&D.x.i.length){const KM={t:"text",a:"area",r:"radio",s:"scale",g:"star"};DEF={title:D.x.ti||DEF.title,intro:D.x.in||"",items:D.x.i.filter(a=>Array.isArray(a)&&!(IDF.length&&/^(soc|nom)$/.test(String(a[0])))).map(a=>({id:String(a[0]).replace(/[^\w-]/g,"_"),k:KM[a[1]]||"text",t:String(a[2]||""),req:a[3]?1:0,o:a[1]==="s"?(a[4]==="qual"?QUAL:SAT):(Array.isArray(a[4])?a[4]:[]),pre:a[0]==="soc"?(D.c||""):a[0]==="nom"?((D.nm||"")+(D.fn?" / "+D.fn:"")):""}))}}
 const PREV=D.n==="APERCU",IT=DEF.items;
 document.title=DEF.title;
 $("#ft").textContent="Vos réponses servent à améliorer nos formations et à justifier de leur qualité (certification Qualiopi) ; elles sont conservées 3 ans – "+(org||"TOPAS informatique")+", organisme certifié Qualiopi"+(D.m?" · Contact : "+D.m:"");const lnk=t=>esc(t).replace(/(https?:\/\/[^\s<]+)/g,u=>`<a href="${u}" target="_blank" rel="noopener">formulaire en ligne</a>`).replace(/([\w.+-]+@[\w-]+\.[\w.-]+)/g,m=>`<a href="mailto:${m}">${m}</a>`);if(D.rc)$("#ft").insertAdjacentHTML("beforeend",`<div style="margin-top:6px">${lnk(D.rc)}</div>`);if(D.rh)$("#ft").insertAdjacentHTML("beforeend",`<div class="rh" style="margin-top:6px">♿ ${lnk(D.rh)}</div>`);
@@ -276,7 +284,7 @@ function recap(){cur=SCR.length;saveDraft();
  app.innerHTML=shell(`<div class="kk">✅ Dernière étape</div><h1>Vérifiez vos réponses</h1><div class="rc">${IT.map(q=>{const s=SCR.findIndex(x=>x.includes(q)),v=String(A[q.id]||"").trim();return `<div class="rr"><div><div class="q">${esc(q.t)}</div><div class="a ${v?"":"v"}">${v?esc(q.k==="star"?"★".repeat(+v.split("/")[0])+" ("+v+")":v):"— (sans réponse)"}</div></div><button type="button" class="sec" data-edit="${s}" aria-label="Modifier : ${esc(q.t)}">Modifier</button></div>`}).join("")}</div>
  <div class="err" id="err" role="alert"></div><div class="nav"><button type="button" class="sec" id="prev">‹ Précédent</button><button type="button" class="go" id="send"${PREV?' disabled aria-disabled="true" title="Aperçu : l’envoi est désactivé"':""}>✔ Envoyer</button></div>`,0);
  $$("[data-edit]").forEach(b=>b.onclick=()=>{fromRecap=true;go(+b.dataset.edit)});$("#prev").onclick=()=>go(SCR.length-1);if(!PREV)$("#send").onclick=submit;window.scrollTo(0,0)}
-function thanks(already){const L=[];if(K==="post"&&D.sp)L.push(`<a class="btn" href="${esc(D.sp)}" target="_blank" rel="noopener">📚 Retrouver les supports de cours</a>`);if(K==="bilan"&&D.ie)L.push(`<a class="btn" href="${esc(D.ie)}" target="_blank" rel="noopener">🧑‍🏫 Mon espace formateur</a>`);
+function thanks(already){const L=[];if(K==="post"&&safeUrl(D.sp))L.push(`<a class="btn" href="${esc(safeUrl(D.sp))}" target="_blank" rel="noopener">📚 Retrouver les supports de cours</a>`);if(K==="bilan"&&safeUrl(D.ie))L.push(`<a class="btn" href="${esc(safeUrl(D.ie))}" target="_blank" rel="noopener">🧑‍🏫 Mon espace formateur</a>`);
  app.innerHTML=shell(`<div class="thx"><div class="ckb" aria-hidden="true">✓</div><h1>Merci${prenom?" "+esc(prenom):""} !</h1><p>${already?"Vos réponses ont déjà été transmises depuis cet appareil.":"Vos réponses sont bien envoyées à "+esc(org||"TOPAS informatique")+"."}</p>${K==="bilan"?"<p>Merci pour votre intervention.</p>":K==="post"?"<p>Votre avis nous aide à améliorer nos formations.</p>":PP?"<p>Merci pour votre retour : il nous aide à nous améliorer.</p>":""}${L.length?`<div class="links">${L.join("")}</div>`:""}<p style="color:var(--mu);font-size:15px;margin-top:18px">Vous pouvez fermer cette page.</p></div>`,0);window.scrollTo(0,0)}
 async function submit(){if(PREV)return;const btn=$("#send"),err=$("#err");err.textContent="";
  const miss=IT.find(q=>q.req&&!String(A[q.id]||"").trim());if(miss){fromRecap=true;go(SCR.findIndex(x=>x.includes(miss)));next();return}
