@@ -534,7 +534,16 @@ function aboPageV2(C){const {D,app,id,org,cm,L,KEY,TT,rc0,F1,F2,pa0}=C,R1=1.4142
     const w=Math.max(1,x1-x0),row=Y=>{let n=0;for(let X=x0;X<x1;X++)if(dk(X,Y))n++;return n/w},cy=(y0+y1)/2;for(let Y=y0;Y<y1;Y++)if(row(Y)>=.6){if(Y<cy)y0=Y+2;else{y1=Y-1;break}}
     if(x1>x0+4&&y1>y0+2){a.x=x0/cw;a.w=(x1-x0)/cw;a.y=y0/ch;a.h=(y1-y0)/ch}a.tr=1});
    /* (17/11, correctif 2) bande visible de chaque ligne = la ligne entière (case comprise), un peu agrandie, sans jamais chevaucher la ligne voisine */
-   const Zs=Zi.slice().sort((p,q)=>p.y-q.y);Zs.forEach(a=>{const b=a.bb||a.b,y0=Math.min(a.y,b?b.y:a.y),y1=Math.max(a.y+a.h,b?b.y+b.h:0),pd=(y1-y0)*.22,x0=Math.min(a.x,b?b.x-b.w*.35:a.x);a.v={x:x0,y:y0-pd,w:a.x+a.w-x0,h:y1-y0+2*pd}});
+   const Zs=Zi.slice().sort((p,q)=>p.y-q.y);
+   /* (17/11, correctif 3) les 3 bandes ont la même largeur : même début (juste avant la case la plus à gauche, contour compris) et même fin = bord droit du bloc
+      « Information Facturation & Règlement », retrouvé sur l'image (première colonne non blanche sur ≥ 90 % de la hauteur des 3 lignes, à droite des cases :
+      trait du bloc, même gris clair, ou fond gris des totaux). Introuvable : la plus PETITE des fins de zone. Jamais la zone enregistrée seule, jamais sur les totaux. */
+   const bxs=Zs.map(a=>a.bb||a.b).filter(Boolean),S0=Math.max(0,Math.min(...Zs.map(a=>{const b=a.bb||a.b;return b?b.x-b.w*.35:a.x}))),Emin=Math.min(...Zs.map(a=>a.x+a.w));
+   const E0=(()=>{try{const Y0=Math.max(0,Math.round(Math.min(...Zs.map(a=>a.y))*ch)),Y1=Math.min(ch,Math.round(Math.max(...Zs.map(a=>a.y+a.h))*ch)),H=Math.max(1,Y1-Y0);
+     const xs=Math.round(((bxs.length?Math.max(...bxs.map(b=>b.x+b.w)):S0)+.02)*cw),xe=Math.min(cw-1,Math.round((Math.max(...Zs.map(a=>a.x+a.w))+.06)*cw));
+     for(let X=xs;X<xe;X++){let n=0;for(let Y=Y0;Y<Y1;Y++){const o=(Y*cw+X)*4;if(d[o]+d[o+1]+d[o+2]<690)n++}if(n>=H*.9)return (X-2)/cw}}catch(e){}return null})();
+   const E=E0!=null&&E0>S0+.05?E0:Emin;Zs.forEach(a=>{a.bend=E0!=null?"img":"min"});
+   Zs.forEach(a=>{const b=a.bb||a.b,y0=Math.min(a.y,b?b.y:a.y),y1=Math.max(a.y+a.h,b?b.y+b.h:0),pd=(y1-y0)*.22;a.v={x:S0,y:y0-pd,w:Math.max(.01,E-S0),h:y1-y0+2*pd}});
    for(let j=0;j+1<Zs.length;j++){const A=Zs[j].v,B=Zs[j+1].v,e=A.y+A.h;if(e>B.y-.0006){const m=(e+B.y)/2;A.h=m-.0003-A.y;const nb=m+.0003;B.h=B.y+B.h-nb;B.y=nb}}
    /* (16/11) carte de l'encre de la page (grille 240 colonnes, sommes cumulées) : la bulle « Cochez ici » se pose dans un blanc, jamais sur du texte */
    const G=240,cl=cw/G,gh=Math.ceil(ch/cl),P=new Int32Array((G+1)*(gh+1));for(let gy=0;gy<gh;gy++){let rs=0;const Y0=Math.floor(gy*cl),Y1=Math.min(ch,Math.floor((gy+1)*cl));for(let gx=0;gx<G;gx++){const X0=Math.floor(gx*cl),X1=Math.min(cw,Math.floor((gx+1)*cl));let f=0;
