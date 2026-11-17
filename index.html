@@ -199,6 +199,9 @@ body.abs-lock{overflow:hidden}
 .abv-endt{margin:0;font-size:16px;color:#0f172a}.abv-endt b{color:#14532d}.abv-enda{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.abv4 .abv-end .abv-sec{min-height:44px;padding:8px 16px;font-size:15px}.abv4 .abv-end .abv-cta{min-height:52px;padding:12px 24px;font-size:17px;width:auto}
 body.abv-on.abv-done .abs-msg{bottom:92px}
 @media (max-width:700px){.abv4 .abv-end{display:none!important}.abv4 .abv-act .abv-start{flex:1 1 100%;width:100%;min-height:48px}.abv4 .abv-act .abv-cta{flex:1 1 100%;width:100%;order:-1;min-height:52px;font-size:16px}}
+/* (17/11, visuel contrat-bouton-commencer-dans-le-cadre) « ▶ Commencer la signature » dans le cadre blanc, « Ajouter un commentaire » à sa droite (dessous au téléphone) */
+.abv-strow{display:flex;align-items:center;flex-wrap:wrap;gap:8px 18px}.abv-stw:empty{display:none}.abv-strow .abv-cmd[open]{flex:1 1 100%}
+@media (max-width:700px){.abv-strow{flex-direction:column;align-items:stretch}.abv-stw{display:block}.abv-stw .abv-start{width:100%;min-height:48px}.abv-strow .abv-cmd summary{min-height:44px;box-sizing:border-box;display:list-item;padding:11px 0;font-size:14px}}
 </style>
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
@@ -519,7 +522,7 @@ function aboPageV2(C){const {D,app,id,org,cm,L,KEY,TT,rc0,pa0}=C,R1=1.4142,FR=(C
    <div class="abv-zoom" role="group" aria-label="Taille du contrat"><button type="button" class="abz-b" data-z="-1" aria-label="Réduire le contrat">−</button><button type="button" class="abz-b" data-z="1" aria-label="Agrandir le contrat">＋</button><button type="button" class="abz-b abz-fit" data-z="0">Voir la page entière</button></div></div>
   <div class="abz abv-view" id="abz" tabindex="0" aria-label="Contrat à signer"><div class="abz-in" id="abzin"><div class="abv-head" id="abvhead"><div class="abv-hd"><img src="logo.jpg" alt=""><div><div class="abv-org">${esc(org)}</div><div class="abv-ti" id="abzti">${esc(TT)}</div>${sub?`<div class="abv-sub">${esc(sub)}</div>`:""}</div></div>
    <div class="abv-infw">${inf}</div><p class="abv-how2">Lisez le contrat puis signez-le directement dessus : ${RG.length?"cochez votre mode de règlement, puis ":""}cliquez dans ${nFr>1?"chaque cadre":"le cadre"} « ✍ Signez ici »${nFr>1?" ("+nFr+" cadres)":""}. Rien n’est envoyé avant « ✓ Valider et envoyer ».</p>
-   <details class="abv-cmd" id="abvcmd"><summary>Ajouter un commentaire <span class="sgf-mu">(facultatif)</span></summary><textarea id="abocm" rows="2" maxlength="1000" placeholder="Une remarque sur le contrat ? Écrivez-la ici…" aria-label="Commentaire (facultatif)"></textarea></details></div>${figs}</div></div><div class="abv-end" id="abvend" role="region" aria-label="Envoyer le contrat signé" hidden></div></div>${dlg}<div class="abs-msg" id="abomsg" role="status" aria-live="polite" hidden></div><div id="res"></div>`;
+   <div class="abv-strow"><span class="abv-stw" id="abvstw"></span><details class="abv-cmd" id="abvcmd"><summary>Ajouter un commentaire <span class="sgf-mu">(facultatif)</span></summary><textarea id="abocm" rows="2" maxlength="1000" placeholder="Une remarque sur le contrat ? Écrivez-la ici…" aria-label="Commentaire (facultatif)"></textarea></details></div></div>${figs}</div></div><div class="abv-end" id="abvend" role="region" aria-label="Envoyer le contrat signé" hidden></div></div>${dlg}<div class="abs-msg" id="abomsg" role="status" aria-live="polite" hidden></div><div id="res"></div>`;
  let nOk=0,ri=rc0,s1=null,sending=false,redoD2=false,msgT=0,anim=null,zoom=1,z0done=false,started=false,startPend=false,wasDone=false;/* (17/11) « ▶ Commencer la signature » : rien ne défile tout seul avant le clic (ou avant que le client coche / clique un cadre) */const V=[];/* V[j] = heure de la signature posée dans le cadre j (V[0] = la signature) */const INK={};let BUB=null;/* (16/11) v2 = page 2 validée par « ✓ Valider » ; INK = blancs du contrat (bulle « Cochez ici ») */const z=$("#abz"),zin=$("#abzin");
  const say=(t,ko)=>{const m=$("#abomsg");if(!m)return;m.textContent=t;m.className="abs-msg"+(ko?" ko":"");m.hidden=false;clearTimeout(msgT);msgT=setTimeout(()=>{m.hidden=true},5000)};
  const now=()=>{const n=new Date(),p2=v=>String(v).padStart(2,"0");return {dl:n.getFullYear()+"-"+p2(n.getMonth()+1)+"-"+p2(n.getDate()),hl:p2(n.getHours())+":"+p2(n.getMinutes())}};
@@ -611,8 +614,9 @@ function aboPageV2(C){const {D,app,id,org,cm,L,KEY,TT,rc0,pa0}=C,R1=1.4142,FR=(C
   const pg=F?" (page "+(F.p+1)+")":"",cf=nFr>1&&F?"Cadre "+(j+1)+" sur "+nFr+pg+" : ":"",fin=k>=2+nFr,end=$("#abvend"),abs=$("#abs");
   /* (17/11) avant le départ : « Contrat à signer · le mode de règlement, puis N signatures » + « ▶ Commencer la signature » (page en haut, rien ne défile) */
   if(!started&&!fin){stn.textContent="Contrat à signer";stn.classList.add("pre");sti.textContent="· "+(RG.length?"le mode de règlement, puis ":"")+nFr+" signature"+(nFr>1?"s":"");{const c=$("#abvch");if(c)c.innerHTML=""}
-   ac.innerHTML=`<button type="button" class="abv-start" id="abvstart" data-act="start">▶ Commencer la signature</button>`;if(end){end.hidden=true;end.innerHTML=""}if(abs)abs.classList.remove("done");document.body.classList.remove("abv-done");return}
-  stn.classList.remove("pre");
+   /* (17/11, visuel contrat-bouton-commencer-dans-le-cadre) le bouton est dans le cadre blanc d'en-tête, sous la consigne ; les barres n'ont pas de bouton */
+   ac.innerHTML="";{const w=$("#abvstw");if(w)w.innerHTML=`<button type="button" class="abv-start" id="abvstart" data-act="start">▶ Commencer la signature</button>`}if(end){end.hidden=true;end.innerHTML=""}if(abs)abs.classList.remove("done");document.body.classList.remove("abv-done");return}
+  stn.classList.remove("pre");{const w=$("#abvstw");if(w&&w.firstChild)w.innerHTML=""}
   stn.textContent=fin?"✓ Tout est signé":"Étape "+n+" sur "+N;
   sti.textContent=k===1?"Cochez votre mode de règlement, directement sur le contrat"+(ZR[0]?" (page "+(ZR[0].p+1)+")":"")+"."
    :k>=2+nFr?(mob()?"Vérifiez puis envoyez le contrat signé.":"")
