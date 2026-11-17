@@ -89,7 +89,7 @@ body.abv-on .abs-msg{left:auto;right:12px;top:auto;bottom:12px;transform:none;ma
 .abv-dlg .sgw-tabs{display:grid}.abv-dlg .sgw-tb{min-height:48px!important;font-size:15px!important}/* 16/11 : les deux choix de signature visibles, cibles ≥ 44 px */
 @media print{/* 16/11 : impression de la page de signature = le contrat seul (pages entières), sans panneau, sans cadre vert ni case mise en avant : seulement la croix choisie et la signature */
  body.abv-on{overflow:visible!important;background:#fff!important}.abv3{position:static!important;display:block!important;background:#fff!important}
- .abv-pan,.abs-msg,#abodlg,.abv-cap,.abs-dlg,.rgpdm,#res .noprint{display:none!important}
+ .abv-pan,.abv-bar,.abv-head,.abs-msg,#abodlg,.abv-cap,.abs-dlg,.rgpdm,#res .noprint{display:none!important}
  .abv3 .abz.abv-view{height:auto!important;overflow:visible!important;background:#fff!important}.abv3 .abz-in{display:block!important;padding:0!important;min-width:0!important}
  #abzin .abof{width:100%!important;margin:0!important;box-shadow:none!important;break-after:page;page-break-after:always}#abzin .abof:last-child{break-after:auto;page-break-after:auto}
  .abs-rg,.abs-rga,.abv-fr,.abv-fr2,.abs-rg.on,.abv-fr.on,.abv-fr.done,.abv-fr.lock,.abv-fr2.on,.abv-fr2.lock,.abv-fr2.done{border-color:transparent!important;background:transparent!important;box-shadow:none!important;outline:0!important;animation:none!important}
@@ -177,6 +177,18 @@ body.abv-on .abs-msg{left:auto;right:12px;top:auto;bottom:12px;transform:none;ma
 .abs-msg{position:fixed;left:50%;top:14px;transform:translateX(-50%);z-index:60;background:#14532d;color:#fff;font-weight:700;border-radius:12px;padding:10px 16px;box-shadow:0 8px 24px rgba(0,0,0,.25);max-width:calc(100vw - 32px);text-align:center}.abs-msg.ko{background:#9a3412}.abs-msg[hidden]{display:none}
 body.abs-lock{overflow:hidden}
 @media (max-width:700px),(hover:none) and (pointer:coarse) and (max-width:1100px){.abs-dlg{padding:0;align-items:stretch}.abs-dlgb{max-width:none;max-height:none;height:100%;border-radius:0}.abs-nm{grid-template-columns:1fr}.abs-cta{font-size:14px;padding:6px 10px}.abs-msg{font-size:15px}}
+/* (17/11, correctif 3, choix A) contrat en grand : fine barre d'étapes en haut (en bas au téléphone), contrat sur toute la largeur */
+.abv3.abv4{grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr)}
+.abv4 .abv-bar{order:0;display:flex;align-items:center;flex-wrap:wrap;gap:6px 14px;padding:8px 16px;background:#fff;border-bottom:1px solid #cbd5e1;box-shadow:0 2px 10px rgba(15,23,42,.08);position:relative;z-index:3;min-height:58px;box-sizing:border-box;color:#0f172a}
+.abv4 .abz{order:1;position:relative}/* positions des pages comptées depuis la zone du contrat (la barre est au-dessus) */.abv-bl{display:flex;align-items:center;gap:10px;flex:1 1 380px;min-width:0}.abv-blogo{height:30px;width:auto;flex:none}.abv-bt{min-width:0;font-size:15px;line-height:1.35}
+.abv-stn{font:800 15px system-ui,sans-serif;color:#14532d;white-space:nowrap}.abv-sti{color:#0f172a}.abv4 .abv-chm{display:inline-block;max-width:34ch;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:bottom;color:#14532d;font-size:14px}
+.abv4 .abv-act{display:flex;flex-direction:row;flex-wrap:wrap;gap:8px;align-items:center}.abv4 .abv-act .abv-sec,.abv4 .abv-act .abv-cta{width:auto;min-height:40px;padding:6px 14px}
+.abv4 .abv-zoom{display:flex;gap:6px;flex:none}.abv4 .abz-b{min-height:40px;min-width:40px;border:1px solid #cbd5e1;background:#f8fafc;border-radius:10px;font:700 16px system-ui,sans-serif;color:#0f172a;cursor:pointer;padding:0 10px}.abv4 .abz-fit{font-size:14px;font-weight:600}
+.abv4 .abv-head{order:-1;align-self:flex-start;position:sticky;left:16px;width:min(var(--pw,900px),calc(100vw - 48px));box-sizing:border-box;background:#fff;border-radius:6px;padding:14px 16px;box-shadow:0 4px 18px rgba(15,23,42,.12);display:flex;flex-direction:column;gap:8px;font-size:15px;color:#0f172a}
+.abv4 .abv-head .abv-infw{max-width:560px}.abv-how2{margin:0;color:#334155;font-size:15px}.abv4 .abv-cmd textarea{max-width:560px}
+@media (max-width:700px){.abv3.abv4{grid-template-rows:minmax(0,1fr) auto}.abv4 .abv-bar{order:2;border-bottom:0;border-top:1px solid #cbd5e1;box-shadow:0 -6px 18px rgba(15,23,42,.12);padding:8px 10px;gap:6px 8px}.abv-blogo{display:none}.abv-bl{flex:1 1 100%}
+ .abv4 .abz-b,.abv4 .abv-act .abv-sec,.abv4 .abv-act .abv-cta{min-height:44px;min-width:44px}.abv4 .abv-act{flex:1 1 auto}.abv4 .abv-cmb{display:none}.abv-bt,.abv-stn,.abv4 .abv-chm{font-size:14px}.abv4 .abv-head{left:8px;width:calc(100vw - 32px);padding:12px}
+ body.abv-on .abs-msg{bottom:auto;top:10px}}
 </style>
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
@@ -468,12 +480,17 @@ function blcPage(D){const app=$("#app"),id=new URLSearchParams(location.search).
 // bouton de l'étape en cours, loupe − / + et « Ajuster à l'écran ». Zones des cases = le carré + sa ligne de texte, recoupées sur l'image au
 // premier trait de cadre rencontré (jamais sur le cadre des totaux, anciens liens compris). Fenêtre de signature, signature visible dans le cadre,
 // défilement doux vers la page 2, « Lu et approuvé » + « Valider et envoyer » : comme v496. Dépôt identique (k:"abo", h1, h2, gd:2).
-function aboPageV2(C){const {D,app,id,org,cm,L,KEY,TT,rc0,F1,F2,pa0}=C,R1=1.4142;
+// (17/11, correctif 3, choix A + « toutes les signatures ») contrat en GRAND (toute la largeur, on fait défiler), fine barre d'étapes en haut (en bas au téléphone) :
+// « Étape n sur N » + consigne + − / ＋ / « Voir la page entière ». Une étape par cadre trouvé (FR, ordre des pages) : le client signe une fois (1er cadre), puis
+// clique et valide chaque cadre suivant ; « Valider et envoyer » seulement après le dernier. Lignes du règlement : un seul choix, croix sur chaque page.
+function aboPageV2(C){const {D,app,id,org,cm,L,KEY,TT,rc0,pa0}=C,R1=1.4142,FR=(C.FR&&C.FR.length?C.FR:[C.F1,C.F2].filter(Boolean)),F1=FR[0]||null,nFr=FR.length;
  const RG=(C.RG||[]).map(l=>String(l||"").replace(/\s+(TOTAL\s+(HT|TTC)|TVA\s+\d|MONTANT\s+(HT|TTC)|NET\s+A\s+PAYER)\b.*$/i,"").trim());
- const ZR=(()=>{const Z=(C.ZR||[]).map(z=>Object.assign({},z,{b:z.b?Object.assign({},z.b):null}));if(!Z.length)return Z;
+ const fixSet=S0=>{const Z=(S0||[]).map(z=>Object.assign({},z,{b:z.b?Object.assign({},z.b):null}));if(!Z.length)return Z;
   const ov=Z.some((z,j)=>j&&Z[j-1].y+Z[j-1].h>z.y+.0005);if(!ov)return Z;/* anciens liens : zones qui se chevauchent → une bande par ligne */
   const bt=Z.map(z=>z.y+z.h),dd=Z.length>1?bt.slice(1).map((v,j)=>v-bt[j]).sort((a,b)=>a-b)[Math.floor((Z.length-1)/2)]:Z[0].h,d=Math.max(.006,Math.min(.04,dd));
-  return Z.map((z,j)=>{const c=bt[j]-.45*d,t=c-d/2+.0006,h=d-.0012,bh=Math.min(h*.78,(z.b&&z.b.w?z.b.w*R1:h*.78)),bw=bh/R1;return Object.assign(z,{y:+t.toFixed(4),h:+h.toFixed(4),b:{x:z.b?z.b.x:z.x+.004,w:+bw.toFixed(4),y:+(c-bh/2).toFixed(4),h:+bh.toFixed(4)}})})})();
+  return Z.map((z,j)=>{const c=bt[j]-.45*d,t=c-d/2+.0006,h=d-.0012,bh=Math.min(h*.78,(z.b&&z.b.w?z.b.w*R1:h*.78)),bw=bh/R1;return Object.assign(z,{y:+t.toFixed(4),h:+h.toFixed(4),b:{x:z.b?z.b.x:z.x+.004,w:+bw.toFixed(4),y:+(c-bh/2).toFixed(4),h:+bh.toFixed(4)}})})};
+ /* une zone par ligne et par page ; a.j = n° du choix (le même sur chaque page) */
+ const ZR=[].concat(...(C.ZS&&C.ZS.length?C.ZS:[C.ZR||[]]).map(s=>fixSet(s).map((z,j)=>Object.assign(z,{j})))).filter(a=>a.p<L.length);
  const pc=a=>`left:${(nf(a.x)*100).toFixed(3)}%;top:${(nf(a.y)*100).toFixed(3)}%;width:${(nf(a.w)*100).toFixed(3)}%;height:${(nf(a.h)*100).toFixed(3)}%`;
  const XS=`<svg viewBox="0 0 10 10" preserveAspectRatio="none" aria-hidden="true"><path d="M1.6 1.6L8.4 8.4M8.4 1.6L1.6 8.4"/></svg>`;
  const mob=()=>innerWidth<=700;
@@ -483,26 +500,27 @@ function aboPageV2(C){const {D,app,id,org,cm,L,KEY,TT,rc0,F1,F2,pa0}=C,R1=1.4142
   <p class="abv-how" id="abvhow">Choisissez : « ✍ Signature simple » (écrite à partir de votre nom) ou « ✏ Signer à la main ».</p><div id="sgw"></div>
   
   <div class="err" id="err1" role="alert"></div><div class="abs-dlga"><button type="button" class="abs-no" id="dlgno">Annuler</button><button type="button" class="abs-no" id="dlgclr">↺ Effacer</button><button type="button" class="go" id="dlgok">✓ Valider ma signature</button></div></div></div>
-  <div class="abs-dlg abv-dlg" id="abv2dlg" role="dialog" aria-modal="true" aria-labelledby="abv2t" hidden><div class="abs-dlgb abv2b"><button type="button" class="abv2-x" aria-label="Fermer sans valider">×</button><h2 class="abs-h" id="abv2t">Signature de la page 2</h2><p class="abv2-p">Voici votre signature de la page 1 :</p><div class="abv2-sg" id="abv2sg"></div><p class="abv2-lu">« Lu et approuvé — Contrat (page 1) et CGV (page 2) »</p><button type="button" class="abv2-ok" data-v2="ok">✓ Valider</button><button type="button" class="abv2-re" data-v2="redo">↺ Refaire la signature</button></div></div>`;
+  <div class="abs-dlg abv-dlg" id="abv2dlg" role="dialog" aria-modal="true" aria-labelledby="abv2t" hidden><div class="abs-dlgb abv2b"><button type="button" class="abv2-x" aria-label="Fermer sans valider">×</button><h2 class="abs-h" id="abv2t">Signature de la page 2</h2><p class="abv2-p" id="abv2p">Voici votre signature :</p><div class="abv2-sg" id="abv2sg"></div><p class="abv2-lu">« Lu et approuvé — Contrat et conditions générales »</p><button type="button" class="abv2-ok" data-v2="ok">✓ Valider</button><button type="button" class="abv2-re" data-v2="redo">↺ Refaire la signature</button></div></div>`;
  const sub=[D.of||D.s,D.c].filter(Boolean).join(" · ");
  const inf=`<table class="abv-inf"><tr><th>Client</th><td><b>${esc(D.c||"")}</b></td></tr>${D.s?`<tr><th>Service</th><td>${esc(D.s)}</td></tr>`:""}${D.mt?`<tr><th>Montant</th><td>${esc(D.mt)}${D.ttc?" ("+esc(D.ttc)+")":""}</td></tr>`:""}${D.db?`<tr><th>Début</th><td>${esc(D.db)}</td></tr>`:""}</table>`;
  document.body.classList.add("abv-on");
- app.innerHTML=`<div id="abs" class="abv3"><div class="abz abv-view" id="abz" tabindex="0" aria-label="Contrat à signer (pages entières)"><div class="abz-in" id="abzin">${figs}</div></div>
-  <aside class="abv-pan" id="abvp" aria-label="Signer le contrat"><div class="abv-hd"><img src="logo.jpg" alt=""><div><div class="abv-org">${esc(org)}</div><div class="abv-ti" id="abzti">${esc(TT)}</div>${sub?`<div class="abv-sub">${esc(sub)}</div>`:""}</div></div>
-   <div class="abv-infw">${inf}</div>
-   <h2 class="abv-h2">Signer le contrat</h2><ol class="abv-steps" id="abvst"></ol><div class="abv-chm" id="abvch"></div><div class="abv-act" id="abvact" role="region" aria-live="polite"></div>
-   <div class="abv-zoom" role="group" aria-label="Taille du contrat"><button type="button" class="abz-b" data-z="-1" aria-label="Réduire">🔍 −</button><button type="button" class="abz-b" data-z="1" aria-label="Agrandir">🔍 +</button><button type="button" class="abz-b" data-z="0">Ajuster à l’écran</button></div>
-   <details class="abv-cmd"><summary>Ajouter un commentaire <span class="sgf-mu">(facultatif)</span></summary><textarea id="abocm" rows="2" maxlength="1000" placeholder="Une remarque sur le contrat ? Écrivez-la ici…" aria-label="Commentaire (facultatif)"></textarea></details>
-   <p class="abv-nb2">Rien n’est envoyé avant le dernier bouton « Valider et envoyer ».</p></aside></div>${dlg}<div class="abs-msg" id="abomsg" role="status" aria-live="polite" hidden></div><div id="res"></div>`;
- let nOk=0,ri=rc0,s1=null,v2=null,redo2=false,sending=false,msgT=0,lu=false,anim=null,zoom=1,ed1=false;const INK={};let BUB=null;/* (16/11) v2 = page 2 validée par « ✓ Valider » ; INK = blancs du contrat (bulle « Cochez ici ») */const z=$("#abz"),zin=$("#abzin");
+ app.innerHTML=`<div id="abs" class="abv3 abv4"><div class="abv-bar" id="abvp" role="region" aria-label="Signer le contrat"><div class="abv-bl"><img src="logo.jpg" alt="" class="abv-blogo"><div class="abv-bt" aria-live="polite"><b class="abv-stn" id="abvstn"></b> <span class="abv-sti" id="abvsti"></span> <span class="abv-chm" id="abvch"></span></div></div>
+   <div class="abv-act" id="abvact"></div>
+   <div class="abv-zoom" role="group" aria-label="Taille du contrat"><button type="button" class="abz-b" data-z="-1" aria-label="Réduire le contrat">−</button><button type="button" class="abz-b" data-z="1" aria-label="Agrandir le contrat">＋</button><button type="button" class="abz-b abz-fit" data-z="0">Voir la page entière</button></div></div>
+  <div class="abz abv-view" id="abz" tabindex="0" aria-label="Contrat à signer"><div class="abz-in" id="abzin"><div class="abv-head" id="abvhead"><div class="abv-hd"><img src="logo.jpg" alt=""><div><div class="abv-org">${esc(org)}</div><div class="abv-ti" id="abzti">${esc(TT)}</div>${sub?`<div class="abv-sub">${esc(sub)}</div>`:""}</div></div>
+   <div class="abv-infw">${inf}</div><p class="abv-how2">Lisez le contrat puis signez-le directement dessus : ${RG.length?"cochez votre mode de règlement, puis ":""}cliquez dans ${nFr>1?"chaque cadre":"le cadre"} « ✍ Signez ici »${nFr>1?" ("+nFr+" cadres)":""}. Rien n’est envoyé avant « ✓ Valider et envoyer ».</p>
+   <details class="abv-cmd" id="abvcmd"><summary>Ajouter un commentaire <span class="sgf-mu">(facultatif)</span></summary><textarea id="abocm" rows="2" maxlength="1000" placeholder="Une remarque sur le contrat ? Écrivez-la ici…" aria-label="Commentaire (facultatif)"></textarea></details></div>${figs}</div></div></div>${dlg}<div class="abs-msg" id="abomsg" role="status" aria-live="polite" hidden></div><div id="res"></div>`;
+ let nOk=0,ri=rc0,s1=null,sending=false,redoD2=false,msgT=0,anim=null,zoom=1,z0done=false;const V=[];/* V[j] = heure de la signature posée dans le cadre j (V[0] = la signature) */const INK={};let BUB=null;/* (16/11) v2 = page 2 validée par « ✓ Valider » ; INK = blancs du contrat (bulle « Cochez ici ») */const z=$("#abz"),zin=$("#abzin");
  const say=(t,ko)=>{const m=$("#abomsg");if(!m)return;m.textContent=t;m.className="abs-msg"+(ko?" ko":"");m.hidden=false;clearTimeout(msgT);msgT=setTimeout(()=>{m.hidden=true},5000)};
  const now=()=>{const n=new Date(),p2=v=>String(v).padStart(2,"0");return {dl:n.getFullYear()+"-"+p2(n.getMonth()+1)+"-"+p2(n.getDate()),hl:p2(n.getHours())+":"+p2(n.getMinutes())}};
- const step=()=>RG.length&&ri<0?1:!s1?2:!v2?3:4,ratio=p=>{const im=document.querySelector("#abof"+(p||0)+" img");return im&&im.naturalWidth?im.naturalHeight/im.naturalWidth:R1};
+ const curF=()=>{for(let j=0;j<nFr;j++)if(!V[j])return j;return nFr},step=()=>RG.length&&ri<0?1:2+curF(),ratio=p=>{const im=document.querySelector("#abof"+(p||0)+" img");return im&&im.naturalWidth?im.naturalHeight/im.naturalWidth:R1};
  const pv=h=>`<span class="abs-sv">${sigSvgFit(s1.sg)}</span><span class="abs-sn">${esc(s1.nm)} · ${esc(fd(s1.dl))} ${esc(String(h).replace(":","h"))}</span>`;
  // ---- taille des pages : zoom 1 = page ENTIÈRE (hauteur de la fenêtre sur ordinateur, largeur au téléphone)
- const baseW=()=>{const r=ratio(0),vw=z.clientWidth,vh=z.clientHeight;return mob()?Math.max(200,vw-16):Math.max(240,Math.min((vh-24)/r,vw-32))};
- const setZoom=(s,ax,ay)=>{s=Math.max(.5,Math.min(5,s));const cw=z.clientWidth,ch=z.clientHeight,fx=ax==null?cw/2:ax,fy=ay==null?ch/2:ay,px=(z.scrollLeft+fx)/(zin.scrollWidth||1),py=(z.scrollTop+fy)/(zin.scrollHeight||1);
-  zoom=s;const w=Math.round(baseW()*s);document.querySelectorAll("#abzin .abof").forEach(f=>{f.style.width=w+"px";f.style.setProperty("--pw",w+"px")});z.scrollLeft=px*zin.scrollWidth-fx;z.scrollTop=py*zin.scrollHeight-fy;try{requestAnimationFrame(snFit)}catch(e){}try{bubPlace()}catch(e){}};
+ const baseW=()=>{const vw=z.clientWidth;return Math.max(200,vw-(mob()?16:32))},fitZ=()=>{const r=ratio(0),vh=z.clientHeight;return Math.max(.2,Math.min(1,((vh-24)/r)/baseW()))};
+ /* taille de départ : texte des lignes du règlement ≥ 15 px (ordinateur) / ≥ 14 px (téléphone) ; jamais plus petit que toute la largeur */
+ const z0=()=>{const a=ZR[0];if(!a)return 1;const tt=a.t>0?a.t:.0098,H1=baseW()*ratio(a.p);return Math.max(1,Math.min(5,(mob()?14.6:15.6)/(tt*H1)))};
+ const setZoom=(s,ax,ay)=>{s=Math.max(.2,Math.min(5,s));const cw=z.clientWidth,ch=z.clientHeight,fx=ax==null?cw/2:ax,fy=ay==null?ch/2:ay,px=(z.scrollLeft+fx)/(zin.scrollWidth||1),py=(z.scrollTop+fy)/(zin.scrollHeight||1);
+  zoom=s;const w=Math.round(baseW()*s);document.querySelectorAll("#abzin .abof").forEach(f=>{f.style.width=w+"px";f.style.setProperty("--pw",w+"px")});zin.style.setProperty("--pw",w+"px");z.scrollLeft=px*zin.scrollWidth-fx;z.scrollTop=py*zin.scrollHeight-fy;try{requestAnimationFrame(snFit)}catch(e){}try{bubPlace()}catch(e){}};
  const stopAnim=()=>{if(anim){cancelAnimationFrame(anim.r);anim=null}};
  const glide=(L0,T0,dur,cb)=>{stopAnim();const l1=z.scrollLeft,t1=z.scrollTop,st=performance.now(),e=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
   if(dur<=0||matchMedia("(prefers-reduced-motion: reduce)").matches){z.scrollLeft=L0;z.scrollTop=T0;if(cb)cb();return}
@@ -510,9 +528,9 @@ function aboPageV2(C){const {D,app,id,org,cm,L,KEY,TT,rc0,F1,F2,pa0}=C,R1=1.4142
  ["wheel","touchstart","pointerdown","keydown"].forEach(ev=>z.addEventListener(ev,()=>{if(anim)stopAnim()},{passive:true}));
  // montrer une zone SANS changer la taille : la page entière reste visible quand elle tient dans la fenêtre
  const show=(r,p,dur,cb)=>{const f=$("#abof"+p),im=f&&f.querySelector(".abs-im");if(!im)return;const W=im.offsetWidth,H=im.offsetHeight,top=f.offsetTop,ch=z.clientHeight,cw=z.clientWidth;
-  let T0=H+24<=ch?top-12:top+r.y*H-Math.max(12,(ch-r.h*H)/2);const L0=W<=cw?0:f.offsetLeft+r.x*W-Math.max(12,(cw-r.w*W)/2);glide(Math.max(0,L0),Math.max(0,T0),dur==null?450:dur,cb)};
- const rgBox=()=>{if(!ZR.length)return null;const x0=Math.min(...ZR.map(a=>a.x)),y0=Math.min(...ZR.map(a=>a.y)),x1=Math.max(...ZR.map(a=>a.x+a.w)),y1=Math.max(...ZR.map(a=>a.y+a.h));return {p:ZR[0].p,r:{x:x0,y:y0,w:x1-x0,h:y1-y0}}};
- const goStep=dur=>{const k=step();if(k===1){const a=rgBox();if(a)show(a.r,a.p,dur)}else if(k===2&&F1)show(F1,F1.p,dur);else if(k>=3&&F2)show(F2,F2.p,dur)};
+  let T0=H+24<=ch+2?top-12:top+r.y*H-Math.max(12,(ch-r.h*H)/2);const L0=W<=cw?0:f.offsetLeft+r.x*W-Math.max(12,(cw-r.w*W)/2);glide(Math.max(0,L0),Math.max(0,T0),dur==null?450:dur,cb)};
+ const rgBox=()=>{if(!ZR.length)return null;const Z1=ZR.filter(a=>a.p===ZR[0].p),x0=Math.min(...Z1.map(a=>a.x)),y0=Math.min(...Z1.map(a=>a.y)),x1=Math.max(...Z1.map(a=>a.x+a.w)),y1=Math.max(...Z1.map(a=>a.y+a.h));return {p:ZR[0].p,r:{x:x0,y:y0,w:x1-x0,h:y1-y0}}};
+ const goStep=dur=>{const k=step();if(k===1){const a=rgBox();if(a)show(a.r,a.p,dur);return}const F=FR[Math.min(nFr-1,k-2)];if(F)show(F,F.p,dur)};
  // ---- zones recoupées sur l'image : premier trait de cadre (ligne sombre continue) rencontré = bord de la zone ; jamais sur un autre cadre
  const trim=(i,img)=>{try{const Zi=ZR.filter(a=>a.p===i);if(!Zi.length)return;const cw=Math.min(1600,img.naturalWidth),k=cw/img.naturalWidth,ch=Math.round(img.naturalHeight*k),c=document.createElement("canvas");c.width=cw;c.height=ch;
    const x=c.getContext("2d",{willReadFrequently:true});x.drawImage(img,0,0,cw,ch);const d=x.getImageData(0,0,cw,ch).data,dk=(X,Y)=>{const o=(Y*cw+X)*4;return d[o]+d[o+1]+d[o+2]<330};
@@ -557,7 +575,7 @@ function aboPageV2(C){const {D,app,id,org,cm,L,KEY,TT,rc0,F1,F2,pa0}=C,R1=1.4142
  const BUBX=14;/* centre de la pointe, en px depuis le bord gauche de la bulle */
  function bubPlace(){const b=document.getElementById("abvbub"),g=rgBox();if(!b||!g)return;const f=$("#abof"+g.p),im=f&&f.querySelector(".abs-im");if(!im||!im.offsetWidth||!INK[g.p])return;const W=im.offsetWidth,H=im.offsetHeight;
   if(!BUB||BUB.W!==W){const Zg=ZR.filter(a=>a.p===g.p).sort((p,q)=>p.y-q.y),b0=Zg[0].bb||Zg[0].b||Zg[0],cx=b0.x+b0.w/2,bw=b.offsetWidth/W,bh=b.offsetHeight/H,m=2/W,mh=7/H,m2=2/H;/* la pointe (5 px) tombe aussi dans le blanc */
-   const X0=cx-BUBX/W,bad=c=>[F1,F2].some(F=>F&&F.p===g.p&&hit(c,F))||ZR.some(a=>a.p===g.p&&hit(c,a.v||a)),okx=(x,y,dn)=>x>=0&&x+bw<=1&&!bad({x,y,w:bw,h:bh})&&inkFree(g.p,x-m,y-(dn?m2:mh),bw+2*m,bh+m2+mh);/* marge de 7 px seulement du côté de la pointe */
+   const X0=cx-BUBX/W,bad=c=>FR.some(F=>F&&F.p===g.p&&hit(c,F))||ZR.some(a=>a.p===g.p&&hit(c,a.v||a)),okx=(x,y,dn)=>x>=0&&x+bw<=1&&!bad({x,y,w:bw,h:bh})&&inkFree(g.p,x-m,y-(dn?m2:mh),bw+2*m,bh+m2+mh);/* marge de 7 px seulement du côté de la pointe */
    /* pointe sur la colonne des cases ; la bulle peut glisser jusqu'à 22 px vers la droite (jamais par-dessus le bord du bloc) */const ok=(y,dn)=>{for(let dx=0;dx<=22;dx+=2){const x=X0+dx/W;if(okx(x,y,dn)){P0=x;return true}}return false};let P0=X0;const x=Math.max(0,X0);
    const top=Math.min(...Zg.map(a=>(a.v||a).y)),bot=Math.max(...Zg.map(a=>(a.v||a).y+(a.v||a).h)),st=2/H,far=70/H;let P=null;
    for(let y=top-bh-7/H;!P&&y>=Math.max(0,top-bh-far);y-=st)if(ok(y,1))P={x:P0,y,d:"dn"};
@@ -565,40 +583,39 @@ function aboPageV2(C){const {D,app,id,org,cm,L,KEY,TT,rc0,F1,F2,pa0}=C,R1=1.4142
    BUB=Object.assign({W},P||{x,y:Math.max(0,top-bh-7/H),d:"dn",nf:1})}
   b.style.left=(BUB.x*100).toFixed(3)+"%";b.style.top=(BUB.y*100).toFixed(3)+"%";b.classList.remove("dn","up","lt","rt");b.classList.add(BUB.d);b.firstChild.textContent=BUB.d==="up"?"👆":"👇";b.style.visibility="visible"}
 
- // ---- panneau
- function panel(){const k=step(),st=$("#abvst"),ac=$("#abvact");if(!st||!ac)return;const S=[];
-  const TL=(l,c)=>`<span class="abv-tl">${l}</span><span class="abv-ts">${c}</span>`;/* téléphone : libellés courts */
-  if(RG.length)S.push([1,TL("Cochez votre mode de règlement","Cochez ici"),ri>=0?`<span class="abv-ch">${esc(RG[ri])}</span> <button type="button" class="abv-lk2" data-act="mod1">modifier</button>`:"une des 3 cases de la page 1",ri>=0]);
-  S.push([2,TL("Signez ici — page 1","Signez p. 1"),s1?`signée par ${esc(s1.nm)} · ${esc(fd(s1.dl))} ${esc(s1.h1.replace(":","h"))}`:"cadre « Pour le Client »",!!s1]);S.push([3,TL("Signez ici — page 2","Signez p. 2"),v2?`validée · ${esc(fd(s1.dl))} ${esc(v2.hl.replace(":","h"))}`:s1?"« ✍ Signez ici » puis « ✓ Valider »":"après la page 1",!!v2]);
-  {const c=$("#abvch");if(c)c.innerHTML=RG.length&&ri>=0?`Règlement : <b>${esc(RG[ri])}</b> · <button type="button" class="abv-lk2" data-act="mod1">modifier</button>`:""}/* téléphone : le choix reste lisible sous les étapes */
-  st.innerHTML=S.map(([n,t,d,ok],i)=>`<li class="abv-s${ok?" ok":""}${n===k?" cur":""}" id="abvs${n}"><span class="abv-n" aria-hidden="true">${ok?"✓":RG.length?n:i+1}</span><div><b>${t}</b><small>${d}</small></div></li>`).join("");
-  let h="";if(k===1||ed1)h=`<fieldset class="abv-rgf"><legend>Cochez votre mode de règlement (ici ou sur le contrat)</legend>${RG.map((l,j)=>`<label class="abv-rgo"><input type="radio" name="abvrg" value="${j}"${ri===j?" checked":""}> <span>${esc(l)}</span></label>`).join("")}</fieldset>${ed1&&k>1?`<button type="button" class="abv-sec" data-act="ok1">OK</button>`:`<button type="button" class="abv-sec" data-act="see1">Voir les cases sur le contrat</button>`}`;
-  else if(k===2)h=`<button type="button" class="abv-cta abv-blue" data-act="f1">✍ Signez ici</button><button type="button" class="abv-sec" data-act="see2">Voir le cadre sur le contrat</button>`;
-  else if(k===3)h=`<p class="abv-ok">✓ Page 1 signée. En page 2, cliquez sur « ✍ Signez ici » puis « ✓ Valider ».</p><button type="button" class="abv-cta abv-blue" data-act="f2">✍ Signez ici — page 2</button><div class="abv-row"><button type="button" class="abv-sec" data-act="redo">↺ Refaire la signature</button><button type="button" class="abv-sec" id="abzgo2" data-act="go2">Aller à la 2e signature ↓</button></div>`;
-  else h=`<p class="abv-ok">✓ Pages 1 et 2 signées.</p><div class="abv-row"><button type="button" class="abv-sec" data-act="redo">↺ Refaire la signature</button><button type="button" class="abv-sec" id="abzgo2" data-act="go2">Aller à la 2e signature ↓</button></div>
-   <button type="button" class="abv-cta" id="go" data-act="send">✓ Valider et envoyer le contrat signé</button>`;/* (17/11, correctif 2) plus de case « Lu et approuvé » : la fenêtre « Signature de la page 2 » la porte déjà */
-  ac.innerHTML=h;
-  ac.querySelectorAll('input[name=abvrg]').forEach(r=>r.onchange=()=>pick(+r.value))}
+ // ---- barre d'étapes : « Étape n sur N » + consigne ; rien n'est recopié du contrat (on coche et on signe sur le contrat)
+ function panel(){const k=step(),N=(RG.length?1:0)+nFr,j=k-2,F=FR[j],n=k===1?1:Math.min(N,(RG.length?1:0)+j+1),stn=$("#abvstn"),sti=$("#abvsti"),ac=$("#abvact");if(!stn||!ac)return;
+  const pg=F?" (page "+(F.p+1)+")":"",cf=nFr>1&&F?"Cadre "+(j+1)+" sur "+nFr+pg+" : ":"";
+  stn.textContent=k>=2+nFr?"✓ Tout est signé":"Étape "+n+" sur "+N;
+  sti.textContent=k===1?"Cochez votre mode de règlement, directement sur le contrat"+(ZR[0]?" (page "+(ZR[0].p+1)+")":"")+"."
+   :k>=2+nFr?"Vérifiez puis envoyez le contrat signé."
+   :j===0?cf+"cliquez dans le cadre « ✍ Signez ici »"+(cf?"":pg)+" pour signer."
+   :cf+"cliquez sur « ✍ Signez ici » puis « ✓ Valider ».";
+  {const c=$("#abvch");if(c){c.innerHTML=RG.length&&ri>=0?`· Règlement : <b>${esc(RG[ri])}</b>`:"";c.title=RG.length&&ri>=0?"Mode de règlement choisi : "+RG[ri]+" (cliquez une autre ligne du contrat pour changer)":""}}
+  let h="";if(k>=2&&k<2+nFr)h+=`<button type="button" class="abv-sec" id="abzgo2" data-act="go2">${j===0?"Aller au cadre ↓":"Aller au cadre "+(j+1)+" ↓"}</button>`;
+  if(s1)h+=`<button type="button" class="abv-sec" data-act="redo">↺ Refaire la signature</button>`;
+  if(k>=2+nFr)h+=`<button type="button" class="abv-sec abv-cmb" data-act="cmt" aria-label="Ajouter un commentaire (facultatif)">💬 Commentaire</button>`;
+  if(k>=2+nFr)h+=`<button type="button" class="abv-cta" id="go" data-act="send">✓ Valider et envoyer le contrat signé</button>`;
+  ac.innerHTML=h}
  // ---- calques sur les pages
  function paint(noPanel){const k=step();
   L.forEach((u,i)=>{const o=document.getElementById("abov"+i);if(!o)return;let h="";
-   ZR.forEach((a,j)=>{if(a.p!==i)return;h+=`<button type="button" class="abs-rg abs-band${ri<0?" todo":ri===j?" on":""}" data-rg="${j}" style="${pc(a.v||a)}" aria-pressed="${ri===j}" aria-label="Cocher : ${esc(RG[j]||"")}"></button>`;
+   ZR.forEach(a=>{if(a.p!==i)return;const j=a.j;h+=`<button type="button" class="abs-rg abs-band${ri<0?" todo":ri===j?" on":""}" data-rg="${j}" style="${pc(a.v||a)}" aria-pressed="${ri===j}" aria-label="Cocher : ${esc(RG[j]||"")}"></button>`;
     /* (17/11, correctif 2) case retrouvée sur l'image (a.bb), sinon zone du lien (a.b) ; contour posé exactement sur la case, croix à l'intérieur */
     const bx=a.bb||a.b||{x:a.x+.004,y:a.y+a.h*.15,w:a.h*.7/R1,h:a.h*.7},ix=bx.w*.16,iy=bx.h*.16;
     if(ri<0||ri===j)h+=`<span class="abs-rgb ${ri===j?"on":"todo"}" aria-hidden="true" style="${pc(bx)}"></span>`;if(ri===j)h+=`<span class="abs-x" style="${pc({x:bx.x+ix,y:bx.y+iy,w:bx.w-2*ix,h:bx.h-2*iy})}">${XS}</span>`});
    if(k===1&&rgBox()&&rgBox().p===i)h+=`<div class="abv-bub" id="abvbub" role="note" style="visibility:hidden"><span aria-hidden="true">👇</span> Cochez ici</div>`;
    const pw=(F,lab)=>{const Zz=F.z||{x:F.x,y:F.y+F.h*.45,w:F.w,h:F.h*.55};return `<span class="abv-pw" aria-hidden="true" style="left:${((Zz.x-F.x)/F.w*100).toFixed(2)}%;top:${((Zz.y-F.y)/F.h*100).toFixed(2)}%;width:${(Zz.w/F.w*100).toFixed(2)}%;height:${(Zz.h/F.h*100).toFixed(2)}%"><span class="abv-pill">${lab}</span></span>`};
-   if(F1&&F1.p===i){h+=`<button type="button" class="abv-fr ${s1?"done":k===2?"on":"lock"}" id="abgf1" data-act="f1" style="${pc(F1)}" aria-label="${s1?"Signature de la page 1 (cliquer pour la refaire)":"Signez ici : cadre « Pour le Client », page 1"}">${s1?"":pw(F1,"✍ Signez ici")}</button>`;if(s1&&F1.z)h+=`<div class="abs-zn abv-zn" style="${pc(F1.z)}">${pv(s1.h1)}</div>`}
-   if(F2&&F2.p===i){h+=`<button type="button" class="abv-fr abv-fr2 ${v2?"done":k===3?"on":"lock"}" id="abgf2" data-act="f2" style="${pc(F2)}" aria-label="${v2?"Signature de la page 2 posée":"Signez ici : cadre « Pour le Client », page 2"}">${v2?"":pw(F2,"✍ Signez ici")}</button>`;if(v2&&F2.z)h+=`<div class="abs-zn abv-zn" style="${pc(F2.z)}">${pv(v2.hl)}</div>`}
+   FR.forEach((F,j)=>{if(F.p!==i)return;const dn=!!V[j],on=k===2+j;h+=`<button type="button" class="abv-fr${j?" abv-fr2":""} ${dn?"done":on?"on":"lock"}" id="abgf${j+1}" data-act="f" data-f="${j}" style="${pc(F)}" aria-label="${dn?(j?"Signature posée (cadre "+(j+1)+", page "+(F.p+1)+")":"Signature posée (cliquer pour la refaire)"):"Signez ici : cadre "+(j+1)+(nFr>1?" sur "+nFr:"")+", page "+(F.p+1)}">${dn?"":pw(F,"✍ Signez ici")}</button>`;if(dn&&F.z)h+=`<div class="abs-zn abv-zn" style="${pc(F.z)}">${pv(V[j])}</div>`});
    o.innerHTML=h});try{bubPlace()}catch(e){}
   if(!noPanel)panel();try{requestAnimationFrame(snFit)}catch(e){}}
- const pick=j=>{if(sending||!(j>=0&&j<RG.length))return;ri=j;ed1=false;paint();say("✓ Mode de règlement choisi : "+RG[ri]+(s1?"":" — signez maintenant la page 1."));if(!s1)setTimeout(()=>goStep(600),400)};
+ const pick=j=>{if(sending||!(j>=0&&j<RG.length))return;ri=j;paint();say("✓ Mode de règlement choisi : "+RG[ri]+(s1?"":" — signez maintenant la page 1."));if(!s1)setTimeout(()=>goStep(600),400)};
  // ---- pages (même lecture qu'avant, contrat_lire)
  L.forEach(async(u,i)=>{const f=document.getElementById("abof"+i),st=f&&f.querySelector(".abos");if(!st)return;if(!u.cle||!id){st.textContent="Page indisponible.";return}
   try{let a=0,P=[],h=null;for(;;){const r=await fetch(SBU+"/rest/v1/rpc/contrat_lire",{method:"POST",headers:{apikey:SBK,"Content-Type":"application/json"},body:JSON.stringify({p_lien:id,p_cle:u.cle,p_a:a,p_b:a+4})}),j=r.ok?await r.json():null;
     if(!j||!j.ok){st.textContent=j&&j.etat==="expire"?"Ce lien a expiré.":"Page indisponible pour l’instant. Réessayez plus tard ou écrivez-nous"+(cm?" : "+cm:"")+".";return}h=j;(j.morceaux||[]).forEach(m=>{P[m.n]=m.b64});a+=5;if(a>=(+j.n||0))break}
    if(P.filter(Boolean).length<(+h.n||0))throw 0;const t=atob(P.join("")),by=new Uint8Array(t.length);for(let k=0;k<t.length;k++)by[k]=t.charCodeAt(k);const url=URL.createObjectURL(new Blob([by],{type:imgT(h.type)}));
-   const im=new Image();im.className="aboimg";im.alt=u.t||"Page "+(i+1);im.decoding="async";im.onload=()=>{nOk++;trim(i,im);setZoom(zoom);paint();if(nOk===L.length){z.scrollTop=0;z.scrollLeft=0}};im.src=url;st.replaceWith(im)}
+   const im=new Image();im.className="aboimg";im.alt=u.t||"Page "+(i+1);im.decoding="async";im.onload=()=>{nOk++;trim(i,im);setZoom(zoom);paint();if(nOk===L.length&&!z0done){z0done=true;setZoom(z0());paint();z.scrollTop=0;z.scrollLeft=0;if(mob()&&ZR.length){const a=rgBox();if(a)show(a.r,a.p,0)}}};im.src=url;st.replaceWith(im)}
   catch(e){st.textContent="Page indisponible pour l’instant. Réessayez plus tard."}});
  setZoom(1);
  // ---- pincer pour zoomer (téléphone / tablette)
@@ -611,43 +628,44 @@ function aboPageV2(C){const {D,app,id,org,cm,L,KEY,TT,rc0,F1,F2,pa0}=C,R1=1.4142
  ["#spr","#sno"].forEach(s=>{const i=$(s);if(i)i.addEventListener("input",()=>{try{SW.refresh()}catch(e){}})});
  const openSig=()=>{const d=$("#abodlg");$("#err1").textContent="";d.hidden=false;document.body.classList.add("abs-lock");mount();setTimeout(()=>{const i=$("#spr").value?$("#sno"):$("#spr");try{i.focus({preventScroll:true})}catch(e){}},60)};
  const closeSig=()=>{$("#abodlg").hidden=true;document.body.classList.remove("abs-lock")};
- $("#dlgno").onclick=()=>{redo2=false;closeSig()};$("#abodlg").addEventListener("keydown",e=>{if(e.key==="Escape"){redo2=false;closeSig()}});$("#dlgclr").onclick=()=>{KP.mode=SW?SW.mode():"txt";KP.drw=[];mount()};
+ $("#dlgno").onclick=()=>{redoD2=false;closeSig()};$("#abodlg").addEventListener("keydown",e=>{if(e.key==="Escape"){closeSig()}});$("#dlgclr").onclick=()=>{KP.mode=SW?SW.mode():"txt";KP.drw=[];mount()};
  /* 16/11 : paraphe, initiales ou simple trait acceptés ; seul un simple point est refusé (le cadre vide est refusé plus haut) */const tooShort=()=>{if(!SW||SW.mode()!=="draw")return false;const P=[].concat(...(KP.drw||[]));if(!P.length)return false;const xs=P.map(p=>p[0]),ys=P.map(p=>p[1]);return Math.max(...xs)-Math.min(...xs)<4&&Math.max(...ys)-Math.min(...ys)<4};
  $("#dlgok").onclick=()=>{const e=$("#err1"),pr=$("#spr").value.trim().replace(/\s+/g," "),no=$("#sno").value.trim().replace(/\s+/g," ");e.textContent="";
   if(!pr)return(e.textContent="Merci d’indiquer votre prénom.",$("#spr").focus());if(!no)return(e.textContent="Merci d’indiquer votre NOM.",$("#sno").focus());
   if(!SW||SW.empty())return e.textContent=SW&&SW.mode()==="draw"?"Le cadre de signature est vide : signez avec le doigt ou la souris (un paraphe ou vos initiales suffisent), ou choisissez « ✍ Signature simple ».":"Merci d’indiquer votre prénom et votre nom : votre signature s’écrit à partir d’eux.";
   if(tooShort())return e.textContent="Un simple point ne suffit pas : tracez un paraphe, vos initiales ou un trait, ou choisissez « ✍ Signature simple ».";
-  const T=now();s1={pr,no,nm:pr+" "+no,sg:SW.get(),sm:SW.how(),sk:SW.kind(),h1:T.hl,dl:T.dl};lu=false;v2=null;closeSig();paint();
-  if(redo2){redo2=false;say("✓ Nouvelle signature placée en page 1 — validez-la pour la page 2.");return open2()}/* une seule signature par contrat : la page 2 se valide de nouveau */
-  say("✓ Page 1 signée — votre signature est dans le cadre. Le contrat descend vers la 2e signature…");
+  const T=now(),re=!!s1;s1={pr,no,nm:pr+" "+no,sg:SW.get(),sm:SW.how(),sk:SW.kind(),h1:T.hl,dl:T.dl};V.length=0;V[0]=T.hl;closeSig();paint();/* une seule signature par contrat : après « Refaire », chaque cadre suivant se valide de nouveau */
+  if(nFr<2){say("✓ Contrat signé — vous pouvez l’envoyer.");return}
+  if(redoD2){redoD2=false;say("✓ Nouvelle signature placée dans le cadre 1 — validez-la pour le cadre suivant.");return open2(curF())}/* « Refaire » depuis la fenêtre : elle revient pour le cadre en cours */
+  say(re?"✓ Nouvelle signature placée dans le cadre 1 — validez de nouveau les cadres suivants.":"✓ Cadre 1 signé — votre signature est dans le cadre. Le contrat descend vers le cadre suivant…");
   if(F1)show(F1,F1.p,300,()=>setTimeout(()=>{if(step()===3)goStep(2000)},900))};
  // ---- fenêtre « Signature de la page 2 » : la même signature, posée seulement sur « ✓ Valider » (fermer = rien n'est posé)
  const d2=$("#abv2dlg");let d2f=null;
- function open2(){if(!s1)return;d2f=document.activeElement;$("#abv2sg").innerHTML=`<div class="abs-zn abv2-zn">${pv(s1.h1)}</div>`;d2.hidden=false;document.body.classList.add("abs-lock");try{requestAnimationFrame(snFit)}catch(e){}setTimeout(()=>{const b=d2.querySelector('[data-v2="ok"]');try{b.focus({preventScroll:true})}catch(e){}},60)}
+ let d2j=1;function open2(j){if(!s1)return;d2j=j>0?j:1;const F=FR[d2j],same=F&&FR.filter(G=>G.p===F.p).length>1;$("#abv2t").textContent="Signature de la page "+(F?F.p+1:2)+(same||nFr>2?" — cadre "+(d2j+1)+" sur "+nFr:"");$("#abv2p").textContent="Voici votre signature (cadre 1"+(F1?", page "+(F1.p+1):"")+") :";d2f=document.activeElement;$("#abv2sg").innerHTML=`<div class="abs-zn abv2-zn">${pv(s1.h1)}</div>`;d2.hidden=false;document.body.classList.add("abs-lock");try{requestAnimationFrame(snFit)}catch(e){}setTimeout(()=>{const b=d2.querySelector('[data-v2="ok"]');try{b.focus({preventScroll:true})}catch(e){}},60)}
  function close2(){d2.hidden=true;document.body.classList.remove("abs-lock");try{if(d2f&&d2f.focus)d2f.focus({preventScroll:true})}catch(e){}}
  d2.addEventListener("click",e=>{if(e.target===d2)return close2();if(e.target.closest(".abv2-x"))return close2();const b=e.target.closest("[data-v2]");if(!b)return;
-  if(b.dataset.v2==="ok"){v2={hl:now().hl};close2();paint();say("✓ Page 2 signée — vous pouvez envoyer le contrat signé.");return}
-  close2();redo2=true;openSig()});
+  if(b.dataset.v2==="ok"){const j=d2j,F=FR[j];V[j]=now().hl;close2();paint();const left=nFr-curF();say("✓ Cadre "+(j+1)+(F?" (page "+(F.p+1)+")":"")+" signé"+(left>0?" — encore "+left+" cadre"+(left>1?"s":"")+" à valider.":" — vous pouvez envoyer le contrat signé."));if(left>0)setTimeout(()=>goStep(1500),700);return}
+  close2();redoD2=true;openSig()});
  d2.addEventListener("keydown",e=>{if(e.key==="Escape"){e.preventDefault();close2()}else if(e.key==="Tab"){const B=[...d2.querySelectorAll("button")],i=B.indexOf(document.activeElement);if(e.shiftKey&&i<=0){e.preventDefault();B[B.length-1].focus()}else if(!e.shiftKey&&i===B.length-1){e.preventDefault();B[0].focus()}}});
  // ---- actions
- function act(a){if(sending)return;
-  if(a==="f1"){if(RG.length&&ri<0){say("Cochez d’abord votre mode de règlement.",1);goStep(400);const bb=$("#abvbub");if(bb){bb.classList.remove("shake");void bb.offsetWidth;bb.classList.add("shake")}document.querySelectorAll(".abs-rg").forEach(b=>{b.classList.remove("flash");void b.offsetWidth;b.classList.add("flash")});return}return openSig()}
-  if(a==="f2"){if(!s1){say(RG.length&&ri<0?"Cochez d’abord votre mode de règlement.":"Signez d’abord la page 1 (cadre « Pour le Client »).",1);return goStep(400)}if(v2)return;return open2()}
+ const needRg=()=>{say("Cochez d’abord votre mode de règlement.",1);goStep(400);const bb=$("#abvbub");if(bb){bb.classList.remove("shake");void bb.offsetWidth;bb.classList.add("shake")}document.querySelectorAll(".abs-rg").forEach(b=>{b.classList.remove("flash");void b.offsetWidth;b.classList.add("flash")})};
+ function act(a,el){if(sending)return;if(a==="f1")return act("f",{dataset:{f:"0"}});if(a==="f2")return act("f",{dataset:{f:"1"}});
+  if(a==="f"){const j=+((el&&el.dataset&&el.dataset.f)||0);if(RG.length&&ri<0)return needRg();if(j===0)return openSig();
+   if(!s1){say("Signez d’abord le cadre 1"+(F1?" (page "+(F1.p+1)+")":"")+".",1);return goStep(400)}if(V[j])return;const c=curF();if(j!==c){say("Validez d’abord le cadre "+(c+1)+(FR[c]?" (page "+(FR[c].p+1)+")":"")+".",1);return goStep(400)}return open2(j)}
   if(a==="redo")return openSig();if(a==="go2")return goStep(1500);if(a==="send")return send();
-  if(a==="see1"){goStep(500);document.querySelectorAll(".abs-rg").forEach(b=>{b.classList.remove("flash");void b.offsetWidth;b.classList.add("flash")});return}
-  if(a==="see2"&&F1)return show(F1,F1.p,500);if(a==="mod1"){ed1=true;panel();const r=rgBox();if(r)show(r.r,r.p,500);return}if(a==="ok1"){ed1=false;panel();return}}
+  if(a==="cmt"){const d=$("#abvcmd");if(d){d.open=true;const h=$("#abvhead");glide(0,Math.max(0,(h?h.offsetTop:0)-8),400,()=>{const x=$("#abocm");try{x.focus({preventScroll:true})}catch(e){}})}return}}
  document.addEventListener("click",e=>{const b=e.target.closest("#abs [data-act],#abs [data-rg],#abs [data-z]");if(!b)return;
-  if(b.dataset.z!=null){const v=+b.dataset.z;if(!v){setZoom(1);const k=step(),p=k===3&&F2?F2.p:k===2&&F1?F1.p:0,f=$("#abof"+p);if(f)glide(0,Math.max(0,f.offsetTop-12),300)}else setZoom(zoom*(v>0?1.25:1/1.25));return}
-  if(b.dataset.rg!=null)return pick(+b.dataset.rg);act(b.dataset.act)});
+  if(b.dataset.z!=null){const v=+b.dataset.z;if(!v){setZoom(fitZ());setZoom(fitZ())/* 2e passage : barres de défilement apparues ou disparues */;const k=step(),F=k>=2?FR[Math.min(nFr-1,k-2)]:null,p=F?F.p:ZR[0]?ZR[0].p:0,f=$("#abof"+p);if(f)glide(0,Math.max(0,f.offsetTop-12),300)}else setZoom(zoom*(v>0?1.25:1/1.25));return}
+  if(b.dataset.rg!=null)return pick(+b.dataset.rg);act(b.dataset.act,b)});
  window.addEventListener("resize",()=>{clearTimeout(window._abvR);window._abvR=setTimeout(()=>{setZoom(zoom)},150)});
  const ref=()=>{const a="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";let t="";try{const u=new Uint8Array(6);crypto.getRandomValues(u);u.forEach(x=>t+=a[x%a.length])}catch(e){for(let i=0;i<6;i++)t+=a[Math.floor(Math.random()*a.length)]}return "S-"+t};
  async function send(){const c=String(($("#abocm")||{}).value||"").trim().slice(0,1000);if(RG.length&&ri<0){say("Choisissez d’abord votre mode de règlement.",1);return goStep(400)}if(!s1)return act("f1");
-  if(!v2){say("Signez la page 2 : « ✍ Signez ici » puis « ✓ Valider ».",1);return goStep(400)}
+  if(curF()<nFr){const c=curF();say("Signez le cadre "+(c+1)+(FR[c]?" (page "+(FR[c].p+1)+")":"")+" : « ✍ Signez ici » puis « ✓ Valider ».",1);return goStep(400)}
 if(nOk<L.length)return say("Patientez : le contrat n’est pas encore entièrement affiché.",1);
   const go=$("#go");if(go){go.disabled=true;go.textContent="Envoi en cours…"}sending=true;const T=now(),s2=T.hl;
-  const payload={t:"fp-sign",k:"abo",ab:D.ab||"",n:D.n||"",v:+D.v||1,nm:s1.nm,pr:s1.pr,no:s1.no,fn:"",dl:T.dl,hl:s2,h1:s1.h1,h2:v2&&v2.hl||s2,tsl:fd(T.dl)+" à "+s2,sg:s1.sg,sm:s1.sm,sk:s1.sk,rf:ref(),lu:1,rg:ri,rgl:ri>=0?RG[ri]:"",cm:c,gd:2},code="FPSIG:"+b64u(payload);
+  const payload={t:"fp-sign",k:"abo",ab:D.ab||"",n:D.n||"",v:+D.v||1,nm:s1.nm,pr:s1.pr,no:s1.no,fn:"",dl:T.dl,hl:s2,h1:s1.h1,h2:V[nFr-1]||s2,tsl:fd(T.dl)+" à "+s2,sg:s1.sg,sm:s1.sm,sk:s1.sk,rf:ref(),lu:1,rg:ri,rgl:ri>=0?RG[ri]:"",cm:c,gd:3,nf:nFr,hs:V.slice(0,nFr),fp:FR.map(F=>F.p+1)},code="FPSIG:"+b64u(payload);
   let ok=false;if(D.t){try{ok=!!(await sbDep(D.t,payload))}catch(e){ok=false}}
-  if(!ok){sending=false;if(go){go.disabled=false;go.textContent="✓ Valider et envoyer le contrat signé"}const rs=$("#abvres")||document.createElement("div");rs.id="abvres";rs.innerHTML=`<div class="card noprint" id="sigko" style="border-color:var(--ko)" role="alert"><div class="okt" style="color:var(--ko)">Signature non transmise : rien n’a été envoyé</div><p>Le serveur n’a pas répondu : le contrat n’est pas signé. Vérifiez votre connexion puis réessayez ; sinon utilisez le code de secours ci-dessous.</p><button class="go" id="retry" type="button">↻ Réessayer</button>${fbHtml(code,"Contrat signé – "+(D.n||"")+" – "+s1.nm,"Bonjour,\n\n"+s1.nm+" a signé en ligne le contrat d’abonnement N° "+(D.n||"")+" ("+(D.c||"")+"), mais l’envoi automatique a échoué. Voici le code de signature :\n\n")}</div>`;$("#abvp").appendChild(rs);const rt=$("#retry");if(rt)rt.onclick=()=>{rs.remove();send()};try{rs.scrollIntoView({block:"start"})}catch(e){}return}
+  if(!ok){sending=false;if(go){go.disabled=false;go.textContent="✓ Valider et envoyer le contrat signé"}const rs=$("#abvres")||document.createElement("div");rs.id="abvres";rs.innerHTML=`<div class="card noprint" id="sigko" style="border-color:var(--ko)" role="alert"><div class="okt" style="color:var(--ko)">Signature non transmise : rien n’a été envoyé</div><p>Le serveur n’a pas répondu : le contrat n’est pas signé. Vérifiez votre connexion puis réessayez ; sinon utilisez le code de secours ci-dessous.</p><button class="go" id="retry" type="button">↻ Réessayer</button>${fbHtml(code,"Contrat signé – "+(D.n||"")+" – "+s1.nm,"Bonjour,\n\n"+s1.nm+" a signé en ligne le contrat d’abonnement N° "+(D.n||"")+" ("+(D.c||"")+"), mais l’envoi automatique a échoué. Voici le code de signature :\n\n")}</div>`;$("#abvhead").appendChild(rs);glide(0,0,300);const rt=$("#retry");if(rt)rt.onclick=()=>{rs.remove();send()};try{rs.scrollIntoView({block:"start"})}catch(e){}return}
   const done={nm:s1.nm,fn:"",tsl:payload.tsl,sg:payload.sg,rf:payload.rf,sk:payload.sk,rgl:payload.rgl,cm:c};try{localStorage.setItem(KEY,JSON.stringify(done))}catch(e){}
   const a=$("#abs");if(a)a.remove();const d=$("#abodlg");if(d)d.remove();if(d2)d2.remove();document.body.classList.remove("abv-on");$("#res").innerHTML=C.okHtml(done);window.scrollTo(0,0)}
  paint()}
@@ -659,6 +677,8 @@ function aboPage(D){const app=$("#app"),id=new URLSearchParams(location.search).
  const RG=Array.isArray(D.R)?D.R.filter(Boolean).slice(0,6):[],rc0=Number.isInteger(D.rc)&&D.rc>=0&&D.rc<RG.length?D.rc:-1,Z=D.Z&&typeof D.Z==="object"?D.Z:{};
  const zOk=a=>a&&[a.x,a.y,a.w,a.h].every(v=>typeof v==="number"&&v>=0&&v<=1.01)&&Number.isInteger(a.p)&&a.p>=0&&a.p<L.length;
  const ZR=Array.isArray(Z.rg)&&Z.rg.length===RG.length&&Z.rg.every(zOk)?Z.rg:[],F1=zOk(Z.f1)?Z.f1:null,F2=zOk(Z.f2)?Z.f2:null,FB=!F1||!F2||(RG.length&&!ZR.length);
+ /* (17/11) tous les cadres du client (Z.fr, longueur libre) ; anciens liens : f1 / f2 ; lignes du règlement sur chaque page qui les porte (Z.rgp) */
+ const FR=(Array.isArray(Z.fr)&&Z.fr.length?Z.fr:[Z.f1,Z.f2]).filter(zOk).slice(0,30),ZS=(Array.isArray(Z.rgp)&&Z.rgp.length?Z.rgp:[Z.rg||[]]).filter(s=>Array.isArray(s)&&s.length===RG.length&&s.length&&s.every(zOk)).slice(0,12);
  const pc=a=>`left:${(nf(a.x)*100).toFixed(2)}%;top:${(nf(a.y)*100).toFixed(2)}%;width:${(nf(a.w)*100).toFixed(2)}%;height:${(nf(a.h)*100).toFixed(2)}%`;
  const rgT=l=>{const m=String(l).match(/^(.*?)\s*\/\s*(.*)$/);const cap=t=>t?t.charAt(0).toUpperCase()+t.slice(1).toLowerCase():"";const acc=t=>t.replace(/^Prelevement/,"Prélèvement");return m?[cap(m[1]),acc(cap(m[2]))]:[String(l),""]};
  const info=`<div class="card emgs-c"><div class="emgs-h"><img src="logo.jpg" alt="" style="height:48px"><div><div class="emgs-o">${esc(org)}</div><h1 class="emgs-t">${esc(TT)}</h1><div class="abo-sub">${esc([D.of||D.s,D.c].filter(Boolean).join(" · "))}</div></div></div>
@@ -676,7 +696,7 @@ function aboPage(D){const app=$("#app"),id=new URLSearchParams(location.search).
   <div class="abs-nm"><div><label for="spr">Prénom</label><input type="text" id="spr" autocomplete="given-name" value="${esc(pa0.length>1?pa0[0]:"")}"></div><div><label for="sno">NOM</label><input type="text" id="sno" autocomplete="family-name" value="${esc(pa0.length>1?pa0.slice(1).join(" "):pa0[0]||"")}"></div></div>
   <div id="sgw"></div><div class="err" id="err1" role="alert"></div><div class="abs-dlga"><button type="button" class="abs-no" id="dlgno">Annuler</button><button type="button" class="go" id="dlgok">✓ Valider ma signature</button></div></div></div>`;
  const okHtml=()=>`<div class="card okb noprint" id="abo-ok"><div class="okt">✔ Merci, votre contrat est signé !</div><p>${esc(org)} a bien reçu votre signature. Vous recevrez votre exemplaire signé par e-mail.</p><div class="sgfm">✅ Signé électroniquement par ${esc(done.nm)}${done.fn?" ("+esc(done.fn)+")":""} le ${esc(done.tsl)}${done.rf?" · réf. "+esc(done.rf):""}${kt(done.sk)} · Lu et approuvé : contrat (page 1) et CGV (page 2)</div>${done.rgl?`<p>Mode de règlement choisi : <b>${esc(done.rgl)}</b></p>`:""}${done.cm?`<p>Votre commentaire : « ${esc(done.cm)} »</p>`:""}${done.sg?sigSvg(done.sg):""}<p>Vous pouvez fermer cette page.</p></div>`;
- if(!FB&&!done&&L.length&&!window.ABO_V1){aboPageV2({D,app,id,org,cm,L,KEY,TT,info,RG,rc0,ZR,F1,F2,rgT,pa0,okHtml:x=>{done=x;return okHtml()}});return}/* 13/11 : visionneuse zoomable + signature guidée lisible */
+ if(!done&&L.length&&!window.ABO_V1&&FR.length&&!(RG.length&&!ZS.length)){aboPageV2({D,app,id,org,cm,L,KEY,TT,info,RG,rc0,ZR,ZS,FR,F1,F2,rgT,pa0,okHtml:x=>{done=x;return okHtml()}});return}/* 13/11 : visionneuse zoomable + signature guidée lisible */
  app.innerHTML=info+(done?okHtml():`<div id="abs"><div class="card abo-pgs">${figs}</div>${fb}${fin}</div>${dlg}<div class="abs-msg" id="abomsg" role="status" aria-live="polite" hidden></div>`)+'<div id="res"></div>';
  let nOk=0;
  L.forEach(async(u,i)=>{const f=document.getElementById("abof"+i),st=f&&f.querySelector(".abos");if(!st)return;if(!u.cle||!id){st.textContent="Page indisponible.";return}
