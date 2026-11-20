@@ -644,6 +644,10 @@ async function main(){
  const F=D.f.map((f,ix)=>({f,ix,s:stat(f),a:DS(f)[0]||"9999"})).sort((x,y)=>x.a.localeCompare(y.a)),by=k=>F.filter(x=>x.s===k);
  const pr=(D.p||String(D.i||"").split(" ")[0]||"").trim(),mo=T.slice(0,7);
  // interventions (bons de livraison) : section affichée seulement pour qui en a (technicien, commercial, ou les deux rôles)
+ /* (20/11) règle des 7 jours : un BL ni signé ni « envoyé sans signature » 7 jours après la date d'intervention (ou après un renvoi « à faire signer »
+    par TOPAS) quitte l'espace ; au bureau il apparaît « NON signé ». Jamais s'il attend un envoi sur ce téléphone (signature ou envoi sans signature). */
+ const ns7=t=>{if(!t||t.s||t.k==="bi"||!/^\d{4}-\d\d-\d\d/.test(t.d||""))return false;const r0=String(t.rs||"").slice(0,10),d0=r0>t.d?r0:t.d;if(dd(d0,T)<7)return false;return !LS.get(RK("bl:"+t.i),[]).length&&!LS.get(RK("blns:"+t.i),[]).length};
+ if(Array.isArray(D.it))D.it=D.it.filter(t=>!ns7(t));
  const IT=(Array.isArray(D.it)?D.it:[]).map((t,ix)=>({t,ix})),shF=D.r?!!(D.r.f||D.f.length):true,shT=IT.length>0||!!(D.r&&D.r.t);
  const allD=F.flatMap(x=>DS(x.f).map(d=>({x,d}))),nUp=F.filter(x=>x.s==="venir").length,nMo=allD.filter(o=>o.d.slice(0,7)===mo).length,hUp=allD.filter(o=>o.d>=T).reduce((a,o)=>a+hOf(o.x.f,o.d),0);
  const nx=allD.filter(o=>o.d>T).sort((a,b)=>a.d.localeCompare(b.d))[0];
@@ -857,7 +861,7 @@ async function main(){
   <button type="button" class="ip7-go" data-bl7="${ix}:sign">✍ Faire signer le client</button>
   <div class="ip7-4"><button type="button" class="ip7-3b" data-bl7="${ix}:voir"><i aria-hidden="true">👁</i><span>Voir le BL</span></button>${t.a?`<a class="ip7-3b" href="${itMaps(t)}" target="_blank" rel="noopener"><i aria-hidden="true">🧭</i><span>Itinéraire</span></a>`:`<span class="ip7-3b ip7-3x"><i aria-hidden="true">🧭</i><span>Itinéraire</span></span>`}<button type="button" class="ip7-3b" data-bl7="${ix}:photos"><i aria-hidden="true">📷</i><span>Photos</span></button><button type="button" class="ip7-3b" data-bl7="${ix}:rem"><i aria-hidden="true">✎</i><span>Remarque</span></button></div>
   <div class="ip7-img hide" id="ip7img">${imgBox(ix)}</div>
-  <p class="ip7-abs">Client absent ? <button type="button" class="ip7-lnk" data-blns="${ix}">Envoyer sans signature</button></p></div>${foot()}`}
+  ${late?`<button type="button" class="ip7-nsb" data-blns="${ix}"><i aria-hidden="true">📤</i><span><b>Envoyer sans signature</b><small>Client absent ou refus de signer</small></span></button>`:`<p class="ip7-abs">Client absent ? <button type="button" class="ip7-lnk" data-blns="${ix}">Envoyer sans signature</button></p>`}</div>${foot()}`}
  // ---- formation en retard : « Envoyer à l'ADV sans signature » = les feuilles d'émargement partent telles quelles, avec le motif ; au bureau la pièce passe
  // « Non fourni » avec ce motif (retNfAsk / s.ret, étape 7 orange non bloquante). Rien n'est effacé, les signatures déjà faites restent.
  const EMNSR=["Feuilles papier remises au bureau","Stagiaires partis avant de signer","Oubli","Autre…"];
@@ -2132,6 +2136,7 @@ body.ip-fx{padding-bottom:calc(100px + env(safe-area-inset-bottom,0px))}
 .ip7-bh0~.ve-in .ip7-go,.ip7-kv+.ip7-go{margin-top:12px}
 .ip7-img{margin-top:10px}.ip7-img.hide{display:none}
 .ip7-abs{margin:14px 0 0;text-align:center;font-size:15px;color:#374151}
+/* (20/11) BL en retard : « 📤 Envoyer sans signature » en vrai bouton sous « Faire signer le client » (le petit lien reste pour un bon du jour) */.ip7-nsb{display:flex;align-items:center;gap:12px;width:100%;min-height:58px;margin:12px 0 0;padding:8px 16px;border:2px solid #b91c1c;border-radius:14px;background:#fff;color:#b91c1c;font-family:inherit;cursor:pointer;text-align:left}.ip7-nsb:hover{background:#fef2f2}.ip7-nsb i{font-style:normal;font-size:24px;line-height:1}.ip7-nsb span{display:flex;flex-direction:column;gap:2px;min-width:0}.ip7-nsb b{font-size:17px;font-weight:800}.ip7-nsb small{font-size:14px;font-weight:500;color:#7f1d1d}
 .ip7-lnk{min-height:44px;padding:0 6px;border:0;background:none;color:#1e3a8a;font:700 15px inherit;font-family:inherit;text-decoration:underline;cursor:pointer}
 .ip7-nsw{margin:12px 0 0;text-align:center}.ip7-lnkc{display:block;margin:8px auto 0}
 .ip7-sheet{position:fixed;inset:0;z-index:90;display:flex;align-items:flex-end;justify-content:center;background:rgba(15,23,42,.45)}
