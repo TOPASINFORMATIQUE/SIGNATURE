@@ -360,6 +360,65 @@ function rapPage(D){const app=$("#app"),G=Array.isArray(D.g)?D.g:[],org=String(D
    $("#rpplus").innerHTML='<button type="button" class="btn" id="rpp" style="margin-top:14px">Envoyer ces précisions</button>';const pb=$("#rpp");
    pb.onclick=async()=>{const v=val();if(!v.tel&&!v.mom){m.className="msg";m.textContent="Indiquez un numéro ou un moment, puis envoyez.";return}pb.disabled=true;m.className="msg";m.textContent="Envoi…";try{await send("plus",v);m.textContent="✓ Précisions envoyées. Merci !";pb.textContent="✓ Précisions envoyées";pb.onclick=null;setTimeout(()=>{pb.disabled=false;pb.textContent="Envoyer ces précisions";pb.onclick=pb.__f},4000)}catch(e){pb.disabled=false;m.className="msg ko";m.textContent="Les précisions n’ont pas pu être envoyées. Réessayez."}};pb.__f=pb.onclick}
   catch(e){busy=false;b.disabled=false;m.className="msg ko";m.textContent="Votre demande n’a pas pu être envoyée. Vérifiez votre connexion et réessayez."+(mail?" Vous pouvez aussi écrire à "+mail+".":"")}}}
+// (24/11) Diagnostic sécurité gratuit (lien court de type « diag », questions dans le contenu du lien, écrites par TOPAS Formation) :
+// 10 questions Oui / Non / Je ne sais pas, résultat et 3 conseils affichés tout de suite, sur le téléphone seulement (rien n'est envoyé pendant les questions).
+// Un seul dépôt « fp-diag » (deposer_lien) au clic « Être rappelé(e) », case d'accord cochée. La page ne lit rien d'autre que son lien.
+function diagPage(D){const app=$("#app"),org=String(D.og||""),mail=String(D.m||FB_MAIL||""),web=/^https:\/\/[^\s"'<>]+$/.test(String(D.w||""))?String(D.w):"";
+ const Q=(Array.isArray(D.qs)?D.qs:[]).filter(q=>Array.isArray(q)&&q[0]&&q[1]).slice(0,20).map(q=>({k:String(q[0]).slice(0,20),q:String(q[1]).slice(0,240),h:String(q[2]||"").slice(0,240),w:Math.max(0,+q[3]||0),r:String(q[4]||"").slice(0,240)}));
+ const NB=(Array.isArray(D.nb)?D.nb:[]).map(x=>String(x).slice(0,30)).slice(0,8),TOT=Q.reduce((s,q)=>s+q.w,0)||1,A={};let i=-1,busy=false,done=false;
+ document.title="Diagnostic sécurité gratuit";
+ try{const g=document.getElementById("rgpdm");if(g)g.style.display="none"}catch(e){}/* mention propre au diagnostic, écrite dans la page (prospection, pas formation) */
+ const st=`<style>.dg{max-width:680px;margin:0 auto}.dg .hd{display:flex;align-items:center;gap:14px;margin:0 0 6px}.dg .hd img{height:52px;width:auto}.dg .org{font-size:14px;color:#475569;font-weight:600}.dg h1{font-size:24px;line-height:1.25;margin:4px 0 6px;color:#0f2a6b}.dg p{font-size:16px;line-height:1.5;margin:8px 0}.dg .lead{font-size:17px;color:#1e293b}
+.dg .pts{list-style:none;padding:0;margin:14px 0}.dg .pts li{display:flex;gap:10px;align-items:center;font-size:16px;padding:6px 0;color:#1e293b}.dg .pts li b{flex:0 0 34px;height:34px;border-radius:50%;background:#eff6ff;color:#1d4ed8;display:flex;align-items:center;justify-content:center;font-size:15px}
+.dg .go{display:block;width:100%;min-height:54px;font-size:18px;font-weight:800;background:#1d4ed8;color:#fff;border-radius:14px;margin-top:14px}.dg .go:disabled{opacity:.7}
+.dg .bar{height:8px;background:#e2e8f0;border-radius:99px;overflow:hidden;margin:6px 0 4px}.dg .bar i{display:block;height:100%;background:#1d4ed8;border-radius:99px;transition:width .25s}.dg .stp{font-size:14px;color:#475569;font-weight:600}
+.dg .qq{font-size:21px;font-weight:800;line-height:1.35;color:#0f172a;margin:16px 0 6px}.dg .qh{font-size:15px;color:#475569;margin:0 0 14px}
+.dg .an{display:grid;gap:10px}.dg .an button{min-height:56px;font-size:18px;font-weight:700;border-radius:14px;background:#fff;border:2px solid #cbd5e1;color:#0f172a;text-align:left;padding:0 18px}.dg .an button:hover{border-color:#1d4ed8;background:#f8fbff}.dg .an button[aria-pressed=true]{border-color:#1d4ed8;background:#eff6ff}
+.dg .bk{background:none;border:0;color:#1d4ed8;font-weight:700;font-size:16px;padding:12px 0;min-height:44px}
+.dg .sc{display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin:8px 0 6px}.dg .gauge{flex:0 0 auto;width:120px;height:120px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:conic-gradient(var(--c) calc(var(--p)*1%),#e2e8f0 0)}.dg .gauge span{width:92px;height:92px;border-radius:50%;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:30px;font-weight:800;color:#0f172a}.dg .gauge small{font-size:14px;color:#475569;font-weight:600}
+.dg .nv{font-size:22px;font-weight:800;margin:0}.dg .nv.v{color:#15803d}.dg .nv.o{color:#b45309}.dg .nv.r{color:#b91c1c}
+.dg .rc{list-style:none;padding:0;margin:8px 0}.dg .rc li{background:#f8fafc;border-left:4px solid #1d4ed8;border-radius:8px;padding:10px 12px;margin:8px 0;font-size:16px;color:#0f172a}
+.dg form{border-top:1px solid #e2e8f0;margin-top:18px;padding-top:6px}.dg h2{font-size:19px;color:#0f2a6b;margin:14px 0 4px}.dg label{display:block;font-weight:700;font-size:15px;margin:12px 0 5px;color:#1e293b}.dg input[type=text],.dg input[type=email],.dg input[type=tel],.dg select{width:100%;min-height:48px;font-size:17px;padding:10px 12px;border:1px solid #cbd5e1;border-radius:10px;background:#fff;color:#0f172a;font-family:inherit}.dg .g2{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
+.dg .ck{display:flex;gap:10px;align-items:flex-start;font-weight:600;font-size:15px;margin:16px 0 4px;min-height:44px}.dg .ck input{width:22px;height:22px;margin:2px 0 0;flex:0 0 auto}
+.dg .rg{font-size:14px;color:#475569;line-height:1.45}.dg .msg{min-height:22px;font-size:15px;margin:10px 0 0}.dg .msg.ko{color:#b91c1c}.dg .merci{background:#f0fdf4;border:1px solid #86efac;border-radius:12px;padding:14px 16px;color:#14532d;font-size:17px;font-weight:700}.dg .hp{position:absolute;left:-5000px;width:1px;height:1px;overflow:hidden}
+@media (max-width:700px){.dg .g2{grid-template-columns:1fr}.dg h1{font-size:22px}.dg .qq{font-size:19px}}</style>`;
+ const head=`<div class="hd"><img src="logo.jpg" alt="${esc(org||"Logo")}" onerror="this.remove()"><div class="org">${esc(org)}</div></div>`;
+ const foot=`<p class="rg" style="margin-top:16px">${esc(org)}${mail?` · <a href="mailto:${esc(mail)}">${esc(mail)}</a>`:""}${web?` · <a href="${esc(web)}" target="_blank" rel="noopener">${esc(web.replace(/^https:\/\/|\/$/g,""))}</a>`:""}</p>`;
+ const score=()=>Math.round(Q.reduce((s,q)=>s+(A[q.k]==="o"?q.w:0),0)*100/TOT);
+ const nv=s=>s>=75?["v","Bon niveau","#15803d","Votre informatique est bien protégée. Quelques points peuvent encore être améliorés."]:s>=45?["o","À renforcer","#d97706","Les bases sont là, mais plusieurs portes restent ouvertes."]:["r","À risque","#dc2626","Votre entreprise est exposée : une panne ou un piratage pourrait bloquer votre activité."];
+ const intro=()=>{app.innerHTML=`${st}<div class="card dg">${head}<h1>Diagnostic sécurité gratuit</h1><p class="lead">Votre entreprise est-elle bien protégée contre les pannes, les virus et le piratage ? Répondez à ${Q.length} questions simples.</p>
+ <ul class="pts"><li><b>1</b>${Q.length} questions, environ 2 minutes</li><li><b>2</b>Votre résultat et nos conseils tout de suite</li><li><b>3</b>Si vous le souhaitez, un expert vous rappelle, sans engagement</li></ul>
+ <p class="rg">Rien n’est enregistré pendant les questions : vos réponses restent sur votre écran tant que vous ne demandez pas à être rappelé(e).</p><button type="button" class="go" id="dggo">Commencer le diagnostic</button>${foot}</div>`;$("#dggo").onclick=()=>{i=0;quest()}};
+ const quest=()=>{const q=Q[i];app.innerHTML=`${st}<div class="card dg">${head}<div class="stp">Question ${i+1} sur ${Q.length}</div><div class="bar" aria-hidden="true"><i style="width:${Math.round(i*100/Q.length)}%"></i></div>
+ <h1 class="qq" id="dgq" tabindex="-1">${esc(q.q)}</h1>${q.h?`<p class="qh">${esc(q.h)}</p>`:'<p class="qh"></p>'}<div class="an" role="group" aria-labelledby="dgq">${[["o","Oui"],["n","Non"],["?","Je ne sais pas"]].map(([v,l])=>`<button type="button" data-v="${v}" aria-pressed="${A[q.k]===v}">${l}</button>`).join("")}</div>
+ <button type="button" class="bk" id="dgbk">‹ ${i?"Question précédente":"Retour"}</button></div>`;
+  app.querySelectorAll(".an button").forEach(b=>b.onclick=()=>{A[q.k]=b.dataset.v;i++;if(i<Q.length)quest();else res()});$("#dgbk").onclick=()=>{if(i>0){i--;quest()}else intro()};try{$("#dgq").focus({preventScroll:true});window.scrollTo(0,0)}catch(e){}};
+ const res=()=>{const s=score(),n=nv(s),R=Q.filter(q=>A[q.k]!=="o"&&q.r).sort((a,b)=>b.w-a.w).slice(0,3);
+  app.innerHTML=`${st}<div class="card dg">${head}<div class="stp">Votre résultat</div><div class="sc"><div class="gauge" style="--p:${s};--c:${n[2]}" role="img" aria-label="Score ${s} sur 100"><span>${s}<small>/ 100</small></span></div><div><p class="nv ${n[0]}">${esc(n[1])}</p><p>${esc(n[3])}</p></div></div>
+  ${R.length?`<h2>Nos 3 conseils prioritaires</h2><ul class="rc">${R.map(q=>`<li>${esc(q.r)}</li>`).join("")}</ul>`:`<p>Bravo : toutes les bonnes pratiques de ce diagnostic sont en place.</p>`}
+  <div id="dgz"><form id="dgf" novalidate><h2>Être rappelé(e) par un expert</h2><p>Gratuit et sans engagement : nous faisons le point avec vous sur votre résultat.</p>
+  <label for="dgso">Société *</label><input type="text" id="dgso" maxlength="120" autocomplete="organization" required>
+  <div class="g2"><div><label for="dgnm">Nom et prénom *</label><input type="text" id="dgnm" maxlength="80" autocomplete="name" required></div><div><label for="dgfn">Fonction</label><input type="text" id="dgfn" maxlength="80" autocomplete="organization-title" placeholder="Gérant, comptable…"></div></div>
+  <div class="g2"><div><label for="dge">E-mail professionnel *</label><input type="email" id="dge" maxlength="120" autocomplete="email" inputmode="email" required></div><div><label for="dgtel">Téléphone</label><input type="tel" id="dgtel" maxlength="20" autocomplete="tel" inputmode="tel" placeholder="06 12 34 56 78"></div></div>
+  <div class="g2"><div><label for="dgnb">Nombre d’ordinateurs</label><select id="dgnb"><option value="">—</option>${NB.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join("")}</select></div><div><label for="dgcp">Code postal</label><input type="text" id="dgcp" maxlength="5" inputmode="numeric" autocomplete="postal-code"></div></div>
+  <div class="hp" aria-hidden="true"><label for="dgsite">Ne pas remplir</label><input type="text" id="dgsite" tabindex="-1" autocomplete="off"></div>
+  <label class="ck" for="dgok"><input type="checkbox" id="dgok"> <span>J’accepte que ${esc(org||"l’entreprise")} me recontacte au sujet de ce diagnostic et me présente ses services. *</span></label>
+  <p class="rg">Vos réponses et vos coordonnées sont envoyées à ${esc(org||"l’entreprise")} seulement quand vous cliquez sur le bouton ci-dessous. Elles servent uniquement à vous recontacter au sujet de ce diagnostic et à vous présenter nos services, et sont conservées 3 ans après notre dernier échange. Vous pouvez y accéder, les corriger ou demander leur effacement${mail?` en écrivant à <a href="mailto:${esc(mail)}">${esc(mail)}</a>`:""}.</p>
+  <button type="submit" class="go" id="dgsend">Être rappelé(e) par un expert</button><p class="msg" id="dgm" role="status"></p></form></div>
+  <button type="button" class="bk" id="dgre">↺ Refaire le diagnostic</button>${foot}</div>`;window.scrollTo(0,0);
+  $("#dgre").onclick=()=>{if(done)return;i=0;quest()};
+  $("#dgf").onsubmit=async ev=>{ev.preventDefault();if(busy||done)return;const v=id=>String(($(id)||{}).value||"").trim(),m=$("#dgm");m.className="msg ko";
+   const so=v("#dgso"),nm=v("#dgnm"),e=v("#dge"),cp=v("#dgcp");
+   if(!so||!nm||!e){m.textContent="Indiquez votre société, votre nom et votre e-mail.";return}if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)){m.textContent="L’adresse e-mail n’est pas valide.";return}if(cp&&!/^\d{5}$/.test(cp)){m.textContent="Le code postal doit avoir 5 chiffres.";return}
+   if(!$("#dgok").checked){m.textContent="Cochez la case d’accord pour être rappelé(e).";return}
+   const ok=()=>{done=true;$("#dgz").innerHTML=`<p class="merci" role="status">Merci, c’est noté. Un expert ${esc(org)} vous rappelle très vite pour faire le point sur votre résultat.</p>`;const r=$("#dgre");if(r)r.remove()};
+   if(v("#dgsite")){ok();return}/* robot : rien n'est envoyé */
+   busy=true;const b=$("#dgsend");b.disabled=true;m.className="msg";m.textContent="Envoi…";
+   const a={};Q.forEach(q=>{a[q.k]=A[q.k]==="o"||A[q.k]==="n"?A[q.k]:"?"});
+   const p={t:"fp-diag",k:"diag",a,sc:score(),so,nm,fn:v("#dgfn"),e,tel:v("#dgtel").replace(/[^\d+ .]/g,"").slice(0,20),nb:v("#dgnb"),cp,ok:1,d:new Date().toISOString()};
+   try{await sbDep(String(D.t||""),p);ok();m.textContent=""}catch(err){busy=false;b.disabled=false;m.className="msg ko";m.textContent="Votre demande n’a pas pu être envoyée. Vérifiez votre connexion et réessayez."+(mail?" Vous pouvez aussi écrire à "+mail+".":"")}}};
+ if(!Q.length){app.innerHTML=`${st}<div class="card dg">${head}<h1>Diagnostic sécurité</h1><p>Ce diagnostic n’est pas disponible pour le moment.</p>${foot}</div>`;return}
+ intro()}
 // (23/11) « Mieux vous connaître » (lien du mail de bienvenue, type « client ») : le client vérifie / complète ses coordonnées et ses interlocuteurs.
 // Rien n'est envoyé à l'ouverture ; un seul dépôt « fp-cli » au clic « Valider » (deposer_lien). TOPAS reprend ensuite ce qu'il veut sur la fiche.
 function cliPage(D){const app=$("#app"),G=Array.isArray(D.g)?D.g:[],org=String(D.og||G[0]||""),so=String(D.so||""),mail=String(D.m||G[3]||FB_MAIL||""),I=D.i&&typeof D.i==="object"?D.i:{};let busy=false,done=false;
@@ -855,6 +914,7 @@ if(D&&D.k==="blc"){blcPage(D);return}
 if(D&&D.k==="cert"){certPage(D);return}
 if(D&&D.k==="rap"){rapPage(D);return}
 if(D&&D.k==="cli"){cliPage(D);return}
+if(D&&D.k==="diag"){diagPage(D);return}
 const app=$("#app");
 if(!D||!D.n||!D.g){app.innerHTML='<div class="card"><h1>Lien incomplet</h1><p>Ce lien de signature est incomplet ou a été modifié. Merci de rouvrir le lien reçu par e-mail, tel quel, ou de contacter l’organisme de formation.</p></div>';return}
 const plan=D.k==="plan",dev=D.k==="dev",ro=!!D.ro,G=D.g,C=D.c||D.cl||["","",""],tr=D.tr||[];
