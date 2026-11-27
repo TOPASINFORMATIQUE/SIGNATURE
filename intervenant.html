@@ -1759,6 +1759,8 @@ const hMin=h=>{const m=/^(\d\d):(\d\d)$/.exec(String(h||""));return m?(+m[1])*60
   if(!enqueue([p])){LS.set(TPK,R0);return tpErr("Impossible d’enregistrer sur ce téléphone (mémoire pleine ou navigation privée). Rien n’a été envoyé.")}
   const ed=s.ed;TS=null;nav({v:"list"});flash(ann?"Demande d’annulation envoyée à TOPAS informatique":ed?"Intervention modifiée · planning mis à jour":"Intervention créée · ajoutée à votre planning",1)}
  // ouverture depuis le rendez-vous Outlook : intervenant.html?tp=identifiant
+ // (27/11) lien du mail « Évaluation avant / après » : ?ev=N°&t=av|ap ouvre directement l’évaluation de cette formation (espace déjà ouvert sur l’appareil)
+ function evDeep(){try{const q=new URLSearchParams(location.search),n=q.get("ev"),ty=q.get("t")==="ap"?"ap":"av";if(!n||!D||!Array.isArray(D.f))return;const ix=D.f.findIndex(f=>f&&String(f.n)===n);if(ix<0||D.f[ix].dc)return;nav({v:"evl",ix,ty})}catch(e){}}
  function tpDeep(){try{const id=new URLSearchParams(location.search).get("tp");if(id&&/^[A-Za-z0-9-]{2,40}$/.test(id)&&tpAll().some(t=>t.tid===id))tpStart(id)}catch(e){}}
  function tpBindAll(){document.querySelectorAll("[data-tpe]").forEach(b=>b.onclick=()=>tpStart(b.dataset.tpe));document.querySelectorAll("[data-bin]").forEach(b=>b.onclick=()=>nav({v:"bid",n:b.dataset.bin}));document.querySelectorAll("[data-tpn]").forEach(b=>b.onclick=()=>tpStart());if(V.v==="tp")tpBind()}
  // (03/11, G) un seul bouton de création ＋ (vert d'eau, barre du bas) : il ouvre DIRECTEMENT le bon d'intervention ; le bon est aussi ajouté
@@ -1878,7 +1880,7 @@ const tpFab=()=>"";
  }
  try{history.replaceState({v:{v:"list"}},"")}catch(e){}
  window.addEventListener("beforeunload",e=>{const dirty=(AQ&&Object.values(AQ.all||{}).some(z=>z&&z.dirty))||(BI&&BI.dirty);if(dirty){e.preventDefault();e.returnValue=""}});
- view();tpDeep();flush();setTimeout(()=>{prefetch().catch(()=>{})},400);setTimeout(phCatch,1500);setInterval(phCatch,120000);window.addEventListener("online",()=>prefetch().catch(()=>{}));
+ view();tpDeep();evDeep();flush();setTimeout(()=>{prefetch().catch(()=>{})},400);setTimeout(phCatch,1500);setInterval(phCatch,120000);window.addEventListener("online",()=>prefetch().catch(()=>{}));
  if(EJ){window.addEventListener("online",async()=>{if(!hors||V.v!=="list")return;try{await flush()}catch(e){}if(FP||Q().length)return;try{const r=await espLoad(EJ);if(!r.hors){D=r.D;location.reload()}}catch(e){}});
   document.addEventListener("click",e=>{if(e.target.closest("[data-insok]")){LS.set("fpiv:inst",1);const i=document.getElementById("inst");if(i)i.remove()}});
   try{if("serviceWorker" in navigator&&location.protocol==="https:")navigator.serviceWorker.register("sw.js").catch(()=>{})}catch(e){}}
